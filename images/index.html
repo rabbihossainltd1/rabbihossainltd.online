@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Test</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#0a0a0a;
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      flex-direction:column;
+      gap:30px;
+      padding:20px;
+    }
+
+    .card{
+      width:350px;
+      background:#111;
+      border:1px solid #00ff88;
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 0 25px rgba(0,255,136,0.3);
+      text-align:center;
+    }
+
+    .card img{
+      width:100%;
+      display:block;
+    }
+
+    .card h2{
+      padding:15px;
+      color:#00ff88;
+    }
+
+    .banner{
+      width:100%;
+      max-width:900px;
+      height:300px;
+      border-radius:20px;
+      background-image:url('images/bg.jpg');
+      background-size:cover;
+      background-position:center;
+      border:2px solid #00ff88;
+      box-shadow:0 0 30px rgba(0,255,136,0.25);
+    }
+
+    .logo{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      border:3px solid #00ff88;
+      box-shadow:0 0 20px rgba(0,255,136,0.4);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <img src="images/logo.png" class="logo" alt="Logo">
+
+  <!-- Profile Card -->
+  <div class="card">
+    <img src="images/profile.jpg" alt="Profile">
+    <h2>MD Rabbi Hossain</h2>
+  </div>
+
+  <!-- Banner Background -->
+  <div class="banner"></div>
+
+</body>
+</html>
