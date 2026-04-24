@@ -1,0 +1,169 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  background:#050505;
+  color:white;
+}
+
+a{
+  text-decoration:none;
+  color:white;
+}
+
+.home{
+  width:100%;
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+}
+
+.bg{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+}
+
+.home-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  padding:20px;
+}
+
+.profile{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #00ff88;
+  margin-bottom:22px;
+}
+
+.home-content h1{
+  font-size:48px;
+  margin-bottom:10px;
+}
+
+.home-content p{
+  color:#cfcfcf;
+  margin-bottom:35px;
+}
+
+.menu-box{
+  display:grid;
+  gap:15px;
+  width:260px;
+  margin:auto;
+}
+
+.menu-box a{
+  padding:16px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(0,255,136,0.35);
+  color:#00ff88;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+.menu-box a:hover{
+  background:#00ff88;
+  color:#000;
+}
+
+nav{
+  width:100%;
+  padding:18px;
+  display:flex;
+  justify-content:center;
+  gap:22px;
+  background:#0b0b0b;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+nav a{
+  color:#00ff88;
+  font-weight:bold;
+}
+
+.page{
+  padding:60px 7%;
+  text-align:center;
+}
+
+.page h1{
+  font-size:40px;
+  color:#00ff88;
+  margin-bottom:35px;
+}
+
+.card{
+  background:#111;
+  border:1px solid rgba(0,255,136,0.25);
+  border-radius:20px;
+  padding:20px;
+  max-width:700px;
+  margin:auto;
+}
+
+.card img{
+  width:100%;
+  border-radius:16px;
+  margin-bottom:18px;
+}
+
+.page-img{
+  max-width:260px;
+  height:260px;
+  object-fit:cover;
+  border-radius:50%;
+  border:4px solid #00ff88;
+}
+
+.card p{
+  color:#cfcfcf;
+  line-height:1.8;
+  margin-bottom:15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:22px;
+}
+
+.grid .card{
+  max-width:none;
+}
+
+.card h3{
+  color:#00ff88;
+  margin-top:10px;
+}
+
+@media(max-width:600px){
+  .home-content h1{
+    font-size:34px;
+  }
+
+  nav{
+    gap:14px;
+    font-size:14px;
+  }
+}
