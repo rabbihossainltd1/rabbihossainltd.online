@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Credit | Rabbi Hossain LTD</title>
+  <meta name="description" content="Manual wallet credit and instant service payment page." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .wallet-page { min-height:100vh; padding:130px 20px 70px; background:radial-gradient(circle at top, rgba(0,255,136,0.10), transparent 35%), #02050a; }
+    .wallet-wrap { max-width:980px; margin:0 auto; display:grid; grid-template-columns:1.15fr .85fr; gap:22px; align-items:start; }
+    .wallet-card { background:rgba(255,255,255,0.055); border:1px solid rgba(0,200,255,0.16); border-radius:24px; padding:26px; box-shadow:0 28px 80px rgba(0,0,0,0.42); backdrop-filter:blur(16px); }
+    .wallet-title { font-size:clamp(2rem,5vw,3.4rem); color:#e8edf5; line-height:1.04; margin-bottom:12px; }
+    .wallet-sub { color:#7a8ca8; line-height:1.7; margin-bottom:20px; }
+    .wallet-balance { display:flex; justify-content:space-between; gap:14px; align-items:center; background:rgba(0,255,136,.08); border:1px solid rgba(0,255,136,.20); border-radius:18px; padding:16px; margin-bottom:20px; }
+    .wallet-balance span { color:#8fa2bb; font-size:.86rem; }
+    .wallet-balance strong { display:block; color:#00ff88; font-size:1.5rem; margin-top:3px; }
+    .wallet-grid { display:grid; gap:15px; }
+    .wallet-field label { display:block; color:#c9d4e5; font-weight:800; margin-bottom:8px; font-size:.9rem; }
+    .wallet-field select, .wallet-field input { width:100%; padding:14px 15px; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.30); color:#e8edf5; outline:none; font-size:.94rem; }
+    .wallet-field select:focus, .wallet-field input:focus { border-color:rgba(0,200,255,.45); }
+    .payment-box { background:rgba(0,200,255,.06); border:1px solid rgba(0,200,255,.16); border-radius:18px; padding:17px; }
+    .payment-box small { color:#7a8ca8; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .payment-box strong { display:block; color:#00ff88; font-size:1.45rem; margin:8px 0; word-break:break-word; }
+    .payment-note { color:#93a4bb; line-height:1.65; font-size:.9rem; margin:6px 0 0; }
+    .copy-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+    .copy-btn { border:1px solid rgba(255,255,255,.11); border-radius:999px; padding:10px 12px; color:#e8edf5; background:rgba(255,255,255,.055); cursor:pointer; font-weight:800; }
+    .copy-btn:hover { border-color:rgba(0,200,255,.4); color:#00c8ff; }
+    .amount-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .wallet-btn { width:100%; border:0; border-radius:999px; padding:15px 18px; cursor:pointer; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; font-weight:900; box-shadow:0 18px 50px rgba(0,200,255,.13); }
+    .wallet-btn:disabled { opacity:.55; cursor:not-allowed; }
+    .wallet-link { display:block; text-align:center; margin-top:14px; color:#7a8ca8; text-decoration:none; }
+    .wallet-link:hover { color:#00c8ff; }
+    .wallet-message { display:none; margin:14px 0; padding:13px 14px; border-radius:14px; font-size:0.92rem; }
+    .wallet-message.success { display:block; color:#a7ffcf; background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.22); }
+    .wallet-message.error { display:block; color:#ffb0b0; background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.22); }
+    .request-list { display:grid; gap:12px; }
+    .request-card, .empty-state { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px; color:#c9d4e5; }
+    .request-card div { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:8px; }
+    .request-card p { color:#7a8ca8; margin:6px 0 0; word-break:break-word; }
+    .status { padding:5px 10px; border-radius:999px; font-size:0.74rem; text-transform:uppercase; font-weight:800; }
+    .status.pending { color:#ffe7a3; background:rgba(255,200,80,0.12); }
+    .status.approved { color:#a7ffcf; background:rgba(0,255,136,0.12); }
+    .status.declined { color:#ffb0b0; background:rgba(255,80,80,0.12); }
+    #authRequired { display:none; max-width:560px; margin:0 auto; text-align:center; }
+    .service-chip { display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:999px; background:rgba(0,255,136,.08); border:1px solid rgba(0,255,136,.20); color:#a7ffcf; font-size:.86rem; margin-bottom:16px; }
+    @media(max-width:780px) { .wallet-wrap { grid-template-columns:1fr; } .wallet-page { padding-top:110px; } .copy-row, .amount-row { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body onload="loadWalletPage()">
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Rabbi Hossain</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main class="wallet-page">
+    <section id="authRequired" class="wallet-card">
+      <h1 class="wallet-title">Login Required</h1>
+      <p class="wallet-sub">Credit add বা service payment করতে হলে আগে account login করতে হবে। Navbar-এর Login button ব্যবহার করো।</p>
+      <button class="wallet-btn" onclick="window.rabbiAuth ? window.rabbiAuth.openLogin() : location.href='index.html'">Login Now</button>
+      <a class="wallet-link" href="index.html">Back to Home</a>
+    </section>
+
+    <section id="walletContent" class="wallet-wrap" style="display:none;">
+      <div class="wallet-card">
+        <div class="service-chip" id="paymentPurpose">Wallet Credit Top-up</div>
+        <h1 class="wallet-title" id="walletPageTitle">Add Credit</h1>
+        <p class="wallet-sub" id="walletPageSub">bKash, Nagad অথবা Rocket personal number-এ Send Money করুন। Amount USD থেকে BDT-তে auto convert হবে। Rate: <strong style="color:#00ff88;">$1 / ৳125</strong>.</p>
+
+        <div class="wallet-balance">
+          <div>
+            <span>Current Balance</span>
+            <strong id="userCredit">$0</strong>
+          </div>
+          <div style="text-align:right;color:#7a8ca8;font-size:.86rem;">
+            <div id="userName">User</div>
+            <div id="userEmail">Loading...</div>
+          </div>
+        </div>
+
+        <div class="wallet-grid">
+          <div class="wallet-field">
+            <label>Payment Method</label>
+            <select id="paymentMethod" onchange="updatePaymentNumber()">
+              <option value="bKash">bKash Personal</option>
+              <option value="Nagad">Nagad Personal</option>
+              <option value="Rocket">Rocket Personal</option>
+            </select>
+          </div>
+
+          <div class="payment-box">
+            <small>Send Money Number</small>
+            <strong id="paymentNumber">01731410341</strong>
+            <p class="payment-note">Selected Method: <b id="selectedMethod">bKash</b><br>Send Money করার পর exact Transaction ID নিচে লিখুন।</p>
+            <div class="copy-row">
+              <button class="copy-btn" type="button" onclick="copyTextValue('paymentNumber','Wallet number')">Copy Wallet Number</button>
+              <button class="copy-btn" type="button" onclick="copyTextValue('selectedBdtAmount','BDT amount')">Copy ৳ Amount</button>
+            </div>
+          </div>
+
+          <div class="wallet-field">
+            <label>Select Dollar Amount</label>
+            <select id="amount" onchange="handleAmountChange()">
+              <option value="1">$1 / ৳125</option>
+              <option value="5">$5 / ৳625</option>
+              <option value="10">$10 / ৳1,250</option>
+              <option value="20">$20 / ৳2,500</option>
+              <option value="50">$50 / ৳6,250</option>
+              <option value="custom">Custom Dollar Amount</option>
+            </select>
+          </div>
+
+          <div class="wallet-field" id="customAmountWrap" style="display:none;">
+            <label>Custom Dollar Amount</label>
+            <input type="number" id="customAmount" placeholder="Enter dollar amount" min="1" step="0.01" oninput="handleAmountChange()" />
+          </div>
+
+          <div class="payment-box">
+            <small>User Selected Amount</small>
+            <div class="amount-row">
+              <div>
+                <span style="color:#7a8ca8;font-size:.85rem;">Dollar</span>
+                <strong id="selectedUsdAmount">$1</strong>
+              </div>
+              <div>
+                <span style="color:#7a8ca8;font-size:.85rem;">Pay in BDT</span>
+                <strong id="selectedBdtAmount">৳125</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="wallet-field">
+            <label>Transaction ID</label>
+            <input type="text" id="transactionId" placeholder="Paste Transaction ID" />
+          </div>
+
+          <div id="walletMessage" class="wallet-message"></div>
+          <button class="wallet-btn" id="submitTopupBtn" onclick="submitTopup()">Verify Payment</button>
+          <a class="wallet-link" href="index.html">Back to Website</a>
+        </div>
+      </div>
+
+      <aside class="wallet-card">
+        <h2 style="color:#e8edf5;margin-bottom:10px;">My Payment Requests</h2>
+        <p class="wallet-sub">Admin confirm করলে wallet credit বা service request automatically update হবে।</p>
+        <div class="request-list" id="myTopupList">
+          <div class="empty-state">Loading...</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script type="module" src="js/wallet.js"></script>
+</body>
+</html>
