@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Rabbi Hossain</title>
+  <meta name="description" content="User dashboard for wallet balance, payment history, service orders and profile overview." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
+  <style>
+    .dashboard-page { min-height:100vh; padding:130px 0 120px; background:radial-gradient(circle at top right,rgba(0,200,255,.12),transparent 32%),var(--bg-primary); }
+    .dashboard-wrap { max-width:980px; margin:0 auto; padding:0 20px; }
+    .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(0,200,255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); }
+    .dashboard-profile { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:18px; }
+    .dashboard-avatar { width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#020a10; font-family:var(--font-display); font-size:1.6rem; font-weight:900; overflow:hidden; border:2px solid rgba(0,200,255,.35); }
+    .dashboard-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .dashboard-profile h1 { color:var(--text-primary); font-size:clamp(1.7rem,4vw,2.5rem); margin-bottom:6px; font-family:var(--font-display); }
+    .dashboard-profile p { color:var(--text-secondary); word-break:break-word; }
+    .dashboard-balance { margin-top:16px; padding:18px; border-radius:20px; background:rgba(0,255,136,.075); border:1px solid rgba(0,255,136,.20); display:flex; justify-content:space-between; gap:14px; align-items:center; flex-wrap:wrap; }
+    .dashboard-balance span { color:#93a9c3; font-weight:800; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; }
+    .dashboard-balance strong { color:#00ff88; font-size:1.35rem; font-family:var(--font-display); }
+    .dashboard-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:18px 0; }
+    .dashboard-action { text-decoration:none; text-align:center; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.10); color:var(--text-primary); font-weight:900; transition:.2s ease; }
+    .dashboard-action.primary { background:linear-gradient(135deg,#00c8ff,#00ff88); color:#020a10; border:0; }
+    .dashboard-action:hover { transform:translateY(-2px); }
+    .dashboard-tabs { display:flex; gap:10px; flex-wrap:wrap; margin:22px 0 16px; }
+    .dashboard-tab { border:1px solid rgba(0,200,255,.16); background:rgba(0,200,255,.06); color:#a8bbd4; padding:11px 15px; border-radius:999px; font-weight:900; cursor:pointer; }
+    .dashboard-tab.active { background:linear-gradient(135deg,#00c8ff,#00ff88); color:#020a10; border:0; }
+    .dashboard-history-list { display:grid; gap:12px; }
+    .dashboard-history-card { background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.085); border-radius:18px; padding:16px; }
+    .dashboard-history-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:8px; }
+    .dashboard-history-head strong { display:block; color:var(--text-primary); font-size:.98rem; margin-bottom:4px; }
+    .dashboard-history-head span:not(.status) { color:#00ff88; font-size:.86rem; font-weight:900; }
+    .dashboard-history-card p { color:#7a8ca8; font-size:.84rem; line-height:1.55; }
+    .status { display:inline-flex; padding:5px 9px; border-radius:999px; background:rgba(0,200,255,.10); border:1px solid rgba(0,200,255,.16); color:#9edfff; font-size:.68rem; font-weight:900; text-transform:uppercase; white-space:nowrap; }
+    .status.approved,.status.accepted { background:rgba(0,255,136,.10); border-color:rgba(0,255,136,.20); color:#a8ffd0; }
+    .status.declined,.status.cancelled { background:rgba(255,80,80,.10); border-color:rgba(255,80,80,.22); color:#ffb1b1; }
+    .dashboard-cancel-btn { margin-top:12px; border:1px solid rgba(255,80,80,.26); background:rgba(255,80,80,.08); color:#ffb1b1; border-radius:12px; padding:10px 12px; font-weight:900; cursor:pointer; }
+    .dashboard-login { display:none; text-align:center; padding:42px 22px; }
+    .dashboard-login h1 { color:var(--text-primary); margin-bottom:12px; font-family:var(--font-display); }
+    .dashboard-login p { color:var(--text-secondary); margin-bottom:20px; }
+    .orders-only-title { display:none; color:var(--text-primary); font-family:var(--font-display); font-size:clamp(1.9rem,5vw,3rem); margin-bottom:16px; }
+    .orders-only-subtitle { display:none; color:var(--text-secondary); margin-bottom:18px; line-height:1.6; }
+    html.orders-only-mode .dashboard-profile,
+    html.orders-only-mode .dashboard-balance,
+    html.orders-only-mode .dashboard-actions,
+    html.orders-only-mode .dashboard-tabs,
+    html.orders-only-mode [data-dashboard-panel="payments"] { display:none !important; }
+    html.orders-only-mode .orders-only-title,
+    html.orders-only-mode .orders-only-subtitle { display:block; }
+    html.orders-only-mode [data-dashboard-panel="orders"] { display:block !important; }
+    @media(max-width:720px){ .dashboard-actions{grid-template-columns:1fr;} .dashboard-profile{grid-template-columns:1fr;text-align:center;} .dashboard-avatar{margin:0 auto;} .dashboard-history-head{display:grid;grid-template-columns:1fr;} }
+  </style>
+</head>
+<body onload="loadUserDashboard()">
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Rabbi Hossain</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="index.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg></span>Home</a></li>
+        <li><a href="services.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766"/></svg></span>Services</a></li>
+        <li><a href="portfolio.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25A2.25 2.25 0 018.25 10.5H6A2.25 2.25 0 013.75 8.25V6zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6z"/></svg></span>Portfolio</a></li>
+        <li><a href="about.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg></span>About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main class="dashboard-page">
+    <div class="dashboard-wrap">
+      <div id="dashboardLoginRequired" class="dashboard-card dashboard-login">
+        <h1>Login Required</h1>
+        <p>Please login first to see your dashboard, payment history, and service order status.</p>
+        <a href="index.html" class="btn btn-primary">Go to Login</a>
+      </div>
+
+      <div id="dashboardContent" class="dashboard-card" style="display:none;">
+        <h1 class="orders-only-title">My Orders</h1>
+        <p class="orders-only-subtitle">Your service buy history and order status are shown below.</p>
+        <div class="dashboard-profile">
+          <div class="dashboard-avatar" id="dashboardAvatar">U</div>
+          <div>
+            <h1 id="dashboardName">User</h1>
+            <p id="dashboardEmail">Loading...</p>
+          </div>
+        </div>
+
+        <div class="dashboard-balance">
+          <span>Current Balance</span>
+          <strong id="dashboardBalance">$0 / ৳0</strong>
+        </div>
+
+        <div class="dashboard-actions">
+          <a class="dashboard-action primary" href="add-credit.html">Add Credit</a>
+          <a class="dashboard-action" href="services.html">Buy Services</a>
+        </div>
+
+        <section data-dashboard-panel="orders">
+          <h2 style="color:var(--text-primary);font-family:var(--font-display);font-size:1.2rem;margin:22px 0 14px;">My Orders</h2>
+          <div class="dashboard-history-list" id="dashboardOrderHistory">
+            <div class="empty-state">Loading service orders...</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script type="module" src="js/wallet.js"></script>
+</body>
+</html>
