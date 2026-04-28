@@ -1,4 +1,0 @@
-V16 backend force fix:
-- service-modal.js now calls https://rabbi-backend.vercel.app/api/buy-service directly for Buy with Credit.
-- If Buy with Credit is clicked, Vercel Logs must show POST /api/buy-service.
-- Added cache busting ?v=16 to JS/CSS references.
