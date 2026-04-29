@@ -990,6 +990,9 @@ function loadDashboardTopups(user) {
       const data = docSnap.data() || {};
       const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
       const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      const svgCard = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>`;
+      const svgKey  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="17" r="3"/><path d="M10.5 13.5 21 3"/><path d="M18 5l1 1"/><path d="M15 8l1 1"/></svg>`;
+      const svgCal  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1000,9 +1003,9 @@ function loadDashboardTopups(user) {
             <span class="status ${escapeHtml(data.status || "pending")}">${escapeHtml(data.status || "pending")}</span>
           </div>
           <div class="premium-order-details">
-            <span>💳 Method: ${escapeHtml(data.method || "Manual")}</span>
-            ${data.transactionId ? `<span>🔑 TX: ${escapeHtml(data.transactionId)}</span>` : ""}
-            <span>📅 ${dateStr}</span>
+            <span>${svgCard} Method: ${escapeHtml(data.method || "Manual")}</span>
+            ${data.transactionId ? `<span>${svgKey} TX: ${escapeHtml(data.transactionId)}</span>` : ""}
+            <span>${svgCal} ${dateStr}</span>
           </div>
         </div>
       `;
@@ -1037,8 +1040,17 @@ function loadDashboardOrders(user) {
       const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
       const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       const statusClass = (data.status || 'pending').toLowerCase();
-      const statusIcon = statusClass === 'approved' || statusClass === 'accepted' || statusClass === 'completed' ? '✅' : statusClass === 'declined' || statusClass === 'cancelled' || statusClass === 'failed' ? '❌' : '⏳';
-      const failReason = (statusClass === 'declined' || statusClass === 'failed') && data.failReason ? `<div class="order-fail-reason">⚠️ Reason: ${escapeHtml(data.failReason)}</div>` : '';
+      const svgCheck = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+      const svgX     = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+      const svgClock = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+      const svgPay   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>`;
+      const svgGame  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7.4 9.25h9.2c2.25 0 4.15 1.72 4.35 3.96l.22 2.42a2.55 2.55 0 0 1-4.42 1.95l-1.38-1.48H8.63l-1.38 1.48a2.55 2.55 0 0 1-4.42-1.95l.22-2.42a4.37 4.37 0 0 1 4.35-3.96Z"/><path d="M8.25 12v3M6.75 13.5h3M15.75 13.25h.01M18.25 14.75h.01"/></svg>`;
+      const svgID    = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h2a2 2 0 0 1 2 2M8 3H6a2 2 0 0 0-2 2"/><path d="M9 12h.01M12 12h.01M15 12h.01M9 15h6"/></svg>`;
+      const svgCal   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+      const statusIcon = statusClass === 'approved' || statusClass === 'accepted' || statusClass === 'completed' ? svgCheck : statusClass === 'declined' || statusClass === 'cancelled' || statusClass === 'failed' ? svgX : svgClock;
+      const failReason = (statusClass === 'declined' || statusClass === 'failed') && data.failReason ? `<div class="order-fail-reason"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Reason: ${escapeHtml(data.failReason)}</div>` : '';
+      const pendingNote = statusClass === 'pending' ? `<div class="order-pending-note">${svgClock} Order সাধারণত <strong>15 মিনিটের মধ্যে</strong> complete হয়</div>` : '';
+      const payMethod = data.paymentMethod || data.method || 'credit';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1049,11 +1061,12 @@ function loadDashboardOrders(user) {
             <span class="status ${escapeHtml(statusClass)}">${statusIcon} ${escapeHtml(data.status || "pending")}</span>
           </div>
           <div class="premium-order-details">
-            <span>💰 ${escapeHtml(data.paymentMethod || "credit")}</span>
-            ${getFreeFireUid(data) ? `<span>🎮 UID: ${escapeHtml(getFreeFireUid(data))}</span>` : ""}
-            ${data.providerOrderId ? `<span>🆔 Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
-            <span>📅 ${dateStr}</span>
+            <span>${svgPay} ${escapeHtml(payMethod)}</span>
+            ${getFreeFireUid(data) ? `<span>${svgGame} UID: ${escapeHtml(getFreeFireUid(data))}</span>` : ""}
+            ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
+            <span>${svgCal} ${dateStr}</span>
           </div>
+          ${pendingNote}
           ${failReason}
         </div>
       `;
