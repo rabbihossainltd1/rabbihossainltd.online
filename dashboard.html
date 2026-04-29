@@ -105,7 +105,7 @@
         <div class="dashboard-profile">
           <div class="dashboard-avatar" id="dashboardAvatar">U</div>
           <div>
-            <h1 id="dashboardName">User</h1>
+            <h1 id="dashboardName">User <span class="user-verify-badge"><img src="images/verify.png" alt="Verified" title="Verified Member" /></span></h1>
             <p id="dashboardEmail">Loading...</p>
           </div>
         </div>
@@ -120,14 +120,21 @@
           </a>
         </div>
 
-        <section class="profile-control-panel">
-          <div class="profile-control-grid">
-            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings('profile')">Name Change</button>
-            <a class="profile-control-btn" href="https://wa.me/8801731410341" target="_blank" rel="noopener">Customer Service</a>
-            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings('password')">Password Change</button>
-            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings('photo')">Profile Picture</button>
+        <section class="profile-control-panel" id="profileControlPanel">
+          <div class="profile-control-grid" id="profileControlGrid">
+            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()">⚙️ Settings</button>
+            <a class="profile-control-btn" href="https://wa.me/8801731410341" target="_blank" rel="noopener">💬 Customer Service</a>
           </div>
         </section>
+        <script>
+          // In orders-only mode, hide profile control panel entirely (already no useful buttons there)
+          (function(){
+            if(document.documentElement.classList.contains('orders-only-mode')){
+              var panel = document.getElementById('profileControlPanel');
+              if(panel) panel.style.display='none';
+            }
+          })();
+        </script>
 
         <section data-dashboard-panel="orders" style="display:none;">
           <div class="orders-segment" role="tablist" aria-label="My orders">

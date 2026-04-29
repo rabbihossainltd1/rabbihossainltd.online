@@ -785,9 +785,7 @@
                 <span class="method-name">bKash</span>
                 <span class="method-type">Personal</span>
               </span>
-            </button>
-
-            <button class="method-btn nagad" type="button" data-method="Nagad" onclick="selectPremiumMethod('Nagad')">
+            </button>>
               <span class="method-icon logo-icon">
                 <img src="images/nagad.png" alt="Nagad logo" loading="lazy" decoding="async" />
               </span>
@@ -920,6 +918,26 @@
       const walletTag = document.getElementById('walletTag');
       if (walletTag) walletTag.textContent = method + ' Number';
 
+      // bKash closed notice
+      let noticeEl = document.getElementById('bkashClosedNotice');
+      if (method === 'bKash') {
+        if (!noticeEl) {
+          noticeEl = document.createElement('div');
+          noticeEl.id = 'bkashClosedNotice';
+          noticeEl.className = 'bkash-closed-notice';
+          noticeEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><div><strong>bKash Temporarily Unavailable</strong><br/>আমাদের bKash account-এ সমস্যা হওয়ায় এই মুহূর্তে bKash Payment সম্ভব নয়। দয়া করে Nagad বা Rocket ব্যবহার করুন। অসুবিধার জন্য আন্তরিকভাবে দুঃখিত।</div>`;
+          const divider = document.querySelector('.pay-divider');
+          if (divider) divider.after(noticeEl);
+        }
+        noticeEl.style.display = 'flex';
+        const submitBtn = document.getElementById('submitTopupBtn');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '.5'; submitBtn.style.cursor = 'not-allowed'; }
+      } else {
+        if (noticeEl) noticeEl.style.display = 'none';
+        const submitBtn = document.getElementById('submitTopupBtn');
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = ''; submitBtn.style.cursor = ''; }
+      }
+
       if (typeof window.updatePaymentNumber === 'function') window.updatePaymentNumber();
     }
 
@@ -935,6 +953,8 @@
         if (typeof window.updatePaymentNumber === 'function') window.updatePaymentNumber();
         if (typeof window.handleAmountChange === 'function') window.handleAmountChange();
         window.syncPaymentMirror();
+        // Show bKash notice by default since bKash is pre-selected
+        selectPremiumMethod('bKash');
       }, 250);
 
       document.addEventListener('change', function (e) {
