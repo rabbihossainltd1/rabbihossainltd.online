@@ -522,7 +522,7 @@
           <span id="profileMenuInitial">U</span>
         </div>
         <div style="min-width:0;">
-          <div class="profile-name" id="profileMenuName">User</div>
+          <div class="profile-name" id="profileMenuName">User <span class="user-verify-badge"><img src="images/verify.png" alt="Verified" title="Verified Member" /></span></div>
           <div class="profile-email" id="profileMenuEmail">Loading...</div>
         </div>
       </div>

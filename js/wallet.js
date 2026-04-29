@@ -988,8 +988,10 @@ function loadDashboardTopups(user) {
 
     docs.forEach((docSnap) => {
       const data = docSnap.data() || {};
+      const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
+      const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       list.innerHTML += `
-        <div class="dashboard-history-card">
+        <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
             <div>
               <strong>${escapeHtml(data.purpose === "service" ? (data.serviceName || "Instant Service Payment") : "Credit Top-up")}</strong>
@@ -997,8 +999,11 @@ function loadDashboardTopups(user) {
             </div>
             <span class="status ${escapeHtml(data.status || "pending")}">${escapeHtml(data.status || "pending")}</span>
           </div>
-          <p>Method: ${escapeHtml(data.method || "Manual")} ${data.transactionId ? "• TX: " + escapeHtml(data.transactionId) : ""}</p>
-          ${canCancelTopup(data.status) ? `<button class="dashboard-cancel-btn" onclick="cancelTopupRequest('${docSnap.id}')">Cancel Pending Request</button>` : ""}
+          <div class="premium-order-details">
+            <span>💳 Method: ${escapeHtml(data.method || "Manual")}</span>
+            ${data.transactionId ? `<span>🔑 TX: ${escapeHtml(data.transactionId)}</span>` : ""}
+            <span>📅 ${dateStr}</span>
+          </div>
         </div>
       `;
     });
@@ -1029,17 +1034,27 @@ function loadDashboardOrders(user) {
 
     docs.forEach((docSnap) => {
       const data = docSnap.data() || {};
+      const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
+      const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      const statusClass = (data.status || 'pending').toLowerCase();
+      const statusIcon = statusClass === 'approved' || statusClass === 'accepted' || statusClass === 'completed' ? '✅' : statusClass === 'declined' || statusClass === 'cancelled' || statusClass === 'failed' ? '❌' : '⏳';
+      const failReason = (statusClass === 'declined' || statusClass === 'failed') && data.failReason ? `<div class="order-fail-reason">⚠️ Reason: ${escapeHtml(data.failReason)}</div>` : '';
       list.innerHTML += `
-        <div class="dashboard-history-card">
+        <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
             <div>
               <strong>${escapeHtml(data.serviceName || "Service")}</strong>
               <span>${moneyPair(data.amountUsd || data.amountUSD || 0, data.amountBdt || data.amountBDT)}</span>
             </div>
-            <span class="status ${escapeHtml(data.status || "pending")}">${escapeHtml(data.status || "pending")}</span>
+            <span class="status ${escapeHtml(statusClass)}">${statusIcon} ${escapeHtml(data.status || "pending")}</span>
           </div>
-          <p>${escapeHtml(data.paymentMethod || "credit")}${getFreeFireUid(data) ? " • UID: " + escapeHtml(getFreeFireUid(data)) : ""}${data.providerOrderId ? " • Auto ID: " + escapeHtml(data.providerOrderId) : ""}</p>
-          ${canCancelOrder(data.status) ? `<button class="dashboard-cancel-btn" onclick="cancelServiceOrderRequest('${docSnap.id}')">Cancel Pending Request</button>` : ""}
+          <div class="premium-order-details">
+            <span>💰 ${escapeHtml(data.paymentMethod || "credit")}</span>
+            ${getFreeFireUid(data) ? `<span>🎮 UID: ${escapeHtml(getFreeFireUid(data))}</span>` : ""}
+            ${data.providerOrderId ? `<span>🆔 Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
+            <span>📅 ${dateStr}</span>
+          </div>
+          ${failReason}
         </div>
       `;
     });
