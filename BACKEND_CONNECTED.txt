@@ -1,5 +1,0 @@
-Backend connected to: https://rabbi-backend.vercel.app
-
-Replace/upload all files in this ZIP to your website repository.
-Then copy FIRESTORE_RULES.txt into Firebase Firestore Rules and Publish.
-Finally sign out, login again, and hard refresh.
