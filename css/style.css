@@ -1666,27 +1666,44 @@ img {
 
 
 /* v22 requested UI polish */
-.home-svc-png-icon{width:32px;height:32px;object-fit:contain;display:block}
+.home-svc-png-icon{width:56px;height:56px;object-fit:contain;display:block}
 .home-visa-icon svg,.home-diamond-icon svg{width:38px;height:38px;display:block}
 .home-apple-icon svg{width:34px;height:34px;display:block;color:#eaf3ff}
 
+/* Service Hub — vertical scroll layout */
 .service-banner-grid{
-  display:flex!important;
-  overflow-x:auto;
-  gap:14px;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  padding:4px 2px 12px;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:18px;
+  overflow-x:unset;
+  padding:0;
 }
 .service-banner-grid::-webkit-scrollbar{display:none}
 .service-banner-card{
-  flex:0 0 min(86vw,520px)!important;
-  scroll-snap-align:start;
+  flex:unset!important;
+  display:grid;
+  grid-template-columns:200px 1fr;
+  min-height:180px;
+  align-items:center;
+  border-radius:22px;
+  border:1px solid rgba(0,200,255,.16);
+  background:rgba(255,255,255,.04);
+  overflow:hidden;
+  transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  text-decoration:none;
 }
+.service-banner-card:hover{transform:translateY(-4px);border-color:rgba(0,200,255,.38);box-shadow:0 26px 70px rgba(0,0,0,.38),0 0 28px rgba(0,200,255,.10);}
+.service-banner-media{width:200px!important;height:180px!important;border-radius:0!important;overflow:hidden;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;}
+.service-banner-media img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
+.service-banner-content{padding:20px 22px;}
 @media(max-width:720px){
-  .service-banner-card{grid-template-columns:110px 1fr!important;min-height:170px!important;padding:14px!important}
-  .service-banner-media{height:120px!important}
+  .service-banner-card{grid-template-columns:1fr!important;min-height:unset!important;}
+  .service-banner-media{width:100%!important;height:180px!important;}
 }
+
+/* Services page — compact service card images bigger */
+.compact-service-card .service-card-img{height:160px!important;border-radius:18px 18px 0 0!important;}
+.compact-service-card .service-card-img img{object-fit:cover!important;}
 
 .landing-popup{
   position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;
@@ -1869,4 +1886,162 @@ img {
 
 .nav-user-menu .profile-balance strong {
   line-height: 1.15 !important;
+}
+
+/* ── v24 Premium Updates ─────────────────────────────── */
+
+/* Premium Order Cards */
+.premium-order-card {
+  border-left: 3px solid rgba(0,200,255,.3) !important;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+}
+.premium-order-card:hover {
+  transform: translateY(-2px) !important;
+  border-left-color: rgba(0,200,255,.7) !important;
+  box-shadow: 0 8px 28px rgba(0,200,255,.08) !important;
+}
+.premium-order-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+}
+.premium-order-details span {
+  color: #6a8aaa;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.order-fail-reason {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,80,80,.08);
+  border: 1px solid rgba(255,80,80,.18);
+  color: #ffb1b1;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+/* Verify badge next to nickname */
+.user-verify-badge {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.user-verify-badge img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Profile page — Settings button layout */
+.profile-settings-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 6px;
+}
+.profile-settings-row .profile-control-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* bKash closed notice */
+.bkash-closed-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 10px 0 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(226,19,110,.08);
+  border: 1px solid rgba(226,19,110,.25);
+  color: #f8b4d0;
+  font-size: .86rem;
+  line-height: 1.6;
+  font-weight: 700;
+}
+.bkash-closed-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #E2136E;
+}
+
+/* Order result overlay animation */
+@keyframes orderResultIn {
+  from { opacity:0; transform:scale(.88) translateY(20px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+@keyframes orderResultOut {
+  from { opacity:1; }
+  to   { opacity:0; transform:scale(.9); }
+}
+.order-result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+}
+.order-result-card {
+  width: min(360px, 100%);
+  border-radius: 28px;
+  padding: 36px 28px 28px;
+  text-align: center;
+  animation: orderResultIn .45s cubic-bezier(.2,1,.2,1) both;
+}
+.order-result-card.success {
+  background: linear-gradient(180deg, rgba(0,255,136,.12), rgba(0,200,255,.06));
+  border: 1px solid rgba(0,255,136,.28);
+  box-shadow: 0 32px 80px rgba(0,255,136,.12), 0 0 60px rgba(0,200,255,.08);
+}
+.order-result-card.failed {
+  background: linear-gradient(180deg, rgba(255,80,80,.12), rgba(255,40,40,.04));
+  border: 1px solid rgba(255,80,80,.28);
+  box-shadow: 0 32px 80px rgba(255,80,80,.12);
+}
+.order-result-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 2.2rem;
+}
+.order-result-card.success .order-result-icon {
+  background: rgba(0,255,136,.14);
+  border: 2px solid rgba(0,255,136,.3);
+}
+.order-result-card.failed .order-result-icon {
+  background: rgba(255,80,80,.14);
+  border: 2px solid rgba(255,80,80,.3);
+}
+.order-result-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #f0f6ff;
+  margin: 0 0 8px;
+}
+.order-result-card p {
+  color: #93a9c3;
+  line-height: 1.65;
+  margin: 0 0 20px;
+  font-size: .9rem;
+}
+.order-result-close {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: #dbe8f7;
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: .9rem;
 }
