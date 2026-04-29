@@ -785,7 +785,9 @@
                 <span class="method-name">bKash</span>
                 <span class="method-type">Personal</span>
               </span>
-            </button>>
+            </button>
+
+            <button class="method-btn nagad" type="button" data-method="Nagad" onclick="selectPremiumMethod('Nagad')">
               <span class="method-icon logo-icon">
                 <img src="images/nagad.png" alt="Nagad logo" loading="lazy" decoding="async" />
               </span>
@@ -810,7 +812,7 @@
 
           <div class="section-label">Payment Information</div>
           <div class="info-stack">
-            <div class="info-row">
+            <div class="info-row" id="walletNumberRow">
               <div>
                 <div class="info-tag" id="walletTag">bKash Number</div>
                 <div class="info-value" id="paymentNumber">01731410341</div>
@@ -920,6 +922,7 @@
 
       // bKash closed notice
       let noticeEl = document.getElementById('bkashClosedNotice');
+      const walletRow = document.getElementById('walletNumberRow');
       if (method === 'bKash') {
         if (!noticeEl) {
           noticeEl = document.createElement('div');
@@ -930,10 +933,12 @@
           if (divider) divider.after(noticeEl);
         }
         noticeEl.style.display = 'flex';
+        if (walletRow) walletRow.style.display = 'none';
         const submitBtn = document.getElementById('submitTopupBtn');
         if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '.5'; submitBtn.style.cursor = 'not-allowed'; }
       } else {
         if (noticeEl) noticeEl.style.display = 'none';
+        if (walletRow) walletRow.style.display = '';
         const submitBtn = document.getElementById('submitTopupBtn');
         if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = ''; submitBtn.style.cursor = ''; }
       }
