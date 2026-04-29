@@ -383,17 +383,49 @@
   <div class="landing-popup" id="landingPopup" aria-live="polite">
     <div class="landing-popup-card">
       <button class="landing-popup-close" id="landingPopupClose" type="button" aria-label="Close">&times;</button>
+
+      <!-- Badge -->
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(0,255,136,.09);border:1px solid rgba(0,255,136,.22);color:#a7ffcf;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#00ff88;display:inline-block;box-shadow:0 0 8px #00ff88;animation:lpDot 1.2s ease-in-out infinite;"></span>
+        Live &amp; Active
+      </div>
+
       <div class="landing-popup-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
           <path d="m9 12 2 2 4-5"/>
         </svg>
       </div>
-      <h3>24/7 Auto Top-up Service</h3>
-      <p>Instant order flow, secure payment tracking, and customer support available anytime.</p>
-      <a href="services.html?service=Free%20Fire%20Diamond%20Top-up&fields=ff">Start Top-up</a>
+
+      <h3>24/7 Instant Service</h3>
+      <p>Automatic order processing, secure payment tracking, and real-time status updates — available anytime, anywhere.</p>
+
+      <!-- Feature list -->
+      <div style="display:grid;gap:8px;margin:14px 0 20px;text-align:left;">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);border-radius:12px;padding:10px 13px;color:#c2dcf0;font-size:.83rem;font-weight:700;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Instant Diamond &amp; Panel Orders
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.12);border-radius:12px;padding:10px 13px;color:#c2f0da;font-size:.83rem;font-weight:700;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Secure bKash · Nagad · Rocket Payment
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,166,0,.06);border:1px solid rgba(255,166,0,.12);border-radius:12px;padding:10px 13px;color:#f0dda2;font-size:.83rem;font-weight:700;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Real-time Order Status Tracking
+        </div>
+      </div>
+
+      <a href="services.html?service=Free%20Fire%20Diamond%20Top-up&fields=ff">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Start Top-up Now
+      </a>
+      <div style="margin-top:12px;color:#5a7090;font-size:.75rem;">Trusted by 500+ customers · 4.9★ rating</div>
     </div>
   </div>
+  <style>
+    @keyframes lpDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+  </style>
 
 
   <script>
