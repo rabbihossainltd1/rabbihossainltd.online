@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="css/style.css" />
   <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
   <style>
-    .dashboard-page { min-height:100vh; padding:130px 0 120px; background:radial-gradient(circle at top right,rgba(0,200,255,.12),transparent 32%),var(--bg-primary); }
-    .dashboard-wrap { max-width:980px; margin:0 auto; padding:0 20px; }
-    .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(0,200,255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); }
+    .dashboard-page { min-height:100vh; padding:0; background:var(--bg-primary); }
+    .dashboard-wrap { max-width:100%; min-height:100vh; padding:120px 20px 80px; background:radial-gradient(circle at top right,rgba(0,200,255,.10),transparent 32%),radial-gradient(circle at bottom left,rgba(0,255,136,.07),transparent 28%),var(--bg-primary); }
+    .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(0,200,255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); max-width:780px; margin:0 auto; }
     .dashboard-profile { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:18px; }
     .dashboard-avatar { width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#020a10; font-family:var(--font-display); font-size:1.6rem; font-weight:900; overflow:hidden; border:2px solid rgba(0,200,255,.35); }
     .dashboard-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -165,6 +165,7 @@
     </div>
   </main>
 
+  <script src="js/lang.js"></script>
   <script src="js/main.js"></script>
   <script src="js/auth.js"></script>
   <script type="module" src="js/wallet.js"></script>
