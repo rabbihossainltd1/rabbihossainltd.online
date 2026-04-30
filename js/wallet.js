@@ -143,9 +143,22 @@ function createdMillis(data) {
 
 function statusClass(status) {
   const value = String(status || "pending").toLowerCase();
-  if (["approved", "accepted", "confirmed", "completed", "processing", "delivered", "paid_credit_pending_review", "paid_instant_pending_review"].includes(value)) return value;
+  if (["approved", "accepted", "confirmed", "completed", "delivered"].includes(value)) return "approved";
+  if (["processing", "paid_credit_pending_review", "paid_instant_pending_review"].includes(value)) return "processing";
   if (["declined", "cancelled", "rejected", "failed"].includes(value)) return value;
   return "pending";
+}
+
+function statusLabel(status) {
+  const value = String(status || "pending").toLowerCase();
+  if (value === "paid_credit_pending_review" || value === "paid_instant_pending_review") return "In Progress";
+  if (value === "processing") return "In Progress";
+  if (value === "approved" || value === "accepted" || value === "confirmed") return "Approved";
+  if (value === "completed" || value === "delivered") return "Completed";
+  if (value === "declined" || value === "rejected") return "Declined";
+  if (value === "failed") return "Failed";
+  if (value === "cancelled") return "Cancelled";
+  return "Pending";
 }
 
 function isActionableOrder(status) {
@@ -654,7 +667,7 @@ window.loadAdminPanel = function () {
           <div class="admin-card">
             <div class="admin-card-head">
               <h3>${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</h3>
-              <span class="status pending">pending</span>
+              <span class="status pending">${statusLabel('pending')}</span>
             </div>
             <p><b>Purpose:</b> ${escapeHtml(purpose)}${data.serviceName ? " — " + escapeHtml(data.serviceName) : ""}</p>
             <p><b>User:</b> ${escapeHtml(data.userName || "User")}</p>
@@ -695,7 +708,7 @@ window.loadAdminPanel = function () {
           <div class="admin-card">
             <div class="admin-card-head">
               <h3>${escapeHtml(data.serviceName || "Service")}</h3>
-              <span class="status ${statusClass(data.status)}">${escapeHtml(data.status || "pending")}</span>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
             </div>
             <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
             <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}</p>
@@ -732,7 +745,7 @@ window.loadAdminPanel = function () {
           <div class="admin-card history-card">
             <div class="admin-card-head">
               <h3>${purpose === "service" ? escapeHtml(data.serviceName || "Instant Service Payment") : "Credit Top-up"}</h3>
-              <span class="status ${statusClass(data.status)}">${escapeHtml(data.status || "pending")}</span>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
             </div>
             <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</p>
             <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
@@ -761,7 +774,7 @@ window.loadAdminPanel = function () {
           <div class="admin-card history-card">
             <div class="admin-card-head">
               <h3>${escapeHtml(data.serviceName || "Service")}</h3>
-              <span class="status ${statusClass(data.status)}">${escapeHtml(data.status || "pending")}</span>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
             </div>
             <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
             <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
@@ -1001,7 +1014,7 @@ function loadDashboardTopups(user) {
               <strong>${escapeHtml(data.purpose === "service" ? (data.serviceName || "Instant Service Payment") : "Credit Top-up")}</strong>
               <span>${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</span>
             </div>
-            <span class="status ${escapeHtml(data.status || "pending")}">${escapeHtml(data.status || "pending")}</span>
+            <span class="status ${escapeHtml(data.status || "pending")}">${statusLabel(data.status)}</span>
           </div>
           <div class="premium-order-details">
             <span>${svgCard} Method: ${escapeHtml(data.method || "Manual")}</span>
@@ -1040,7 +1053,7 @@ function loadDashboardOrders(user) {
       const data = docSnap.data() || {};
       const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
       const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-      const statusClass = (data.status || 'pending').toLowerCase();
+      const sc = statusClass(data.status);
       const svgCheck = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>`;
       const svgX     = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
       const svgClock = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
@@ -1048,10 +1061,10 @@ function loadDashboardOrders(user) {
       const svgGame  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7.4 9.25h9.2c2.25 0 4.15 1.72 4.35 3.96l.22 2.42a2.55 2.55 0 0 1-4.42 1.95l-1.38-1.48H8.63l-1.38 1.48a2.55 2.55 0 0 1-4.42-1.95l.22-2.42a4.37 4.37 0 0 1 4.35-3.96Z"/><path d="M8.25 12v3M6.75 13.5h3M15.75 13.25h.01M18.25 14.75h.01"/></svg>`;
       const svgID    = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h2a2 2 0 0 1 2 2M8 3H6a2 2 0 0 0-2 2"/><path d="M9 12h.01M12 12h.01M15 12h.01M9 15h6"/></svg>`;
       const svgCal   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
-      const statusIcon = statusClass === 'approved' || statusClass === 'accepted' || statusClass === 'completed' ? svgCheck : statusClass === 'declined' || statusClass === 'cancelled' || statusClass === 'failed' ? svgX : svgClock;
-      const failReason = (statusClass === 'declined' || statusClass === 'failed') && data.failReason ? `<div class="order-fail-reason"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Reason: ${escapeHtml(data.failReason)}</div>` : '';
+      const statusIcon = sc === 'approved' ? svgCheck : sc === 'declined' || sc === 'cancelled' || sc === 'failed' ? svgX : svgClock;
+      const failReason = (sc === 'declined' || sc === 'failed') && data.failReason ? `<div class="order-fail-reason"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Reason: ${escapeHtml(data.failReason)}</div>` : '';
       const _t = window.rabbiLang ? window.rabbiLang.t.bind(window.rabbiLang) : (k => k);
-      const pendingNote = statusClass === 'pending' ? `<div class="order-pending-note">${svgClock} ${_t('Order সাধারণত')} <strong>${_t('15 মিনিটের মধ্যে')}</strong> ${_t('complete হয়')}</div>` : '';
+      const pendingNote = (sc === 'pending' || sc === 'processing') ? `<div class="order-pending-note">${svgClock} ${_t('Order সাধারণত')} <strong>${_t('15 মিনিটের মধ্যে')}</strong> ${_t('complete হয়')}</div>` : '';
       const payMethod = data.paymentMethod || data.method || 'credit';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
@@ -1060,7 +1073,7 @@ function loadDashboardOrders(user) {
               <strong>${escapeHtml(data.serviceName || "Service")}</strong>
               <span>${moneyPair(data.amountUsd || data.amountUSD || 0, data.amountBdt || data.amountBDT)}</span>
             </div>
-            <span class="status ${escapeHtml(statusClass)}">${statusIcon} ${escapeHtml(data.status || "pending")}</span>
+            <span class="status ${sc}">${statusIcon} ${statusLabel(data.status)}</span>
           </div>
           <div class="premium-order-details">
             <span>${svgPay} ${escapeHtml(payMethod)}</span>

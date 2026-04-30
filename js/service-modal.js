@@ -97,7 +97,7 @@
   const FIXED_SERVICE_PRICES = {
     'Facebook Meta Verified': 12,
     'Visa / Mastercard': 0,
-    'Premium App & Subscription': 5,
+    'Premium App & Subscription': 0,
     'Website Development': 50,
     'Ethical Hacking / Security Audit': 30,
     'Android App Development': 40,
@@ -212,6 +212,21 @@
   let activeServiceName = '';
   let activeFieldsType = '';
   let _currentAmountUsd = 0;
+
+  // Global setter so proapp plan picker can update amount directly
+  window.setServiceAmountUsd = function(usd) {
+    _currentAmountUsd = Math.round(Number(usd) * 10000) / 10000;
+    if (typeof window.updateServiceAmountUI === 'function') window.updateServiceAmountUI();
+  };
+
+  // Listen for programmatic change on serviceAmountUsd hidden input
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'serviceAmountUsd') {
+      const v = parseFloat(e.target.value) || 0;
+      _currentAmountUsd = v;
+      if (typeof window.updateServiceAmountUI === 'function') window.updateServiceAmountUI();
+    }
+  });
 
   function moneyUsd(value) {
     return `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: Number(value || 0) < 1 ? 3 : 2, maximumFractionDigits: 4 })}`;
@@ -612,8 +627,7 @@
     } catch (err) { /* non-blocking */ }
   }
 
-  function openModal(serviceName, fieldsType) {
-    if (!overlay || !form) return;
+  function openModal(serviceName, fieldsType) {    if (!overlay || !form) return;
 
     injectCheckoutPanel();
 
@@ -718,8 +732,21 @@
       e.preventDefault();
       const service = this.dataset.service || 'Service';
       const fields = this.dataset.fields || '';
+      const proapp = this.dataset.proapp || '';
 
       openModal(service, fields);
+
+      // Auto-select premium app if data-proapp set
+      if (proapp) {
+        const trySelect = (n) => {
+          if (typeof window._proappSelect === 'function') {
+            window._proappSelect(proapp);
+          } else if (n > 0) {
+            setTimeout(() => trySelect(n - 1), 200);
+          }
+        };
+        setTimeout(() => trySelect(10), 350);
+      }
     });
   });
 
@@ -775,6 +802,9 @@
     }, 150);
   }
   openServiceFromQuery();
+
+  // Expose globally so index.html and other pages can open the modal
+  window.openServiceModal = openModal;
 
   if (form) {
     form.addEventListener('submit', async function (e) {
