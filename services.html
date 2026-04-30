@@ -313,6 +313,17 @@
             const p = app.plans[idx];
             document.getElementById('mo_plan_type').value = p.label;
             document.getElementById('mo_plan_usd').value = p.usd;
+            // Update service modal price UI
+            const usd = parseFloat(p.usd) || 0;
+            const bdt = Math.round(usd * BDT_RATE);
+            const priceUsdEl = document.getElementById('servicePriceUsd');
+            const priceBdtEl = document.getElementById('servicePriceBdt');
+            const amountInp = document.getElementById('serviceAmountUsd');
+            if (priceUsdEl) priceUsdEl.textContent = '$' + usd.toFixed(2);
+            if (priceBdtEl) priceBdtEl.textContent = '৳' + bdt.toLocaleString();
+            if (amountInp) amountInp.value = usd;
+            if (window._currentAmountUsd !== undefined) window._currentAmountUsd = usd;
+            if (typeof window.updateServiceAmountUI === 'function') window.updateServiceAmountUI();
           };
 
           // Init on DOM ready
