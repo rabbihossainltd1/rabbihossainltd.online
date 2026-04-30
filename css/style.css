@@ -2137,3 +2137,94 @@ img {
   display: block;
   filter: drop-shadow(0 1px 4px rgba(29,161,242,.4));
 }
+
+/* ── Language Settings ─────────────────────────────── */
+.settings-section-label {
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #5a7090;
+  margin: 22px 0 10px;
+}
+.settings-lang-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.settings-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+.settings-lang-btn input[type="radio"] { display: none; }
+.settings-lang-btn:has(input:checked) {
+  border-color: rgba(0,200,255,.45);
+  background: rgba(0,200,255,.09);
+}
+.lang-flag { font-size: 1.4rem; line-height: 1; }
+.lang-name { font-weight: 900; font-size: .88rem; color: #c8ddf0; }
+.settings-lang-save-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,200,255,.25);
+  background: rgba(0,200,255,.08);
+  color: #9ee8ff;
+  font-weight: 900;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+.settings-lang-save-btn:hover { background: rgba(0,200,255,.16); }
+
+/* ── Bangla Mode ────────────────────────────────────── */
+[lang="bn"] { font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif; }
+
+/* ── Order Status Colours v3 ─────────────────────────── */
+.status.approved, .status.completed, .status.accepted {
+  background: rgba(0,255,136,.12);
+  color: #a7ffcf;
+  border: 1px solid rgba(0,255,136,.22);
+}
+.status.pending {
+  background: rgba(255,200,80,.10);
+  color: #ffd580;
+  border: 1px solid rgba(255,200,80,.22);
+  animation: pendingPulse 1.8s ease-in-out infinite;
+}
+.status.processing {
+  background: rgba(0,200,255,.10);
+  color: #9ee8ff;
+  border: 1px solid rgba(0,200,255,.22);
+  animation: pendingPulse 2s ease-in-out infinite;
+}
+.status.declined, .status.failed, .status.cancelled {
+  background: rgba(255,80,80,.10);
+  color: #ffb0b0;
+  border: 1px solid rgba(255,80,80,.20);
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: .74rem;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.status svg { flex-shrink: 0; }
