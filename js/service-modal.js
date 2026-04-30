@@ -437,8 +437,8 @@
       <div class="service-checkout-box">
         <div class="service-checkout-head">
           <div>
-            <strong>Payment Method</strong>
-            <span>Credit balance দিয়ে কিনুন অথবা instant secure payment করুন।</span>
+            <strong>Payment</strong>
+            <span>Credit balance থেকে instant order দিন।</span>
           </div>
           <div class="service-price-pill">
             <span id="servicePriceUsd">$0</span>
@@ -447,15 +447,14 @@
         </div>
         <input type="hidden" id="serviceAmountUsd" value="0" />
         <div class="service-pay-actions">
-          <button type="button" id="buyWithCreditBtn">Buy with Credit</button>
-          <button type="button" id="buyInstantPayBtn">Buy with Instant Pay</button>
+          <button type="button" id="buyWithCreditBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg> Place Order</button>
         </div>
         <p class="service-pay-note">Credit দিয়ে Free Fire top-up করলে auto processing হবে। Instant Pay secure verification থাকবে। Rate: $1 / ৳125.</p>
       </div>
     `;
 
     // Place payment buttons at the bottom where the old Submit Request button was.
-    // Users now choose only Buy with Credit or Buy with Instant Pay.
+    
     if (submitBtn) {
       submitBtn.style.display = 'none';
       form.insertBefore(panel, submitBtn);
@@ -472,19 +471,17 @@
       .service-price-pill { text-align:right; background:rgba(0,255,136,.08); border:1px solid rgba(0,255,136,.20); border-radius:14px; padding:10px 12px; min-width:112px; }
       .service-price-pill span { display:block; color:#00ff88; font-weight:900; font-size:1.15rem; }
       .service-price-pill small { display:block; color:#8fa2bb; margin-top:2px; }
-      .service-pay-actions { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-      .service-pay-actions button { border:0; border-radius:999px; padding:13px 14px; font-weight:900; cursor:pointer; }
+      .service-pay-actions { display:grid; grid-template-columns:1fr; gap:12px; }
+      .service-pay-actions button { border:0; border-radius:999px; padding:14px 20px; font-weight:900; cursor:pointer; font-size:.95rem; }
       #buyWithCreditBtn { background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; }
-      #buyInstantPayBtn { background:rgba(255,255,255,.07); color:#e8edf5; border:1px solid rgba(255,255,255,.12); }
+      
       .service-pay-note { color:#7a8ca8; font-size:.8rem; line-height:1.55; margin:12px 0 0; }
       @media(max-width:640px){ .service-checkout-head, .service-pay-actions { display:grid; grid-template-columns:1fr; } .service-price-pill { text-align:left; } }
     `;
     document.head.appendChild(style);
 
     const creditBtn = document.getElementById('buyWithCreditBtn');
-    const instantBtn = document.getElementById('buyInstantPayBtn');
     if (creditBtn) creditBtn.addEventListener('click', handleBuyWithCredit);
-    if (instantBtn) instantBtn.addEventListener('click', handleInstantPay);
   }
 
   function setDefaultAmount(serviceName) {
@@ -624,7 +621,7 @@
     activeFieldsType = fieldsType || '';
 
     modalTitle.textContent = 'Apply for: ' + serviceName;
-    modalSub.textContent = 'Package select করো তারপর Buy with Credit অথবা Instant Pay।';
+    modalSub.textContent = 'Package select করো তারপর Place Order করুন।';
     serviceInput.value = serviceName;
     showFields(fieldsType || '');
     if (fieldsType === 'card') resetCardPricing();
@@ -666,52 +663,30 @@
     if (!validateBasicDetails()) return;
 
     const btn = document.getElementById('buyWithCreditBtn');
-    const old = btn ? btn.textContent : '';
-    if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+    const old = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;animation:spin .7s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Processing…'; }
 
     const amountUsd = getServiceAmount();
     const details = collectFormData();
 
-    try {
-      showStatus('Connecting to secure backend…', 'info');
+    // Show order placed animation IMMEDIATELY — don't wait for backend
+    // Backend processes in background
+    showServiceSuccess(null, amountUsd);
 
-      // Force backend API call directly from the service modal.
-      // This avoids old wallet/function mismatch and guarantees Vercel logs show POST /api/buy-service.
-      const result = await buyServiceWithCreditDirect({
-        serviceName: activeServiceName,
-        fieldsType: activeFieldsType,
-        amountUsd,
-        details
-      });
-
-      if (result.ok) {
-        await sendToFormspree({
-          _payment_method: 'credit',
-          _payment_status: 'paid_credit_pending_review',
-          _amount_usd: amountUsd,
-          _amount_bdt: Math.round(amountUsd * 125)
-        });
-        showServiceSuccess(result, amountUsd);
-      } else if (result.reason === 'insufficient') {
-        showStatus('Insufficient balance. Please add credit.', 'error');
-        const target = `add-credit.html?usd=${encodeURIComponent(amountUsd)}`;
-        setTimeout(() => {
-          if (confirm('Balance insufficient. Open Add Credit page?')) window.location.href = target;
-        }, 300);
-      } else if (result.reason === 'login') {
-        showStatus('Please login first to buy services.', 'error');
-      } else if (result.reason === 'permission') {
-        showStatus('Permission error. Contact admin or check Firestore rules.', 'error');
-        console.error('[ServiceModal] Permission denied on buy with credit');
-      } else if (result.reason === 'amount') {
-        showStatus('Please select a service package or price first.', 'error');
-      } else {
-        showStatus(result.message || 'Payment failed. Please try again.', 'error');
-        console.error('[ServiceModal] Buy with credit failed:', result);
-      }
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = old || 'Buy with Credit'; }
-    }
+    // Fire backend in background (non-blocking)
+    buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, details })
+      .then(result => {
+        if (!result.ok) {
+          if (result.reason === 'insufficient') {
+            // Already redirected to My Orders, but notify on return
+            localStorage.setItem('orderFailReason', 'insufficient_balance');
+          }
+          console.error('[ServiceModal] Order result:', result);
+        } else {
+          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
+        }
+      })
+      .catch(err => console.error('[ServiceModal] Order error:', err));
   }
 
   function handleInstantPay() {
@@ -786,11 +761,18 @@
       openModal(decodeURIComponent(service), decodeURIComponent(fields));
       const modal = document.getElementById('serviceModal');
       if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Auto-select premium app if app= param provided
-      if (appId && typeof window._proappSelect === 'function') {
-        setTimeout(() => window._proappSelect(decodeURIComponent(appId)), 200);
+      // Auto-select premium app — wait for modal DOM + renderApps() to complete
+      if (appId) {
+        const trySelect = (attempts) => {
+          if (typeof window._proappSelect === 'function') {
+            window._proappSelect(decodeURIComponent(appId));
+          } else if (attempts > 0) {
+            setTimeout(() => trySelect(attempts - 1), 200);
+          }
+        };
+        setTimeout(() => trySelect(10), 300);
       }
-    }, 120);
+    }, 150);
   }
   openServiceFromQuery();
 
@@ -798,7 +780,7 @@
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      showStatus('Please choose Buy with Credit or Buy with Instant Pay.', 'error');
+      showStatus('Please fill in all required fields and click Place Order.', 'error');
       return;
 
       const data = collectFormData();

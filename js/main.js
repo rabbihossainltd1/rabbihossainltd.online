@@ -314,52 +314,5 @@
 
 })();
 
-/* ── BANGLA TRANSLATION ─────────────────────────────── */
-(function() {
-  const lang = localStorage.getItem('siteLang') || 'en';
-  if (lang !== 'bn') return;
-  const translations = {
-    'Home': 'হোম',
-    'Services': 'সেবা',
-    'Portfolio': 'পোর্টফোলিও',
-    'About': 'আমার সম্পর্কে',
-    'Hire Me': 'আমাকে নিযুক্ত করুন',
-    'Login': 'লগইন',
-    'Sign Out': 'সাইন আউট',
-    'Settings': 'সেটিংস',
-    'Add Credit': 'ক্রেডিট যোগ করুন',
-    'Admin Panel': 'অ্যাডমিন প্যানেল',
-    'Balance': 'ব্যালেন্স',
-    'Our Services': 'আমাদের সেবা',
-    'View Portfolio': 'পোর্টফোলিও দেখুন',
-    'Available for Projects': 'প্রজেক্টের জন্য উপলব্ধ',
-    'Apply Now': 'এখন আবেদন করুন',
-    'Get Your Card': 'কার্ড নিন',
-    'Get Now': 'এখন নিন',
-    'Get Started': 'শুরু করুন',
-    'Top-up Now': 'টপ-আপ করুন',
-    'Setup Now': 'সেটআপ করুন',
-    'Submit Request': 'অনুরোধ জমা দিন',
-    'Buy with Credit': 'ক্রেডিট দিয়ে কিনুন',
-    'Buy with Instant Pay': 'ইনস্ট্যান্ট পে দিয়ে কিনুন',
-    'Full Name *': 'পূর্ণ নাম *',
-    'Email Address *': 'ইমেইল ঠিকানা *',
-    'WhatsApp / Phone': 'হোয়াটসঅ্যাপ / ফোন',
-  };
-  function translateNode(node) {
-    if (node.nodeType === 3) {
-      const t = node.textContent.trim();
-      if (translations[t]) node.textContent = node.textContent.replace(t, translations[t]);
-    } else if (node.nodeType === 1 && !['SCRIPT','STYLE','INPUT','TEXTAREA','SELECT'].includes(node.tagName)) {
-      node.childNodes.forEach(translateNode);
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    translateNode(document.body);
-    // Add lang indicator
-    const indicator = document.createElement('div');
-    indicator.style.cssText = 'position:fixed;bottom:14px;left:14px;z-index:9999;background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.25);color:var(--accent,#00c8ff);font-size:0.7rem;padding:4px 10px;border-radius:20px;font-weight:700;pointer-events:none;';
-    indicator.textContent = 'বাংলা';
-    document.body.appendChild(indicator);
-  });
-})();
+/* ── BANGLA TRANSLATION — handled by js/lang.js ──────── */
+

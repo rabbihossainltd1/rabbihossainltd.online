@@ -156,9 +156,10 @@
       }
     });
 
-    // Translate only the text node inside nav links (not SVG)
+    // Translate only the text node inside nav links (not SVG) — SKIP bottom-nav active labels
     document.querySelectorAll('nav a, .nav-mobile-link').forEach(el => {
-      // Walk child nodes and translate the last text node (after icon)
+      // Skip bottom nav items — they use separate span for label, handled below
+      if (el.closest('.bottom-nav') || el.closest('.mobile-nav-bar')) return;
       el.childNodes.forEach(node => {
         if (node.nodeType === 3) { // TEXT_NODE
           const txt = node.textContent.trim();
@@ -168,6 +169,16 @@
           }
         }
       });
+    });
+
+    // Bottom nav labels — translate only the label span text, never the icon span
+    document.querySelectorAll('.bottom-nav a span:last-child, .mobile-nav-bar a span:not(.nav-icon), .nav-mobile-label').forEach(el => {
+      if (el.querySelector('svg, img')) return;
+      const txt = el.textContent.trim();
+      if (txt && BN[txt]) {
+        if (!el._i18nOrig) el._i18nOrig = el.textContent;
+        el.textContent = BN[txt];
+      }
     });
 
     // Translate profile-control-btn and similar buttons that have SVG inside

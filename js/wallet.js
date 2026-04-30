@@ -23,7 +23,7 @@ const PAYMENT_NUMBERS = {
   bKash: "01731410341",
   Nagad: "01731410341",
   Rocket: "01731410341",
-  Binance: "EPRH9YyT",
+  Binance: "749542753",
 };
 
 const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
