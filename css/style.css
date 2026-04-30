@@ -536,15 +536,15 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 .portfolio-item:hover .portfolio-preview { opacity: 1; transform: scale(1); }
 
 /* ============================================================ ANIMATIONS ============================================================ */
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
-.animate-fade-up { animation: fadeInUp 0.65s cubic-bezier(0.4,0,0.2,1) both; }
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-.delay-3 { animation-delay: 0.3s; }
-.delay-4 { animation-delay: 0.4s; }
-.delay-5 { animation-delay: 0.5s; }
-.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.65s cubic-bezier(0.4,0,0.2,1), transform 0.65s cubic-bezier(0.4,0,0.2,1); }
+.animate-fade-up { animation: fadeInUp 0.25s ease both; }
+.delay-1 { animation-delay: 0.03s; }
+.delay-2 { animation-delay: 0.06s; }
+.delay-3 { animation-delay: 0.09s; }
+.delay-4 { animation-delay: 0.12s; }
+.delay-5 { animation-delay: 0.15s; }
+.reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.22s ease, transform 0.22s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* ============================================================ RESPONSIVE ============================================================ */
@@ -2330,3 +2330,6 @@ img {
 .proapp-plan-label { font-weight: 900; font-size: .88rem; color: #c8ddf0; }
 .proapp-plan-price { font-weight: 900; font-size: .95rem; color: #00ff88; }
 .proapp-plan-bdt { font-size: .78rem; color: #5a8a6a; font-weight: 700; }
+
+/* Spin animation for loading buttons */
+@keyframes spin { to { transform: rotate(360deg); } }
