@@ -166,24 +166,163 @@
           </p>
         </div>
 
-        <!-- Pro App fields -->
+        <!-- Pro App fields — App selector + Plan picker -->
         <div id="proappFields" style="display:none;">
-          <div class="form-group">
-            <label class="form-label" for="mo_app_name">App / Subscription Name</label>
-            <input class="form-input" type="text" id="mo_app_name" name="app_name" placeholder="e.g. Netflix, Spotify, Adobe CC…" />
+
+          <!-- Step 1: Select App -->
+          <div class="form-group" id="proappStep1">
+            <label class="form-label">Select App / Subscription</label>
+            <div class="proapp-grid" id="proappGrid">
+              <!-- Cards injected by JS -->
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="mo_plan_type">Plan Type</label>
-            <select class="form-input form-select" id="mo_plan_type" name="plan_type">
-              <option value="">Select…</option>
-              <option>Monthly</option>
-              <option>3 Months</option>
-              <option>6 Months</option>
-              <option>Yearly</option>
-              <option>Lifetime (if available)</option>
-            </select>
+
+          <!-- Step 2: Select Plan (shown after app selected) -->
+          <div class="form-group" id="proappStep2" style="display:none;">
+            <div class="proapp-selected-row" id="proappSelectedRow"></div>
+            <label class="form-label" style="margin-top:14px;">Select Your Plan</label>
+            <div class="proapp-plan-list" id="proappPlanList"></div>
+            <input type="hidden" id="mo_app_name" name="app_name" />
+            <input type="hidden" id="mo_plan_type" name="plan_type" />
+            <input type="hidden" id="mo_plan_usd" name="plan_usd" />
           </div>
+
+          <!-- Email field -->
+          <div class="form-group" id="proappEmailGroup" style="display:none;">
+            <label class="form-label" for="mo_proapp_email">Account Email (required)</label>
+            <input class="form-input" type="email" id="mo_proapp_email" name="proapp_email" placeholder="Your account email address" autocomplete="email" />
+          </div>
+
         </div>
+
+        <script>
+        (function(){
+          const APPS = [
+            {
+              id:'chatgpt', name:'ChatGPT', img:'images/chatgpt-pro.png',
+              plans:[
+                {label:'Go · 1 Month', usd:10},
+                {label:'Plus · 1 Month', usd:20},
+                {label:'Pro · 1 Month', usd:200},
+              ]
+            },
+            {
+              id:'gemini', name:'Gemini', img:'images/gemini-pro.png',
+              plans:[
+                {label:'AI Pro · 1 Month', usd:19.99},
+                {label:'AI Ultra · 1 Month', usd:249.99},
+              ]
+            },
+            {
+              id:'canva', name:'Canva', img:'images/canva-pro.png',
+              plans:[
+                {label:'Pro · 1 Month', usd:12.99},
+                {label:'Pro · 1 Year', usd:119.99},
+                {label:'Teams · 1 Month / user', usd:14.99},
+              ]
+            },
+            {
+              id:'capcut', name:'CapCut', img:'images/capcut-pro.png',
+              plans:[
+                {label:'Pro · 1 Month', usd:9.99},
+                {label:'Pro · 1 Year', usd:89.99},
+              ]
+            },
+            {
+              id:'youtube', name:'YouTube', img:'images/youtube-pro.png',
+              plans:[
+                {label:'Premium Individual · 1 Month', usd:3.99},
+                {label:'Premium Family · 1 Month', usd:6.99},
+                {label:'Premium Student · 1 Month', usd:2.49},
+              ]
+            },
+            {
+              id:'truecaller', name:'Truecaller', img:'images/Truecaller-pro.png',
+              plans:[
+                {label:'Premium · 1 Month', usd:1.99},
+                {label:'Premium · 3 Months', usd:4.99},
+                {label:'Premium · 12 Months', usd:14.99},
+                {label:'Gold · 1 Month', usd:4.99},
+              ]
+            },
+            {
+              id:'imo', name:'imo', img:'images/imo-pro.png',
+              plans:[
+                {label:'Premium · 1 Week', usd:0.29},
+                {label:'Premium · 1 Month', usd:0.82},
+                {label:'Premium · 3 Months', usd:2.07},
+                {label:'Premium · 12 Months', usd:7.49},
+              ]
+            },
+          ];
+
+          const BDT_RATE = 125;
+
+          function renderApps() {
+            const grid = document.getElementById('proappGrid');
+            if (!grid) return;
+            grid.innerHTML = APPS.map(app => `
+              <button class="proapp-app-card" type="button" data-appid="${app.id}" onclick="window._proappSelect('${app.id}')">
+                <img src="${app.img}" alt="${app.name}" />
+                <span>${app.name}</span>
+              </button>
+            `).join('');
+          }
+
+          window._proappSelect = function(appId) {
+            const app = APPS.find(a => a.id === appId);
+            if (!app) return;
+
+            // Highlight selected
+            document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.toggle('active', c.dataset.appid === appId));
+
+            // Fill selected row
+            const row = document.getElementById('proappSelectedRow');
+            if (row) row.innerHTML = `<img src="${app.img}" alt="${app.name}" class="proapp-sel-img" /><strong>${app.name}</strong><button class="proapp-change-btn" type="button" onclick="window._proappClear()">Change App</button>`;
+
+            // Fill plan list
+            const planList = document.getElementById('proappPlanList');
+            if (planList) {
+              planList.innerHTML = app.plans.map((p,i) => `
+                <label class="proapp-plan-item">
+                  <input type="radio" name="proappPlan" value="${i}" onchange="window._proappPickPlan('${appId}',${i})" />
+                  <div class="proapp-plan-info">
+                    <span class="proapp-plan-label">${p.label}</span>
+                    <span class="proapp-plan-price">$${p.usd.toFixed(2)} <span class="proapp-plan-bdt">/ ৳${Math.round(p.usd*BDT_RATE).toLocaleString()}</span></span>
+                  </div>
+                </label>
+              `).join('');
+            }
+
+            document.getElementById('proappStep2').style.display = '';
+            document.getElementById('proappEmailGroup').style.display = '';
+            document.getElementById('mo_app_name').value = app.name;
+            document.getElementById('mo_plan_type').value = '';
+            document.getElementById('mo_plan_usd').value = '';
+          };
+
+          window._proappClear = function() {
+            document.getElementById('proappStep2').style.display = 'none';
+            document.getElementById('proappEmailGroup').style.display = 'none';
+            document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.remove('active'));
+          };
+
+          window._proappPickPlan = function(appId, idx) {
+            const app = APPS.find(a => a.id === appId);
+            if (!app) return;
+            const p = app.plans[idx];
+            document.getElementById('mo_plan_type').value = p.label;
+            document.getElementById('mo_plan_usd').value = p.usd;
+          };
+
+          // Init on DOM ready
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderApps);
+          } else {
+            renderApps();
+          }
+        })();
+        </script>
 
         <!-- ══ FREE FIRE DIAMOND TOP-UP fields ══ -->
         <div id="ffFields" style="display:none;">

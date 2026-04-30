@@ -806,6 +806,46 @@
                 <span class="method-type">Personal</span>
               </span>
             </button>
+
+            <button class="method-btn binance" type="button" data-method="Binance" onclick="selectPremiumMethod('Binance')">
+              <span class="method-icon logo-icon">
+                <img src="images/binance.png" alt="Binance Pay logo" loading="lazy" decoding="async" />
+              </span>
+              <span>
+                <span class="method-name">Binance Pay</span>
+                <span class="method-type">Crypto</span>
+              </span>
+            </button>
+
+          </div><!-- end method-grid -->
+
+          <!-- Binance Pay panel (shown when Binance selected) -->
+          <div id="binancePanel" style="display:none;margin-top:14px;">
+            <div style="border-radius:20px;background:rgba(243,186,47,.06);border:1px solid rgba(243,186,47,.22);padding:20px;text-align:center;">
+              <div style="color:#f3ba2f;font-weight:900;font-size:.88rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Scan QR to Pay
+              </div>
+              <div style="width:180px;height:180px;margin:0 auto 16px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.3);">
+                <img src="images/binance.png" alt="Binance QR Code" style="width:160px;height:160px;object-fit:contain;border-radius:12px;" />
+              </div>
+              <p style="color:#c9a227;font-size:.8rem;margin:0 0 16px;line-height:1.6;">Open Binance app → Pay → Scan QR Code</p>
+              <div style="background:rgba(0,0,0,.3);border:1px solid rgba(243,186,47,.18);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;text-align:left;">
+                <div>
+                  <div style="color:#8a7040;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Binance Wallet ID</div>
+                  <div style="color:#f3ba2f;font-weight:900;font-size:.95rem;letter-spacing:.02em;" id="binanceWalletId">EPRH9YyT</div>
+                </div>
+                <button type="button" class="copy-btn icon-only" onclick="copyTextValue('binanceWalletId','Binance Wallet ID')" aria-label="Copy Wallet ID">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+              <a href="https://app.binance.com/uni-qr/EPRH9YyT" target="_blank" rel="noopener"
+                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#f3ba2f,#e6a817);color:#1a0f00;font-weight:900;font-size:.92rem;text-decoration:none;box-shadow:0 8px 28px rgba(243,186,47,.22);margin-bottom:4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Pay with Binance App
+              </a>
+              <p style="color:#8a7040;font-size:.74rem;margin-top:8px;">Payment করার পর নিচে Binance Order ID দিন</p>
+            </div>
           </div>
 
           <div class="pay-divider"></div>
@@ -918,7 +958,20 @@
       if (active) active.classList.add('active');
 
       const walletTag = document.getElementById('walletTag');
-      if (walletTag) walletTag.textContent = method + ' Number';
+      if (walletTag) walletTag.textContent = method === 'Binance' ? 'Binance Wallet ID' : method + ' Number';
+
+      // Update transaction ID placeholder
+      const txInput = document.getElementById('transactionId');
+      if (txInput) txInput.placeholder = method === 'Binance' ? 'Paste Binance Order ID' : 'Paste Transaction ID';
+
+      // Binance panel show/hide
+      const binancePanel = document.getElementById('binancePanel');
+      if (method === 'Binance') {
+        if (binancePanel) binancePanel.style.display = '';
+        if (walletRow) walletRow.style.display = 'none';
+      } else {
+        if (binancePanel) binancePanel.style.display = 'none';
+      }
 
       // bKash closed notice
       let noticeEl = document.getElementById('bkashClosedNotice');
