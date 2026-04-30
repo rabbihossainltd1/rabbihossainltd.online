@@ -284,43 +284,107 @@
   }
 
   function showServiceSuccess(result, amountUsd) {
-    ensureServiceSuccessStyle();
-    if (form) form.style.display = 'none';
+    // Close modal immediately
+    const overlay = document.getElementById('serviceModal');
+    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
 
-    let successScreen = document.getElementById('modalSuccess');
-    if (!successScreen) {
-      successScreen = document.createElement('div');
-      successScreen.id = 'modalSuccess';
-      form && form.parentNode ? form.parentNode.appendChild(successScreen) : overlay?.querySelector('.service-modal')?.appendChild(successScreen);
+    // Show full-screen order-placed overlay
+    let ov = document.getElementById('orderPlacedOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'orderPlacedOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(14px);padding:20px;';
+      document.body.appendChild(ov);
     }
 
-    const autoText = result?.autoTopup?.ok
-      ? 'Auto top-up started. My Orders থেকে live status দেখুন।'
-      : 'Order received successfully. My Orders থেকে status দেখুন।';
+    const bdtAmt = Math.round((amountUsd || 0) * 125);
+    const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
+    const bdtStr = bdtAmt ? `৳${bdtAmt.toLocaleString()}` : '';
 
-    successScreen.innerHTML = `
-      <div class="service-success-animation">
-        <div class="service-success-ring">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    ov.innerHTML = `
+      <div style="width:min(420px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
+        background:linear-gradient(180deg,rgba(0,255,136,.10) 0%,rgba(0,200,255,.06) 100%);
+        border:1px solid rgba(0,255,136,.28);
+        box-shadow:0 40px 100px rgba(0,0,0,.5),0 0 60px rgba(0,255,136,.08);
+        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
+
+        <!-- Animated checkmark ring -->
+        <div style="width:88px;height:88px;border-radius:50%;margin:0 auto 22px;position:relative;
+          background:rgba(0,255,136,.12);border:2px solid rgba(0,255,136,.35);
+          display:flex;align-items:center;justify-content:center;">
+          <div style="position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(0,255,136,.18);animation:opRing 1.6s ease-out infinite;"></div>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:opCheck .6s ease .15s both;">
             <path d="M20 6 9 17l-5-5"/>
           </svg>
         </div>
-        <h3>Order Successful</h3>
-        <p>${autoText}</p>
-        <div class="service-success-badges">
-          <span>${moneyUsd(amountUsd)}</span>
-          <span>${moneyBdtFromUsd(amountUsd)}</span>
-          <span>${result?.autoTopup?.ok ? 'Auto Processing' : 'Submitted'}</span>
+
+        <!-- Title -->
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
+          background:rgba(0,255,136,.10);border:1px solid rgba(0,255,136,.22);
+          color:#a7ffcf;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#00ff88;display:inline-block;animation:opDot 1s ease-in-out infinite;"></span>
+          Order Placed
         </div>
-        <div class="service-success-actions">
-          <a href="dashboard.html?tab=orders">View My Orders</a>
-          <button type="button" id="serviceSuccessClose">Close</button>
+
+        <h2 style="font-family:var(--font-display,inherit);font-size:1.65rem;color:#f0f8ff;margin:0 0 10px;line-height:1.2;">
+          Your Order is Placed!
+        </h2>
+        <p style="color:#8faec9;line-height:1.72;margin:0 0 6px;font-size:.93rem;">
+          Please wait a few moments to complete the order.
+        </p>
+        <p style="color:#6a8aaa;font-size:.83rem;margin:0 0 22px;">
+          It takes maximum <strong style="color:#ffa500;">10–15 minutes</strong> to process.
+        </p>
+
+        ${usdStr ? `
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;">
+          <span style="padding:8px 16px;border-radius:999px;background:rgba(0,255,136,.10);border:1px solid rgba(0,255,136,.20);color:#a7ffcf;font-weight:900;font-size:.88rem;">${usdStr}</span>
+          ${bdtStr ? `<span style="padding:8px 16px;border-radius:999px;background:rgba(0,200,255,.10);border:1px solid rgba(0,200,255,.20);color:#9ee8ff;font-weight:900;font-size:.88rem;">${bdtStr}</span>` : ''}
+          <span style="padding:8px 16px;border-radius:999px;background:rgba(255,166,0,.10);border:1px solid rgba(255,166,0,.20);color:#ffd580;font-weight:900;font-size:.88rem;">Processing</span>
+        </div>` : ''}
+
+        <!-- Redirect info -->
+        <div style="padding:14px 16px;border-radius:16px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.14);
+          display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:22px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          <div>
+            <div style="color:#9ee8ff;font-weight:900;font-size:.83rem;">Redirecting to My Orders…</div>
+            <div style="color:#5a7a94;font-size:.76rem;margin-top:2px;">Track your order status live from there.</div>
+          </div>
         </div>
+
+        <button id="opGoNow" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
+          box-shadow:0 16px 40px rgba(0,200,255,.2);">
+          View My Orders Now
+        </button>
       </div>
     `;
-    successScreen.style.display = 'block';
-    const closeBtn = document.getElementById('serviceSuccessClose');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal, { once: true });
+
+    // Inject animation keyframes once
+    if (!document.getElementById('opAnimStyle')) {
+      const s = document.createElement('style');
+      s.id = 'opAnimStyle';
+      s.textContent = `
+        @keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}
+        @keyframes opRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+        @keyframes opCheck{from{stroke-dasharray:50;stroke-dashoffset:50}to{stroke-dashoffset:0}}
+        @keyframes opDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+      `;
+      document.head.appendChild(s);
+    }
+
+    // Button click → go to orders
+    document.getElementById('opGoNow')?.addEventListener('click', () => {
+      window.location.href = 'dashboard.html?tab=orders';
+    });
+
+    // Auto redirect after 4 seconds
+    setTimeout(() => {
+      window.location.href = 'dashboard.html?tab=orders';
+    }, 4000);
   }
 
 

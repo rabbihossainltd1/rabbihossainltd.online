@@ -522,7 +522,12 @@
           <span id="profileMenuInitial">U</span>
         </div>
         <div style="min-width:0;">
-          <div class="profile-name" id="profileMenuName">User <span class="user-verify-badge"><img src="images/verify.png" alt="Verified" title="Verified Member" /></span></div>
+          <div class="profile-name" id="profileMenuName">User <span class="user-verify-badge" title="Verified Member" aria-label="Verified">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
+    <path d="M7 12.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</span></div>
           <div class="profile-email" id="profileMenuEmail">Loading...</div>
         </div>
       </div>
@@ -684,6 +689,25 @@
           <a href="https://wa.me/8801731410341" target="_blank" rel="noopener">${iconSupport()} <span>Customer Service</span></a>
         </div>
 
+        <!-- Language Setting -->
+        <div class="settings-section-label">Language / ভাষা</div>
+        <div class="settings-lang-row">
+          <label class="settings-lang-btn" id="settingsLangEnLabel">
+            <input type="radio" name="siteLanguage" id="langEn" value="en" />
+            <span class="lang-flag">🇬🇧</span>
+            <span class="lang-name">English</span>
+          </label>
+          <label class="settings-lang-btn" id="settingsLangBnLabel">
+            <input type="radio" name="siteLanguage" id="langBn" value="bn" />
+            <span class="lang-flag">🇧🇩</span>
+            <span class="lang-name">বাংলা</span>
+          </label>
+        </div>
+        <button class="settings-lang-save-btn" id="saveLangBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          Save Language
+        </button>
+
         <div id="profileSettingsMessage" class="settings-message" style="display:none;"></div>
         <button class="settings-save-btn" id="settingsSaveProfileBtn" type="button">${iconSave()} <span>Save Changes</span></button>
       </div>
@@ -780,7 +804,8 @@
       if (file) photoURL = await resizeImageToDataUrl(file);
 
       await authApi.updateProfile(currentUser, {
-  displayName: fullName
+  displayName: fullName,
+  photoURL: photoURL || null
 });
 
       if (newPassword) {

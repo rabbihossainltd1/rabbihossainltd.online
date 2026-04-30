@@ -1049,7 +1049,8 @@ function loadDashboardOrders(user) {
       const svgCal   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
       const statusIcon = statusClass === 'approved' || statusClass === 'accepted' || statusClass === 'completed' ? svgCheck : statusClass === 'declined' || statusClass === 'cancelled' || statusClass === 'failed' ? svgX : svgClock;
       const failReason = (statusClass === 'declined' || statusClass === 'failed') && data.failReason ? `<div class="order-fail-reason"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Reason: ${escapeHtml(data.failReason)}</div>` : '';
-      const pendingNote = statusClass === 'pending' ? `<div class="order-pending-note">${svgClock} Order সাধারণত <strong>15 মিনিটের মধ্যে</strong> complete হয়</div>` : '';
+      const _t = window.rabbiLang ? window.rabbiLang.t.bind(window.rabbiLang) : (k => k);
+      const pendingNote = statusClass === 'pending' ? `<div class="order-pending-note">${svgClock} ${_t('Order সাধারণত')} <strong>${_t('15 মিনিটের মধ্যে')}</strong> ${_t('complete হয়')}</div>` : '';
       const payMethod = data.paymentMethod || data.method || 'credit';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
