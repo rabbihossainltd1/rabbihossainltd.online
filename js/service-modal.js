@@ -781,10 +781,15 @@
     const service = params.get('service');
     if (!service) return;
     const fields = params.get('fields') || '';
+    const appId = params.get('app') || '';
     setTimeout(() => {
       openModal(decodeURIComponent(service), decodeURIComponent(fields));
       const modal = document.getElementById('serviceModal');
       if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Auto-select premium app if app= param provided
+      if (appId && typeof window._proappSelect === 'function') {
+        setTimeout(() => window._proappSelect(decodeURIComponent(appId)), 200);
+      }
     }, 120);
   }
   openServiceFromQuery();

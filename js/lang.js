@@ -136,27 +136,51 @@
       }
     });
 
-    // Also scan text nodes in key elements for matching phrases
+    // Translate text nodes only (skip elements containing SVG or img children)
     const selectors = [
       'nav a', '.nav-link', 'h1', 'h2', 'h3', 'h4',
       '.section-label', '.orders-section-title', '.orders-only-title',
       '.orders-only-subtitle', '.dashboard-section-title',
-      '.profile-control-btn', '.method-name', '.balance-text span',
+      '.method-name', '.balance-text span',
       '.empty-state', '.landing-popup-card h3', '.landing-popup-card p',
-      'button:not(.profile-settings-close):not(.landing-popup-close)',
-      '.svc-hub-btn', '.compact-service-card .service-cta',
-      '.service-apply-btn',
+      '.svc-hub-btn',
     ];
 
     document.querySelectorAll(selectors.join(',')).forEach(el => {
+      // Skip if element has SVG or img children (icons mixed with text)
+      if (el.querySelector('svg, img')) return;
       const txt = el.textContent.trim();
       if (BN[txt]) {
-        el._i18nOriginal = el._i18nOriginal || el.innerHTML;
-        // Only replace if it's a simple text node (no child elements that matter)
-        if (el.children.length === 0) {
-          el.textContent = BN[txt];
-        }
+        if (!el._i18nOriginal) el._i18nOriginal = el.innerHTML;
+        el.textContent = BN[txt];
       }
+    });
+
+    // Translate only the text node inside nav links (not SVG)
+    document.querySelectorAll('nav a, .nav-mobile-link').forEach(el => {
+      // Walk child nodes and translate the last text node (after icon)
+      el.childNodes.forEach(node => {
+        if (node.nodeType === 3) { // TEXT_NODE
+          const txt = node.textContent.trim();
+          if (txt && BN[txt]) {
+            if (!node._i18nOrig) node._i18nOrig = node.textContent;
+            node.textContent = BN[txt];
+          }
+        }
+      });
+    });
+
+    // Translate profile-control-btn and similar buttons that have SVG inside
+    document.querySelectorAll('.profile-control-btn, .service-apply-btn, .home-svc-action, .svc-hub-btn').forEach(el => {
+      el.childNodes.forEach(node => {
+        if (node.nodeType === 3) {
+          const txt = node.textContent.trim();
+          if (txt && BN[txt]) {
+            if (!node._i18nOrig) node._i18nOrig = node.textContent;
+            node.textContent = ' ' + BN[txt];
+          }
+        }
+      });
     });
   }
 
