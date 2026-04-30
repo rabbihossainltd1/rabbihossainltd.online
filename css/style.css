@@ -2228,3 +2228,105 @@ img {
   white-space: nowrap;
 }
 .status svg { flex-shrink: 0; }
+
+/* ── Binance Pay method button ───────────────────────── */
+.method-btn.binance { border-color: rgba(243,186,47,.25); }
+.method-btn.active.binance {
+  border-color: #f3ba2f !important;
+  background: rgba(243,186,47,.12) !important;
+  box-shadow: 0 0 22px rgba(243,186,47,.12) !important;
+}
+
+/* ── Premium App Selector ────────────────────────────── */
+.proapp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+.proapp-app-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  border-radius: 18px;
+  border: 1.5px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  cursor: pointer;
+  transition: border-color .18s, background .18s, transform .18s;
+  font-size: .78rem;
+  font-weight: 900;
+  color: #8aaac8;
+}
+.proapp-app-card img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+.proapp-app-card:hover {
+  border-color: rgba(0,200,255,.3);
+  background: rgba(0,200,255,.06);
+  transform: translateY(-2px);
+  color: #c2e4f8;
+}
+.proapp-app-card.active {
+  border-color: rgba(0,200,255,.55) !important;
+  background: rgba(0,200,255,.12) !important;
+  color: #9ee8ff !important;
+  box-shadow: 0 0 22px rgba(0,200,255,.1);
+}
+.proapp-selected-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0,200,255,.06);
+  border: 1px solid rgba(0,200,255,.18);
+}
+.proapp-sel-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+.proapp-selected-row strong {
+  flex: 1;
+  font-size: 1rem;
+  color: #d0eaff;
+}
+.proapp-change-btn {
+  font-size: .76rem;
+  font-weight: 900;
+  color: #6a9ab8;
+  background: none;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.proapp-change-btn:hover { color: #9ee8ff; border-color: rgba(0,200,255,.3); }
+.proapp-plan-list { display: flex; flex-direction: column; gap: 10px; }
+.proapp-plan-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.proapp-plan-item:has(input:checked) {
+  border-color: rgba(0,255,136,.4);
+  background: rgba(0,255,136,.06);
+}
+.proapp-plan-item input[type="radio"] { accent-color: #00ff88; width: 17px; height: 17px; flex-shrink: 0; }
+.proapp-plan-info { display: flex; flex-direction: column; gap: 3px; }
+.proapp-plan-label { font-weight: 900; font-size: .88rem; color: #c8ddf0; }
+.proapp-plan-price { font-weight: 900; font-size: .95rem; color: #00ff88; }
+.proapp-plan-bdt { font-size: .78rem; color: #5a8a6a; font-weight: 700; }
