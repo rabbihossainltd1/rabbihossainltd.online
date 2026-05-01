@@ -23,10 +23,180 @@
         <li><a href="about.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>About</a></li>
         
       </ul>
+            <button class="nav-search-btn" id="navSearchBtn" aria-label="Search services" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
       <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
       
     </div>
   </nav>
+  <!-- ── Global Service Search Overlay ── -->
+  <div id="serviceSearchOverlay" role="dialog" aria-modal="true" aria-label="Search services" style="display:none;">
+    <div id="serviceSearchBox">
+      <div id="serviceSearchInputRow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#7a8ca8;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="serviceSearchInput" placeholder="Search services..." autocomplete="off" spellcheck="false" aria-label="Search services" />
+        <button type="button" id="serviceSearchClose" aria-label="Close search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="serviceSearchResults"></div>
+    </div>
+  </div>
+  <style>
+    .nav-search-btn { background:none; border:none; cursor:pointer; color:#8aaac8; padding:6px; border-radius:8px; display:flex; align-items:center; transition:color .18s; margin-right:4px; }
+    .nav-search-btn:hover { color:#00c8ff; }
+    #serviceSearchOverlay { position:fixed; inset:0; z-index:9999; background:rgba(2,5,10,.82); backdrop-filter:blur(12px); display:flex !important; align-items:flex-start; justify-content:center; padding-top:80px; }
+    #serviceSearchOverlay[style*="display:none"] { display:none !important; }
+    #serviceSearchBox { width:100%; max-width:640px; background:rgba(15,22,35,.95); border:1px solid rgba(0,200,255,.18); border-radius:22px; padding:18px; box-shadow:0 40px 100px rgba(0,0,0,.6); }
+    #serviceSearchInputRow { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:12px 14px; margin-bottom:14px; }
+    #serviceSearchInput { flex:1; background:transparent; border:0; outline:none; color:#e8edf5; font-size:1rem; font-family:inherit; }
+    #serviceSearchInput::placeholder { color:#4a6070; }
+    #serviceSearchClose { background:none; border:none; cursor:pointer; color:#7a8ca8; padding:4px; display:flex; align-items:center; border-radius:6px; }
+    #serviceSearchClose:hover { color:#e8edf5; }
+    #serviceSearchResults { max-height:420px; overflow-y:auto; display:grid; gap:8px; }
+    .search-result-item { display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.04); cursor:pointer; transition:.18s; text-decoration:none; color:inherit; }
+    .search-result-item:hover { border-color:rgba(0,200,255,.28); background:rgba(0,200,255,.07); }
+    .search-result-icon { width:38px; height:38px; border-radius:10px; background:rgba(0,200,255,.10); border:1px solid rgba(0,200,255,.18); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .search-result-name { font-weight:900; color:#d0eaff; font-size:.95rem; }
+    .search-result-tag { font-size:.76rem; color:#7a8ca8; margin-top:2px; }
+    .search-empty { text-align:center; color:#7a8ca8; padding:28px 0; font-size:.9rem; }
+    @media(max-width:680px){ #serviceSearchBox { margin:0 12px; border-radius:18px; } #serviceSearchOverlay { padding-top:70px; align-items:flex-start; } }
+  </style>
+  <script>
+  (function(){
+    const ALL_SERVICES = [
+      {name:'ChatGPT Subscription', tag:'Premium App', action:'proapp', proapp:'chatgpt'},
+      {name:'Gemini AI', tag:'Premium App', action:'proapp', proapp:'gemini'},
+      {name:'Grok AI', tag:'Premium App', action:'proapp', proapp:'grok'},
+      {name:'Netflix', tag:'Premium App', action:'proapp', proapp:'netflix'},
+      {name:'Canva Pro', tag:'Premium App', action:'proapp', proapp:'canva'},
+      {name:'CapCut Pro', tag:'Premium App', action:'proapp', proapp:'capcut'},
+      {name:'YouTube Premium', tag:'Premium App', action:'proapp', proapp:'youtube'},
+      {name:'Truecaller Premium', tag:'Premium App', action:'proapp', proapp:'truecaller'},
+      {name:'imo Premium', tag:'Premium App', action:'proapp', proapp:'imo'},
+      {name:'Premium VPN', tag:'Premium App', action:'proapp', proapp:'vpn'},
+      {name:'Remove Ads', tag:'Premium App', action:'proapp', proapp:'adsremove'},
+      {name:'Antivirus', tag:'Premium App', action:'proapp', proapp:'antivirus'},
+      {name:'Adobe Premiere Pro', tag:'PC Software', action:'proapp', proapp:'premiere'},
+      {name:'Adobe Photoshop', tag:'PC Software', action:'proapp', proapp:'photoshop'},
+      {name:'Adobe Illustrator', tag:'PC Software', action:'proapp', proapp:'illustrator'},
+      {name:'Windows License', tag:'PC Software', action:'proapp', proapp:'windows'},
+      {name:'Microsoft Excel / Office', tag:'PC Software', action:'proapp', proapp:'excel'},
+      {name:'Facebook Meta Verified', tag:'Social Media', action:'service', service:'Facebook Meta Verified', fields:'meta'},
+      {name:'Visa / Mastercard', tag:'Cards', action:'service', service:'Visa / Mastercard', fields:'card'},
+      {name:'Free Fire Diamond Top-up', tag:'Gaming', action:'service', service:'Free Fire Diamond Top-up', fields:'ff'},
+      {name:'Free Fire Android Panel (Drip)', tag:'Gaming', action:'service', service:'Free Fire Android Panel (Drip)', fields:'ffDrip'},
+      {name:'Free Fire Android Panel (FF4X)', tag:'Gaming', action:'service', service:'Free Fire Android Panel (FF4X)', fields:'ffFf4x'},
+      {name:'Free Fire iPhone Panel (iOS)', tag:'Gaming', action:'service', service:'Free Fire iPhone Panel (iOS)', fields:'ffIos'},
+      {name:'Free Fire PC Panel', tag:'Gaming', action:'service', service:'Free Fire PC Panel', fields:'ffPc'},
+      {name:'Website Development', tag:'Development', action:'service', service:'Website Development', fields:'webDev'},
+      {name:'Android App Development', tag:'Development', action:'service', service:'Android App Development', fields:'android'},
+      {name:'Ethical Hacking / Security Audit', tag:'Security', action:'service', service:'Ethical Hacking / Security Audit', fields:'security'},
+      {name:'Digital Branding', tag:'Branding', action:'service', service:'Digital Branding', fields:'android'},
+      {name:'Premium Digital Services', tag:'Digital', action:'service', service:'Premium Digital Services', fields:'android'},
+    ];
+
+    const svgIcons = {
+      'Premium App':   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+      'PC Software':   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+      'Social Media':  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1877f2" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>',
+      'Cards':         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+      'Gaming':        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round"><path d="M7.4 9.25h9.2c2.25 0 4.15 1.72 4.35 3.96l.22 2.42a2.55 2.55 0 0 1-4.42 1.95l-1.38-1.48H8.63l-1.38 1.48a2.55 2.55 0 0 1-4.42-1.95l.22-2.42a4.37 4.37 0 0 1 4.35-3.96Z"/><path d="M8.25 12v3M6.75 13.5h3M15.75 13.25h.01M18.25 14.75h.01"/></svg>',
+      'Development':   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+      'Security':      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      'Branding':      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>',
+      'Digital':       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    };
+
+    let overlay, input, results, open = false;
+
+    function init() {
+      overlay = document.getElementById('serviceSearchOverlay');
+      input = document.getElementById('serviceSearchInput');
+      results = document.getElementById('serviceSearchResults');
+      const openBtn = document.getElementById('navSearchBtn');
+      const closeBtn = document.getElementById('serviceSearchClose');
+      if (!overlay || !input) return;
+      if (openBtn) openBtn.addEventListener('click', openSearch);
+      if (closeBtn) closeBtn.addEventListener('click', closeSearch);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSearch(); });
+      input.addEventListener('input', doSearch);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) closeSearch(); });
+    }
+
+    function openSearch() {
+      open = true;
+      overlay.style.display = '';
+      input.value = '';
+      showAll();
+      setTimeout(() => input.focus(), 60);
+    }
+
+    function closeSearch() {
+      open = false;
+      overlay.style.display = 'none';
+    }
+
+    function showAll() {
+      renderResults(ALL_SERVICES.slice(0, 12));
+    }
+
+    function doSearch() {
+      const q = input.value.trim().toLowerCase();
+      if (!q) { showAll(); return; }
+      const filtered = ALL_SERVICES.filter(s =>
+        s.name.toLowerCase().includes(q) || s.tag.toLowerCase().includes(q)
+      );
+      renderResults(filtered);
+    }
+
+    function renderResults(list) {
+      if (!list.length) {
+        results.innerHTML = '<div class="search-empty">No services found.</div>';
+        return;
+      }
+      results.innerHTML = list.map(s => {
+        const icon = svgIcons[s.tag] || svgIcons['Digital'];
+        return `<div class="search-result-item" tabindex="0" onclick="handleSearchClick(${JSON.stringify(s).replace(/"/g,'&quot;')})">
+          <div class="search-result-icon">${icon}</div>
+          <div>
+            <div class="search-result-name">${s.name}</div>
+            <div class="search-result-tag">${s.tag}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    window.handleSearchClick = function(s) {
+      closeSearch();
+      // Navigate to services page if not already there
+      const onServices = window.location.pathname.endsWith('services.html') || window.location.pathname === '/services.html';
+      if (!onServices) {
+        const param = s.action === 'proapp'
+          ? `?service=Premium+App+%26+Subscription&fields=proapp&app=${encodeURIComponent(s.proapp)}`
+          : `?service=${encodeURIComponent(s.service)}&fields=${encodeURIComponent(s.fields || '')}`;
+        window.location.href = 'services.html' + param;
+        return;
+      }
+      // Already on services page — trigger modal directly
+      if (s.action === 'proapp') {
+        const trigger = document.querySelector('[data-fields="proapp"][data-proapp="' + s.proapp + '"]');
+        if (trigger) { trigger.click(); return; }
+        const anyProapp = document.querySelector('[data-service="Premium App & Subscription"]');
+        if (anyProapp) { anyProapp.click(); setTimeout(() => { if (typeof window._proappSelect === 'function') window._proappSelect(s.proapp); }, 200); }
+      } else {
+        const trigger = document.querySelector('[data-service="' + s.service + '"]');
+        if (trigger) trigger.click();
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else { init(); }
+  })();
+  </script>
+
 
   <!-- ── SERVICE ORDER MODAL ──────────────────────────────── -->
   <!-- ══ SERVICE ORDER MODAL ════════════════════════════════ -->
@@ -350,9 +520,9 @@
           function renderApps() {
             const grid = document.getElementById('proappGrid');
             if (!grid) return;
+            // Compact list — name only, no image
             grid.innerHTML = APPS.map(app => `
-              <button class="proapp-app-card" type="button" data-appid="${app.id}" onclick="window._proappSelect('${app.id}')">
-                <img src="${app.img}" alt="${app.name}" />
+              <button class="proapp-app-card proapp-app-name-only" type="button" data-appid="${app.id}" onclick="window._proappSelect('${app.id}')">
                 <span>${app.name}</span>
               </button>
             `).join('');
@@ -365,9 +535,9 @@
             // Highlight selected
             document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.toggle('active', c.dataset.appid === appId));
 
-            // Fill selected row
+            // Fill selected row — compact, show name + Change App button (no redirect to services page)
             const row = document.getElementById('proappSelectedRow');
-            if (row) row.innerHTML = `<img src="${app.img}" alt="${app.name}" class="proapp-sel-img" /><strong>${app.name}</strong><button class="proapp-change-btn" type="button" onclick="window._proappClear()">Change App</button>`;
+            if (row) row.innerHTML = `<strong style="color:#e8edf5;font-size:1rem;">${app.name}</strong><button class="proapp-change-btn" type="button" onclick="window._proappShowList()">Change App</button>`;
 
             // Fill plan list
             const planList = document.getElementById('proappPlanList');
@@ -391,6 +561,14 @@
           };
 
           window._proappClear = function() {
+            document.getElementById('proappStep2').style.display = 'none';
+            document.getElementById('proappEmailGroup').style.display = 'none';
+            document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.remove('active'));
+          };
+
+          // Show app list again (inline, within modal — no redirect)
+          window._proappShowList = function() {
+            document.getElementById('proappStep1').style.display = '';
             document.getElementById('proappStep2').style.display = 'none';
             document.getElementById('proappEmailGroup').style.display = 'none';
             document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.remove('active'));
@@ -978,6 +1156,210 @@
       });
     })();
   </script>
+
+<!-- ── Floating Customer Support Widget ── -->
+<div id="floatChatWidget">
+  <div id="floatChatWindow" style="display:none;" role="dialog" aria-label="Customer Support Chat">
+    <div id="floatChatHeader">
+      <div id="floatChatHeaderInfo">
+        <div id="floatChatAvatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div id="floatChatTitle">Rabbi Hossain Support</div>
+          <div id="floatChatStatus">
+            <span id="floatStatusDot"></span> Online
+          </div>
+        </div>
+      </div>
+      <button type="button" id="floatChatClose" aria-label="Close chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="floatChatMessages">
+      <div class="float-msg float-msg-admin">
+        <div class="float-msg-bubble">Hi! How can we help you today?</div>
+        <div class="float-msg-time">Support Team</div>
+      </div>
+    </div>
+    <div id="floatChatInputArea">
+      <input type="text" id="floatChatInput" placeholder="Type your message..." autocomplete="off" maxlength="500" />
+      <button type="button" id="floatChatSend" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+  <button type="button" id="floatChatToggle" aria-label="Open customer support">
+    <span id="floatChatBadge" style="display:none;"></span>
+    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+
+<style>
+#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:8888; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+#floatChatToggle { width:56px; height:56px; border-radius:50%; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(0,200,255,.35); transition:transform .2s, box-shadow .2s; position:relative; }
+#floatChatToggle:hover { transform:scale(1.08); box-shadow:0 12px 40px rgba(0,200,255,.45); }
+#floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #02050a; }
+#floatChatWindow { width:340px; max-height:520px; background:rgba(10,18,30,.97); border:1px solid rgba(0,200,255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
+@keyframes floatSlideIn { from{opacity:0;transform:translateY(18px) scale(.96)} to{opacity:1;transform:none} }
+#floatChatHeader { background:rgba(0,200,255,.07); border-bottom:1px solid rgba(0,200,255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#floatChatHeaderInfo { display:flex; align-items:center; gap:10px; }
+#floatChatAvatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#00c8ff,#00ff88); display:flex; align-items:center; justify-content:center; color:#02050a; flex-shrink:0; }
+#floatChatTitle { color:#d0eaff; font-weight:900; font-size:.92rem; }
+#floatChatStatus { color:#7a8ca8; font-size:.75rem; display:flex; align-items:center; gap:5px; margin-top:2px; }
+#floatStatusDot { width:7px; height:7px; border-radius:50%; background:#00ff88; animation:statusPulse 2s ease-in-out infinite; display:inline-block; }
+@keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#floatChatClose { background:none; border:none; color:#7a8ca8; cursor:pointer; padding:4px; border-radius:6px; display:flex; align-items:center; }
+#floatChatClose:hover { color:#e8edf5; }
+#floatChatMessages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:200px; max-height:300px; }
+.float-msg { display:flex; flex-direction:column; max-width:82%; }
+.float-msg-admin { align-self:flex-start; }
+.float-msg-user { align-self:flex-end; }
+.float-msg-bubble { padding:10px 14px; border-radius:16px; font-size:.86rem; line-height:1.52; word-break:break-word; }
+.float-msg-admin .float-msg-bubble { background:rgba(0,200,255,.10); border:1px solid rgba(0,200,255,.18); color:#c9d4e5; border-bottom-left-radius:4px; }
+.float-msg-user .float-msg-bubble { background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(0,255,136,.14)); border:1px solid rgba(0,200,255,.22); color:#d8f0ff; border-bottom-right-radius:4px; }
+.float-msg-time { font-size:.7rem; color:#4a6070; margin-top:4px; }
+.float-msg-admin .float-msg-time { text-align:left; }
+.float-msg-user .float-msg-time { text-align:right; }
+#floatChatInputArea { border-top:1px solid rgba(255,255,255,.07); padding:12px; display:flex; gap:8px; align-items:center; }
+#floatChatInput { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 12px; color:#e8edf5; font-size:.88rem; font-family:inherit; outline:none; }
+#floatChatInput::placeholder { color:#4a6070; }
+#floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
+#floatChatSend:hover { transform:scale(1.08); }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 32px); } #floatChatWidget { right:12px; bottom:16px; } }
+</style>
+
+<script type="module">
+import { auth, db } from './js/firebase-core.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+import {
+  collection, addDoc, onSnapshot, query, where, orderBy,
+  serverTimestamp, limit
+} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+(function() {
+  'use strict';
+
+  const toggle = document.getElementById('floatChatToggle');
+  const window_ = document.getElementById('floatChatWindow');
+  const closeBtn = document.getElementById('floatChatClose');
+  const sendBtn = document.getElementById('floatChatSend');
+  const input = document.getElementById('floatChatInput');
+  const messages = document.getElementById('floatChatMessages');
+  const badge = document.getElementById('floatChatBadge');
+  const iconChat = document.getElementById('floatIconChat');
+  const iconClose = document.getElementById('floatIconClose');
+
+  let isOpen = false;
+  let currentUser = null;
+  let unsubMessages = null;
+  let unreadCount = 0;
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts.seconds * 1000);
+    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function appendMessage(role, text, time) {
+    const wrap = document.createElement('div');
+    wrap.className = 'float-msg ' + (role === 'user' ? 'float-msg-user' : 'float-msg-admin');
+    wrap.innerHTML = `<div class="float-msg-bubble">${escHtml(text)}</div><div class="float-msg-time">${time || ''}</div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function openChat() {
+    isOpen = true;
+    window_.style.display = 'flex';
+    iconChat.style.display = 'none';
+    iconClose.style.display = '';
+    unreadCount = 0;
+    badge.style.display = 'none';
+    if (currentUser) subscribeMessages();
+    setTimeout(() => input.focus(), 60);
+  }
+
+  function closeChat() {
+    isOpen = false;
+    window_.style.display = 'none';
+    iconChat.style.display = '';
+    iconClose.style.display = 'none';
+  }
+
+  function subscribeMessages() {
+    if (unsubMessages) unsubMessages();
+    if (!currentUser) return;
+    const q = query(
+      collection(db, 'supportChats', currentUser.uid, 'messages'),
+      orderBy('createdAt', 'asc'),
+      limit(80)
+    );
+    messages.innerHTML = '';
+    unsubMessages = onSnapshot(q, (snap) => {
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const d = change.doc.data();
+          appendMessage(d.role, d.text, fmtTime(d.createdAt));
+          if (!isOpen && d.role === 'admin') {
+            unreadCount++;
+            badge.textContent = unreadCount;
+            badge.style.display = 'flex';
+          }
+        }
+      });
+    });
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    if (!currentUser) {
+      appendMessage('admin', 'Please login to send messages.', new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+      return;
+    }
+    try {
+      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
+        text,
+        role: 'user',
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        createdAt: serverTimestamp(),
+      });
+      // Also create/update the chat room record so admin sees it
+      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {}).catch(()=>{});
+      const { doc: fsDoc, setDoc: fsSetDoc } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const roomRef = fsDoc(db, 'supportRooms', currentUser.uid);
+      await fsSetDoc(roomRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        displayName: currentUser.displayName || currentUser.email || '',
+        lastMessage: text,
+        lastAt: serverTimestamp(),
+        unreadAdmin: (window._supportRoomUnread || 0) + 1
+      }, { merge: true });
+    } catch(e) {
+      appendMessage('admin', 'Failed to send message. Try again.', '');
+    }
+  }
+
+  toggle.addEventListener('click', () => { isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user && isOpen) subscribeMessages();
+  });
+})();
+</script>
 
 </body>
 </html>
