@@ -1758,7 +1758,9 @@ img {
 .compact-service-card .service-card-body{padding:14px!important;flex:1!important;}
 .compact-service-card h3{font-size:.92rem!important;margin-bottom:5px!important;line-height:1.3!important;}
 .compact-service-card p{font-size:.76rem!important;line-height:1.45!important;margin-bottom:10px!important;}
-.compact-service-card .service-apply-btn{padding:9px 12px!important;font-size:.75rem!important;width:100%!important;text-align:center!important;}
+.compact-service-card .service-apply-btn{padding:9px 12px!important;font-size:.80rem!important;width:100%!important;text-align:center!important;justify-content:center!important;margin-top:0!important;}
+.compact-service-card .svc-btn-row{margin-top:10px!important;}
+.compact-service-card .svc-info-btn{width:100%!important;justify-content:center!important;padding:8px 12px!important;font-size:.78rem!important;}
 @media(max-width:480px){.svc-category-grid{grid-template-columns:1fr 1fr;gap:10px;}
   .compact-service-card .service-card-img{height:120px!important;}
   .compact-service-card .service-card-body{padding:11px!important;}
@@ -2397,51 +2399,51 @@ img {
 
 /* ── Button alignment fixes ─────────────────────────────── */
 
-/* Popular Services card (home page) */
+/* Popular Services card (home page) — buttons stacked vertically */
 .home-svc-action-row {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
   margin-top: auto;
   padding-top: 12px;
-  flex-wrap: nowrap;
   width: 100%;
 }
 .home-svc-action {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--accent), #00ff88);
   color: #020a10;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: .80rem;
+  font-size: .82rem;
   letter-spacing: .02em;
-  white-space: nowrap;
-  flex-shrink: 0;
+  text-align: center;
+}
+.home-svc-action-row .svc-info-btn {
+  width: 100% !important;
+  justify-content: center;
 }
 
-/* Service cards page (services.html) */
+/* Service cards page (services.html) — buttons stacked vertically */
 .svc-btn-row {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
   margin-top: 16px;
-  flex-wrap: nowrap;
   width: 100%;
 }
 .svc-btn-row .service-apply-btn {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   margin-top: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   justify-content: center;
 }
 .svc-btn-row .svc-info-btn {
-  flex-shrink: 0;
+  width: 100% !important;
+  justify-content: center;
   margin-top: 0;
 }
