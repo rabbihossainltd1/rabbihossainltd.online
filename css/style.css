@@ -2258,8 +2258,8 @@ img {
 /* ── Premium App Selector ────────────────────────────── */
 .proapp-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
   margin-top: 6px;
 }
 .proapp-app-card {
@@ -2276,6 +2276,16 @@ img {
   font-size: .78rem;
   font-weight: 900;
   color: #8aaac8;
+}
+/* Compact name-only card (no image) */
+.proapp-app-name-only {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: .86rem;
+  text-align: left;
 }
 .proapp-app-card img {
   width: 56px;
