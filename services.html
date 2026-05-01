@@ -214,6 +214,27 @@
               ]
             },
             {
+              id:'grok', name:'Grok AI', img:'images/grok-pro.png',
+              plans:[
+                {label:'Grok Basic · 1 Month', usd:5},
+                {label:'Grok Plus · 1 Month', usd:15},
+                {label:'Grok Plus · 3 Months', usd:30},
+                {label:'Grok Plus · 12 Months', usd:120},
+                {label:'Grok Premium · 1 Month', usd:20},
+                {label:'Grok Premium · 3 Months', usd:50},
+                {label:'Grok Premium · 12 Months', usd:100},
+              ]
+            },
+            {
+              id:'netflix', name:'Netflix', img:'images/netflix-pro.png',
+              plans:[
+                {label:'Mobile · 1 Month', usd:2.99},
+                {label:'Basic · 1 Month', usd:4.99},
+                {label:'Standard · 1 Month', usd:6.99},
+                {label:'Premium · 1 Month', usd:9.99},
+              ]
+            },
+            {
               id:'canva', name:'Canva', img:'images/canva-pro.png',
               plans:[
                 {label:'Pro · 1 Month', usd:12.99},
@@ -252,6 +273,74 @@
                 {label:'Premium · 1 Month', usd:0.82},
                 {label:'Premium · 3 Months', usd:2.07},
                 {label:'Premium · 12 Months', usd:7.49},
+              ]
+            },
+            {
+              id:'vpn', name:'Premium VPN', img:'images/pro-vpn.png',
+              plans:[
+                {label:'1 Device · 1 Year', usd:4.99},
+                {label:'3 Devices · 1 Year', usd:11.99},
+                {label:'5 Devices · 1 Year', usd:19.99},
+                {label:'10 Devices · 1 Year', usd:29.99},
+              ]
+            },
+            {
+              id:'adsremove', name:'Remove Ads', img:'images/ads-remove.png',
+              plans:[
+                {label:'Lifetime', usd:5.99},
+              ]
+            },
+            {
+              id:'antivirus', name:'Antivirus', img:'images/anti-virus.png',
+              plans:[
+                {label:'1 Device · 1 Year', usd:4.99},
+                {label:'3 Devices · 1 Year', usd:9.99},
+                {label:'5 Devices · 1 Year', usd:19.99},
+                {label:'10 Devices · 1 Year', usd:29.99},
+              ]
+            },
+            // ── PC Software ──────────────────────────────────
+            {
+              id:'premiere', name:'Adobe Premiere Pro', img:'images/adobe-premier-pro.png', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:19.99},
+                {label:'Annual Plan Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Plan Prepaid · 1 Year', usd:240.88},
+              ]
+            },
+            {
+              id:'photoshop', name:'Adobe Photoshop', img:'images/adobe-photoshop.png', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:18.99},
+                {label:'Annual Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Prepaid · 1 Year', usd:240.88},
+              ]
+            },
+            {
+              id:'illustrator', name:'Adobe Illustrator', img:'images/adobe-illustrator.png', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:19.99},
+                {label:'Annual Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Prepaid · 1 Year', usd:250.88},
+              ]
+            },
+            {
+              id:'windows', name:'Windows License', img:'images/Microsoft-excel.png', category:'pc',
+              plans:[
+                {label:'Windows 10 Home · Lifetime', usd:11.99},
+                {label:'Windows 10 Pro · Lifetime', usd:14.99},
+                {label:'Windows 11 Home · Lifetime', usd:19.99},
+                {label:'Windows 11 Pro · Lifetime', usd:16.99},
+                {label:'Windows 11 Pro 2PC · Lifetime', usd:29.99},
+              ]
+            },
+            {
+              id:'excel', name:'Microsoft Excel', img:'images/Microsoft-excel.png', category:'pc',
+              plans:[
+                {label:'Excel 2021 · Lifetime', usd:14.99},
+                {label:'Microsoft 365 Excel · 1 Year / 1 User', usd:29.99},
+                {label:'Microsoft 365 Family · 1 Year / 6 Users', usd:49.99},
+                {label:'Excel + Word + PowerPoint · Lifetime', usd:39.99},
               ]
             },
           ];
@@ -611,13 +700,115 @@
               <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="imo">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
             </div>
           </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/netflix-pro.png" alt="Netflix" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">10</div>
+              <h3>Netflix</h3>
+              <p>Mobile · Basic · Standard · Premium.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="netflix">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/grok-pro.png" alt="Grok AI" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">11</div>
+              <h3>Grok AI</h3>
+              <p>Basic · Plus · Premium — from $5/mo.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="grok">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/pro-vpn.png" alt="Premium VPN" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">12</div>
+              <h3>Premium VPN</h3>
+              <p>1–10 Devices · 1 Year — from $4.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="vpn">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/anti-virus.png" alt="Antivirus" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">13</div>
+              <h3>Antivirus</h3>
+              <p>1–10 Devices · 1 Year — from $4.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="antivirus">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/ads-remove.png" alt="Remove Ads" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">14</div>
+              <h3>Remove Ads</h3>
+              <p>Lifetime ad-free experience — $5.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="adsremove">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CATEGORY 04: PC Software ───────────────────── -->
+      <div class="svc-category-block reveal">
+        <div class="svc-category-head">
+          <span>Category 04</span>
+          <h2>PC Software & Licenses</h2>
+        </div>
+        <div class="svc-category-grid">
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/adobe-premier-pro.png" alt="Adobe Premiere Pro" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC01</div>
+              <h3>Adobe Premiere Pro</h3>
+              <p>Monthly & Annual plans — from $19.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="premiere">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/adobe-photoshop.png" alt="Adobe Photoshop" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC02</div>
+              <h3>Adobe Photoshop</h3>
+              <p>Monthly & Annual plans — from $18.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="photoshop">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/adobe-illustrator.png" alt="Adobe Illustrator" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC03</div>
+              <h3>Adobe Illustrator</h3>
+              <p>Monthly & Annual plans — from $19.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="illustrator">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/Microsoft-excel.png" alt="Windows License" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC04</div>
+              <h3>Windows License Key</h3>
+              <p>Win 10/11 Home & Pro — from $11.99.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="windows">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="images/Microsoft-excel.png" alt="Microsoft Excel" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC05</div>
+              <h3>Microsoft Excel</h3>
+              <p>Lifetime & Microsoft 365 plans.</p>
+              <button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="excel">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+            </div>
+          </div>
+
+          </div>
         </div>
       </div>
 
       <div class="svc-category-block reveal">
         <div class="svc-category-head">
           <span>Category 02</span>
-          <h2>Free Fire Top-up & Panels</h2>
+          <h2>Free Fire Top-up &amp; Panels</h2>
         </div>
         <div class="svc-category-grid">
           <div class="service-card glass-card reveal compact-service-card">
