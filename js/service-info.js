@@ -11,7 +11,7 @@
 
     'meta': {
       name: 'Facebook Meta Verified',
-      emoji: '✅',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1877f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>',
       color: '#1877f2',
       tagline: 'Facebook Profile বা Page-কে সরকারি Verified Badge দিন',
       what_en: 'Meta Verified is an official verification badge (blue tick) from Facebook/Instagram for profiles and pages. It confirms your identity and boosts trust with your audience.',
@@ -24,13 +24,13 @@
         { en: 'More credibility for business and personal brand', bn: 'Business ও personal brand-এর বিশ্বাসযোগ্যতা বাড়ে' },
         { en: 'Direct support from Meta for verified accounts', bn: 'Meta থেকে সরাসরি support পাওয়া যায়' },
       ],
-      note_bn: '⚠️ Verification apply করার জন্য আপনার National ID / Passport লাগতে পারে। আমরা পুরো process guide করি।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Verification apply করার জন্য আপনার National ID / Passport লাগতে পারে। আমরা পুরো process guide করি।',
       note_en: 'National ID or Passport may be required. We guide you through the full process.',
     },
 
     'card': {
       name: 'Visa / Mastercard',
-      emoji: '💳',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
       color: '#1a56db',
       tagline: 'Physical বা Virtual Dollar Card পান — Online Payment সহজ করুন',
       what_en: 'Get a physical or virtual Visa/Mastercard that works for online shopping, international payments, subscriptions, and more — from anywhere.',
@@ -43,13 +43,13 @@
         { en: 'Virtual card — instant delivery, no physical wait', bn: 'Virtual card — instant delivery, physical card-এর জন্য অপেক্ষা নেই' },
         { en: 'Secure chip & PIN / contactless payments', bn: 'Secure chip & PIN / contactless payment' },
       ],
-      note_bn: '💡 NID বা Passport ছাড়াই কার্ড পাওয়া সম্ভব। যোগাযোগ করুন আরও জানতে।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> NID বা Passport ছাড়াই কার্ড পাওয়া সম্ভব। যোগাযোগ করুন আরও জানতে।',
       note_en: 'Card available without NID/Passport in some cases. Contact us to learn more.',
     },
 
     'ff': {
       name: 'Free Fire Diamond Top-up',
-      emoji: '💎',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
       color: '#ffa500',
       tagline: 'সবচেয়ে কম দামে FF Diamond — সরাসরি আপনার UID-এ',
       what_en: 'Recharge Free Fire diamonds directly to your UID at the lowest prices. Choose from single diamond packs or weekly/monthly membership plans.',
@@ -62,13 +62,13 @@
         { en: 'Fast delivery — usually within minutes', bn: 'দ্রুত delivery — সাধারণত মিনিটের মধ্যে' },
         { en: 'bKash, Nagad, Rocket, Binance payment accepted', bn: 'bKash, Nagad, Rocket, Binance payment accept করা হয়' },
       ],
-      note_bn: '🎮 Diamond পেতে শুধু আপনার Free Fire UID দিন। Password বা account দেওয়া লাগবে না।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M15 10l-4 4m0 0l-4-4m4 4V3M5 21h14"/></svg> Diamond পেতে শুধু আপনার Free Fire UID দিন। Password বা account দেওয়া লাগবে না।',
       note_en: 'Only your Free Fire UID is needed. No password or account access required.',
     },
 
     'ffIos': {
       name: 'Free Fire iPhone Panel (iOS)',
-      emoji: '📱',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00bfff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
       color: '#00bfff',
       tagline: 'iPhone এ Free Fire Panel — হ্যাক ছাড়া সব অ্যাডভান্টেজ',
       what_en: 'The Free Fire iOS Panel gives you special in-game advantages directly on your iPhone without needing to root or jailbreak. Safe, fast, and effective.',
@@ -81,13 +81,13 @@
         { en: 'Fast activation after payment', bn: 'Payment-এর পরেই দ্রুত activate হয়' },
         { en: 'Support provided throughout the setup', bn: 'Setup-এর সময় সম্পূর্ণ support দেওয়া হয়' },
       ],
-      note_bn: '⚠️ এটি শুধুমাত্র iPhone (iOS) এর জন্য। Android ব্যবহারকারীরা Android Panel ব্যবহার করুন।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> এটি শুধুমাত্র iPhone (iOS) এর জন্য। Android ব্যবহারকারীরা Android Panel ব্যবহার করুন।',
       note_en: 'This panel is for iPhone (iOS) only. Android users should use the Android Panel.',
     },
 
     'ffDrip': {
       name: 'FF Android Panel — Drip Client (Root)',
-      emoji: '🤖',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b39ddb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M12 11V7a4 4 0 0 1 8 0M8 11V7a4 4 0 0 0-8 0"/><circle cx="9" cy="15" r="1" fill="#b39ddb"/><circle cx="15" cy="15" r="1" fill="#b39ddb"/></svg>',
       color: '#b39ddb',
       tagline: 'Android Rooted Phone-এ Free Fire Panel — Drip Client',
       what_en: 'The Free Fire Android Drip Panel works on rooted Android phones, giving you in-game enhancements through the Drip Client. Powerful and customizable.',
@@ -100,13 +100,13 @@
         { en: 'Secure delivery via email', bn: 'Email-এর মাধ্যমে secure delivery' },
         { en: 'Affordable pricing for all budgets', bn: 'সব বাজেটের জন্য সাশ্রয়ী মূল্য' },
       ],
-      note_bn: '⚠️ এই service-টি ব্যবহার করতে আপনার Android phone অবশ্যই root করা থাকতে হবে।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> এই service-টি ব্যবহার করতে আপনার Android phone অবশ্যই root করা থাকতে হবে।',
       note_en: 'Your Android device must be rooted to use this service.',
     },
 
     'ffPc': {
       name: 'Free Fire PC Panel',
-      emoji: '🖥️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
       color: '#00c864',
       tagline: 'PC-তে Free Fire Panel — সহজ ও দ্রুত',
       what_en: 'The Free Fire PC Panel lets you use in-game enhancements on your Windows computer. Ideal for players who prefer playing Free Fire on PC via emulator.',
@@ -119,13 +119,13 @@
         { en: 'Cost-effective pricing', bn: 'সাশ্রয়ী মূল্য' },
         { en: 'Fast delivery after order confirmation', bn: 'Order confirm হওয়ার পরেই দ্রুত delivery' },
       ],
-      note_bn: '💻 PC panel শুধু emulator-এ চলে। Phone দিয়ে FF খেললে iOS বা Android Panel ব্যবহার করুন।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> PC panel শুধু emulator-এ চলে। Phone দিয়ে FF খেললে iOS বা Android Panel ব্যবহার করুন।',
       note_en: 'PC panel works with emulators only. Use iOS or Android Panel if you play on phone.',
     },
 
     'chatgpt': {
       name: 'ChatGPT Subscription',
-      emoji: '🤖',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
       color: '#10a37f',
       tagline: 'ChatGPT-এর সর্বোচ্চ ক্ষমতা Unlock করুন — সবচেয়ে কম দামে',
       what_en: 'ChatGPT by OpenAI is the world\'s most advanced AI assistant. Upgrade to Plus or Pro for faster responses, GPT-4o, image generation, and much more.',
@@ -139,13 +139,13 @@
         { en: 'Priority access — no slowdowns during peak hours', bn: 'Peak hour-এও slow হবে না, priority access' },
         { en: 'Unlimited message limit (Pro)', bn: 'Message-এর কোনো limit নেই (Pro)' },
       ],
-      note_bn: '📧 Account আপনার নিজের, আমরা শুধু subscription activate করে দিই। 100% নিরাপদ।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Account আপনার নিজের, আমরা শুধু subscription activate করে দিই। 100% নিরাপদ।',
       note_en: 'Your own account. We only activate the subscription. 100% safe.',
     },
 
     'gemini': {
       name: 'Gemini AI Pro / Ultra',
-      emoji: '✨',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
       color: '#8e75ff',
       tagline: 'Google-এর সবচেয়ে শক্তিশালী AI — Gemini Ultra',
       what_en: 'Google Gemini is Google\'s most capable AI model. Gemini Advanced (Ultra 1.0) handles complex reasoning, coding, math, and creative tasks far beyond basic AI.',
@@ -158,13 +158,13 @@
         { en: 'Integrated with Gmail, Docs, Drive (Workspace)', bn: 'Gmail, Docs, Drive-এর সাথে integrated' },
         { en: 'Access exclusive Gemini features before others', bn: 'Exclusive Gemini features আগে ব্যবহার করুন' },
       ],
-      note_bn: '📧 আপনার নিজের Google account-এ activate হবে। Safe ও secure।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> আপনার নিজের Google account-এ activate হবে। Safe ও secure।',
       note_en: 'Activated on your own Google account. Safe and secure.',
     },
 
     'canva': {
       name: 'Canva Pro / Teams',
-      emoji: '🎨',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
       color: '#7d2ae8',
       tagline: 'Design এখন অনেক সহজ — Canva Pro-র সব Premium Features পান',
       what_en: 'Canva Pro is the premium design platform used by millions of creators. Unlock brand kits, 100M+ stock assets, background remover, magic resize, and more.',
@@ -178,13 +178,13 @@
         { en: 'Schedule social media posts from Canva', bn: 'Canva থেকেই social media post schedule করুন' },
         { en: 'Team collaboration (Canva Teams plan)', bn: 'Team-এর সাথে মিলে কাজ করুন (Teams plan)' },
       ],
-      note_bn: '🎨 Design জানা না লাগলেও চলবে! Canva এতটাই সহজ।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Design জানা না লাগলেও চলবে! Canva এতটাই সহজ।',
       note_en: 'No design experience needed! Canva is that easy.',
     },
 
     'capcut': {
       name: 'CapCut Pro',
-      emoji: '🎬',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="background:#fff;border-radius:6px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
       color: '#fe2c55',
       tagline: 'Professional Video Edit করুন Mobile বা PC-তে — CapCut Pro দিয়ে',
       what_en: 'CapCut Pro is the premium version of the world\'s most popular video editor. Remove watermarks, access AI features, use premium effects and templates.',
@@ -198,13 +198,13 @@
         { en: 'Export in 4K Ultra HD quality', bn: '4K Ultra HD quality-তে export করুন' },
         { en: 'Works on mobile and PC', bn: 'Mobile ও PC দুটোতেই কাজ করে' },
       ],
-      note_bn: '🎬 TikTok, YouTube Shorts, Reels তৈরির জন্য সেরা tool।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5757" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> TikTok, YouTube Shorts, Reels তৈরির জন্য সেরা tool।',
       note_en: 'Best tool for creating TikTok, YouTube Shorts, and Reels content.',
     },
 
     'youtube': {
       name: 'YouTube Premium',
-      emoji: '▶️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.97C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.97A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#ff0000"/></svg>',
       color: '#ff0000',
       tagline: 'Ad ছাড়া YouTube — Background Play ও Offline Download',
       what_en: 'YouTube Premium removes all ads, lets you play videos in the background, download for offline viewing, and includes YouTube Music Premium for free.',
@@ -217,13 +217,13 @@
         { en: 'Exclusive YouTube Originals content', bn: 'Exclusive YouTube Originals content দেখুন' },
         { en: 'Family plan — up to 6 members', bn: 'Family plan — সর্বোচ্চ 6 জন ব্যবহার করতে পারবেন' },
       ],
-      note_bn: '🎵 YouTube Music-ও included, আলাদা subscribe করতে হবে না!',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> YouTube Music-ও included, আলাদা subscribe করতে হবে না!',
       note_en: 'YouTube Music is included — no separate subscription needed!',
     },
 
     'truecaller': {
       name: 'Truecaller Premium / Gold',
-      emoji: '📞',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00b259" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
       color: '#0099ff',
       tagline: 'Caller ID-এর সেরা — Spam Block করুন, Contact জানুন',
       what_en: 'Truecaller Premium gives you advanced caller ID, spam blocking, who viewed your profile, contact requests, and an ad-free experience.',
@@ -237,13 +237,13 @@
         { en: 'Ad-free experience throughout the app', bn: 'পুরো app-এ কোনো ad নেই' },
         { en: 'Gold badge on your profile (Gold plan)', bn: 'Profile-এ Gold badge (Gold plan)' },
       ],
-      note_bn: '📱 Bangladesh-এ Truecaller সবচেয়ে জনপ্রিয় caller ID app।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b259" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> Bangladesh-এ Truecaller সবচেয়ে জনপ্রিয় caller ID app।',
       note_en: 'Most popular caller ID app in Bangladesh.',
     },
 
     'imo': {
       name: 'imo Premium',
-      emoji: '💬',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0099ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
       color: '#0084ff',
       tagline: 'imo-তে Special দেখান — Premium Badge ও Features পান',
       what_en: 'imo Premium gives you a special premium badge, the ability to see who viewed your story, send large files, and more — at a very affordable price.',
@@ -256,13 +256,13 @@
         { en: 'Exclusive sticker packs & themes', bn: 'Exclusive sticker pack ও theme' },
         { en: 'Ad-free messaging experience', bn: 'Ad ছাড়া messaging' },
       ],
-      note_bn: '💡 Weekly plan মাত্র ৳36 থেকে শুরু — সবচেয়ে সস্তা premium!',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Weekly plan মাত্র ৳36 থেকে শুরু — সবচেয়ে সস্তা premium!',
       note_en: 'Weekly plan starts from just ৳36 — most affordable premium!',
     },
 
     'netflix': {
       name: 'Netflix',
-      emoji: '🎥',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e50914" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
       color: '#e50914',
       tagline: 'Movies ও Series-এর সেরা Platform — Netflix Premium',
       what_en: 'Netflix is the world\'s leading streaming service with thousands of movies, TV shows, documentaries, and Netflix Originals. Available on all devices.',
@@ -276,13 +276,13 @@
         { en: 'Works on TV, phone, tablet, PC', bn: 'TV, phone, tablet, PC সব device-এ চলে' },
         { en: 'New content added every week', bn: 'প্রতি সপ্তাহে নতুন content যোগ হয়' },
       ],
-      note_bn: '🎬 Mobile plan থেকে Premium পর্যন্ত সব plan পাওয়া যায়।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5757" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Mobile plan থেকে Premium পর্যন্ত সব plan পাওয়া যায়।',
       note_en: 'All plans available — from Mobile to Premium.',
     },
 
     'grok': {
       name: 'Grok AI Pro',
-      emoji: '⚡',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
       color: '#1da1f2',
       tagline: 'X (Twitter)-এর AI — Real-time Information সহ Grok',
       what_en: 'Grok AI by xAI (Elon Musk) is a powerful AI with real-time X/Twitter data access, web search, image generation, and document analysis.',
@@ -295,13 +295,13 @@
         { en: 'Unfiltered, direct and witty responses', bn: 'সরাসরি ও witty উত্তর — কোনো filter নেই' },
         { en: 'Voice conversation mode', bn: 'Voice conversation mode' },
       ],
-      note_bn: '🐦 X (Twitter) এর সাথে connected, তাই সব latest news ও trend জানে।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1da1f2" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg> X (Twitter) এর সাথে connected, তাই সব latest news ও trend জানে।',
       note_en: 'Connected to X (Twitter) — knows all latest news and trends.',
     },
 
     'vpn': {
       name: 'Premium VPN',
-      emoji: '🔒',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       color: '#00ff88',
       tagline: 'Internet নিরাপদ করুন — Block সাইট খুলুন, Privacy রক্ষা করুন',
       what_en: 'A premium VPN encrypts your internet connection, hides your IP, lets you access blocked websites, and protects your privacy on any network.',
@@ -315,13 +315,13 @@
         { en: 'No-log policy — your activity is never stored', bn: 'No-log policy — আপনার activity store হয় না' },
         { en: 'Protect 1 to 10 devices with one plan', bn: 'এক plan দিয়ে 1 থেকে 10 device সুরক্ষিত' },
       ],
-      note_bn: '🌐 YouTube, Facebook, WhatsApp সব কিছু যেকোনো দেশ থেকে ব্যবহার করুন।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> YouTube, Facebook, WhatsApp সব কিছু যেকোনো দেশ থেকে ব্যবহার করুন।',
       note_en: 'Use YouTube, Facebook, WhatsApp from any country, without restrictions.',
     },
 
     'antivirus': {
       name: 'Antivirus Premium',
-      emoji: '🛡️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>',
       color: '#00c8ff',
       tagline: 'Virus, Malware ও Hacker থেকে Device রক্ষা করুন',
       what_en: 'Premium Antivirus protects your device from viruses, malware, ransomware, phishing, and hackers — in real time, without slowing your device.',
@@ -335,13 +335,13 @@
         { en: 'Works on Windows, Android & iOS', bn: 'Windows, Android ও iOS সব platform-এ কাজ করে' },
         { en: 'Covers 1 to 10 devices', bn: '1 থেকে 10 device cover করে' },
       ],
-      note_bn: '🔒 একটি antivirus ছাড়া আপনার device সবসময় ঝুঁকিতে থাকে।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> একটি antivirus ছাড়া আপনার device সবসময় ঝুঁকিতে থাকে।',
       note_en: 'Without antivirus, your device is always at risk.',
     },
 
     'adsremove': {
       name: 'Remove Ads — Lifetime',
-      emoji: '🚫',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff5757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
       color: '#ffa500',
       tagline: 'সব App ও Browser থেকে Ad চিরতরে সরিয়ে দিন',
       what_en: 'Remove Ads gives you a lifetime ad-free experience across apps and browsers. No more pop-ups, banners, or video ads interrupting your activity.',
@@ -354,13 +354,13 @@
         { en: 'Better battery life without ad loading', bn: 'Ad load না হওয়ায় battery বেশি থাকে' },
         { en: 'Works across Android, iOS & PC', bn: 'Android, iOS ও PC সব platform-এ কাজ করে' },
       ],
-      note_bn: '💡 মাত্র ৳749-এ lifetime ad-free অভিজ্ঞতা!',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> মাত্র ৳749-এ lifetime ad-free অভিজ্ঞতা!',
       note_en: 'Lifetime ad-free experience for just ৳749!',
     },
 
     'premiere': {
       name: 'Adobe Premiere Pro',
-      emoji: '🎞️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9999ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="2" y1="17" x2="7" y2="17"/></svg>',
       color: '#9999ff',
       tagline: 'Professional Video Editing Software — Industry Standard',
       what_en: 'Adobe Premiere Pro is the industry-standard professional video editing software used by filmmakers, YouTubers, and broadcasters worldwide.',
@@ -374,13 +374,13 @@
         { en: 'Thousands of effects, transitions & presets', bn: 'হাজারো effect, transition ও preset' },
         { en: 'Cloud sync with Creative Cloud (100GB)', bn: 'Creative Cloud-এ cloud sync (100GB)' },
       ],
-      note_bn: '🎬 YouTube, Film, TV Production সব ক্ষেত্রে industry standard।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5757" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> YouTube, Film, TV Production সব ক্ষেত্রে industry standard।',
       note_en: 'Industry standard for YouTube, Film, and TV Production.',
     },
 
     'photoshop': {
       name: 'Adobe Photoshop',
-      emoji: '🖼️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
       color: '#31a8ff',
       tagline: 'Photo Editing-এর King — Photoshop-এর সব Power আনলক করুন',
       what_en: 'Adobe Photoshop is the world\'s most powerful photo editing and graphic design software. Used by photographers, designers, and digital artists globally.',
@@ -394,13 +394,13 @@
         { en: 'Layer-based editing with unlimited layers', bn: 'Unlimited layer দিয়ে layer-based editing' },
         { en: 'Works on Windows & Mac', bn: 'Windows ও Mac দুটোতেই কাজ করে' },
       ],
-      note_bn: '📸 Design জানলে Photoshop ছাড়া professional হওয়া কঠিন।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#31a8ff" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Design জানলে Photoshop ছাড়া professional হওয়া কঠিন।',
       note_en: 'Hard to be a professional designer without knowing Photoshop.',
     },
 
     'illustrator': {
       name: 'Adobe Illustrator',
-      emoji: '✏️',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff9a00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 19 22 19"/></svg>',
       color: '#ff9a00',
       tagline: 'Vector Graphics Design-এর সেরা Tool — Logo থেকে Illustration পর্যন্ত',
       what_en: 'Adobe Illustrator is the industry-standard vector graphics software for creating logos, icons, illustrations, typography, and scalable artwork.',
@@ -414,13 +414,13 @@
         { en: 'Export SVG, PDF, PNG in any resolution', bn: 'SVG, PDF, PNG যেকোনো resolution-এ export' },
         { en: 'Works seamlessly with Photoshop & InDesign', bn: 'Photoshop ও InDesign-এর সাথে seamlessly কাজ করে' },
       ],
-      note_bn: '🎨 Logo design ও branding-এ Illustrator সবার প্রথম পছন্দ।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Logo design ও branding-এ Illustrator সবার প্রথম পছন্দ।',
       note_en: 'First choice for logo design and branding work.',
     },
 
     'windows': {
       name: 'Windows License',
-      emoji: '🪟',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9"/><rect x="13" y="2" width="9" height="9"/><rect x="2" y="13" width="9" height="9"/><rect x="13" y="13" width="9" height="9"/></svg>',
       color: '#0078d4',
       tagline: 'Original Windows License — Lifetime Activation কম দামে',
       what_en: 'Get a genuine Windows 10 or Windows 11 license key for lifetime activation. No subscription — pay once and use forever.',
@@ -433,13 +433,13 @@
         { en: 'Free Windows updates forever', bn: 'সারাজীবন বিনামূল্যে Windows update পাবেন' },
         { en: 'Windows 10 & 11 Home and Pro available', bn: 'Windows 10 ও 11 Home ও Pro পাওয়া যায়' },
       ],
-      note_bn: '✅ Original license — pirate Windows-এর ঝামেলা থেকে মুক্তি পান।',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg> Original license — pirate Windows-এর ঝামেলা থেকে মুক্তি পান।',
       note_en: 'Original license — no more issues with pirated Windows.',
     },
 
     'excel': {
       name: 'Microsoft Excel / Office 365',
-      emoji: '📊',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#217346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
       color: '#217346',
       tagline: 'Microsoft Office-এর সব Apps — Excel, Word, PowerPoint',
       what_en: 'Get Microsoft Excel, Word, PowerPoint and the full Office 365 suite. Perfect for students, professionals, and businesses at a fraction of the retail price.',
@@ -453,7 +453,7 @@
         { en: 'Real-time collaboration with team members', bn: 'Team-এর সাথে real-time collaboration' },
         { en: 'Lifetime license option available', bn: 'Lifetime license option পাওয়া যায়' },
       ],
-      note_bn: '📚 Students-দের জন্য সবচেয়ে সাশ্রয়ী Microsoft Office!',
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#217346" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Students-দের জন্য সবচেয়ে সাশ্রয়ী Microsoft Office!',
       note_en: 'Most affordable Microsoft Office option for students!',
     },
   };
@@ -500,7 +500,7 @@
         <div style="padding:28px 28px 32px;" id="svcInfoContent">
           <!-- header -->
           <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;">
-            <div id="svcInfoEmoji" style="font-size:2.4rem;line-height:1;flex-shrink:0;"></div>
+            <div id="svcInfoEmoji" style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.06);flex-shrink:0;"></div>
             <div>
               <div id="svcInfoBadge" style="display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:8px;"></div>
               <h2 id="svcInfoModalTitle" style="font-size:clamp(1.2rem,4vw,1.55rem);color:#e8f0f8;font-weight:900;margin:0 0 4px;line-height:1.3;font-family:var(--font-display,sans-serif);"></h2>
@@ -572,7 +572,7 @@
     const modal = document.getElementById('svcInfoModal');
 
     /* Fill content */
-    document.getElementById('svcInfoEmoji').textContent = data.emoji || '⭐';
+    document.getElementById('svcInfoEmoji').innerHTML = data.emoji || '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>';
     document.getElementById('svcInfoModalTitle').textContent = data.name;
     document.getElementById('svcInfoTagline').textContent = data.tagline || '';
     document.getElementById('svcInfoWhatBn').textContent = data.what_bn || '';
@@ -624,7 +624,7 @@
       closeModal();
       if (typeof ctaCallback === 'function') ctaCallback();
     };
-    document.getElementById('svcInfoCTALabel').textContent = 'এখনই Order করুন / Get Now →';
+    document.getElementById('svcInfoCTALabel').textContent = 'Order করুন →';
 
     /* Show */
     modal.style.display = 'flex';
@@ -663,22 +663,10 @@
     .svc-info-btn svg { flex-shrink:0; }
 
     /* Button wrapper for service-card-body buttons */
-    .svc-btn-row {
-      display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:0;
-    }
-    /* Make apply btn flexible */
-    .service-apply-btn {
-      flex:1;min-width:0;
-    }
+    /* (layout handled in style.css) */
 
     /* home-svc-card action row */
-    .home-svc-action-row {
-      display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:auto;
-      padding-top:10px;
-    }
-    .home-svc-action {
-      flex:1;min-width:0;
-    }
+    /* (layout handled in style.css) */
 
     /* service-banner-card bottom row */
     .svc-hub-row {
