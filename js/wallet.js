@@ -1066,6 +1066,16 @@ function loadDashboardOrders(user) {
       const _t = window.rabbiLang ? window.rabbiLang.t.bind(window.rabbiLang) : (k => k);
       const pendingNote = (sc === 'pending' || sc === 'processing') ? `<div class="order-pending-note">${svgClock} ${_t('Order সাধারণত')} <strong>${_t('15 মিনিটের মধ্যে')}</strong> ${_t('complete হয়')}</div>` : '';
       const payMethod = data.paymentMethod || data.method || 'credit';
+      const sourcePage = (function() {
+        const details = data.serviceDetails || data.details || {};
+        const raw = details.source_page || data.source_page || '';
+        if (!raw) return '';
+        // Extract app name from "services.html?app=chatgpt" or just "services.html"
+        const appMatch = raw.match(/[?&]app=([^&]+)/);
+        if (appMatch) return decodeURIComponent(appMatch[1]);
+        return raw.replace(/\.html.*/, '').replace(/-/g,' ');
+      })();
+      const svgApp = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1077,6 +1087,7 @@ function loadDashboardOrders(user) {
           </div>
           <div class="premium-order-details">
             <span>${svgPay} ${escapeHtml(payMethod)}</span>
+            ${sourcePage ? `<span>${svgApp} App: ${escapeHtml(sourcePage)}</span>` : ""}
             ${getFreeFireUid(data) ? `<span>${svgGame} UID: ${escapeHtml(getFreeFireUid(data))}</span>` : ""}
             ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>

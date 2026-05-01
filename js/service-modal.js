@@ -550,6 +550,14 @@
     });
     data.service_type = activeServiceName;
     data._amount_usd = _currentAmountUsd;
+    // Track which page/app the order came from
+    data.source_page = (function() {
+      const path = window.location.pathname.split('/').pop() || 'index.html';
+      const params = new URLSearchParams(window.location.search);
+      const appId = params.get('app');
+      if (appId) return path + '?app=' + appId;
+      return path;
+    })();
     enrichFreeFireAutoTopupDetails(data);
     return data;
   }
@@ -676,31 +684,54 @@
 
     if (!validateBasicDetails()) return;
 
+    const amountUsd = getServiceAmount();
+
+    // ── Balance check BEFORE placing order ──────────────────────────
+    if (!amountUsd || amountUsd <= 0) {
+      showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
+      return;
+    }
+
+    const currentCredit = window.rabbiAuth && typeof window.rabbiAuth.getCredit === 'function'
+      ? window.rabbiAuth.getCredit()
+      : null;
+
+    if (currentCredit !== null && currentCredit < amountUsd) {
+      // Insufficient balance — redirect to add-credit immediately
+      showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
+      setTimeout(() => {
+        window.location.href = 'add-credit.html';
+      }, 1200);
+      return;
+    }
+    // ────────────────────────────────────────────────────────────────
+
     const btn = document.getElementById('buyWithCreditBtn');
     const old = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;animation:spin .7s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Processing…'; }
 
-    const amountUsd = getServiceAmount();
     const details = collectFormData();
 
-    // Show order placed animation IMMEDIATELY — don't wait for backend
-    // Backend processes in background
-    showServiceSuccess(null, amountUsd);
+    // Call backend first — only show success if backend confirms
+    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, details });
 
-    // Fire backend in background (non-blocking)
-    buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, details })
-      .then(result => {
-        if (!result.ok) {
-          if (result.reason === 'insufficient') {
-            // Already redirected to My Orders, but notify on return
-            localStorage.setItem('orderFailReason', 'insufficient_balance');
-          }
-          console.error('[ServiceModal] Order result:', result);
-        } else {
-          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
-        }
-      })
-      .catch(err => console.error('[ServiceModal] Order error:', err));
+    if (!result.ok) {
+      if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
+      if (result.reason === 'insufficient') {
+        showStatus('Insufficient balance. Add Credit করো।', 'error');
+        setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
+      } else if (result.reason === 'login') {
+        showStatus('Please login first.', 'error');
+        window.rabbiAuth && window.rabbiAuth.openLogin('apply');
+      } else {
+        showStatus(result.message || 'Order failed. আবার চেষ্টা করো।', 'error');
+      }
+      return;
+    }
+
+    // Backend confirmed — now show success
+    showServiceSuccess(result, amountUsd);
+    sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
   }
 
   function handleInstantPay() {
