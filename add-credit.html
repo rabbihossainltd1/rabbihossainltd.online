@@ -7,10 +7,6 @@
   <title>Payment | Rabbi Hossain LTD</title>
   <meta name="description" content="Secure automatic payment page for wallet credit and instant service payment." />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="css/style.css" />
 
   <style>
@@ -21,321 +17,237 @@
       --nagad-dark: #c03d10;
       --rocket: #8B2FC9;
       --rocket-dark: #6b21a8;
-      --pay-bg: #040608;
-      --pay-surface: rgba(10, 13, 22, 0.96);
-      --pay-surface-2: rgba(255, 255, 255, 0.04);
-      --pay-border: rgba(255, 255, 255, 0.07);
-      --pay-text: #eef2ff;
-      --pay-muted: #7a8fb5;
-      --pay-success: #00e87a;
-      --pay-accent: #4f8fff;
-      --pay-accent-2: #00c8ff;
-      --pay-error: #ff5757;
-      --font-display: 'Syne', sans-serif;
-      --font-body: 'DM Sans', sans-serif;
+      --pay-bg: #05070d;
+      --pay-surface: rgba(13, 18, 31, 0.94);
+      --pay-surface-2: rgba(255, 255, 255, 0.055);
+      --pay-border: rgba(255, 255, 255, 0.09);
+      --pay-text: #f3f7ff;
+      --pay-muted: #8fa2bb;
+      --pay-success: #00ff88;
+      --pay-accent: #00c8ff;
+      --pay-error: #ff6262;
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: var(--font-body);
-      background: var(--pay-bg);
-      color: var(--pay-text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Animated background ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 10% -10%, rgba(79,143,255,0.14) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 90% 10%, rgba(0,232,122,0.09) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 70% at 50% 100%, rgba(79,143,255,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 52px 52px;
-      mask-image: radial-gradient(ellipse 100% 80% at 50% 0%, black 0%, transparent 70%);
-      pointer-events: none;
+        radial-gradient(circle at 18% 0%, rgba(0, 200, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(0, 255, 136, 0.10), transparent 32%),
+        var(--pay-bg);
     }
 
     .payment-page {
       min-height: 100vh;
-      padding: 130px 20px 200px;
+      padding: 124px 18px 180px;
       position: relative;
-      z-index: 1;
+      overflow: hidden;
+    }
+
+    .payment-page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(0, 200, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 136, 0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at top, black, transparent 75%);
+      z-index: 0;
     }
 
     .payment-shell {
-      width: min(1140px, 100%);
+      width: min(1120px, 100%);
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 390px;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 22px;
       align-items: start;
     }
 
-    /* ── Header ── */
     .payment-header {
       grid-column: 1 / -1;
       text-align: center;
-      margin-bottom: 12px;
-      animation: fadeUp 0.7s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
+      margin-bottom: 4px;
     }
 
     .payment-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 7px 18px;
+      gap: 10px;
+      padding: 8px 16px;
       border-radius: 999px;
-      border: 1px solid rgba(0, 232, 122, 0.2);
-      background: rgba(0, 232, 122, 0.06);
-      color: #7fffc4;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    .payment-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--pay-success);
-      box-shadow: 0 0 8px var(--pay-success);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .payment-header h1 {
-      font-family: var(--font-display);
-      font-size: clamp(2.4rem, 6vw, 4.2rem);
-      font-weight: 900;
-      color: var(--pay-text);
-      line-height: 1;
-      letter-spacing: -0.02em;
+      border: 1px solid rgba(0, 255, 136, 0.22);
+      background: rgba(0, 255, 136, 0.07);
+      color: #a7ffcf;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       margin-bottom: 14px;
     }
 
-    .payment-header h1 span {
-      background: linear-gradient(135deg, var(--pay-accent-2), var(--pay-success));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .payment-badge svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .payment-header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2.1rem, 6vw, 4rem);
+      color: var(--pay-text);
+      line-height: 1.02;
+      font-family: var(--font-display, inherit);
     }
 
     .payment-header p {
       color: var(--pay-muted);
-      line-height: 1.75;
+      line-height: 1.7;
       margin: 0 auto;
-      max-width: 600px;
-      font-size: 0.95rem;
+      max-width: 650px;
     }
 
-    /* ── Cards ── */
     .payment-card,
     .payment-history-card,
     #authRequired {
-      background: rgba(12, 16, 28, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 28px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03) inset,
-        0 40px 100px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+      border: 1px solid rgba(0, 200, 255, 0.18);
+      border-radius: 26px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(18px);
       overflow: hidden;
-      animation: fadeUp 0.7s ease both;
-      animation-delay: 0.1s;
     }
 
     #authRequired {
       max-width: 620px;
       margin: 0 auto;
-      padding: 40px;
+      padding: 30px;
       text-align: center;
       display: none;
     }
 
     #authRequired h1 {
-      font-family: var(--font-display);
       color: var(--pay-text);
-      font-size: 2.4rem;
-      margin-bottom: 12px;
-      letter-spacing: -0.02em;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      font-family: var(--font-display, inherit);
     }
 
     #authRequired p {
       color: var(--pay-muted);
       line-height: 1.7;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
     }
 
     .payment-card-inner {
-      padding: 28px;
+      padding: 26px;
     }
 
-    /* ── Purpose row ── */
     .purpose-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 26px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 22px;
     }
 
     .purpose-chip {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 16px;
-      border-radius: 14px;
-      border: 1px solid rgba(79,143,255,0.2);
-      background: rgba(79,143,255,0.07);
-      color: #a8c4ff;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      gap: 9px;
+      padding: 10px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 136, 0.18);
+      background: rgba(0, 255, 136, 0.075);
+      color: #a7ffcf;
+      font-size: 0.84rem;
+      font-weight: 900;
     }
 
     .purpose-chip svg {
-      width: 15px;
-      height: 15px;
-      opacity: 0.8;
+      width: 16px;
+      height: 16px;
     }
 
     .balance-mini {
       text-align: right;
       color: var(--pay-muted);
-      font-size: 0.8rem;
-      line-height: 1.5;
+      font-size: 0.82rem;
+      line-height: 1.45;
     }
 
     .balance-mini strong {
       display: block;
       color: var(--pay-success);
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      letter-spacing: -0.01em;
+      font-size: 1.08rem;
     }
 
-    /* ── Section label ── */
     .section-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
       color: var(--pay-muted);
       text-transform: uppercase;
-      margin: 0 0 14px;
+      margin: 0 0 12px;
     }
 
-    /* ── Method buttons ── */
     .method-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .method-btn {
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 20px;
-      background: rgba(255,255,255,0.035);
-      padding: 18px 8px 14px;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.055);
+      padding: 16px 9px;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+      display: grid;
+      place-items: center;
+      gap: 9px;
       color: var(--pay-text);
-      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-      min-height: 120px;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .method-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity 0.22s ease;
-      border-radius: inherit;
+      transition: 0.25s ease;
+      min-height: 122px;
     }
 
     .method-btn:hover {
-      transform: translateY(-3px) scale(1.02);
-      border-color: rgba(255,255,255,0.14);
-    }
-
-    .method-btn.active {
       transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.16);
     }
 
     .method-btn.active.bkash {
-      border-color: rgba(226,19,110,0.5);
-      background: rgba(226,19,110,0.1);
-      box-shadow: 0 0 0 1px rgba(226,19,110,0.2) inset, 0 12px 40px rgba(226,19,110,0.15);
+      border-color: var(--bkash);
+      background: rgba(226, 19, 110, 0.11);
+      box-shadow: 0 0 34px rgba(226, 19, 110, 0.18);
     }
 
     .method-btn.active.nagad {
-      border-color: rgba(240,90,40,0.5);
-      background: rgba(240,90,40,0.1);
-      box-shadow: 0 0 0 1px rgba(240,90,40,0.2) inset, 0 12px 40px rgba(240,90,40,0.15);
+      border-color: var(--nagad);
+      background: rgba(240, 90, 40, 0.11);
+      box-shadow: 0 0 34px rgba(240, 90, 40, 0.18);
     }
 
     .method-btn.active.rocket {
-      border-color: rgba(139,47,201,0.5);
-      background: rgba(139,47,201,0.1);
-      box-shadow: 0 0 0 1px rgba(139,47,201,0.2) inset, 0 12px 40px rgba(139,47,201,0.15);
-    }
-
-    .method-btn.active.binance {
-      border-color: rgba(243,186,47,0.5);
-      background: rgba(243,186,47,0.08);
-      box-shadow: 0 0 0 1px rgba(243,186,47,0.2) inset, 0 12px 40px rgba(243,186,47,0.12);
+      border-color: var(--rocket);
+      background: rgba(139, 47, 201, 0.11);
+      box-shadow: 0 0 34px rgba(139, 47, 201, 0.18);
     }
 
     .method-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
       overflow: hidden;
       display: grid;
       place-items: center;
-      flex-shrink: 0;
     }
 
     .method-icon.logo-icon {
-      background: rgba(255,255,255,0.97);
-      padding: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.96);
+      padding: 7px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
     }
 
     .method-icon.logo-icon img {
@@ -347,85 +259,74 @@
     }
 
     .method-name {
-      font-weight: 800;
-      font-size: 0.88rem;
-      letter-spacing: -0.01em;
+      font-weight: 900;
+      font-size: 0.92rem;
     }
 
     .method-type {
       color: var(--pay-muted);
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       margin-top: 1px;
     }
 
-    /* ── Divider ── */
     .pay-divider {
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-      margin: 24px -28px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 22px -26px;
     }
 
-    /* ── Info rows ── */
     .info-stack {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
     .info-row {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid var(--pay-border);
+      border-radius: 16px;
+      padding: 16px;
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 14px;
       align-items: center;
-      transition: border-color 0.2s ease;
-    }
-
-    .info-row:hover {
-      border-color: rgba(255,255,255,0.12);
     }
 
     .info-tag {
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
+      font-size: 0.7rem;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--pay-muted);
-      margin-bottom: 5px;
-      font-weight: 700;
+      margin-bottom: 4px;
+      font-weight: 900;
     }
 
     .info-value {
       color: var(--pay-text);
-      font-size: 1.22rem;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+      font-size: 1.18rem;
+      font-weight: 900;
+      letter-spacing: 0.03em;
       word-break: break-word;
-      font-family: var(--font-display);
     }
 
     .info-value.amount-val {
       color: var(--pay-success);
-      font-size: 1.45rem;
+      font-size: 1.38rem;
     }
 
-    /* ── Copy button ── */
     .copy-btn {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.055);
       color: var(--pay-muted);
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 9px 12px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      font-weight: 700;
-      font-size: 0.76rem;
-      transition: all 0.18s ease;
+      font-weight: 900;
+      font-size: 0.78rem;
+      transition: 0.2s ease;
       white-space: nowrap;
-      font-family: var(--font-body);
     }
 
     .copy-btn svg {
@@ -434,202 +335,140 @@
     }
 
     .copy-btn.icon-only {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       padding: 0;
       justify-content: center;
       border-radius: 12px;
     }
 
     .copy-btn.icon-only svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
     .copy-btn:hover,
     .copy-btn.copied {
       color: var(--pay-success);
-      border-color: rgba(0,232,122,0.3);
-      background: rgba(0,232,122,0.07);
+      border-color: rgba(0, 255, 136, 0.28);
+      background: rgba(0, 255, 136, 0.075);
     }
 
-    /* ── Form ── */
     .form-grid {
       display: grid;
       gap: 14px;
-      margin-top: 22px;
+      margin-top: 20px;
     }
 
     .pay-field label {
       display: block;
-      color: #bcc8e0;
-      font-weight: 700;
+      color: #c9d4e5;
+      font-weight: 900;
       margin-bottom: 8px;
-      font-size: 0.84rem;
-      letter-spacing: 0.01em;
+      font-size: 0.86rem;
     }
 
     .pay-field select,
     .pay-field input {
       width: 100%;
-      min-height: 52px;
+      min-height: 54px;
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.09);
-      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.26);
       color: var(--pay-text);
       outline: none;
-      padding: 13px 16px;
-      font-size: 0.96rem;
-      font-weight: 700;
-      font-family: var(--font-body);
-      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-weight: 800;
     }
 
     .pay-field input {
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
     .pay-field select:focus,
     .pay-field input:focus {
-      border-color: rgba(79,143,255,0.5);
-      box-shadow: 0 0 0 3px rgba(79,143,255,0.1);
+      border-color: rgba(0, 200, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(0, 200, 255, 0.10);
     }
 
-    /* ── Amount tiles ── */
     .amount-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
     .amount-tile {
-      background: rgba(0,232,122,0.05);
-      border: 1px solid rgba(0,232,122,0.14);
+      background: rgba(0, 255, 136, 0.07);
+      border: 1px solid rgba(0, 255, 136, 0.18);
       border-radius: 18px;
-      padding: 18px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .amount-tile::after {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,232,122,0.08), transparent 70%);
+      padding: 16px;
     }
 
     .amount-tile span {
       display: block;
       color: var(--pay-muted);
-      font-weight: 700;
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
+      font-weight: 900;
+      font-size: 0.76rem;
+      margin-bottom: 6px;
     }
 
     .amount-tile strong {
       color: var(--pay-success);
-      font-size: 1.6rem;
-      font-weight: 900;
-      font-family: var(--font-display);
-      letter-spacing: -0.02em;
+      font-size: 1.55rem;
+      font-weight: 950;
     }
 
-    /* ── Messages ── */
     .wallet-message {
       display: none;
-      padding: 14px 16px;
-      border-radius: 14px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      font-weight: 500;
+      padding: 13px 14px;
+      border-radius: 15px;
+      font-size: 0.92rem;
+      line-height: 1.55;
     }
 
     .wallet-message.success {
       display: block;
-      color: #a0ffcf;
-      background: rgba(0,232,122,0.07);
-      border: 1px solid rgba(0,232,122,0.2);
+      color: #a7ffcf;
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.22);
     }
 
     .wallet-message.error {
       display: block;
       color: #ffb0b0;
-      background: rgba(255,80,80,0.07);
-      border: 1px solid rgba(255,80,80,0.2);
+      background: rgba(255,80,80,0.08);
+      border: 1px solid rgba(255,80,80,0.22);
     }
 
-    /* ── bKash notice ── */
-    .bkash-closed-notice {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 16px 18px;
-      border-radius: 16px;
-      background: rgba(226,19,110,0.07);
-      border: 1px solid rgba(226,19,110,0.22);
-      color: #ffb0cc;
-      font-size: 0.88rem;
-      line-height: 1.65;
-      margin-bottom: 0;
-    }
-
-    .bkash-closed-notice svg {
-      flex-shrink: 0;
-      margin-top: 2px;
-      color: var(--bkash);
-    }
-
-    .bkash-closed-notice strong {
-      display: block;
-      color: #ff6699;
-      margin-bottom: 4px;
-      font-weight: 800;
-    }
-
-    /* ── Submit button ── */
     .submit-btn {
       width: 100%;
       border: none;
       border-radius: 16px;
-      padding: 18px 20px;
+      padding: 17px 18px;
       cursor: pointer;
       color: #02050a;
-      background: linear-gradient(135deg, var(--pay-accent), var(--pay-accent-2), var(--pay-success));
-      background-size: 200% 200%;
-      font-weight: 900;
-      font-size: 0.98rem;
-      font-family: var(--font-display);
-      letter-spacing: 0.01em;
+      background: linear-gradient(135deg, var(--pay-accent), var(--pay-success));
+      font-weight: 950;
+      font-size: 1rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 10px 40px rgba(79,143,255,0.25);
-      transition: all 0.24s ease;
-      animation: gradientShift 4s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      box-shadow: 0 18px 50px rgba(0, 200, 255, 0.18);
+      transition: 0.24s ease;
     }
 
     .submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 16px 50px rgba(79,143,255,0.3);
+      filter: brightness(1.05);
     }
 
     .submit-btn:disabled {
-      opacity: 0.45;
+      opacity: 0.6;
       cursor: not-allowed;
       transform: none;
-      animation: none;
-      box-shadow: none;
+      filter: none;
     }
 
     .submit-btn svg {
@@ -637,11 +476,10 @@
       height: 18px;
     }
 
-    /* ── Help accordion ── */
     .payment-help {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.07);
+      margin-top: 18px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--pay-border);
       border-radius: 18px;
       overflow: hidden;
     }
@@ -651,20 +489,18 @@
       border: none;
       background: transparent;
       color: var(--pay-text);
-      padding: 16px 18px;
+      padding: 15px 16px;
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      font-weight: 700;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
+      font-weight: 900;
       text-align: left;
     }
 
     .help-header svg {
-      width: 17px;
-      height: 17px;
+      width: 18px;
+      height: 18px;
       color: var(--pay-muted);
     }
 
@@ -681,19 +517,19 @@
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.35s ease;
-      padding: 0 18px;
+      padding: 0 16px;
     }
 
     .payment-help.open .help-body {
-      max-height: 700px;
-      padding: 0 18px 18px;
+      max-height: 620px;
+      padding: 0 16px 16px;
     }
 
     .step {
       display: flex;
-      gap: 13px;
-      color: #bcc8e0;
-      font-size: 0.87rem;
+      gap: 12px;
+      color: #c9d4e5;
+      font-size: 0.86rem;
       line-height: 1.7;
       margin: 12px 0;
     }
@@ -702,58 +538,48 @@
       width: 26px;
       height: 26px;
       flex: 0 0 26px;
-      border-radius: 8px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
-      background: rgba(79,143,255,0.12);
-      border: 1px solid rgba(79,143,255,0.2);
+      background: rgba(0, 200, 255, 0.10);
+      border: 1px solid rgba(0, 200, 255, 0.18);
       color: var(--pay-accent);
-      font-weight: 800;
-      font-size: 0.76rem;
+      font-weight: 900;
+      font-size: 0.78rem;
       margin-top: 1px;
-      font-family: var(--font-display);
     }
 
-    /* ── History panel ── */
     .payment-history-card {
-      padding: 24px;
-      animation: fadeUp 0.7s ease both;
-      animation-delay: 0.2s;
+      padding: 22px;
     }
 
     .history-title {
       color: var(--pay-text);
-      font-size: 1.2rem;
-      margin: 0 0 6px;
-      font-family: var(--font-display);
-      letter-spacing: -0.01em;
+      font-size: 1.25rem;
+      margin: 0 0 8px;
+      font-family: var(--font-display, inherit);
     }
 
     .history-sub {
       color: var(--pay-muted);
       line-height: 1.65;
-      font-size: 0.85rem;
-      margin: 0 0 18px;
+      font-size: 0.88rem;
+      margin: 0 0 16px;
     }
 
     .request-list {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
     .request-card,
     .empty-state {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
-      padding: 16px;
-      color: #bcc8e0;
-      font-size: 0.85rem;
-      transition: border-color 0.18s ease;
-    }
-
-    .request-card:hover {
-      border-color: rgba(255,255,255,0.12);
+      padding: 15px;
+      color: #c9d4e5;
+      font-size: 0.86rem;
     }
 
     .request-card div {
@@ -768,57 +594,49 @@
       color: var(--pay-muted);
       margin: 6px 0 0;
       word-break: break-word;
-      font-size: 0.82rem;
     }
 
     .status {
-      padding: 4px 10px;
+      padding: 5px 10px;
       border-radius: 999px;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      font-weight: 800;
-      letter-spacing: 0.06em;
+      font-weight: 900;
     }
 
     .status.pending {
-      color: #ffd98a;
-      background: rgba(255,200,80,0.1);
-      border: 1px solid rgba(255,200,80,0.18);
+      color: #ffe7a3;
+      background: rgba(255,200,80,0.12);
     }
 
     .status.approved,
     .status.confirmed {
-      color: #a0ffcf;
-      background: rgba(0,232,122,0.1);
-      border: 1px solid rgba(0,232,122,0.18);
+      color: #a7ffcf;
+      background: rgba(0,255,136,0.12);
     }
 
     .status.declined,
     .status.cancelled {
       color: #ffb0b0;
-      background: rgba(255,80,80,0.1);
-      border: 1px solid rgba(255,80,80,0.18);
+      background: rgba(255,80,80,0.12);
     }
 
-    /* ── Safe note ── */
     .safe-note {
       grid-column: 1 / -1;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      color: rgba(122,143,181,0.6);
-      font-size: 0.76rem;
-      margin-top: -4px;
-      letter-spacing: 0.04em;
+      gap: 9px;
+      color: var(--pay-muted);
+      font-size: 0.78rem;
+      margin-top: -6px;
     }
 
     .safe-note svg {
-      width: 13px;
-      height: 13px;
+      width: 14px;
+      height: 14px;
     }
 
-    /* ── Back link ── */
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -826,95 +644,75 @@
       gap: 8px;
       text-decoration: none;
       color: var(--pay-muted);
-      font-weight: 700;
-      margin-top: 10px;
+      font-weight: 900;
+      margin-top: 12px;
       width: 100%;
       padding: 10px;
-      font-size: 0.88rem;
-      transition: color 0.18s ease;
     }
 
     .back-link:hover {
       color: var(--pay-accent);
     }
 
-    /* ── Binance panel ── */
-    #binancePanel {
-      margin-top: 16px;
-    }
-
-    #binancePanel > div {
-      border-radius: 22px;
-      background: rgba(243,186,47,0.05);
-      border: 1px solid rgba(243,186,47,0.18);
-      padding: 22px;
-      text-align: center;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 960px) {
+    @media (max-width: 900px) {
       .payment-shell {
         grid-template-columns: 1fr;
       }
-
-      .method-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 520px) {
       .payment-page {
-        padding: 110px 14px 190px;
+        padding: 108px 12px 185px;
       }
 
       .payment-card-inner,
       .payment-history-card {
-        padding: 20px;
+        padding: 18px;
       }
 
       .method-grid {
-        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
       }
 
       .method-btn {
-        min-height: 110px;
-        padding: 14px 8px;
+        min-height: 112px;
+        padding: 13px 6px;
       }
 
       .method-icon {
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
+      }
+
+      .method-name {
+        font-size: 0.84rem;
+      }
+
+      .method-type {
+        font-size: 0.64rem;
       }
 
       .pay-divider {
-        margin-left: -20px;
-        margin-right: -20px;
+        margin-left: -18px;
+        margin-right: -18px;
+      }
+
+      .info-row,
+      .amount-grid,
+      .purpose-row {
+        grid-template-columns: 1fr;
       }
 
       .purpose-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        display: grid;
       }
 
       .balance-mini {
         text-align: left;
       }
 
-      .info-row,
-      .amount-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .copy-btn.icon-only {
-        width: 100%;
-        border-radius: 12px;
-        height: 40px;
-      }
-
-      .payment-header h1 {
-        font-size: 2.2rem;
+      .copy-btn {
+        justify-content: center;
       }
     }
   </style>
@@ -952,10 +750,11 @@
     <section id="walletContent" class="payment-shell" style="display:none;">
       <header class="payment-header">
         <div class="payment-badge">
-          Secure Automatic Payment · Live
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-5"/></svg>
+          Secure Automatic Payment
         </div>
-        <h1 id="walletPageTitle">Add <span>Credit</span></h1>
-        <p id="walletPageSub">bKash, Nagad অথবা Rocket personal number-এ Send Money করুন। USD amount auto BDT-তে convert হবে। Rate: <strong style="color:var(--pay-success);font-weight:800;">$1 / ৳125</strong></p>
+        <h1 id="walletPageTitle">Add Credit</h1>
+        <p id="walletPageSub">bKash, Nagad অথবা Rocket personal number-এ Send Money করুন। USD amount auto BDT-তে convert হবে। Rate: <strong style="color:#00ff88;">$1 / ৳125</strong>.</p>
       </header>
 
       <section class="payment-card">
@@ -1017,34 +816,35 @@
                 <span class="method-type">Crypto</span>
               </span>
             </button>
+
           </div><!-- end method-grid -->
 
           <!-- Binance Pay panel (shown when Binance selected) -->
-          <div id="binancePanel" style="display:none;">
-            <div>
-              <div style="color:#f3ba2f;font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;justify-content:center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <div id="binancePanel" style="display:none;margin-top:14px;">
+            <div style="border-radius:20px;background:rgba(243,186,47,.06);border:1px solid rgba(243,186,47,.22);padding:20px;text-align:center;">
+              <div style="color:#f3ba2f;font-weight:900;font-size:.88rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Scan QR to Pay
               </div>
-              <div style="width:176px;height:176px;margin:0 auto 18px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(243,186,47,.15);">
-                <img src="images/binance-qr.png" alt="Binance QR Code" style="width:156px;height:156px;object-fit:contain;border-radius:12px;" />
+              <div style="width:180px;height:180px;margin:0 auto 16px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,.3);">
+                <img src="images/binance-qr.png" alt="Binance QR Code" style="width:160px;height:160px;object-fit:contain;border-radius:12px;" />
               </div>
-              <p style="color:rgba(201,162,39,0.8);font-size:.8rem;margin:0 0 16px;line-height:1.6;">Open Binance app → Pay → Scan QR Code</p>
-              <div style="background:rgba(0,0,0,.25);border:1px solid rgba(243,186,47,.16);border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;text-align:left;">
+              <p style="color:#c9a227;font-size:.8rem;margin:0 0 16px;line-height:1.6;">Open Binance app → Pay → Scan QR Code</p>
+              <div style="background:rgba(0,0,0,.3);border:1px solid rgba(243,186,47,.18);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;text-align:left;">
                 <div>
-                  <div style="color:rgba(138,112,64,0.9);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Binance Wallet ID</div>
-                  <div style="color:#f3ba2f;font-weight:800;font-size:.98rem;letter-spacing:.02em;font-family:'Syne',sans-serif;" id="binanceWalletId">749542753</div>
+                  <div style="color:#8a7040;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Binance Wallet ID</div>
+                  <div style="color:#f3ba2f;font-weight:900;font-size:.95rem;letter-spacing:.02em;" id="binanceWalletId">749542753</div>
                 </div>
                 <button type="button" class="copy-btn icon-only" onclick="copyTextValue('binanceWalletId','Binance Wallet ID')" aria-label="Copy Wallet ID">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
               <a href="https://app.binance.com/uni-qr/EPRH9YyT" target="_blank" rel="noopener"
-                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:14px;background:linear-gradient(135deg,#f3ba2f,#e8a410);color:#1a0c00;font-weight:900;font-size:.9rem;font-family:'Syne',sans-serif;text-decoration:none;box-shadow:0 8px 30px rgba(243,186,47,.2);letter-spacing:.01em;">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#f3ba2f,#e6a817);color:#1a0f00;font-weight:900;font-size:.92rem;text-decoration:none;box-shadow:0 8px 28px rgba(243,186,47,.22);margin-bottom:4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 Pay with Binance App
               </a>
-              <p style="color:rgba(138,112,64,0.7);font-size:.74rem;margin-top:10px;">Payment করার পর নিচে Binance Order ID দিন</p>
+              <p style="color:#8a7040;font-size:.74rem;margin-top:8px;">Payment করার পর নিচে Binance Order ID দিন</p>
             </div>
           </div>
 
@@ -1059,8 +859,7 @@
                 <span id="selectedMethod" style="display:none;">bKash</span>
               </div>
               <button class="copy-btn icon-only" type="button" aria-label="Copy wallet number" onclick="copyTextValue('paymentNumber','Wallet number')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             </div>
 
             <div class="info-row">
@@ -1069,8 +868,7 @@
                 <div class="info-value amount-val" id="selectedBdtAmount">৳125</div>
               </div>
               <button class="copy-btn icon-only" type="button" aria-label="Copy payment amount" onclick="copyTextValue('selectedBdtAmount','BDT amount')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             </div>
           </div>
 
@@ -1183,13 +981,13 @@
           noticeEl = document.createElement('div');
           noticeEl.id = 'bkashClosedNotice';
           noticeEl.className = 'bkash-closed-notice';
-          noticeEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><div><strong>bKash Temporarily Unavailable</strong>আমাদের bKash account-এ সমস্যা হওয়ায় এই মুহূর্তে bKash Payment সম্ভব নয়। দয়া করে Nagad বা Rocket ব্যবহার করুন। অসুবিধার জন্য আন্তরিকভাবে দুঃখিত।</div>`;
+          noticeEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><div><strong>bKash Temporarily Unavailable</strong><br/>আমাদের bKash account-এ সমস্যা হওয়ায় এই মুহূর্তে bKash Payment সম্ভব নয়। দয়া করে Nagad বা Rocket ব্যবহার করুন। অসুবিধার জন্য আন্তরিকভাবে দুঃখিত।</div>`;
           const divider = document.querySelector('.pay-divider');
           if (divider) divider.after(noticeEl);
         }
         noticeEl.style.display = 'flex';
         if (walletRow) walletRow.style.display = 'none';
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '.4'; submitBtn.style.cursor = 'not-allowed'; }
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '.5'; submitBtn.style.cursor = 'not-allowed'; }
 
       } else if (method === 'Binance') {
         // Binance Pay panel
@@ -1199,24 +997,24 @@
         if (!binanceInstr) {
           binanceInstr = document.createElement('div');
           binanceInstr.id = 'binanceInstructions';
-          binanceInstr.style.cssText = 'margin-top:12px;padding:14px 16px;border-radius:14px;background:rgba(243,186,47,.05);border:1px solid rgba(243,186,47,.14);';
+          binanceInstr.style.cssText = 'margin-top:12px;padding:14px 16px;border-radius:14px;background:rgba(243,186,47,.06);border:1px solid rgba(243,186,47,.15);';
           binanceInstr.innerHTML = `
-            <div style="color:#f3ba2f;font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;font-family:'Syne',sans-serif;">How to Pay with Binance</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Syne',sans-serif;">1</span>
+            <div style="color:#f3ba2f;font-weight:900;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;">How to Pay with Binance</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.82rem;line-height:1.5;">
+                <span style="background:rgba(243,186,47,.2);color:#f3ba2f;font-weight:900;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;">1</span>
                 Binance App খুলুন → Pay অথবা QR Scan করুন
               </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Syne',sans-serif;">2</span>
+              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.82rem;line-height:1.5;">
+                <span style="background:rgba(243,186,47,.2);color:#f3ba2f;font-weight:900;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;">2</span>
                 উপরের QR স্ক্যান করুন অথবা "Pay with Binance App" বাটনে click করুন
               </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Syne',sans-serif;">3</span>
+              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.82rem;line-height:1.5;">
+                <span style="background:rgba(243,186,47,.2);color:#f3ba2f;font-weight:900;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;">3</span>
                 Payment সম্পন্ন হলে Binance থেকে Order ID কপি করুন
               </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Syne',sans-serif;">4</span>
+              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.82rem;line-height:1.5;">
+                <span style="background:rgba(243,186,47,.2);color:#f3ba2f;font-weight:900;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.72rem;">4</span>
                 নিচের "Binance Order ID" field-এ paste করুন → Verify Payment
               </div>
             </div>`;
