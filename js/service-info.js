@@ -662,13 +662,7 @@
     }
     .svc-info-btn svg { flex-shrink:0; }
 
-    /* Button wrapper for service-card-body buttons */
-    /* (layout handled in style.css) */
-
-    /* home-svc-card action row */
-    /* (layout handled in style.css) */
-
-    /* service-banner-card bottom row */
+    /* service-banner-card bottom row (Service Hub on home page) */
     .svc-hub-row {
       display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;
     }
