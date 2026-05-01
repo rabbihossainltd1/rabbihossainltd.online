@@ -2394,3 +2394,54 @@ img {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+
+/* ── Button alignment fixes ─────────────────────────────── */
+
+/* Popular Services card (home page) */
+.home-svc-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+.home-svc-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), #00ff88);
+  color: #020a10;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: .80rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Service cards page (services.html) */
+.svc-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+.svc-btn-row .service-apply-btn {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: center;
+}
+.svc-btn-row .svc-info-btn {
+  flex-shrink: 0;
+  margin-top: 0;
+}
