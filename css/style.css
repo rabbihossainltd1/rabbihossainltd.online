@@ -1413,7 +1413,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 
 /* ── HOME QUICK SERVICE CARDS ────────────────────────────────── */
 .home-service-cards {
-  padding: 0 0 60px;
+  padding: 0 0 32px;
 }
 .home-svc-grid {
   display: grid;
@@ -1543,7 +1543,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 
 
 /* Service banner hub replacing quick access */
-.service-banner-hub { padding: 72px 0; }
+.service-banner-hub { padding: 40px 0 60px; }
 .service-banner-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
 .service-banner-card {
   position:relative; overflow:hidden; min-height:220px; border-radius:24px; padding:20px;
@@ -1702,7 +1702,6 @@ img {
 }
 
 /* Services page — compact service card images bigger */
-.compact-service-card .service-card-img{height:160px!important;border-radius:18px 18px 0 0!important;}
 .compact-service-card .service-card-img img{object-fit:cover!important;}
 
 .landing-popup{
@@ -1745,19 +1744,27 @@ img {
 .svc-category-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:14px;
+  gap:16px;
 }
 .compact-service-card{
-  border-radius:22px!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
 }
-.svc-category-slider .compact-service-card{flex:0 0 min(78vw,270px);scroll-snap-align:start;}
-.compact-service-card .service-card-img{height:160px!important;border-radius:18px 18px 0 0!important;}
-.compact-service-card .service-card-img img{object-fit:cover!important;}
-.compact-service-card .service-card-body{padding:15px!important}
-.compact-service-card h3{font-size:1rem!important;margin-bottom:6px!important}
-.compact-service-card p{font-size:.8rem!important;line-height:1.5!important;margin-bottom:12px!important}
-.compact-service-card .service-apply-btn{padding:10px 13px!important;font-size:.78rem!important}
-@media(max-width:480px){.svc-category-grid{grid-template-columns:1fr 1fr;}}
+.svc-category-slider .compact-service-card{flex:0 0 min(78vw,230px);scroll-snap-align:start;}
+.compact-service-card .service-card-img{height:140px!important;border-radius:0!important;flex-shrink:0;}
+.compact-service-card .service-card-img img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
+.compact-service-card .service-card-body{padding:14px!important;flex:1!important;}
+.compact-service-card h3{font-size:.92rem!important;margin-bottom:5px!important;line-height:1.3!important;}
+.compact-service-card p{font-size:.76rem!important;line-height:1.45!important;margin-bottom:10px!important;}
+.compact-service-card .service-apply-btn{padding:9px 12px!important;font-size:.75rem!important;width:100%!important;text-align:center!important;}
+@media(max-width:480px){.svc-category-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .compact-service-card .service-card-img{height:120px!important;}
+  .compact-service-card .service-card-body{padding:11px!important;}
+  .compact-service-card h3{font-size:.85rem!important;}
+  .compact-service-card p{font-size:.72rem!important;}
+}
 
 .compact-balance{align-items:center}
 .balance-plus-btn{
@@ -2342,3 +2349,48 @@ img {
 
 /* Spin animation for loading buttons */
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DESKTOP IMPROVEMENTS ─────────────────────────────────────── */
+@media (min-width: 900px) {
+  /* Services page: 3-col grid on desktop */
+  .svc-category-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 20px !important;
+  }
+  .compact-service-card .service-card-img { height: 160px !important; }
+  .compact-service-card .service-card-body { padding: 18px !important; }
+  .compact-service-card h3 { font-size: 1rem !important; }
+  .compact-service-card p { font-size: .82rem !important; margin-bottom: 14px !important; }
+
+  /* Service banner hub: 2-col on desktop */
+  .service-banner-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+  .service-banner-card {
+    grid-template-columns: 160px 1fr !important;
+    min-height: 160px !important;
+  }
+  .service-banner-media {
+    width: 160px !important;
+    height: 160px !important;
+  }
+
+  /* Home quick service cards: 4-col on desktop */
+  .home-svc-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* Container max-width for desktop readability */
+  .container { max-width: 1160px; }
+}
+
+@media (min-width: 1200px) {
+  /* 4-col service grid on wide desktop */
+  .svc-category-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .service-banner-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
