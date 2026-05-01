@@ -432,6 +432,8 @@
     // also update the hidden amount input
     const inp = document.getElementById('serviceAmountUsd');
     if (inp) inp.value = _currentAmountUsd;
+    // refresh coupon discount display
+    if (typeof refreshCouponPriceUI === 'function') refreshCouponPriceUI();
   };
 
   // Called from inline HTML when FF radio options are selected
@@ -442,6 +444,8 @@
     const inp = document.getElementById('serviceAmountUsd');
     if (inp) inp.value = _currentAmountUsd;
   };
+
+  let _activeCoupon = null;
 
   function injectCheckoutPanel() {
     if (!form || document.getElementById('serviceCheckoutPanel')) return;
@@ -461,15 +465,21 @@
           </div>
         </div>
         <input type="hidden" id="serviceAmountUsd" value="0" />
+        <div class="coupon-row" id="couponRow">
+          <div class="coupon-input-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#7a8ca8;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <input type="text" id="couponInput" placeholder="Coupon / Discount Code" autocomplete="off" spellcheck="false" />
+            <button type="button" id="couponApplyBtn">Apply</button>
+          </div>
+          <div id="couponMsg" style="display:none;"></div>
+        </div>
         <div class="service-pay-actions">
           <button type="button" id="buyWithCreditBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg> Place Order</button>
         </div>
-        <p class="service-pay-note">Credit দিয়ে Free Fire top-up করলে auto processing হবে। Instant Pay secure verification থাকবে। Rate: $1 / ৳125.</p>
+        <p class="service-pay-note">Credit দিয়ে Free Fire top-up করলে auto processing হবে। Rate: $1 / ৳125.</p>
       </div>
     `;
 
-    // Place payment buttons at the bottom where the old Submit Request button was.
-    
     if (submitBtn) {
       submitBtn.style.display = 'none';
       form.insertBefore(panel, submitBtn);
@@ -489,14 +499,76 @@
       .service-pay-actions { display:grid; grid-template-columns:1fr; gap:12px; }
       .service-pay-actions button { border:0; border-radius:999px; padding:14px 20px; font-weight:900; cursor:pointer; font-size:.95rem; }
       #buyWithCreditBtn { background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; }
-      
       .service-pay-note { color:#7a8ca8; font-size:.8rem; line-height:1.55; margin:12px 0 0; }
+      .coupon-row { margin-bottom:14px; }
+      .coupon-input-wrap { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:9px 12px; }
+      #couponInput { flex:1; background:transparent; border:0; outline:none; color:#e8edf5; font-size:.88rem; font-family:inherit; }
+      #couponInput::placeholder { color:#4a6070; }
+      #couponApplyBtn { border:1px solid rgba(0,200,255,.30); background:rgba(0,200,255,.10); color:#9ee8ff; border-radius:8px; padding:6px 14px; font-weight:800; font-size:.8rem; cursor:pointer; white-space:nowrap; transition:.2s; }
+      #couponApplyBtn:hover { background:rgba(0,200,255,.20); }
+      #couponMsg { margin-top:8px; padding:8px 12px; border-radius:10px; font-size:.82rem; font-weight:700; }
+      #couponMsg.success { background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.25); color:#a7ffcf; }
+      #couponMsg.error { background:rgba(255,80,80,.10); border:1px solid rgba(255,80,80,.22); color:#ffb0b0; }
       @media(max-width:640px){ .service-checkout-head, .service-pay-actions { display:grid; grid-template-columns:1fr; } .service-price-pill { text-align:left; } }
     `;
     document.head.appendChild(style);
 
     const creditBtn = document.getElementById('buyWithCreditBtn');
     if (creditBtn) creditBtn.addEventListener('click', handleBuyWithCredit);
+    const couponApplyBtn = document.getElementById('couponApplyBtn');
+    if (couponApplyBtn) couponApplyBtn.addEventListener('click', applyCoupon);
+    const couponInput = document.getElementById('couponInput');
+    if (couponInput) couponInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });
+  }
+
+  async function applyCoupon() {
+    const input = document.getElementById('couponInput');
+    const msg = document.getElementById('couponMsg');
+    if (!input || !msg) return;
+    const code = input.value.trim().toUpperCase();
+    if (!code) { showCouponMsg('Please enter a coupon code.', 'error'); return; }
+    const applyBtn = document.getElementById('couponApplyBtn');
+    if (applyBtn) { applyBtn.disabled = true; applyBtn.textContent = '...'; }
+    try {
+      const { db: fsDb } = await import('./firebase-core.js');
+      const { doc: fsDoc, getDoc: fsGetDoc } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const snap = await fsGetDoc(fsDoc(fsDb, 'coupons', code));
+      if (!snap.exists()) { showCouponMsg('Invalid coupon code.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
+      const d = snap.data();
+      if (d.active === false) { showCouponMsg('This coupon is no longer active.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
+      if (d.expiresAt && d.expiresAt.toMillis && d.expiresAt.toMillis() < Date.now()) { showCouponMsg('This coupon has expired.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
+      const dp = Number(d.discountPercent || 0);
+      if (!dp || dp <= 0 || dp > 100) { showCouponMsg('Invalid coupon.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
+      _activeCoupon = { code, discountPercent: dp };
+      refreshCouponPriceUI();
+      showCouponMsg('Coupon applied! ' + dp + '% discount added.', 'success');
+    } catch(err) {
+      showCouponMsg('Could not validate coupon. Try again.', 'error');
+      _activeCoupon = null; refreshCouponPriceUI();
+    } finally {
+      if (applyBtn) { applyBtn.disabled = false; applyBtn.textContent = 'Apply'; }
+    }
+  }
+
+  function showCouponMsg(text, type) {
+    const msg = document.getElementById('couponMsg');
+    if (!msg) return;
+    msg.textContent = text; msg.className = type; msg.style.display = 'block';
+  }
+
+  function refreshCouponPriceUI() {
+    const base = _currentAmountUsd || 0;
+    const final = _activeCoupon ? +(base * (1 - _activeCoupon.discountPercent / 100)).toFixed(2) : base;
+    const priceUsdEl = document.getElementById('servicePriceUsd');
+    const priceBdtEl = document.getElementById('servicePriceBdt');
+    if (priceUsdEl) priceUsdEl.textContent = '$' + final.toFixed(2) + (_activeCoupon ? ' (-' + _activeCoupon.discountPercent + '%)' : '');
+    if (priceBdtEl) priceBdtEl.textContent = '৳' + Math.round(final * 125).toLocaleString();
+  }
+
+  function getFinalAmountUsd() {
+    const base = _currentAmountUsd || 0;
+    if (!_activeCoupon) return base;
+    return +(base * (1 - _activeCoupon.discountPercent / 100)).toFixed(2);
   }
 
   function setDefaultAmount(serviceName) {
@@ -684,10 +756,11 @@
 
     if (!validateBasicDetails()) return;
 
-    const amountUsd = getServiceAmount();
+    const amountUsd = getFinalAmountUsd();
+    const baseAmountUsd = getServiceAmount();
 
     // ── Balance check BEFORE placing order ──────────────────────────
-    if (!amountUsd || amountUsd <= 0) {
+    if (!baseAmountUsd || baseAmountUsd <= 0) {
       showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
       return;
     }
@@ -711,6 +784,12 @@
     if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;animation:spin .7s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Processing…'; }
 
     const details = collectFormData();
+    // Attach coupon info to details so it's saved in order
+    if (_activeCoupon) {
+      details.couponCode = _activeCoupon.code;
+      details.discountPercent = _activeCoupon.discountPercent;
+      details.originalAmountUsd = baseAmountUsd;
+    }
 
     // Call backend first — only show success if backend confirms
     const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, details });

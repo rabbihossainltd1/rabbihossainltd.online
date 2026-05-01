@@ -1027,6 +1027,55 @@ function loadDashboardTopups(user) {
   });
 }
 
+// ── Browser Notification System ─────────────────────────────────
+async function requestNotificationPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission === "denied") return false;
+  const perm = await Notification.requestPermission();
+  return perm === "granted";
+}
+
+function sendOrderNotification(orderId, serviceName, status) {
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  const title = status === "approved" || status === "accepted" || status === "confirmed" || status === "completed"
+    ? "Order Completed"
+    : status === "declined" || status === "failed" || status === "cancelled"
+    ? "Order Update"
+    : "Order Processing";
+  const body = status === "approved" || status === "accepted" || status === "confirmed" || status === "completed"
+    ? `${serviceName || "Your order"} has been completed successfully.`
+    : status === "declined" || status === "failed"
+    ? `${serviceName || "Your order"} could not be processed. Please contact support.`
+    : status === "cancelled"
+    ? `${serviceName || "Your order"} was cancelled.`
+    : `${serviceName || "Your order"} is being processed. Please wait.`;
+  try {
+    const n = new Notification(title, {
+      body,
+      icon: "https://rabbihossainltd.online/favicon.ico",
+      tag: `order-${orderId}`,
+      requireInteraction: false
+    });
+    n.onclick = () => { window.focus(); n.close(); };
+    setTimeout(() => n.close(), 6000);
+  } catch(e) { /* ignore */ }
+}
+
+const _notifiedOrders = {};
+function trackOrderNotification(orderId, data) {
+  const status = String(data?.status || "").toLowerCase();
+  const prev = _notifiedOrders[orderId];
+  if (!prev) { _notifiedOrders[orderId] = status; return; }
+  if (prev !== status) {
+    _notifiedOrders[orderId] = status;
+    const finalStatuses = ["approved","accepted","confirmed","completed","declined","failed","cancelled"];
+    if (finalStatuses.includes(status)) {
+      sendOrderNotification(orderId, data?.serviceName || "Service", status);
+    }
+  }
+}
+
 function loadDashboardOrders(user) {
   const list = document.getElementById("dashboardOrderHistory");
   if (!list) return;
@@ -1051,6 +1100,7 @@ function loadDashboardOrders(user) {
 
     docs.forEach((docSnap) => {
       const data = docSnap.data() || {};
+      trackOrderNotification(docSnap.id, data);
       const ts = data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt?.seconds || 0) * 1000;
       const dateStr = ts ? new Date(ts).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       const sc = statusClass(data.status);
@@ -1066,16 +1116,25 @@ function loadDashboardOrders(user) {
       const _t = window.rabbiLang ? window.rabbiLang.t.bind(window.rabbiLang) : (k => k);
       const pendingNote = (sc === 'pending' || sc === 'processing') ? `<div class="order-pending-note">${svgClock} ${_t('Order সাধারণত')} <strong>${_t('15 মিনিটের মধ্যে')}</strong> ${_t('complete হয়')}</div>` : '';
       const payMethod = data.paymentMethod || data.method || 'credit';
-      const sourcePage = (function() {
+      // Get purchased app name from serviceDetails
+      const purchasedAppName = (function() {
         const details = data.serviceDetails || data.details || {};
+        // Priority: explicit app_name field saved at order time
+        if (details.app_name) return details.app_name;
+        if (details.appName) return details.appName;
+        // Fallback: extract from source_page query param
         const raw = details.source_page || data.source_page || '';
         if (!raw) return '';
-        // Extract app name from "services.html?app=chatgpt" or just "services.html"
         const appMatch = raw.match(/[?&]app=([^&]+)/);
-        if (appMatch) return decodeURIComponent(appMatch[1]);
-        return raw.replace(/\.html.*/, '').replace(/-/g,' ');
+        if (appMatch) return decodeURIComponent(appMatch[1]).replace(/-/g,' ');
+        return '';
       })();
       const svgApp = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`;
+      // Coupon/discount display in order
+      const couponDisplay = data.couponCode ? (() => {
+        const svgTag = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
+        return `<span style="color:#a7ffcf;">${svgTag} ${escapeHtml(data.couponCode)}${data.discountPercent ? ` (${data.discountPercent}% off)` : ''}</span>`;
+      })() : '';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1087,7 +1146,8 @@ function loadDashboardOrders(user) {
           </div>
           <div class="premium-order-details">
             <span>${svgPay} ${escapeHtml(payMethod)}</span>
-            ${sourcePage ? `<span>${svgApp} App: ${escapeHtml(sourcePage)}</span>` : ""}
+            ${purchasedAppName ? `<span>${svgApp} ${escapeHtml(purchasedAppName)}</span>` : ""}
+            ${couponDisplay}
             ${getFreeFireUid(data) ? `<span>${svgGame} UID: ${escapeHtml(getFreeFireUid(data))}</span>` : ""}
             ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>
