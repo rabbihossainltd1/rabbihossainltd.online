@@ -544,7 +544,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 .delay-3 { animation-delay: 0.09s; }
 .delay-4 { animation-delay: 0.12s; }
 .delay-5 { animation-delay: 0.15s; }
-.reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.22s ease, transform 0.22s ease; }
+.reveal { opacity: 0; transform: translateY(6px); transition: opacity 0.14s ease, transform 0.14s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* ============================================================ RESPONSIVE ============================================================ */
