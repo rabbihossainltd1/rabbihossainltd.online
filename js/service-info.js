@@ -104,25 +104,6 @@
       note_en: 'Your Android device must be rooted to use this service.',
     },
 
-    'ffFf4x': {
-      name: 'FF Android Panel — FF4X',
-      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
-      color: '#4fc3f7',
-      tagline: 'Android Phone-এ Free Fire Panel — FF4X Client (Root ছাড়া)',
-      what_en: 'The FF4X Android Panel gives you in-game advantages on Android without requiring root access. Uses the FF4X client for a smooth, safe experience.',
-      what_bn: 'FF4X Android Panel দিয়ে root ছাড়াই Android phone-এ Free Fire-এ in-game সুবিধা পান। FF4X client ব্যবহার করে — safe এবং smooth।',
-      features: [
-        { en: 'Works on non-rooted Android devices via FF4X client', bn: 'Root ছাড়া Android-এ FF4X client দিয়ে কাজ করে' },
-        { en: 'Enhanced in-game visibility and aim assistance', bn: 'In-game visibility ও aim সুবিধা উন্নত হয়' },
-        { en: '1 Day to 30 Day plans available', bn: '1 Day থেকে 30 Day পর্যন্ত plan আছে' },
-        { en: 'Step-by-step setup guidance provided', bn: 'Step-by-step setup guide দেওয়া হয়' },
-        { en: 'Secure delivery via email', bn: 'Email-এর মাধ্যমে secure delivery' },
-        { en: 'Affordable pricing for all budgets', bn: 'সব বাজেটের জন্য সাশ্রয়ী মূল্য' },
-      ],
-      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> এই panel-টি Android phone-এর জন্য এবং root ছাড়াই কাজ করে। Rooted phone-এর জন্য Drip Client panel ব্যবহার করুন।',
-      note_en: 'This panel works on Android without root. For rooted devices, use the Drip Client panel.',
-    },
-
     'ffPc': {
       name: 'Free Fire PC Panel',
       emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
