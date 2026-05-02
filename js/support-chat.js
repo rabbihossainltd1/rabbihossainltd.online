@@ -110,14 +110,24 @@ import {
     }
     if(submitEl){ submitEl.disabled=true; submitEl.textContent='সাবমিট হচ্ছে...'; }
     try {
-      let userId=currentUser?.uid;
-      if(!userId){ userId=sessionStorage.getItem('guestSupportId'); if(!userId){ userId='guest_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); sessionStorage.setItem('guestSupportId',userId); } }
+      const userId=currentUser.uid;
       activeUserId=userId;
-      const userEmail=currentUser?.email||email;
+      const userEmail=currentUser.email||email;
 
-      await setDoc(doc(db,'supportTickets',ticketId),{ ticketId,userId,userName:name,userEmail:email,userPhone:phone,problemDescription:problem,status:'open',createdAt:serverTimestamp(),updatedAt:serverTimestamp() });
-      await setDoc(doc(db,'supportRooms',userId),{ userId,userEmail,displayName:name,userPhone:phone,ticketId,lastMessage:problem,lastAt:serverTimestamp(),unreadAdmin:1,status:'open' },{merge:true});
-      await addDoc(collection(db,'supportChats',userId,'messages'),{ text:problem,role:'user',userId,userEmail,userName:name,userPhone:phone,ticketId,createdAt:serverTimestamp() });
+      // Write supportRooms first — admin panel listens to this collection
+      await setDoc(doc(db,'supportRooms',userId),{
+        userId,userEmail,displayName:name,userPhone:phone,ticketId,
+        lastMessage:problem,lastAt:serverTimestamp(),unreadAdmin:1,status:'open'
+      },{merge:true});
+      // Write first message to supportChats — admin reads this in chat window
+      await addDoc(collection(db,'supportChats',userId,'messages'),{
+        text:problem,role:'user',userId,userEmail,userName:name,userPhone:phone,ticketId,createdAt:serverTimestamp()
+      });
+      // Write supportTickets for profile page tracking (best-effort, non-blocking)
+      setDoc(doc(db,'supportTickets',ticketId),{
+        ticketId,userId,userName:name,userEmail,userPhone:phone,
+        problemDescription:problem,status:'open',createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+      }).catch(e=>console.warn('supportTickets write skipped:',e));
 
       document.getElementById('floatAgentForm')?.remove();
       botState='agent_waiting';
@@ -154,14 +164,29 @@ import {
   function handleTicketSolved(){
     document.getElementById('floatWaitingAnim')?.remove();
     document.getElementById('floatQuickBtns')?.remove();
-    botState='solved'; setInputLocked(true,'সেশন সম্পন্ন হয়েছে');
+    botState='solved';
     appendMsg('admin','আপনার সমস্যাটি সমাধান হয়েছে। ধন্যবাদ RabbiHossainLTD ব্যবহার করার জন্য।',false);
-    setTimeout(()=>{
-      showQuickButtons([{ label:'নতুন কথোপকথন শুরু করুন', action:()=>{
-        if(unsubMessages){ unsubMessages(); unsubMessages=null; }
-        msgsEl.innerHTML=''; botState='wait_first_msg'; activeUserId=null; setInputLocked(false,'বার্তা লিখুন...');
-      }}]);
-    },600);
+    // Hide input area, show a small "New Chat" button in its place
+    const inputArea=document.getElementById('floatChatInputArea')||inputEl?.parentElement;
+    if(inputEl) inputEl.style.display='none';
+    if(sendBtn) sendBtn.style.display='none';
+    // Remove any existing new-chat button
+    document.getElementById('floatNewChatBtn')?.remove();
+    const ncBtn=document.createElement('button');
+    ncBtn.type='button'; ncBtn.id='floatNewChatBtn';
+    ncBtn.textContent='নতুন চ্যাট শুরু করুন';
+    ncBtn.style.cssText='width:100%;padding:10px;background:rgba(0,200,255,.12);border:1px solid rgba(0,200,255,.3);border-radius:10px;color:#9ee8ff;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:4px;';
+    ncBtn.addEventListener('click',()=>{
+      if(unsubMessages){ unsubMessages(); unsubMessages=null; }
+      msgsEl.innerHTML='';
+      botState='wait_first_msg';
+      activeUserId=null;
+      ncBtn.remove();
+      if(inputEl){ inputEl.style.display=''; inputEl.value=''; inputEl.disabled=false; inputEl.placeholder='বার্তা লিখুন...'; }
+      if(sendBtn){ sendBtn.style.display=''; sendBtn.disabled=false; }
+    });
+    if(inputArea) inputArea.appendChild(ncBtn);
+    else msgsEl.appendChild(ncBtn);
   }
 
   /* ── Bot flow ── */

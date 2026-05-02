@@ -64,7 +64,9 @@
 
   async function buyServiceWithCreditDirect(servicePayload) {
     const amountUsd = Number(servicePayload.amountUsd || 0);
-    if (!amountUsd || amountUsd <= 0) {
+    const baseAmountUsd = Number(servicePayload.baseAmountUsd || servicePayload.amountUsd || 0);
+    // Use base (pre-discount) amount for existence check; discounted amount can be 0 on 100% coupon
+    if (!baseAmountUsd || baseAmountUsd <= 0) {
       return { ok: false, reason: 'amount', message: 'Valid service amount required.' };
     }
 
@@ -792,7 +794,7 @@
     }
 
     // Call backend first — only show success if backend confirms
-    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, details });
+    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd: baseAmountUsd, details });
 
     if (!result.ok) {
       if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
