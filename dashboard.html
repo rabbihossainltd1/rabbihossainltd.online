@@ -210,19 +210,26 @@
       if (!user) return;
       const list = document.getElementById('supportTicketsList');
       if (!list) return;
+      // orderBy removed — composite index not required, sort client-side instead
       const q = query(
         collection(db, 'supportTickets'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', user.uid)
       );
       onSnapshot(q, (snap) => {
         if (snap.empty) {
           list.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:#4a6070;font-size:.88rem;">এখনো কোনো Support Ticket নেই।</div>';
           return;
         }
+        // Sort client-side by createdAt desc
+        const docs = [];
+        snap.forEach(docSnap => docs.push(docSnap.data()));
+        docs.sort((a, b) => {
+          const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return tb - ta;
+        });
         list.innerHTML = '';
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
+        docs.forEach(d => {
           const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('bn-BD') : '';
           const statusClass = d.status === 'solved' ? 'solved' : d.status === 'closed' ? 'closed' : 'open';
           const statusLabel = d.status === 'solved' ? 'সমাধান হয়েছে' : d.status === 'closed' ? 'বন্ধ' : 'খোলা আছে';
@@ -235,6 +242,9 @@
             <div class="support-ticket-date">${date}</div>
           </div>`;
         });
+      }, (err) => {
+        console.error('Tickets load error:', err);
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:#ff6b6b;font-size:.88rem;">টিকেট লোড করতে সমস্যা হয়েছে।</div>';
       });
     });
   }
