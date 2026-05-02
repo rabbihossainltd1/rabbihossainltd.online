@@ -490,12 +490,17 @@ window.submitTopup = async function () {
       rate: USD_TO_BDT,
       rateBDT: USD_TO_BDT,
       method,
-      paymentNumber: PAYMENT_NUMBERS[method] || "",
+      paymentNumber: PAYMENT_NUMBERS[method] || '',
       transactionId,
-      status: "pending",
+      status: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
+
+    // Normalize method for Firestore rules — Binance stored as 'Binance'
+    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
+      payload.method = 'bKash'; // fallback
+    }
 
     await addDoc(collection(db, "topups"), payload);
     showMessage("Credit request submitted. Admin approval pending.", "success");
@@ -677,8 +682,14 @@ window.loadAdminPanel = function () {
             <p><b>Transaction ID:</b> ${escapeHtml(data.transactionId || "")}</p>
             ${purpose === "service" ? `<div class="admin-details"><b>Service Details:</b><pre>${escapeHtml(JSON.stringify(details, null, 2))}</pre></div>` : ""}
             <div class="actions">
-              <button class="confirm" onclick="approveTopup('${docSnap.id}')">Confirm Payment</button>
-              <button class="decline" onclick="declineTopup('${docSnap.id}')">Decline Payment</button>
+              <button class="btn-confirm" onclick="approveTopup('${docSnap.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M20 6 9 17l-5-5"/></svg>
+                Approve
+              </button>
+              <button class="btn-decline" onclick="declineTopup('${docSnap.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                Decline
+              </button>
             </div>
           </div>
         `;
@@ -717,8 +728,14 @@ window.loadAdminPanel = function () {
             ${data.transactionId ? `<p><b>Transaction ID:</b> ${escapeHtml(data.transactionId)}</p>` : ""}
             ${adminOrderDetailsHtml(data)}
             <div class="actions">
-              <button class="confirm" onclick="approveServiceOrder('${docSnap.id}')">Accept Order</button>
-              <button class="decline" onclick="declineServiceOrder('${docSnap.id}')">Decline Order</button>
+              <button class="btn-confirm" onclick="approveServiceOrder('${docSnap.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M20 6 9 17l-5-5"/></svg>
+                Accept
+              </button>
+              <button class="btn-decline" onclick="declineServiceOrder('${docSnap.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                Decline
+              </button>
               ${autoTopupButtonHtml(data, docSnap.id)}
             </div>
           </div>
