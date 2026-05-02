@@ -55,21 +55,28 @@
     .support-grid { display:grid; grid-template-columns:240px 1fr; gap:12px; min-height:360px; }
     @media(max-width:600px){ .support-grid { grid-template-columns:1fr; } }
     .chat-rooms { background:rgba(0,0,0,.2); border-radius:14px; overflow-y:auto; max-height:420px; }
-    .chat-room-item { padding:11px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:.15s; }
+    .chat-room-item { padding:11px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:.15s; position:relative; }
     .chat-room-item:hover,.chat-room-item.active { background:rgba(0,200,255,.08); }
     .chat-room-name { font-weight:900; color:#d0eaff; font-size:.85rem; }
     .chat-room-preview { color:#7a8ca8; font-size:.75rem; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chat-room-ticket { font-size:.7rem; color:#4a6880; font-family:monospace; margin-top:2px; }
+    .chat-room-badge { position:absolute; top:10px; right:10px; min-width:18px; height:18px; border-radius:99px; background:#ff5050; color:#fff; font-size:.66rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+    .chat-room-status-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-left:6px; vertical-align:middle; }
+    .chat-room-status-dot.open { background:#00c8ff; }
+    .chat-room-status-dot.solved { background:#00e67a; }
     .chat-pane { background:rgba(0,0,0,.2); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
-    .chat-msgs { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px; max-height:320px; min-height:200px; }
+    .chat-msgs { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px; max-height:280px; min-height:200px; }
     .chat-msg-user { align-self:flex-start; max-width:80%; }
     .chat-msg-admin { align-self:flex-end; max-width:80%; }
     .chat-msg-bubble { padding:9px 13px; border-radius:14px; font-size:.84rem; line-height:1.5; word-break:break-word; }
     .chat-msg-user .chat-msg-bubble { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); color:#d0eaff; }
     .chat-msg-admin .chat-msg-bubble { background:rgba(0,200,255,.15); border:1px solid rgba(0,200,255,.25); color:#d0eaff; }
-    .chat-reply { border-top:1px solid rgba(255,255,255,.07); padding:10px; display:flex; gap:8px; align-items:center; }
-    .chat-reply-input { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:10px; padding:9px 12px; color:#e8edf5; font-size:.86rem; font-family:inherit; outline:none; }
+    .chat-reply { border-top:1px solid rgba(255,255,255,.07); padding:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .chat-reply-input { flex:1; min-width:120px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:10px; padding:9px 12px; color:#e8edf5; font-size:.86rem; font-family:inherit; outline:none; }
     .chat-reply-btn { border:0; border-radius:10px; padding:9px 18px; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; font-weight:900; cursor:pointer; font-size:.84rem; font-family:inherit; white-space:nowrap; }
-    .chat-empty { flex:1; display:flex; align-items:center; justify-content:center; color:#4a6070; font-size:.88rem; padding:30px; text-align:center; }
+    .chat-solved-btn { border:1px solid rgba(0,230,122,.4); border-radius:10px; padding:9px 14px; background:rgba(0,230,122,.12); color:#00e67a; font-weight:900; cursor:pointer; font-size:.82rem; font-family:inherit; white-space:nowrap; display:flex; align-items:center; gap:6px; transition:.17s; }
+    .chat-solved-btn:hover { background:rgba(0,230,122,.22); border-color:rgba(0,230,122,.6); }
+    .chat-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#4a6070; font-size:.88rem; padding:30px; text-align:center; }
   </style>
 </head>
 <body onload="loadAdminPanel()">
@@ -184,18 +191,32 @@
         <div class="admin-card-shell">
           <div class="admin-panel-head">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-            <h2>Live Support</h2>
+            <h2>Support Inbox</h2>
           </div>
           <div class="support-grid">
             <div class="chat-rooms" id="adminChatRooms">
-              <div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">Loading chats...</div>
+              <div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">Loading tickets...</div>
             </div>
             <div class="chat-pane" id="adminChatPane">
-              <div class="chat-empty" id="adminChatEmpty">Select a conversation to reply</div>
+              <div class="chat-empty" id="adminChatEmpty">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:10px;color:#2a4060;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                একটি কথোপকথন বেছে নিন
+              </div>
+              <div id="adminTicketInfo" style="display:none; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.07); background:rgba(0,200,255,.04);">
+                <div style="font-size:.78rem; color:#7a8ca8; line-height:1.8;">
+                  <span id="adminTicketId" style="font-family:monospace; color:#a0c4e0;"></span>
+                  &nbsp;|&nbsp;<span id="adminTicketUser" style="color:#d0eaff;font-weight:700;"></span>
+                  &nbsp;|&nbsp;<span id="adminTicketPhone"></span>
+                </div>
+              </div>
               <div class="chat-msgs" id="adminChatMsgs" style="display:none;"></div>
               <div class="chat-reply" id="adminChatReply" style="display:none;">
-                <input type="text" id="adminReplyInput" class="chat-reply-input" placeholder="Type reply..." />
+                <input type="text" id="adminReplyInput" class="chat-reply-input" placeholder="Reply লিখুন..." />
                 <button type="button" class="chat-reply-btn" onclick="adminSendReply()">Send</button>
+                <button type="button" class="chat-solved-btn" onclick="adminMarkSolved()" title="Solved — কথোপকথন শেষ করুন">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Solved
+                </button>
               </div>
             </div>
           </div>
@@ -314,32 +335,55 @@
     onSnapshot(query(collection(db, 'supportRooms'), orderBy('lastAt', 'desc')), (snap) => {
       rooms.innerHTML = '';
       const badge = document.getElementById('badgeSupport');
-      if (badge) { badge.textContent = snap.size; badge.style.display = snap.size ? 'flex' : 'none'; }
-      if (snap.empty) { rooms.innerHTML = '<div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">No chats yet.</div>'; return; }
+      const openCount = snap.docs.filter(d => d.data().status !== 'solved').length;
+      if (badge) { badge.textContent = openCount || snap.size; badge.style.display = snap.size ? 'flex' : 'none'; }
+      if (snap.empty) { rooms.innerHTML = '<div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো চ্যাট নেই।</div>'; return; }
       snap.forEach(docSnap => {
         const d = docSnap.data();
         const uid = docSnap.id;
+        const isSolved = d.status === 'solved';
         const el = document.createElement('div');
         el.className = 'chat-room-item' + (activeChatUid === uid ? ' active' : '');
-        el.innerHTML = `<div class="chat-room-name">${escHtml(d.displayName || d.userEmail || 'User')}</div><div class="chat-room-preview">${escHtml(d.lastMessage || '')}</div>`;
+        el.innerHTML = `
+          <div class="chat-room-name">
+            ${escHtml(d.displayName || d.userEmail || 'User')}
+            <span class="chat-room-status-dot ${isSolved ? 'solved' : 'open'}" title="${isSolved ? 'Solved' : 'Open'}"></span>
+          </div>
+          <div class="chat-room-preview">${escHtml(d.lastMessage || '')}</div>
+          ${d.ticketId ? `<div class="chat-room-ticket">${escHtml(d.ticketId)}</div>` : ''}
+          ${(d.unreadAdmin && !isSolved) ? `<span class="chat-room-badge">${d.unreadAdmin}</span>` : ''}
+        `;
         el.addEventListener('click', () => {
           document.querySelectorAll('.chat-room-item').forEach(r => r.classList.remove('active'));
           el.classList.add('active');
-          openAdminChat(uid);
+          openAdminChat(uid, d);
         });
         rooms.appendChild(el);
       });
     });
   }
 
-  function openAdminChat(uid) {
+  function openAdminChat(uid, roomData) {
     activeChatUid = uid;
     const msgsEl = document.getElementById('adminChatMsgs');
     const emptyEl = document.getElementById('adminChatEmpty');
     const replyEl = document.getElementById('adminChatReply');
+    const ticketInfoEl = document.getElementById('adminTicketInfo');
     if (emptyEl) emptyEl.style.display = 'none';
     if (msgsEl) { msgsEl.style.display = 'flex'; msgsEl.innerHTML = ''; }
     if (replyEl) replyEl.style.display = 'flex';
+
+    // Show ticket info bar
+    if (ticketInfoEl && roomData) {
+      document.getElementById('adminTicketId').textContent = roomData.ticketId || '';
+      document.getElementById('adminTicketUser').textContent = roomData.displayName || roomData.userEmail || '';
+      document.getElementById('adminTicketPhone').textContent = roomData.userPhone || '';
+      ticketInfoEl.style.display = 'block';
+    }
+
+    // Clear unread badge
+    updateDoc(doc(db, 'supportRooms', uid), { unreadAdmin: 0 }).catch(() => {});
+
     if (unsubChatMsgs) unsubChatMsgs();
     const q = query(collection(db, 'supportChats', uid, 'messages'), orderBy('createdAt', 'asc'));
     unsubChatMsgs = onSnapshot(q, snap => {
@@ -350,7 +394,8 @@
           const isAdmin = d.role === 'admin';
           const wrap = document.createElement('div');
           wrap.className = isAdmin ? 'chat-msg-admin' : 'chat-msg-user';
-          wrap.innerHTML = `<div class="chat-msg-bubble">${escHtml(d.text)}</div>`;
+          const time = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+          wrap.innerHTML = `<div class="chat-msg-bubble">${escHtml(d.text)}</div><div style="font-size:.7rem;color:#4a6070;margin-top:3px;${isAdmin?'text-align:right':'text-align:left'}">${time}</div>`;
           msgsEl.appendChild(wrap);
           msgsEl.scrollTop = msgsEl.scrollHeight;
         }
@@ -367,7 +412,48 @@
     await addDoc(collection(db, 'supportChats', activeChatUid, 'messages'), {
       text, role: 'admin', adminEmail: adminUser.email, createdAt: serverTimestamp()
     });
-    await updateDoc(doc(db, 'supportRooms', activeChatUid), { lastMessage: text, lastAt: serverTimestamp() }).catch(()=>{});
+    await updateDoc(doc(db, 'supportRooms', activeChatUid), {
+      lastMessage: text, lastAt: serverTimestamp()
+    }).catch(() => {});
+  };
+
+  window.adminMarkSolved = async function() {
+    if (!activeChatUid || !adminUser) return;
+    if (!confirm('এই সাপোর্ট টিকেট Solved হিসেবে মার্ক করবেন?')) return;
+
+    // Send system solved message so user widget knows
+    await addDoc(collection(db, 'supportChats', activeChatUid, 'messages'), {
+      text: 'আপনার সমস্যাটি সমাধান হয়েছে। ধন্যবাদ।',
+      role: 'system',
+      type: 'solved',
+      adminEmail: adminUser.email,
+      createdAt: serverTimestamp(),
+    });
+
+    // Update room and ticket status
+    await updateDoc(doc(db, 'supportRooms', activeChatUid), {
+      status: 'solved', lastAt: serverTimestamp()
+    }).catch(() => {});
+
+    // Also update the ticket doc if ticketId known
+    const roomSnap = await getDoc(doc(db, 'supportRooms', activeChatUid));
+    const ticketId = roomSnap.data()?.ticketId;
+    if (ticketId) {
+      await updateDoc(doc(db, 'supportTickets', ticketId), {
+        status: 'solved', updatedAt: serverTimestamp()
+      }).catch(() => {});
+    }
+
+    // Clear UI
+    const msgsEl = document.getElementById('adminChatMsgs');
+    const emptyEl = document.getElementById('adminChatEmpty');
+    const replyEl = document.getElementById('adminChatReply');
+    const ticketInfoEl = document.getElementById('adminTicketInfo');
+    if (msgsEl) { msgsEl.style.display = 'none'; msgsEl.innerHTML = ''; }
+    if (emptyEl) { emptyEl.style.display = 'flex'; emptyEl.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:10px;color:#00e67a;"><polyline points="20 6 9 17 4 12"/></svg>Ticket Solved'; }
+    if (replyEl) replyEl.style.display = 'none';
+    if (ticketInfoEl) ticketInfoEl.style.display = 'none';
+    activeChatUid = null;
   };
 
   document.getElementById('adminReplyInput')?.addEventListener('keydown', (e) => {

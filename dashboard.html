@@ -128,6 +128,7 @@
         <section class="profile-control-panel" id="profileControlPanel">
           <div class="profile-control-grid" id="profileControlGrid">
             <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</button>
+            <button class="profile-control-btn" type="button" id="supportTicketsBtn" onclick="toggleSupportTickets()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Support Tickets</button>
             <a class="profile-control-btn" href="https://wa.me/8801731410341" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Customer Service</a>
           </div>
         </section>
@@ -161,9 +162,83 @@
             </div>
           </div>
         </section>
+
+        <!-- Support Tickets Panel -->
+        <section id="supportTicketsPanel" style="display:none;margin-top:20px;">
+          <h2 class="orders-section-title" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            আমার Support Tickets
+          </h2>
+          <div id="supportTicketsList">
+            <div class="empty-state">লোড হচ্ছে...</div>
+          </div>
+        </section>
       </div>
     </div>
   </main>
+
+  <style>
+  .support-ticket-item { background:rgba(0,200,255,.05); border:1px solid rgba(0,200,255,.14); border-radius:14px; padding:14px 16px; margin-bottom:10px; }
+  .support-ticket-header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .support-ticket-id { font-family:monospace; font-size:.82rem; color:#7ab8d4; font-weight:700; }
+  .support-ticket-status { font-size:.74rem; font-weight:900; padding:3px 10px; border-radius:99px; }
+  .support-ticket-status.open { background:rgba(0,200,255,.15); color:#00c8ff; border:1px solid rgba(0,200,255,.3); }
+  .support-ticket-status.solved { background:rgba(0,255,136,.12); color:#00e67a; border:1px solid rgba(0,255,136,.28); }
+  .support-ticket-status.closed { background:rgba(255,255,255,.06); color:#7a8ca8; border:1px solid rgba(255,255,255,.1); }
+  .support-ticket-problem { font-size:.85rem; color:#9ab4c8; line-height:1.5; margin-bottom:4px; }
+  .support-ticket-date { font-size:.74rem; color:#4a6070; }
+  </style>
+
+  <script type="module">
+  import { auth, db } from './js/firebase-core.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+  import { collection, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+  window.toggleSupportTickets = function() {
+    const panel = document.getElementById('supportTicketsPanel');
+    const btn = document.getElementById('supportTicketsBtn');
+    if (!panel) return;
+    const isVisible = panel.style.display !== 'none';
+    panel.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) loadUserTickets();
+  };
+
+  function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function loadUserTickets() {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      const list = document.getElementById('supportTicketsList');
+      if (!list) return;
+      const q = query(
+        collection(db, 'supportTickets'),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          list.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:#4a6070;font-size:.88rem;">এখনো কোনো Support Ticket নেই।</div>';
+          return;
+        }
+        list.innerHTML = '';
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('bn-BD') : '';
+          const statusClass = d.status === 'solved' ? 'solved' : d.status === 'closed' ? 'closed' : 'open';
+          const statusLabel = d.status === 'solved' ? 'সমাধান হয়েছে' : d.status === 'closed' ? 'বন্ধ' : 'খোলা আছে';
+          list.innerHTML += `<div class="support-ticket-item">
+            <div class="support-ticket-header">
+              <span class="support-ticket-id">${escH(d.ticketId)}</span>
+              <span class="support-ticket-status ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="support-ticket-problem">${escH(d.problemDescription || '')}</div>
+            <div class="support-ticket-date">${date}</div>
+          </div>`;
+        });
+      });
+    });
+  }
+  </script>
 
   <script src="js/lang.js"></script>
   <script src="js/main.js"></script>
@@ -177,6 +252,7 @@
       }, 3000); // wait 3 seconds so it doesn't feel abrupt
     }
   </script>
+
 <!-- ── Floating Customer Support Widget ── -->
 <div id="floatChatWidget">
   <div id="floatChatWindow" style="display:none;" role="dialog" aria-label="Customer Support Chat">
@@ -187,23 +263,16 @@
         </div>
         <div>
           <div id="floatChatTitle">Rabbi Hossain Support</div>
-          <div id="floatChatStatus">
-            <span id="floatStatusDot"></span> Online
-          </div>
+          <div id="floatChatStatus"><span id="floatStatusDot"></span> Online</div>
         </div>
       </div>
       <button type="button" id="floatChatClose" aria-label="Close chat">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <div id="floatChatMessages">
-      <div class="float-msg float-msg-admin">
-        <div class="float-msg-bubble">Hi! How can we help you today?</div>
-        <div class="float-msg-time">Support Team</div>
-      </div>
-    </div>
+    <div id="floatChatMessages"></div>
     <div id="floatChatInputArea">
-      <input type="text" id="floatChatInput" placeholder="Type your message..." autocomplete="off" maxlength="500" />
+      <input type="text" id="floatChatInput" placeholder="বার্তা লিখুন..." autocomplete="off" maxlength="500" />
       <button type="button" id="floatChatSend" aria-label="Send message">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
       </button>
@@ -219,183 +288,75 @@
 <style>
 #floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
 body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
-#floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s, box-shadow .2s; position:relative; }
+#floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s,box-shadow .2s; position:relative; }
 #floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(0,200,255,.38); }
 #floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #02050a; }
-#floatChatWindow { width:340px; max-height:520px; background:rgba(10,18,30,.97); border:1px solid rgba(0,200,255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
+#floatChatWindow { width:340px; max-height:560px; background:rgba(10,18,30,.97); border:1px solid rgba(0,200,255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
 @keyframes floatSlideIn { from{opacity:0;transform:translateY(18px) scale(.96)} to{opacity:1;transform:none} }
-#floatChatHeader { background:rgba(0,200,255,.07); border-bottom:1px solid rgba(0,200,255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#floatChatHeader { background:rgba(0,200,255,.07); border-bottom:1px solid rgba(0,200,255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0; }
 #floatChatHeaderInfo { display:flex; align-items:center; gap:10px; }
 #floatChatAvatar { width:38px; height:38px; border-radius:50%; background:rgba(0,200,255,.12); border:1px solid rgba(0,200,255,.28); display:flex; align-items:center; justify-content:center; color:#00c8ff; flex-shrink:0; }
 #floatChatTitle { color:#d0eaff; font-weight:900; font-size:.92rem; }
 #floatChatStatus { color:#7a8ca8; font-size:.75rem; display:flex; align-items:center; gap:5px; margin-top:2px; }
 #floatStatusDot { width:7px; height:7px; border-radius:50%; background:#00ff88; animation:statusPulse 2s ease-in-out infinite; display:inline-block; }
 @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-#floatChatClose { background:none; border:none; color:#7a8ca8; cursor:pointer; padding:4px; border-radius:6px; display:flex; align-items:center; }
+#floatChatClose { background:none; border:none; color:#7a8ca8; cursor:pointer; padding:4px; border-radius:6px; display:flex; align-items:center; transition:color .15s; }
 #floatChatClose:hover { color:#e8edf5; }
-#floatChatMessages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:200px; max-height:300px; }
-.float-msg { display:flex; flex-direction:column; max-width:82%; }
+#floatChatMessages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:180px; max-height:360px; scroll-behavior:smooth; }
+#floatChatMessages::-webkit-scrollbar { width:4px; }
+#floatChatMessages::-webkit-scrollbar-track { background:transparent; }
+#floatChatMessages::-webkit-scrollbar-thumb { background:rgba(0,200,255,.2); border-radius:2px; }
+.float-msg { display:flex; flex-direction:column; max-width:88%; }
 .float-msg-admin { align-self:flex-start; }
 .float-msg-user { align-self:flex-end; }
-.float-msg-bubble { padding:10px 14px; border-radius:16px; font-size:.86rem; line-height:1.52; word-break:break-word; }
+.float-msg-bubble { padding:10px 14px; border-radius:16px; font-size:.86rem; line-height:1.55; word-break:break-word; }
 .float-msg-admin .float-msg-bubble { background:rgba(0,200,255,.10); border:1px solid rgba(0,200,255,.18); color:#c9d4e5; border-bottom-left-radius:4px; }
 .float-msg-user .float-msg-bubble { background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(0,255,136,.14)); border:1px solid rgba(0,200,255,.22); color:#d8f0ff; border-bottom-right-radius:4px; }
 .float-msg-time { font-size:.7rem; color:#4a6070; margin-top:4px; }
 .float-msg-admin .float-msg-time { text-align:left; }
 .float-msg-user .float-msg-time { text-align:right; }
-#floatChatInputArea { border-top:1px solid rgba(255,255,255,.07); padding:12px; display:flex; gap:8px; align-items:center; }
-#floatChatInput { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 12px; color:#e8edf5; font-size:.88rem; font-family:inherit; outline:none; }
+.float-typing-bubble { display:flex; align-items:center; gap:4px; padding:12px 14px; min-width:54px; }
+.float-typing-dot { width:7px; height:7px; border-radius:50%; background:rgba(0,200,255,.5); animation:floatDotBounce 1.2s ease-in-out infinite; }
+.float-typing-dot:nth-child(2) { animation-delay:.2s; }
+.float-typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes floatDotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+.float-quick-btns { display:flex; flex-direction:column; gap:7px; align-self:stretch; margin-top:4px; }
+.float-quick-btn { background:rgba(0,200,255,.07); border:1px solid rgba(0,200,255,.22); border-radius:12px; color:#9ecfe8; font-size:.84rem; padding:10px 14px; cursor:pointer; text-align:left; transition:background .17s,border-color .17s,color .17s; font-family:inherit; line-height:1.4; }
+.float-quick-btn:hover { background:rgba(0,200,255,.16); border-color:rgba(0,200,255,.45); color:#d0eaff; }
+.float-answer-list { display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+.float-answer-item { display:flex; align-items:flex-start; gap:7px; font-size:.84rem; line-height:1.5; }
+.float-answer-item svg { flex-shrink:0; margin-top:3px; }
+.float-agent-form-wrap { background:rgba(0,200,255,.06); border:1px solid rgba(0,200,255,.18); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:9px; align-self:stretch; }
+.float-form-title { display:flex; align-items:center; gap:8px; color:#00c8ff; font-weight:900; font-size:.88rem; }
+.float-form-ticket-id { font-size:.76rem; color:#7a8ca8; display:flex; align-items:center; gap:5px; }
+.float-form-ticket-id strong { color:#a0c4e0; }
+.float-form-input { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:10px; padding:9px 12px; color:#e8edf5; font-size:.84rem; font-family:inherit; outline:none; transition:border-color .15s; width:100%; box-sizing:border-box; }
+.float-form-input:focus { border-color:rgba(0,200,255,.4); }
+.float-form-textarea { resize:none; min-height:70px; }
+.float-form-ticket-note { font-size:.72rem; color:#4a6070; text-align:center; }
+.float-form-ticket-note code { color:#7ab8d4; font-family:monospace; font-size:.76rem; }
+.float-form-submit { background:linear-gradient(135deg,rgba(0,200,255,.2),rgba(0,255,136,.15)); border:1px solid rgba(0,200,255,.35); border-radius:11px; color:#a0e8ff; font-size:.86rem; font-weight:900; padding:11px 14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:.18s; font-family:inherit; }
+.float-form-submit:hover:not(:disabled) { background:linear-gradient(135deg,rgba(0,200,255,.3),rgba(0,255,136,.22)); border-color:rgba(0,200,255,.55); color:#d0f8ff; }
+.float-form-submit:disabled { opacity:.5; cursor:not-allowed; }
+.float-waiting-bubble { padding:12px 14px; }
+.float-waiting-inner { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.float-wait-ring { flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.float-wait-arc { transform-origin:center; animation:floatSpin 1.1s linear infinite; }
+@keyframes floatSpin { to{transform:rotate(360deg)} }
+.float-waiting-text { color:#7ab8d4; font-size:.84rem; }
+.float-wait-dots { display:flex; gap:5px; padding-left:2px; }
+#floatChatInputArea { border-top:1px solid rgba(255,255,255,.07); padding:11px 12px; display:flex; gap:8px; align-items:center; flex-shrink:0; }
+#floatChatInput { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 12px; color:#e8edf5; font-size:.88rem; font-family:inherit; outline:none; transition:border-color .15s; }
+#floatChatInput:focus { border-color:rgba(0,200,255,.3); }
 #floatChatInput::placeholder { color:#4a6070; }
+#floatChatInput:disabled { opacity:.45; cursor:not-allowed; }
 #floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
-#floatChatSend:hover { transform:scale(1.08); }
+#floatChatSend:hover:not(:disabled) { transform:scale(1.08); }
+#floatChatSend:disabled { opacity:.4; cursor:not-allowed; }
 @media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:10px; bottom:86px; } }
 </style>
 
-<script type="module">
-import { auth, db } from './js/firebase-core.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-import {
-  collection, addDoc, onSnapshot, query, where, orderBy,
-  serverTimestamp, limit
-} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
-
-(function() {
-  'use strict';
-
-  const toggle = document.getElementById('floatChatToggle');
-  const window_ = document.getElementById('floatChatWindow');
-  const closeBtn = document.getElementById('floatChatClose');
-  const sendBtn = document.getElementById('floatChatSend');
-  const input = document.getElementById('floatChatInput');
-  const messages = document.getElementById('floatChatMessages');
-  const badge = document.getElementById('floatChatBadge');
-  const iconChat = document.getElementById('floatIconChat');
-  const iconClose = document.getElementById('floatIconClose');
-
-  let isOpen = false;
-  let currentUser = null;
-  let unsubMessages = null;
-  let unreadCount = 0;
-
-  function escHtml(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function fmtTime(ts) {
-    if (!ts) return '';
-    const d = ts.toDate ? ts.toDate() : new Date(ts.seconds * 1000);
-    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  }
-
-  function appendMessage(role, text, time) {
-    const wrap = document.createElement('div');
-    wrap.className = 'float-msg ' + (role === 'user' ? 'float-msg-user' : 'float-msg-admin');
-    wrap.innerHTML = `<div class="float-msg-bubble">${escHtml(text)}</div><div class="float-msg-time">${time || ''}</div>`;
-    messages.appendChild(wrap);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function openChat() {
-    isOpen = true;
-    window_.style.display = 'flex';
-    iconChat.style.display = 'none';
-    iconClose.style.display = '';
-    unreadCount = 0;
-    badge.style.display = 'none';
-    if (currentUser) subscribeMessages();
-    setTimeout(() => input.focus(), 60);
-  }
-
-  function closeChat() {
-    isOpen = false;
-    window_.style.display = 'none';
-    iconChat.style.display = '';
-    iconClose.style.display = 'none';
-  }
-
-  function subscribeMessages() {
-    if (unsubMessages) unsubMessages();
-    if (!currentUser) return;
-    const q = query(
-      collection(db, 'supportChats', currentUser.uid, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(80)
-    );
-    messages.innerHTML = '';
-    unsubMessages = onSnapshot(q, (snap) => {
-      snap.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          const d = change.doc.data();
-          appendMessage(d.role, d.text, fmtTime(d.createdAt));
-          if (!isOpen && d.role === 'admin') {
-            unreadCount++;
-            badge.textContent = unreadCount;
-            badge.style.display = 'flex';
-          }
-        }
-      });
-    });
-  }
-
-  let _autoReplySent = false;
-  const AUTO_REPLY_TEXT = 'কিছুক্ষণ অপেক্ষা করুন খুব শীগ্রই আপনার message এর উত্তর দেওয়া হবে';
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    if (!currentUser) {
-      appendMessage('admin', 'Please login to send messages.', new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
-      return;
-    }
-    try {
-      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
-        text,
-        role: 'user',
-        userId: currentUser.uid,
-        userEmail: currentUser.email || '',
-        createdAt: serverTimestamp(),
-      });
-      const { doc: fsDoc, setDoc: fsSetDoc, increment: fsIncrement } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
-      const roomRef = fsDoc(db, 'supportRooms', currentUser.uid);
-      await fsSetDoc(roomRef, {
-        userId: currentUser.uid,
-        userEmail: currentUser.email || '',
-        displayName: currentUser.displayName || currentUser.email || '',
-        lastMessage: text,
-        lastAt: serverTimestamp(),
-        unreadAdmin: fsIncrement(1)
-      }, { merge: true });
-      if (!_autoReplySent) {
-        _autoReplySent = true;
-        setTimeout(async () => {
-          try {
-            await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
-              text: AUTO_REPLY_TEXT,
-              role: 'admin',
-              adminEmail: 'auto-reply',
-              createdAt: serverTimestamp(),
-            });
-          } catch(_) {}
-        }, 800);
-      }
-    } catch(e) {
-      appendMessage('admin', 'Failed to send message. Try again.', '');
-    }
-  }
-
-  toggle.addEventListener('click', () => { isOpen ? closeChat() : openChat(); });
-  closeBtn.addEventListener('click', closeChat);
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
-
-  onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    _autoReplySent = false;
-    if (user && isOpen) subscribeMessages();
-  });
-})();
-</script>
+<script type="module" src="js/support-chat.js"></script>
 
 </body>
 </html>
