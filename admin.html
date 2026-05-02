@@ -7,45 +7,69 @@
   <meta name="description" content="Admin panel for manual credit and service payment approval." />
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    .admin-page { min-height:100vh; padding:130px 20px 70px; background: radial-gradient(circle at top, rgba(0,255,136,0.10), transparent 34%), #02050a; }
-    .admin-wrap { max-width:1080px; margin:0 auto; }
-    .admin-head, .admin-card, .empty-state, .admin-section { background:rgba(255,255,255,0.055); border:1px solid rgba(0,200,255,0.16); border-radius:24px; padding:24px; box-shadow:0 28px 80px rgba(0,0,0,0.42); backdrop-filter:blur(16px); }
-    .admin-head { margin-bottom:18px; display:flex; justify-content:space-between; gap:16px; align-items:center; flex-wrap:wrap; }
-    .admin-section { margin-bottom:18px; }
-    .admin-title { font-size:clamp(2rem,5vw,3.2rem); color:#e8edf5; margin-bottom:8px; }
-    .admin-sub, #adminInfo { color:#7a8ca8; line-height:1.65; }
-    .admin-section-title { color:#e8edf5; font-size:1.35rem; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-    .admin-list { display:grid; gap:14px; }
-    .admin-card h3 { color:#00ff88; font-size:1.45rem; margin:0; word-break:break-word; }
-    .admin-card p { color:#c9d4e5; margin:8px 0; word-break:break-word; }
-    .admin-card-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px; }
-    .actions { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
-    .actions button, .admin-link { border:0; border-radius:999px; padding:13px 16px; font-weight:800; cursor:pointer; text-decoration:none; text-align:center; display:inline-block; }
-    .confirm { background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; }
-    .decline { background:rgba(255,80,80,0.16); color:#ffb0b0; border:1px solid rgba(255,80,80,0.28) !important; }
-    .admin-link { background:rgba(255,255,255,0.06); color:#e8edf5; border:1px solid rgba(255,255,255,0.1); }
-    .admin-details { margin-top:12px; background:rgba(0,0,0,.26); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:14px; color:#c9d4e5; }
-    .admin-details pre { margin:10px 0 0; white-space:pre-wrap; word-break:break-word; color:#8fa2bb; font-size:.82rem; line-height:1.55; }
-    .status { padding:5px 10px; border-radius:999px; font-size:0.74rem; text-transform:uppercase; font-weight:800; white-space:nowrap; }
-    .status.pending { color:#ffe7a3; background:rgba(255,200,80,0.12); }
-    .status.approved, .status.accepted, .status.confirmed, .status.completed { color:#a7ffcf; background:rgba(0,255,136,0.12); }
-    .status.declined { color:#ffb0b0; background:rgba(255,80,80,0.12); }
-    .status.paid_credit_pending_review,.status.paid_instant_pending_review { color:#9edfff; background:rgba(0,200,255,.12); }
-    .empty-state { color:#7a8ca8; text-align:center; }
+    .admin-page { min-height:100vh; padding:110px 16px 60px; background:radial-gradient(circle at top,rgba(0,255,136,.08),transparent 30%),#02050a; }
+    .admin-wrap { max-width:1000px; margin:0 auto; }
     .admin-denied { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#02050a; color:#e8edf5; text-align:center; padding:20px; }
-    .admin-denied div { max-width:420px; background:rgba(255,255,255,.06); border:1px solid rgba(255,80,80,.25); border-radius:24px; padding:34px; }
+    .admin-denied div { max-width:400px; background:rgba(255,255,255,.06); border:1px solid rgba(255,80,80,.22); border-radius:24px; padding:34px; }
     .admin-denied a { color:#00c8ff; text-decoration:none; font-weight:700; }
-
-    .admin-nav-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
-    .admin-nav-btn { display:flex; flex-direction:column; align-items:center; gap:12px; padding:28px 18px; border-radius:20px; border:1.5px solid rgba(0,200,255,.18); background:rgba(0,200,255,.06); color:#d0eaff; font-size:1rem; font-weight:900; font-family:inherit; cursor:pointer; transition: border-color .2s, background .2s, transform .2s; }
-    .admin-nav-btn:hover { border-color:rgba(0,200,255,.45); background:rgba(0,200,255,.12); transform:translateY(-2px); }
-    .admin-nav-btn svg { opacity:.7; }
-    .admin-back-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:#9ebbdf; font-size:.88rem; font-weight:800; font-family:inherit; cursor:pointer; margin-bottom:16px; transition:.18s; }
-    .admin-back-btn:hover { background:rgba(255,255,255,.08); color:#e8edf5; }
-    .admin-section-view { display:none; }
-    .admin-section-view.active { display:block; }
-
-    @media(max-width:640px) { .actions { grid-template-columns:1fr; } .admin-page { padding-top:110px; } .admin-card-head { flex-direction:column; align-items:flex-start; } .admin-nav-grid { grid-template-columns:1fr; } }
+    .admin-nav { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    @media(min-width:640px){ .admin-nav { grid-template-columns:repeat(4,1fr); } }
+    .admin-nav-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px 12px; border-radius:20px; border:1px solid rgba(0,200,255,.16); background:rgba(255,255,255,.04); color:#8aaac8; font-weight:900; font-size:.82rem; cursor:pointer; transition:.22s ease; text-align:center; position:relative; font-family:inherit; }
+    .admin-nav-btn svg { width:26px; height:26px; stroke-width:1.6; color:#00c8ff; flex-shrink:0; }
+    .admin-nav-btn:hover { border-color:rgba(0,200,255,.35); background:rgba(0,200,255,.07); color:#c2e4f8; transform:translateY(-2px); }
+    .admin-nav-btn.active { background:linear-gradient(135deg,rgba(0,200,255,.16),rgba(0,255,136,.10)); border-color:rgba(0,200,255,.45); color:#e8edf5; box-shadow:0 8px 28px rgba(0,200,255,.12); }
+    .admin-nav-badge { position:absolute; top:10px; right:10px; min-width:20px; height:20px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 5px; border:2px solid #02050a; }
+    .admin-panel { display:none; animation:panelIn .22s ease; margin-top:16px; }
+    .admin-panel.active { display:block; }
+    @keyframes panelIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    .admin-card-shell { background:rgba(255,255,255,.05); border:1px solid rgba(0,200,255,.14); border-radius:20px; padding:20px; box-shadow:0 16px 50px rgba(0,0,0,.35); }
+    .admin-panel-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .admin-panel-head svg { width:22px; height:22px; color:#00c8ff; flex-shrink:0; stroke-width:1.7; }
+    .admin-panel-head h2 { color:#e8edf5; font-size:1.1rem; margin:0; }
+    .admin-list { display:grid; gap:14px; }
+    .admin-card { background:rgba(255,255,255,.055); border:1px solid rgba(0,200,255,.14); border-radius:18px; padding:18px; }
+    .admin-card h3 { color:#00ff88; font-size:1.25rem; margin:0 0 4px; word-break:break-word; }
+    .admin-card p { color:#c9d4e5; margin:6px 0; font-size:.9rem; word-break:break-word; }
+    .admin-card-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px; flex-wrap:wrap; }
+    .actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+    @media(max-width:420px){ .actions { grid-template-columns:1fr; } }
+    .btn-confirm { border:0; border-radius:999px; padding:12px 16px; font-weight:900; cursor:pointer; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; font-family:inherit; font-size:.88rem; }
+    .btn-decline { border:1px solid rgba(255,80,80,.3); border-radius:999px; padding:12px 16px; font-weight:900; cursor:pointer; background:rgba(255,80,80,.10); color:#ffb0b0; font-family:inherit; font-size:.88rem; }
+    .btn-auto { border:1px solid rgba(0,200,255,.22); border-radius:999px; padding:10px 14px; font-weight:900; cursor:pointer; background:rgba(0,200,255,.08); color:#9ee8ff; font-family:inherit; font-size:.82rem; }
+    .status { padding:4px 10px; border-radius:999px; font-size:.72rem; text-transform:uppercase; font-weight:900; white-space:nowrap; }
+    .status.pending { color:#ffe7a3; background:rgba(255,200,80,.12); }
+    .status.approved,.status.accepted,.status.confirmed,.status.completed { color:#a7ffcf; background:rgba(0,255,136,.12); }
+    .status.declined { color:#ffb0b0; background:rgba(255,80,80,.12); }
+    .empty-state { color:#7a8ca8; text-align:center; padding:28px 0; font-size:.9rem; }
+    .admin-details { margin-top:10px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:12px; color:#c9d4e5; }
+    .admin-details pre { margin:8px 0 0; white-space:pre-wrap; word-break:break-word; color:#8fa2bb; font-size:.8rem; line-height:1.5; }
+    .coupon-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    @media(max-width:420px){ .coupon-form-grid { grid-template-columns:1fr; } }
+    .form-label-small { display:block; color:#8fa2bb; font-size:.78rem; margin-bottom:6px; font-weight:700; }
+    .form-input-small { width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 12px; color:#e8edf5; font-size:.9rem; font-family:inherit; outline:none; box-sizing:border-box; }
+    .form-input-small:focus { border-color:rgba(0,200,255,.42); }
+    .coupon-create-box { background:rgba(0,200,255,.06); border:1px solid rgba(0,200,255,.18); border-radius:16px; padding:18px; margin-bottom:18px; }
+    .coupon-msg { display:none; padding:10px 14px; border-radius:10px; font-size:.83rem; font-weight:700; margin-top:10px; }
+    .coupon-msg.success { background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.25); color:#a7ffcf; display:block; }
+    .coupon-msg.error { background:rgba(255,80,80,.10); border:1px solid rgba(255,80,80,.22); color:#ffb0b0; display:block; }
+    .support-grid { display:grid; grid-template-columns:240px 1fr; gap:12px; min-height:360px; }
+    @media(max-width:600px){ .support-grid { grid-template-columns:1fr; } }
+    .chat-rooms { background:rgba(0,0,0,.2); border-radius:14px; overflow-y:auto; max-height:420px; }
+    .chat-room-item { padding:11px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:.15s; }
+    .chat-room-item:hover,.chat-room-item.active { background:rgba(0,200,255,.08); }
+    .chat-room-name { font-weight:900; color:#d0eaff; font-size:.85rem; }
+    .chat-room-preview { color:#7a8ca8; font-size:.75rem; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chat-pane { background:rgba(0,0,0,.2); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+    .chat-msgs { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px; max-height:320px; min-height:200px; }
+    .chat-msg-user { align-self:flex-start; max-width:80%; }
+    .chat-msg-admin { align-self:flex-end; max-width:80%; }
+    .chat-msg-bubble { padding:9px 13px; border-radius:14px; font-size:.84rem; line-height:1.5; word-break:break-word; }
+    .chat-msg-user .chat-msg-bubble { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); color:#d0eaff; }
+    .chat-msg-admin .chat-msg-bubble { background:rgba(0,200,255,.15); border:1px solid rgba(0,200,255,.25); color:#d0eaff; }
+    .chat-reply { border-top:1px solid rgba(255,255,255,.07); padding:10px; display:flex; gap:8px; align-items:center; }
+    .chat-reply-input { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:10px; padding:9px 12px; color:#e8edf5; font-size:.86rem; font-family:inherit; outline:none; }
+    .chat-reply-btn { border:0; border-radius:10px; padding:9px 18px; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; font-weight:900; cursor:pointer; font-size:.84rem; font-family:inherit; white-space:nowrap; }
+    .chat-empty { flex:1; display:flex; align-items:center; justify-content:center; color:#4a6070; font-size:.88rem; padding:30px; text-align:center; }
   </style>
 </head>
 <body onload="loadAdminPanel()">
@@ -67,94 +91,87 @@
   </nav>
 
   <main class="admin-page">
-    <section class="admin-wrap">
-      <div class="admin-head">
-        <div>
-          <h1 class="admin-title">Admin Panel</h1>
-          <p id="adminInfo">Checking admin access...</p>
-        </div>
-      </div>
+    <div class="admin-wrap">
 
-      <!-- Navigation Buttons (default view) -->
-      <div class="admin-nav-grid" id="adminNavGrid">
-        <button type="button" class="admin-nav-btn" onclick="adminShowSection('services')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+      <!-- Navigation buttons -->
+      <nav class="admin-nav" aria-label="Admin panels">
+        <button class="admin-nav-btn active" type="button" onclick="adminShowPanel('Services')" id="navBtnServices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
           Pending Services
+          <span class="admin-nav-badge" id="badgeServices" style="display:none;"></span>
         </button>
-        <button type="button" class="admin-nav-btn" onclick="adminShowSection('payments')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('Transactions')" id="navBtnTransactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5"/></svg>
           Pending Transactions
+          <span class="admin-nav-badge" id="badgeTransactions" style="display:none;"></span>
         </button>
-        <button type="button" class="admin-nav-btn" onclick="adminShowSection('coupons')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2m0 4v2m0 4v2"/></svg>
-          Create Coupon Code
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('Coupons')" id="navBtnCoupons">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1" fill="currentColor"/></svg>
+          Create Coupon
         </button>
-        <button type="button" class="admin-nav-btn" onclick="adminShowSection('support')">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Live Supports
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('Support')" id="navBtnSupport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+          Live Support
+          <span class="admin-nav-badge" id="badgeSupport" style="display:none;"></span>
         </button>
-      </div>
+      </nav>
 
-      <!-- Section: Pending Services -->
-      <div class="admin-section-view" id="adminViewServices">
-        <button type="button" class="admin-back-btn" onclick="adminGoBack()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          Back
-        </button>
-        <div class="admin-section">
-          <h2 class="admin-section-title">Pending Service Orders</h2>
+      <!-- Panel: Pending Services -->
+      <div class="admin-panel active" id="panelServices">
+        <div class="admin-card-shell">
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
+            <h2>Pending Services</h2>
+          </div>
           <div id="adminOrderList" class="admin-list">
             <div class="empty-state">Loading service orders...</div>
           </div>
         </div>
       </div>
 
-      <!-- Section: Pending Payments -->
-      <div class="admin-section-view" id="adminViewPayments">
-        <button type="button" class="admin-back-btn" onclick="adminGoBack()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          Back
-        </button>
-        <div class="admin-section">
-          <h2 class="admin-section-title">Pending Payments</h2>
+      <!-- Panel: Pending Transactions -->
+      <div class="admin-panel" id="panelTransactions">
+        <div class="admin-card-shell">
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5"/></svg>
+            <h2>Pending Transactions</h2>
+          </div>
           <div id="adminTopupList" class="admin-list">
             <div class="empty-state">Loading payment requests...</div>
           </div>
         </div>
       </div>
 
-      <!-- Section: Coupon Management -->
-      <div class="admin-section-view" id="adminViewCoupons">
-        <button type="button" class="admin-back-btn" onclick="adminGoBack()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          Back
-        </button>
-        <div class="admin-section">
-          <h2 class="admin-section-title">
-            Coupon Management
-            <button type="button" class="admin-link" onclick="document.getElementById('couponCreateForm').style.display=document.getElementById('couponCreateForm').style.display==='none'?'block':'none'" style="font-size:.85rem;padding:8px 16px;">+ Create Coupon</button>
-          </h2>
-          <div id="couponCreateForm" style="display:none;margin-bottom:18px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.18);border-radius:16px;padding:18px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <!-- Panel: Create Coupon -->
+      <div class="admin-panel" id="panelCoupons">
+        <div class="admin-card-shell">
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1" fill="currentColor"/></svg>
+            <h2>Coupon Management</h2>
+          </div>
+          <div class="coupon-create-box">
+            <div class="coupon-form-grid">
               <div>
-                <label style="display:block;color:#8fa2bb;font-size:.8rem;margin-bottom:6px;">Coupon Code</label>
-                <input id="newCouponCode" type="text" placeholder="e.g. SAVE20" autocomplete="off" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:#e8edf5;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box;" />
+                <label class="form-label-small">Coupon Code</label>
+                <input id="newCouponCode" type="text" placeholder="e.g. SAVE20" autocomplete="off" class="form-input-small" />
               </div>
               <div>
-                <label style="display:block;color:#8fa2bb;font-size:.8rem;margin-bottom:6px;">Discount %</label>
-                <input id="newCouponDiscount" type="number" min="1" max="100" placeholder="e.g. 20" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:#e8edf5;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box;" />
+                <label class="form-label-small">Discount %</label>
+                <input id="newCouponDiscount" type="number" min="1" max="100" placeholder="e.g. 20" class="form-input-small" />
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div class="coupon-form-grid">
               <div>
-                <label style="display:block;color:#8fa2bb;font-size:.8rem;margin-bottom:6px;">Expires At (optional)</label>
-                <input id="newCouponExpiry" type="date" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:#e8edf5;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box;" />
+                <label class="form-label-small">Expires At (optional)</label>
+                <input id="newCouponExpiry" type="date" class="form-input-small" />
               </div>
               <div style="display:flex;align-items:flex-end;">
-                <button type="button" class="confirm" style="width:100%;" onclick="adminCreateCoupon()">Create Coupon</button>
+                <button type="button" class="btn-confirm" style="width:100%;" onclick="adminCreateCoupon()">
+                  Create Coupon
+                </button>
               </div>
             </div>
-            <div id="couponCreateMsg" style="display:none;padding:10px 14px;border-radius:10px;font-size:.84rem;font-weight:700;"></div>
+            <div id="couponCreateMsg" class="coupon-msg"></div>
           </div>
           <div id="adminCouponList" class="admin-list">
             <div class="empty-state">Loading coupons...</div>
@@ -162,32 +179,44 @@
         </div>
       </div>
 
-      <!-- Section: Live Supports -->
-      <div class="admin-section-view" id="adminViewSupport">
-        <button type="button" class="admin-back-btn" onclick="adminGoBack()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          Back
-        </button>
-        <div class="admin-section">
-          <h2 class="admin-section-title">Customer Support Chats</h2>
-          <div style="display:grid;grid-template-columns:260px 1fr;gap:14px;min-height:340px;" id="adminSupportGrid">
-            <div id="adminChatRooms" style="background:rgba(0,0,0,.2);border-radius:14px;overflow-y:auto;max-height:400px;">
-              <div class="empty-state" style="padding:20px 14px;font-size:.84rem;">Loading chats...</div>
+      <!-- Panel: Live Support -->
+      <div class="admin-panel" id="panelSupport">
+        <div class="admin-card-shell">
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+            <h2>Live Support</h2>
+          </div>
+          <div class="support-grid">
+            <div class="chat-rooms" id="adminChatRooms">
+              <div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">Loading chats...</div>
             </div>
-            <div id="adminChatPane" style="display:flex;flex-direction:column;background:rgba(0,0,0,.2);border-radius:14px;overflow:hidden;">
-              <div id="adminChatEmpty" style="flex:1;display:flex;align-items:center;justify-content:center;color:#4a6070;font-size:.88rem;">Select a chat to reply</div>
-              <div id="adminChatMsgs" style="flex:1;overflow-y:auto;padding:14px;display:none;flex-direction:column;gap:8px;max-height:300px;"></div>
-              <div id="adminChatReply" style="display:none;border-top:1px solid rgba(255,255,255,.07);padding:10px;gap:8px;align-items:center;">
-                <input type="text" id="adminReplyInput" placeholder="Type reply..." style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:9px 12px;color:#e8edf5;font-size:.86rem;font-family:inherit;outline:none;" />
-                <button type="button" class="confirm" style="padding:9px 18px;font-size:.84rem;" onclick="adminSendReply()">Send</button>
+            <div class="chat-pane" id="adminChatPane">
+              <div class="chat-empty" id="adminChatEmpty">Select a conversation to reply</div>
+              <div class="chat-msgs" id="adminChatMsgs" style="display:none;"></div>
+              <div class="chat-reply" id="adminChatReply" style="display:none;">
+                <input type="text" id="adminReplyInput" class="chat-reply-input" placeholder="Type reply..." />
+                <button type="button" class="chat-reply-btn" onclick="adminSendReply()">Send</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-    </section>
+      <p id="adminInfo" style="color:#4a6070;font-size:.78rem;text-align:center;margin-top:14px;"></p>
+
+    </div>
   </main>
+
+  <script>
+  function adminShowPanel(name) {
+    ['Services','Transactions','Coupons','Support'].forEach(p => {
+      const panel = document.getElementById('panel' + p);
+      const btn = document.getElementById('navBtn' + p);
+      if (panel) panel.classList.toggle('active', p === name);
+      if (btn) btn.classList.toggle('active', p === name);
+    });
+  }
+  </script>
 
   <script src="js/main.js"></script>
   <script src="js/auth.js"></script>
@@ -198,39 +227,26 @@
   import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
   import {
     collection, doc, getDoc, setDoc, addDoc, onSnapshot,
-    serverTimestamp, query, orderBy, Timestamp, deleteField, updateDoc
+    serverTimestamp, query, orderBy, Timestamp, updateDoc
   } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 
   const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
   let adminUser = null;
   let activeChatUid = null;
   let unsubChatMsgs = null;
-  let _loadedSections = {};
+
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   onAuthStateChanged(auth, async (user) => {
     if (!user || !ADMIN_EMAILS.includes(user.email)) return;
     adminUser = user;
+    const info = document.getElementById('adminInfo');
+    if (info) info.textContent = 'Logged in as ' + user.email;
+    loadCoupons();
+    loadSupportRooms();
   });
 
-  window.adminShowSection = function(section) {
-    document.getElementById('adminNavGrid').style.display = 'none';
-    document.querySelectorAll('.admin-section-view').forEach(el => el.classList.remove('active'));
-    const viewMap = { services:'adminViewServices', payments:'adminViewPayments', coupons:'adminViewCoupons', support:'adminViewSupport' };
-    const view = document.getElementById(viewMap[section]);
-    if (view) view.classList.add('active');
-    if (!_loadedSections[section]) {
-      _loadedSections[section] = true;
-      if (section === 'coupons') loadCoupons();
-      if (section === 'support') loadSupportRooms();
-    }
-  };
-
-  window.adminGoBack = function() {
-    document.querySelectorAll('.admin-section-view').forEach(el => el.classList.remove('active'));
-    document.getElementById('adminNavGrid').style.display = '';
-  };
-
-  /* ── Coupon Management ────────────────────────────── */
+  /* ── Coupon Management ── */
   function loadCoupons() {
     const list = document.getElementById('adminCouponList');
     if (!list) return;
@@ -249,15 +265,13 @@
           </div>
           <span class="status ${active ? 'approved' : 'declined'}">${active ? 'Active' : 'Inactive'}</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="${active ? 'decline' : 'confirm'}" style="padding:8px 14px;font-size:.8rem;" onclick="adminToggleCoupon('${escHtml(code)}',${active})">${active ? 'Deactivate' : 'Activate'}</button>
-            <button class="decline" style="padding:8px 14px;font-size:.8rem;" onclick="adminDeleteCoupon('${escHtml(code)}')">Delete</button>
+            <button class="${active ? 'btn-decline' : 'btn-confirm'}" style="padding:8px 14px;font-size:.8rem;" onclick="adminToggleCoupon('${escHtml(code)}',${active})">${active ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn-decline" style="padding:8px 14px;font-size:.8rem;" onclick="adminDeleteCoupon('${escHtml(code)}')">Delete</button>
           </div>
         </div>`;
       });
     });
   }
-
-  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   window.adminCreateCoupon = async function() {
     const code = document.getElementById('newCouponCode')?.value.trim().toUpperCase();
@@ -280,10 +294,7 @@
     const msg = document.getElementById('couponCreateMsg');
     if (!msg) return;
     msg.textContent = text;
-    msg.style.display = 'block';
-    msg.style.background = type === 'success' ? 'rgba(0,255,136,.10)' : 'rgba(255,80,80,.10)';
-    msg.style.border = type === 'success' ? '1px solid rgba(0,255,136,.25)' : '1px solid rgba(255,80,80,.22)';
-    msg.style.color = type === 'success' ? '#a7ffcf' : '#ffb0b0';
+    msg.className = 'coupon-msg ' + type;
   }
 
   window.adminToggleCoupon = async function(code, isActive) {
@@ -296,28 +307,32 @@
     await deleteDoc(doc(db, 'coupons', code));
   };
 
-  /* ── Support Chat ─────────────────────────────────── */
+  /* ── Support Chat ── */
   function loadSupportRooms() {
     const rooms = document.getElementById('adminChatRooms');
     if (!rooms) return;
     onSnapshot(query(collection(db, 'supportRooms'), orderBy('lastAt', 'desc')), (snap) => {
       rooms.innerHTML = '';
-      if (snap.empty) { rooms.innerHTML = '<div style="padding:14px;color:#4a6070;font-size:.84rem;">No chats yet.</div>'; return; }
+      const badge = document.getElementById('badgeSupport');
+      if (badge) { badge.textContent = snap.size; badge.style.display = snap.size ? 'flex' : 'none'; }
+      if (snap.empty) { rooms.innerHTML = '<div style="padding:14px;color:#4a6070;font-size:.84rem;text-align:center;">No chats yet.</div>'; return; }
       snap.forEach(docSnap => {
         const d = docSnap.data();
         const uid = docSnap.id;
         const el = document.createElement('div');
-        el.style.cssText = 'padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:.15s;';
-        el.innerHTML = `<div style="font-weight:900;color:#d0eaff;font-size:.86rem;">${escHtml(d.displayName || d.userEmail || 'User')}</div><div style="color:#7a8ca8;font-size:.76rem;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(d.lastMessage || '')}</div>`;
-        el.addEventListener('mouseenter', () => el.style.background = 'rgba(0,200,255,.07)');
-        el.addEventListener('mouseleave', () => el.style.background = activeChatUid === uid ? 'rgba(0,200,255,.10)' : '');
-        el.addEventListener('click', () => openAdminChat(uid, d.displayName || d.userEmail || 'User'));
+        el.className = 'chat-room-item' + (activeChatUid === uid ? ' active' : '');
+        el.innerHTML = `<div class="chat-room-name">${escHtml(d.displayName || d.userEmail || 'User')}</div><div class="chat-room-preview">${escHtml(d.lastMessage || '')}</div>`;
+        el.addEventListener('click', () => {
+          document.querySelectorAll('.chat-room-item').forEach(r => r.classList.remove('active'));
+          el.classList.add('active');
+          openAdminChat(uid);
+        });
         rooms.appendChild(el);
       });
     });
   }
 
-  function openAdminChat(uid, name) {
+  function openAdminChat(uid) {
     activeChatUid = uid;
     const msgsEl = document.getElementById('adminChatMsgs');
     const emptyEl = document.getElementById('adminChatEmpty');
@@ -334,8 +349,8 @@
           const d = change.doc.data();
           const isAdmin = d.role === 'admin';
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'display:flex;flex-direction:column;max-width:80%;align-self:' + (isAdmin ? 'flex-end' : 'flex-start');
-          wrap.innerHTML = `<div style="padding:9px 13px;border-radius:14px;font-size:.84rem;line-height:1.5;background:${isAdmin ? 'rgba(0,200,255,.15)' : 'rgba(255,255,255,.06)'};border:1px solid ${isAdmin ? 'rgba(0,200,255,.25)' : 'rgba(255,255,255,.09)'};color:#d0eaff;">${escHtml(d.text)}</div>`;
+          wrap.className = isAdmin ? 'chat-msg-admin' : 'chat-msg-user';
+          wrap.innerHTML = `<div class="chat-msg-bubble">${escHtml(d.text)}</div>`;
           msgsEl.appendChild(wrap);
           msgsEl.scrollTop = msgsEl.scrollHeight;
         }
@@ -350,12 +365,9 @@
     if (!text) return;
     inp.value = '';
     await addDoc(collection(db, 'supportChats', activeChatUid, 'messages'), {
-      text,
-      role: 'admin',
-      adminEmail: adminUser.email,
-      createdAt: serverTimestamp()
+      text, role: 'admin', adminEmail: adminUser.email, createdAt: serverTimestamp()
     });
-    await updateDoc(doc(db, 'supportRooms', activeChatUid), { lastMessage: text, lastAt: serverTimestamp() });
+    await updateDoc(doc(db, 'supportRooms', activeChatUid), { lastMessage: text, lastAt: serverTimestamp() }).catch(()=>{});
   };
 
   document.getElementById('adminReplyInput')?.addEventListener('keydown', (e) => {
