@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ — RabbiHossainLTD</title>
+  <meta name="description" content="Frequently Asked Questions about RabbiHossainLTD services — gaming top-ups, premium apps, web development, payments, and more." />
+  <meta name="author" content="MD Rabbi Hossain" />
+  <link rel="canonical" href="https://rabbihossainltd.online/faq.html" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    .policy-hero { padding: calc(var(--nav-h) + 60px) 0 60px; text-align: center; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,200,255,0.08) 0%, transparent 70%); border-bottom: 1px solid var(--border); }
+    .policy-hero .badge { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-dim); border: 1px solid var(--accent-glow); color: var(--accent); border-radius: 999px; padding: 6px 18px; font-size: 0.8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 22px; }
+    .policy-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+    .policy-hero p { color: var(--text-secondary); font-size: 1rem; max-width: 560px; margin: 0 auto; }
+    .faq-body { max-width: 820px; margin: 0 auto; padding: 60px 24px 100px; }
+    .faq-category { margin-bottom: 52px; }
+    .faq-category-title { display: flex; align-items: center; gap: 12px; font-size: 1rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px; }
+    .faq-category-title .icon { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-dim); border: 1px solid var(--accent-glow); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .faq-item { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; transition: border-color .25s; }
+    .faq-item:hover { border-color: rgba(0,200,255,0.25); }
+    .faq-item.open { border-color: rgba(0,200,255,0.3); background: rgba(0,200,255,0.02); }
+    .faq-question { width: 100%; text-align: left; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; background: none; border: none; color: var(--text-primary); font-size: 0.97rem; font-weight: 600; font-family: inherit; }
+    .faq-question:hover { color: var(--accent); }
+    .faq-chevron { width: 20px; height: 20px; flex-shrink: 0; color: var(--text-muted); transition: transform .3s ease, color .2s; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--accent); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    .faq-answer-inner { padding: 0 22px 20px; color: var(--text-secondary); font-size: 0.92rem; line-height: 1.8; border-top: 1px solid var(--border); padding-top: 16px; }
+    .faq-answer-inner a { color: var(--accent); text-decoration: underline; }
+    .faq-answer-inner strong { color: var(--text-primary); }
+    .contact-cta { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px; text-align: center; margin-top: 20px; }
+    .contact-cta h3 { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+    .contact-cta p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
+    .contact-cta .btn-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-accent { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #06080d; font-weight: 700; font-size: 0.9rem; padding: 12px 24px; border-radius: var(--radius-sm); transition: var(--transition); }
+    .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--accent); font-weight: 700; font-size: 0.9rem; padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid var(--accent-glow); transition: var(--transition); }
+    .btn-outline:hover { background: var(--accent-dim); }
+    .faq-search-wrap { max-width: 500px; margin: 0 auto 48px; }
+    .faq-search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; }
+    .faq-search:focus-within { border-color: rgba(0,200,255,0.4); }
+    .faq-search svg { color: var(--text-muted); flex-shrink: 0; }
+    .faq-search input { flex: 1; background: none; border: none; outline: none; color: var(--text-primary); font-size: 0.95rem; font-family: inherit; }
+    .faq-search input::placeholder { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Rabbi Hossain</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="index.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg></span>Home</a></li>
+        <li><a href="services.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg></span>Services</a></li>
+        <li><a href="portfolio.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg></span>Portfolio</a></li>
+        <li><a href="about.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <section class="policy-hero">
+    <div class="container">
+      <div class="badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>Support</div>
+      <h1>Frequently Asked Questions</h1>
+      <p>Find quick answers to the most common questions about our services, payments, and delivery.</p>
+    </div>
+  </section>
+
+  <div class="faq-body">
+    <div class="faq-search-wrap">
+      <div class="faq-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="faqSearch" placeholder="Search questions..." autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- GENERAL -->
+    <div class="faq-category">
+      <div class="faq-category-title">
+        <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
+        General
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What is RabbiHossainLTD?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">RabbiHossainLTD is a digital services platform operated by MD Rabbi Hossain, based in Bangladesh. We offer a wide range of services including gaming top-ups, premium app subscriptions, social media services, web development, ethical hacking, and digital branding solutions.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Is RabbiHossainLTD trustworthy?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. We have served hundreds of satisfied customers across Bangladesh. All our services are delivered promptly and professionally. You can verify our reputation on our <a href="https://facebook.com/rabbihossainltd" target="_blank" rel="noopener">Facebook page</a> through customer reviews and order screenshots.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How do I place an order?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Simply visit our <a href="services.html">Services page</a>, choose the service you need, fill in the required details, and complete your payment. Alternatively, you can reach us directly via <a href="https://wa.me/8801731410341" target="_blank" rel="noopener">WhatsApp</a> or <a href="mailto:info@rabbihossainltd.online">email</a> to place an order manually.</div></div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="faq-category">
+      <div class="faq-category-title">
+        <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+        Payments
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What payment methods do you accept?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">We currently accept <strong>bKash</strong> and <strong>Nagad</strong> as primary payment methods. For larger projects (web development, etc.), bank transfers may also be arranged. Please contact us to confirm the latest accepted payment methods before ordering.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Do I need to pay before receiving the service?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes, payment is required upfront before any service is processed. This is standard practice for digital services. Once payment is confirmed, we proceed with your order immediately.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What if I accidentally send the wrong payment amount?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Contact us immediately via <a href="https://wa.me/8801731410341" target="_blank" rel="noopener">WhatsApp</a> or <a href="mailto:info@rabbihossainltd.online">email</a> with your transaction reference. We will verify and either adjust your order or refund the difference accordingly.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Are transactions safe on your platform?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. We never ask for your banking PINs or passwords. Payments are made directly to our verified bKash/Nagad accounts. Always verify our official contact information before sending payment to avoid scams from impersonators.</div></div>
+      </div>
+    </div>
+
+    <!-- GAMING & DIGITAL -->
+    <div class="faq-category">
+      <div class="faq-category-title">
+        <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.4 9.25h9.2c2.25 0 4.15 1.72 4.35 3.96l.22 2.42a2.55 2.55 0 0 1-4.42 1.95l-1.38-1.48H8.63l-1.38 1.48a2.55 2.55 0 0 1-4.42-1.95l.22-2.42a4.37 4.37 0 0 1 4.35-3.96Z"/><path d="M8.25 12v3M6.75 13.5h3M15.75 13.25h.01M18.25 14.75h.01"/></svg></span>
+        Gaming &amp; Digital Services
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How do Free Fire diamond top-ups work?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Provide us with your Free Fire <strong>Player ID</strong> and the diamond amount you want. After payment, we top up the diamonds directly to your account. Make sure your Player ID is correct — we cannot refund top-ups sent to wrong IDs.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How long does a top-up take?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Most gaming top-ups are delivered within <strong>5–30 minutes</strong> after payment confirmation. During peak hours, it may take slightly longer. If your top-up hasn't arrived within 2 hours, please contact us.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How do premium app subscriptions work?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">For apps like ChatGPT, Netflix, Canva Pro, etc., we provide either a <strong>shared account login</strong> or an <strong>account upgrade</strong> depending on the service. We'll send you the login details or confirmation after delivery. Details vary per service — ask us before ordering if you're unsure.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Will my game account be safe?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">For standard top-ups (diamonds credited to your account), your account remains completely safe — we only need your Player ID. We never ask for your account password for top-up services.</div></div>
+      </div>
+    </div>
+
+    <!-- REFUNDS & ISSUES -->
+    <div class="faq-category">
+      <div class="faq-category-title">
+        <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></span>
+        Refunds &amp; Issues
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Can I get a refund if my order isn't delivered?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. If we are unable to deliver your order within a reasonable time and cannot provide an alternative, you are entitled to a full refund. Please read our full <a href="refund-policy.html">Refund Policy</a> for details.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What if I gave the wrong Player ID?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Unfortunately, we cannot refund top-ups that were delivered to an incorrect Player ID provided by the customer. Always double-check your Player ID before confirming your order. Contact us <strong>immediately</strong> if you notice an error before we process the top-up.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How do I report an issue with my order?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Contact us within <strong>72 hours</strong> of your order via <a href="mailto:info@rabbihossainltd.online">email</a> or <a href="https://wa.me/8801731410341" target="_blank" rel="noopener">WhatsApp</a>. Include your order details, transaction reference, and a description of the issue. We respond within 2–6 hours on business days.</div></div>
+      </div>
+    </div>
+
+    <!-- WEB DEV -->
+    <div class="faq-category">
+      <div class="faq-category-title">
+        <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+        Web Development
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">What types of websites do you build?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">We build portfolio websites, business landing pages, e-commerce stores, admin dashboards, and custom web applications. We also offer Android app development. Contact us to discuss your specific requirements and get a custom quote.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">How long does a website project take?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Timeline depends on project complexity. A simple portfolio site typically takes <strong>3–7 days</strong>, while a full e-commerce or custom web application may take <strong>2–6 weeks</strong>. We provide a clear timeline estimate after reviewing your requirements.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Do you provide post-delivery support?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 9l-7 7-7-7"/></svg></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. We provide <strong>7 days of free support</strong> after project delivery to fix any bugs or minor issues. Extended support and maintenance packages are available upon request.</div></div>
+      </div>
+    </div>
+
+    <div class="contact-cta">
+      <h3>Still Have Questions?</h3>
+      <p>Our team is available daily. We typically respond within 2–6 hours.</p>
+      <div class="btn-group">
+        <a href="https://wa.me/8801731410341" target="_blank" rel="noopener" class="btn-accent">Chat on WhatsApp</a>
+        <a href="mailto:info@rabbihossainltd.online" class="btn-outline">Send Email</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">Rabbi Hossain</a>
+          <p>Premium digital solutions by MD Rabbi Hossain — Web Developer, Ethical Hacker &amp; Digital Branding specialist.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="refund-policy.html">Refund Policy</a><a href="terms.html">Terms &amp; Conditions</a><a href="privacy-policy.html">Privacy Policy</a><a href="faq.html">FAQ</a><a href="delivery-policy.html">Delivery Policy</a>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2025 MD Rabbi Hossain. All rights reserved.</p></div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+  <script>
+    // FAQ Accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-answer').style.maxHeight = '0';
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 40 + 'px';
+        }
+      });
+    });
+    // Search
+    document.getElementById('faqSearch').addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? '' : 'none';
+      });
+      document.querySelectorAll('.faq-category').forEach(cat => {
+        const visible = [...cat.querySelectorAll('.faq-item')].some(i => i.style.display !== 'none');
+        cat.style.display = visible ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
