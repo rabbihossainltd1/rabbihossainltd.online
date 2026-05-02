@@ -238,7 +238,7 @@ function openLoginOrHome() {
   }
 }
 
-async function waitForActiveUser(timeoutMs = 1500) {
+async function waitForActiveUser(timeoutMs = 8000) {
   if (auth.currentUser) return auth.currentUser;
   if (window.rabbiAuth && typeof window.rabbiAuth.getUser === "function" && window.rabbiAuth.getUser()) {
     return window.rabbiAuth.getUser();
@@ -597,14 +597,32 @@ window.buyServiceWithCredit = async function (servicePayload) {
   }
 };
 
+window.showAdminHistoryPanel = function (panel) {
+  const serviceSection = document.getElementById("adminServiceHistorySection");
+  const paymentSection = document.getElementById("adminPaymentHistorySection");
+  const serviceBtn = document.getElementById("showServiceHistoryBtn");
+  const paymentBtn = document.getElementById("showPaymentHistoryBtn");
+
+  const showService = panel === "service";
+  if (serviceSection) serviceSection.style.display = showService ? "block" : "none";
+  if (paymentSection) paymentSection.style.display = showService ? "none" : "block";
+  if (serviceBtn) serviceBtn.classList.toggle("active", showService);
+  if (paymentBtn) paymentBtn.classList.toggle("active", !showService);
+};
+
 window.loadAdminPanel = function () {
   onAuthStateChanged(auth, async (user) => {
     const topupList = document.getElementById("adminTopupList");
     const orderList = document.getElementById("adminOrderList");
+    const topupHistoryList = document.getElementById("adminTopupHistoryList");
+    const orderHistoryList = document.getElementById("adminOrderHistoryList");
     const adminInfo = document.getElementById("adminInfo");
 
     if (!user) {
-      if (adminInfo) adminInfo.textContent = "Please login with admin account first.";
+      if (topupList) topupList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      if (orderList) orderList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      if (topupHistoryList) topupHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      if (orderHistoryList) orderHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
       return;
     }
 
@@ -627,95 +645,146 @@ window.loadAdminPanel = function () {
 
     if (adminInfo) adminInfo.textContent = `Logged in as ${user.email || "Admin"}`;
 
-    const _adminLoaded = {};
-    const origShowSection = window.adminShowSection;
-    window.adminShowSection = function(section) {
-      if (origShowSection) origShowSection(section);
-      if (!_adminLoaded[section]) {
-        _adminLoaded[section] = true;
-        if (section === 'payments') loadPendingPayments();
-        if (section === 'services') loadPendingServices();
+    const topupQuery = query(collection(db, "topups"), where("status", "==", "pending"));
+    onSnapshot(topupQuery, (snapshot) => {
+      if (!topupList) return;
+      topupList.innerHTML = "";
+
+      if (snapshot.empty) {
+        topupList.innerHTML = `<div class="empty-state">No pending payment request.</div>`;
+        return;
       }
-    };
 
-    function loadPendingPayments() {
-      const topupQuery = query(collection(db, "topups"), where("status", "==", "pending"));
-      onSnapshot(topupQuery, (snapshot) => {
-        if (!topupList) return;
-        topupList.innerHTML = "";
-        if (snapshot.empty) {
-          topupList.innerHTML = `<div class="empty-state">No pending payment request.</div>`;
-          return;
-        }
-        const docs = [];
-        snapshot.forEach((docSnap) => docs.push(docSnap));
-        docs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
-        docs.forEach((docSnap) => {
-          const data = docSnap.data() || {};
-          const purpose = data.purpose || "credit";
-          const details = data.serviceDetails || {};
-          topupList.innerHTML += `
-            <div class="admin-card">
-              <div class="admin-card-head">
-                <h3>${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</h3>
-                <span class="status pending">${statusLabel('pending')}</span>
-              </div>
-              <p><b>Purpose:</b> ${escapeHtml(purpose)}${data.serviceName ? " — " + escapeHtml(data.serviceName) : ""}</p>
-              <p><b>User:</b> ${escapeHtml(data.userName || "User")}</p>
-              <p><b>Email:</b> ${escapeHtml(data.userEmail || "No email")}</p>
-              <p><b>Method:</b> ${escapeHtml(data.method || "Manual")}</p>
-              <p><b>Number:</b> ${escapeHtml(data.paymentNumber || "")}</p>
-              <p><b>Transaction ID:</b> ${escapeHtml(data.transactionId || "")}</p>
-              ${purpose === "service" ? `<div class="admin-details"><b>Service Details:</b><pre>${escapeHtml(JSON.stringify(details, null, 2))}</pre></div>` : ""}
-              <div class="actions">
-                <button class="confirm" onclick="approveTopup('${docSnap.id}')">Confirm Payment</button>
-                <button class="decline" onclick="declineTopup('${docSnap.id}')">Decline Payment</button>
-              </div>
-            </div>
-          `;
-        });
-      });
-    }
+      const docs = [];
+      snapshot.forEach((docSnap) => docs.push(docSnap));
+      docs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
 
-    function loadPendingServices() {
-      const orderQuery = query(collection(db, "serviceOrders"));
-      onSnapshot(orderQuery, (snapshot) => {
-        if (!orderList) return;
-        orderList.innerHTML = "";
-        const pendingDocs = [];
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data() || {};
-          if (isActionableOrder(data.status)) pendingDocs.push(docSnap);
-        });
-        pendingDocs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
-        if (!pendingDocs.length) {
-          orderList.innerHTML = `<div class="empty-state">No pending service order.</div>`;
-          return;
-        }
-        pendingDocs.forEach((docSnap) => {
-          const data = docSnap.data() || {};
-          orderList.innerHTML += `
-            <div class="admin-card">
-              <div class="admin-card-head">
-                <h3>${escapeHtml(data.serviceName || "Service")}</h3>
-                <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
-              </div>
-              <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
-              <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}</p>
-              <p><b>User:</b> ${escapeHtml(data.userName || "User")}</p>
-              <p><b>Email:</b> ${escapeHtml(data.userEmail || "No email")}</p>
-              ${data.transactionId ? `<p><b>Transaction ID:</b> ${escapeHtml(data.transactionId)}</p>` : ""}
-              ${adminOrderDetailsHtml(data)}
-              <div class="actions">
-                <button class="confirm" onclick="approveServiceOrder('${docSnap.id}')">Accept Order</button>
-                <button class="decline" onclick="declineServiceOrder('${docSnap.id}')">Decline Order</button>
-                ${autoTopupButtonHtml(data, docSnap.id)}
-              </div>
+      docs.forEach((docSnap) => {
+        const data = docSnap.data() || {};
+        const purpose = data.purpose || "credit";
+        const details = data.serviceDetails || {};
+        topupList.innerHTML += `
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <h3>${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</h3>
+              <span class="status pending">${statusLabel('pending')}</span>
             </div>
-          `;
-        });
+            <p><b>Purpose:</b> ${escapeHtml(purpose)}${data.serviceName ? " — " + escapeHtml(data.serviceName) : ""}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")}</p>
+            <p><b>Email:</b> ${escapeHtml(data.userEmail || "No email")}</p>
+            <p><b>Method:</b> ${escapeHtml(data.method || "Manual")}</p>
+            <p><b>Number:</b> ${escapeHtml(data.paymentNumber || "")}</p>
+            <p><b>Transaction ID:</b> ${escapeHtml(data.transactionId || "")}</p>
+            ${purpose === "service" ? `<div class="admin-details"><b>Service Details:</b><pre>${escapeHtml(JSON.stringify(details, null, 2))}</pre></div>` : ""}
+            <div class="actions">
+              <button class="confirm" onclick="approveTopup('${docSnap.id}')">Confirm Payment</button>
+              <button class="decline" onclick="declineTopup('${docSnap.id}')">Decline Payment</button>
+            </div>
+          </div>
+        `;
       });
-    }
+    });
+
+    const orderQuery = query(collection(db, "serviceOrders"));
+    onSnapshot(orderQuery, (snapshot) => {
+      if (!orderList) return;
+      orderList.innerHTML = "";
+
+      const pendingDocs = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data() || {};
+        if (isActionableOrder(data.status)) pendingDocs.push(docSnap);
+      });
+      pendingDocs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
+
+      if (!pendingDocs.length) {
+        orderList.innerHTML = `<div class="empty-state">No pending service order.</div>`;
+        return;
+      }
+
+      pendingDocs.forEach((docSnap) => {
+        const data = docSnap.data() || {};
+        orderList.innerHTML += `
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <h3>${escapeHtml(data.serviceName || "Service")}</h3>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
+            </div>
+            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
+            <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")}</p>
+            <p><b>Email:</b> ${escapeHtml(data.userEmail || "No email")}</p>
+            ${data.transactionId ? `<p><b>Transaction ID:</b> ${escapeHtml(data.transactionId)}</p>` : ""}
+            ${adminOrderDetailsHtml(data)}
+            <div class="actions">
+              <button class="confirm" onclick="approveServiceOrder('${docSnap.id}')">Accept Order</button>
+              <button class="decline" onclick="declineServiceOrder('${docSnap.id}')">Decline Order</button>
+              ${autoTopupButtonHtml(data, docSnap.id)}
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    const topupHistoryQuery = query(collection(db, "topups"));
+    onSnapshot(topupHistoryQuery, (snapshot) => {
+      if (!topupHistoryList) return;
+      const docs = [];
+      snapshot.forEach((docSnap) => docs.push(docSnap));
+      docs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
+      const limited = docs.slice(0, 80);
+      topupHistoryList.innerHTML = "";
+      if (!limited.length) {
+        topupHistoryList.innerHTML = `<div class="empty-state">No payment transaction history yet.</div>`;
+        return;
+      }
+      limited.forEach((docSnap) => {
+        const data = docSnap.data() || {};
+        const purpose = data.purpose || "credit";
+        topupHistoryList.innerHTML += `
+          <div class="admin-card history-card">
+            <div class="admin-card-head">
+              <h3>${purpose === "service" ? escapeHtml(data.serviceName || "Instant Service Payment") : "Credit Top-up"}</h3>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
+            </div>
+            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
+            <p><b>Method:</b> ${escapeHtml(data.method || "Manual")} ${data.transactionId ? "• TX: " + escapeHtml(data.transactionId) : ""}</p>
+            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
+          </div>
+        `;
+      });
+    });
+
+    const orderHistoryQuery = query(collection(db, "serviceOrders"));
+    onSnapshot(orderHistoryQuery, (snapshot) => {
+      if (!orderHistoryList) return;
+      const docs = [];
+      snapshot.forEach((docSnap) => docs.push(docSnap));
+      docs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
+      const limited = docs.slice(0, 100);
+      orderHistoryList.innerHTML = "";
+      if (!limited.length) {
+        orderHistoryList.innerHTML = `<div class="empty-state">No service transaction history yet.</div>`;
+        return;
+      }
+      limited.forEach((docSnap) => {
+        const data = docSnap.data() || {};
+        orderHistoryList.innerHTML += `
+          <div class="admin-card history-card">
+            <div class="admin-card-head">
+              <h3>${escapeHtml(data.serviceName || "Service")}</h3>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
+            </div>
+            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
+            <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}${data.transactionId ? " • TX: " + escapeHtml(data.transactionId) : ""}</p>
+            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
+            ${adminOrderDetailsHtml(data)}
+          </div>
+        `;
+      });
+    });
   });
 };
 
