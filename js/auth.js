@@ -804,8 +804,7 @@
       if (file) photoURL = await resizeImageToDataUrl(file);
 
       await authApi.updateProfile(currentUser, {
-  displayName: fullName,
-  photoURL: photoURL || null
+  displayName: fullName
 });
 
       if (newPassword) {
