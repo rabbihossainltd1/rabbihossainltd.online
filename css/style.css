@@ -2369,13 +2369,60 @@ img {
   border: 1.5px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.03);
   cursor: pointer;
-  transition: border-color .16s, background .16s;
+  transition: border-color .2s, background .2s;
 }
 .proapp-plan-item:has(input:checked) {
-  border-color: rgba(0,255,136,.4);
+  border-color: rgba(0,255,136,.45);
   background: rgba(0,255,136,.06);
 }
-.proapp-plan-item input[type="radio"] { accent-color: #00ff88; width: 17px; height: 17px; flex-shrink: 0; }
+
+/* ── Custom checkbox/radio tick (Uiverse style) ── */
+.proapp-plan-item input[type="radio"] {
+  display: none;
+}
+.proapp-plan-item label,
+.proapp-plan-item {
+  position: relative;
+}
+.proapp-checkbox-wrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.proapp-checkbox-wrap input[type="radio"] {
+  display: none;
+}
+.proapp-checkbox-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s, background .2s;
+  flex-shrink: 0;
+}
+.proapp-plan-item:has(input:checked) .proapp-checkbox-box {
+  border-color: #00ff88;
+  background: rgba(0,255,136,.15);
+}
+.proapp-tick {
+  display: block;
+  width: 11px;
+  height: 6px;
+  border-left: 2.5px solid #00ff88;
+  border-bottom: 2.5px solid #00ff88;
+  transform: rotate(-45deg) translateY(-1px);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.proapp-plan-item:has(input:checked) .proapp-tick {
+  opacity: 1;
+}
+
 .proapp-plan-info { display: flex; flex-direction: column; gap: 3px; }
 .proapp-plan-label { font-weight: 900; font-size: .88rem; color: #c8ddf0; }
 .proapp-plan-price { font-weight: 900; font-size: .95rem; color: #00ff88; }
