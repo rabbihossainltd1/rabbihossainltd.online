@@ -240,7 +240,7 @@
     <div id="floatChatHeader">
       <div id="floatChatHeaderInfo">
         <div id="floatChatAvatar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
         </div>
         <div>
           <div id="floatChatTitle">Rabbi Hossain Support</div>
@@ -268,21 +268,22 @@
   </div>
   <button type="button" id="floatChatToggle" aria-label="Open customer support">
     <span id="floatChatBadge" style="display:none;"></span>
-    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
     <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
   </button>
 </div>
 
 <style>
-#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:8888; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
-#floatChatToggle { width:56px; height:56px; border-radius:50%; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(0,200,255,.35); transition:transform .2s, box-shadow .2s; position:relative; }
-#floatChatToggle:hover { transform:scale(1.08); box-shadow:0 12px 40px rgba(0,200,255,.45); }
+#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
+body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
+#floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s, box-shadow .2s; position:relative; }
+#floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(0,200,255,.38); }
 #floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #02050a; }
 #floatChatWindow { width:340px; max-height:520px; background:rgba(10,18,30,.97); border:1px solid rgba(0,200,255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
 @keyframes floatSlideIn { from{opacity:0;transform:translateY(18px) scale(.96)} to{opacity:1;transform:none} }
 #floatChatHeader { background:rgba(0,200,255,.07); border-bottom:1px solid rgba(0,200,255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 #floatChatHeaderInfo { display:flex; align-items:center; gap:10px; }
-#floatChatAvatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#00c8ff,#00ff88); display:flex; align-items:center; justify-content:center; color:#02050a; flex-shrink:0; }
+#floatChatAvatar { width:38px; height:38px; border-radius:50%; background:rgba(0,200,255,.12); border:1px solid rgba(0,200,255,.28); display:flex; align-items:center; justify-content:center; color:#00c8ff; flex-shrink:0; }
 #floatChatTitle { color:#d0eaff; font-weight:900; font-size:.92rem; }
 #floatChatStatus { color:#7a8ca8; font-size:.75rem; display:flex; align-items:center; gap:5px; margin-top:2px; }
 #floatStatusDot { width:7px; height:7px; border-radius:50%; background:#00ff88; animation:statusPulse 2s ease-in-out infinite; display:inline-block; }
@@ -304,7 +305,7 @@
 #floatChatInput::placeholder { color:#4a6070; }
 #floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
 #floatChatSend:hover { transform:scale(1.08); }
-@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 32px); } #floatChatWidget { right:12px; bottom:16px; } }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:10px; bottom:86px; } }
 </style>
 
 <script type="module">
@@ -393,6 +394,9 @@ import {
     });
   }
 
+  let _autoReplySent = false;
+  const AUTO_REPLY_TEXT = 'কিছুক্ষণ অপেক্ষা করুন খুব শীগ্রই আপনার message এর উত্তর দেওয়া হবে';
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -409,9 +413,7 @@ import {
         userEmail: currentUser.email || '',
         createdAt: serverTimestamp(),
       });
-      // Also create/update the chat room record so admin sees it
-      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {}).catch(()=>{});
-      const { doc: fsDoc, setDoc: fsSetDoc } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const { doc: fsDoc, setDoc: fsSetDoc, increment: fsIncrement } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
       const roomRef = fsDoc(db, 'supportRooms', currentUser.uid);
       await fsSetDoc(roomRef, {
         userId: currentUser.uid,
@@ -419,8 +421,21 @@ import {
         displayName: currentUser.displayName || currentUser.email || '',
         lastMessage: text,
         lastAt: serverTimestamp(),
-        unreadAdmin: (window._supportRoomUnread || 0) + 1
+        unreadAdmin: fsIncrement(1)
       }, { merge: true });
+      if (!_autoReplySent) {
+        _autoReplySent = true;
+        setTimeout(async () => {
+          try {
+            await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
+              text: AUTO_REPLY_TEXT,
+              role: 'admin',
+              adminEmail: 'auto-reply',
+              createdAt: serverTimestamp(),
+            });
+          } catch(_) {}
+        }, 800);
+      }
     } catch(e) {
       appendMessage('admin', 'Failed to send message. Try again.', '');
     }
@@ -433,6 +448,7 @@ import {
 
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
+    _autoReplySent = false;
     if (user && isOpen) subscribeMessages();
   });
 })();
