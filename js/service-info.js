@@ -523,7 +523,7 @@
           <!-- Features -->
           <div style="margin-bottom:20px;">
             <div style="font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#00ff88;margin-bottom:12px;">
-              ✦ Premium Features
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#00ff88" style="vertical-align:middle;margin-right:4px;"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4 5.6 21.2 8 14 2 9.2h7.6z"/></svg> Premium Features
             </div>
             <ul id="svcInfoFeatures" style="margin:0;padding:0;list-style:none;display:grid;gap:8px;"></ul>
           </div>

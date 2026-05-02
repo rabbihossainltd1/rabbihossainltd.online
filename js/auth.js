@@ -694,12 +694,12 @@
         <div class="settings-lang-row">
           <label class="settings-lang-btn" id="settingsLangEnLabel">
             <input type="radio" name="siteLanguage" id="langEn" value="en" />
-            <span class="lang-flag">🇬🇧</span>
+            <span class="lang-flag"><svg width="20" height="14" viewBox="0 0 60 42"><rect width="60" height="42" fill="#012169"/><path d="M0 0L60 42M60 0L0 42" stroke="#fff" stroke-width="7"/><path d="M0 0L60 42M60 0L0 42" stroke="#C8102E" stroke-width="4.5"/><path d="M30 0V42M0 21H60" stroke="#fff" stroke-width="12"/><path d="M30 0V42M0 21H60" stroke="#C8102E" stroke-width="7"/></svg></span>
             <span class="lang-name">English</span>
           </label>
           <label class="settings-lang-btn" id="settingsLangBnLabel">
             <input type="radio" name="siteLanguage" id="langBn" value="bn" />
-            <span class="lang-flag">🇧🇩</span>
+            <span class="lang-flag"><svg width="20" height="14" viewBox="0 0 60 42"><rect width="60" height="42" fill="#006a4e"/><circle cx="27" cy="21" r="12" fill="#f42a41"/></svg></span>
             <span class="lang-name">বাংলা</span>
           </label>
         </div>
