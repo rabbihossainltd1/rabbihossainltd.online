@@ -755,7 +755,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         Start Top-up Now
       </a>
-      <div style="margin-top:12px;color:#5a7090;font-size:.75rem;">Trusted by 500+ customers · 4.9★ rating</div>
+      <div style="margin-top:12px;color:#5a7090;font-size:.75rem;">Trusted by 500+ customers · 4.9<svg width="11" height="11" viewBox="0 0 24 24" fill="#ffb800" style="vertical-align:middle;"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4 5.6 21.2 8 14 2 9.2h7.6z"/></svg> rating</div>
     </div>
   </div>
   <style>
@@ -834,13 +834,13 @@
   </div>
   <button type="button" id="floatChatToggle" aria-label="Open customer support">
     <span id="floatChatBadge" style="display:none;"></span>
-    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg id="floatIconChat" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16.5V14a6 6 0 0 0-12 0v2.5"/><path d="M4 16.5V14a8 8 0 0 1 16 0v2.5"/><rect x="2" y="14" width="4" height="5" rx="1.5"/><rect x="18" y="14" width="4" height="5" rx="1.5"/><path d="M18 19a4 4 0 0 1-4 4h-2"/></svg>
     <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
   </button>
 </div>
 
 <style>
-#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:8888; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+#floatChatWidget { position:fixed; bottom:80px; right:18px; z-index:2600; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
 #floatChatToggle { width:56px; height:56px; border-radius:50%; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(0,200,255,.35); transition:transform .2s, box-shadow .2s; position:relative; }
 #floatChatToggle:hover { transform:scale(1.08); box-shadow:0 12px 40px rgba(0,200,255,.45); }
 #floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #02050a; }
@@ -870,7 +870,7 @@
 #floatChatInput::placeholder { color:#4a6070; }
 #floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
 #floatChatSend:hover { transform:scale(1.08); }
-@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 32px); } #floatChatWidget { right:12px; bottom:16px; } }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 32px); } #floatChatWidget { right:12px; bottom:72px; } }
 </style>
 
 <script type="module">
@@ -898,6 +898,7 @@ import {
   let currentUser = null;
   let unsubMessages = null;
   let unreadCount = 0;
+  let _autoReplied = false;
 
   function escHtml(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -975,8 +976,6 @@ import {
         userEmail: currentUser.email || '',
         createdAt: serverTimestamp(),
       });
-      // Also create/update the chat room record so admin sees it
-      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {}).catch(()=>{});
       const { doc: fsDoc, setDoc: fsSetDoc } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
       const roomRef = fsDoc(db, 'supportRooms', currentUser.uid);
       await fsSetDoc(roomRef, {
@@ -987,6 +986,18 @@ import {
         lastAt: serverTimestamp(),
         unreadAdmin: (window._supportRoomUnread || 0) + 1
       }, { merge: true });
+      if (!_autoReplied) {
+        _autoReplied = true;
+        setTimeout(async () => {
+          try {
+            await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
+              text: 'কিছুক্ষণ অপেক্ষা করুন খুব শীগ্রই আপনার massage এর উত্তর দেওয়া হবে',
+              role: 'admin',
+              createdAt: serverTimestamp(),
+            });
+          } catch(_){}
+        }, 1200);
+      }
     } catch(e) {
       appendMessage('admin', 'Failed to send message. Try again.', '');
     }
