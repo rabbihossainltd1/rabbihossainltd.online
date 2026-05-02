@@ -597,6 +597,9 @@
               planList.innerHTML = app.plans.map((p,i) => `
                 <label class="proapp-plan-item">
                   <input type="radio" name="proappPlan" value="${i}" onchange="window._proappPickPlan('${appId}',${i})" />
+                  <div class="proapp-checkbox-box">
+                    <span class="proapp-tick"></span>
+                  </div>
                   <div class="proapp-plan-info">
                     <span class="proapp-plan-label">${p.label}</span>
                     <span class="proapp-plan-price">$${p.usd.toFixed(2)} <span class="proapp-plan-bdt">/ ৳${Math.round(p.usd*BDT_RATE).toLocaleString()}</span></span>
