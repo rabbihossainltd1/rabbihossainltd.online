@@ -925,10 +925,11 @@ window.loadUserDashboard = function () {
     if (content) content.style.display = "block";
 
     if (ordersOnly) {
-      // My Orders should load fast: do not load profile photo/name or balance here.
       showDashboardTab("orders");
       setupOrderViewTabs();
-      loadDashboardOrders(user);
+      requestNotificationPermission().then(() => {
+        loadDashboardOrders(user);
+      });
       loadDashboardTopups(user);
       return;
     }

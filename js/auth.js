@@ -656,6 +656,94 @@
     if (pass1) pass1.value = '';
     if (pass2) pass2.value = '';
     setSettingsMessage('', '');
+
+    // Photo file input → crop modal
+    window._pendingCroppedPhoto = null;
+    const fileInput = document.getElementById('settingsPhotoInput');
+    if (fileInput) {
+      fileInput.value = '';
+      fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => openCropModal(e.target.result);
+        reader.readAsDataURL(file);
+      }, { once: true });
+    }
+  }
+
+  function openCropModal(src) {
+    document.getElementById('authCropModal')?.remove();
+    const cm = document.createElement('div');
+    cm.id = 'authCropModal';
+    cm.style.cssText = 'position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.9);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;padding:20px;';
+    cm.innerHTML = `
+      <div style="background:rgba(6,12,22,1);border:1px solid rgba(0,200,255,.2);border-radius:22px;padding:24px;width:min(400px,100%);display:flex;flex-direction:column;gap:16px;">
+        <div style="font-weight:800;font-size:1rem;color:#e8edf5;font-family:var(--font-display,'DM Sans',sans-serif);">Crop Profile Photo</div>
+        <div id="cropContainer" style="position:relative;width:100%;aspect-ratio:1/1;background:#030810;border-radius:14px;overflow:hidden;">
+          <img id="cropImg" src="${src}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;cursor:move;user-select:none;transform-origin:center center;" draggable="false"/>
+          <div style="position:absolute;inset:12%;border:2.5px solid rgba(0,200,255,.75);border-radius:50%;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.58);"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5a7a9a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
+          <input type="range" id="cropZoom" min="100" max="300" value="100" style="flex:1;accent-color:#00c8ff;">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="cropCancel" type="button" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#8faec9;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+          <button id="cropApply" type="button" style="flex:2;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#00c8ff,#00ff88);color:#020a10;font-weight:900;cursor:pointer;font-family:inherit;">Apply & Preview</button>
+        </div>
+      </div>`;
+    document.body.appendChild(cm);
+
+    const img = cm.querySelector('#cropImg');
+    const zoomInput = cm.querySelector('#cropZoom');
+    let tx=0,ty=0,startX=0,startY=0,dragging=false,scale=1;
+
+    function updateTransform() {
+      img.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+    }
+
+    zoomInput.addEventListener('input', () => { scale = zoomInput.value/100; updateTransform(); });
+
+    img.addEventListener('pointerdown', e => {
+      dragging=true; startX=e.clientX-tx; startY=e.clientY-ty;
+      img.setPointerCapture(e.pointerId);
+    });
+    img.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      tx=e.clientX-startX; ty=e.clientY-startY; updateTransform();
+    });
+    img.addEventListener('pointerup', () => { dragging=false; });
+
+    cm.querySelector('#cropCancel').addEventListener('click', () => cm.remove());
+
+    cm.querySelector('#cropApply').addEventListener('click', () => {
+      const size = 300;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.beginPath(); ctx.arc(size/2,size/2,size/2,0,Math.PI*2); ctx.clip();
+
+      const container = cm.querySelector('#cropContainer');
+      const circleEl = container.children[1];
+      const imgRect = img.getBoundingClientRect();
+      const circRect = circleEl.getBoundingClientRect();
+
+      const ratioX = img.naturalWidth / imgRect.width * (1/scale) * scale;
+      const ratioY = img.naturalHeight / imgRect.height * (1/scale) * scale;
+      const sx = (circRect.left - imgRect.left) / scale * (img.naturalWidth / imgRect.width);
+      const sy = (circRect.top  - imgRect.top)  / scale * (img.naturalHeight / imgRect.height);
+      const sw = circRect.width  / scale * (img.naturalWidth / imgRect.width);
+      const sh = circRect.height / scale * (img.naturalHeight / imgRect.height);
+
+      ctx.drawImage(img, Math.max(0,sx), Math.max(0,sy), Math.max(1,sw), Math.max(1,sh), 0, 0, size, size);
+      const cropped = canvas.toDataURL('image/jpeg', 0.9);
+
+      const preview = document.getElementById('settingsAvatarPreview');
+      if (preview) preview.innerHTML = `<img src="${cropped}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      window._pendingCroppedPhoto = cropped;
+      cm.remove();
+    });
   }
 
   function createProfileSettingsModal() {
@@ -716,7 +804,7 @@
             <span class="lang-name">বাংলা</span>
           </label>
         </div>
-        <button class="settings-lang-save-btn" id="saveLangBtn" type="button">
+        <button class="settings-lang-save-btn" id="saveLangBtn" type="button" style="display:none;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
           Save Language
         </button>
@@ -746,6 +834,13 @@
     const langBn = modal.querySelector('#langBn');
     if (langEn && langBn) {
       if (currentLang === 'bn') langBn.checked = true; else langEn.checked = true;
+      // Show save button only when selection changes from current
+      [langEn, langBn].forEach(radio => {
+        radio.addEventListener('change', () => {
+          const changed = radio.value !== currentLang;
+          if (saveLangBtn) saveLangBtn.style.display = changed ? '' : 'none';
+        });
+      });
     }
     if (saveLangBtn) {
       saveLangBtn.addEventListener('click', function() {
@@ -814,7 +909,12 @@
     try {
       if (btn) { btn.disabled = true; btn.innerHTML = `${iconSave()} <span>Saving...</span>`; }
       let photoURL = currentUserData?.photoURL || currentUser.photoURL || '';
-      if (file) photoURL = await resizeImageToDataUrl(file);
+      if (window._pendingCroppedPhoto) {
+        photoURL = window._pendingCroppedPhoto;
+        window._pendingCroppedPhoto = null;
+      } else if (file) {
+        photoURL = await resizeImageToDataUrl(file);
+      }
 
       await authApi.updateProfile(currentUser, {
   displayName: fullName
