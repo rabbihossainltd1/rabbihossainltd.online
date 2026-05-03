@@ -15,34 +15,7 @@
   let currentUser = null;
   let currentUserData = null;
 
-  // ── Instant UI restore from cache (eliminates login-button flash) ──
-  (function instantRestoreUI() {
-    try {
-      const cached = localStorage.getItem('rh_user_cache');
-      if (!cached) return;
-      const u = JSON.parse(cached);
-      if (!u || !u.uid) return;
-      // Instantly show avatar, hide login button
-      const loginBtn = document.getElementById('navLoginBtn');
-      const avatar   = document.getElementById('navUserAvatar');
-      if (loginBtn) loginBtn.style.display = 'none';
-      if (avatar)   avatar.style.display   = 'flex';
-      // Show cached name/email immediately
-      const nameEl  = document.getElementById('profileMenuName');
-      const emailEl = document.getElementById('profileMenuEmail');
-      const balEl   = document.getElementById('profileMenuBalance');
-      if (nameEl)  nameEl.textContent  = u.displayName || u.email || 'User';
-      if (emailEl) emailEl.textContent = u.email || '';
-      if (balEl)   balEl.textContent   = u.balance || '$0.00';
-      // Show cached avatar
-      if (u.photoURL) {
-        const img = document.getElementById('navAvatarImg');
-        const initEl = document.getElementById('navAvatarInitial');
-        if (img) { img.src = u.photoURL; img.style.display = 'block'; }
-        if (initEl) initEl.style.display = 'none';
-      }
-    } catch(e) {}
-  })();
+  // Instant UI restore handled in <head> inline script (see HTML files)
   let currentIsAdmin = false;
   let authApi = null;
   let dbApi = null;
