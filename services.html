@@ -686,9 +686,17 @@
             .ff-diamond-options, .ff-weekly-options { display:none; }
             .ff-diamond-options.show, .ff-weekly-options.show { display:block; }
             .ff-option-list { display:grid; gap:8px; }
-            .ff-option-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-radius:13px; border:1.5px solid rgba(255,166,0,0.18); background:rgba(255,140,0,0.05); cursor:pointer; transition:all 0.18s; }
-            .ff-option-item:hover, .ff-option-item.selected { border-color:rgba(255,166,0,0.5); background:rgba(255,140,0,0.13); }
-            .ff-option-item input[type=radio] { accent-color:#ffa500; margin-right:10px; flex-shrink:0; }
+            .ff-option-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:13px; border:1.5px solid rgba(255,166,0,0.18); background:rgba(255,140,0,0.05); cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
+            .ff-option-item:hover { border-color:rgba(255,166,0,0.45); background:rgba(255,140,0,0.10); }
+            .ff-option-item:has(input:checked) { border-color:rgba(255,166,0,0.6); background:rgba(255,140,0,0.14); }
+            /* hide native radio */
+            .ff-option-item input[type=radio] { display:none; }
+            /* custom tick circle */
+            .ff-option-item::before { content:''; width:20px; height:20px; border-radius:50%; border:2px solid rgba(255,255,255,.22); background:rgba(255,255,255,.04); flex-shrink:0; transition:border-color .2s,background .2s,box-shadow .2s; display:block; order:-1; }
+            .ff-option-item:has(input:checked)::before { border-color:#ffa500; background:rgba(255,165,0,.18); box-shadow:0 0 0 3px rgba(255,165,0,.12); }
+            /* tick mark */
+            .ff-option-item::after { content:''; position:absolute; width:10px; height:6px; border-left:2.5px solid #ffa500; border-bottom:2.5px solid #ffa500; transform:rotate(-45deg) translateY(-1px); opacity:0; transition:opacity .15s; left:19px; top:50%; margin-top:-4px; }
+            .ff-option-item:has(input:checked)::after { opacity:1; }
             .ff-option-label { font-weight:700; color:#e8edf5; font-size:0.88rem; }
             .ff-option-price { color:#ffa500; font-weight:900; font-size:0.9rem; background:rgba(255,166,0,0.12); border-radius:8px; padding:3px 9px; }
           </style>
