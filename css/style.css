@@ -151,39 +151,59 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   background: none;
   border: none;
   outline: none;
+  width: 44px; height: 44px;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+  flex-shrink: 0;
 }
 
 /* ── SVG Menuicon ── */
 .menuicon {
   display: block;
+  width: 44px; height: 44px;
   overflow: visible;
 }
-.menuicon__bar {
-  stroke: var(--text-primary);
-  stroke-width: 2;
-  stroke-linecap: round;
-  transition: stroke-dasharray .4s ease, stroke-dashoffset .4s ease,
-              x1 .3s ease, y1 .3s ease, x2 .3s ease, y2 .3s ease,
-              opacity .2s ease;
-}
+
+/* Circle */
 .menuicon__circle {
   fill: none;
   stroke: rgba(0,200,255,0);
   stroke-width: 1.5;
   stroke-dasharray: 144.51;
   stroke-dashoffset: 144.51;
-  transition: stroke-dashoffset .5s cubic-bezier(.4,0,.2,1),
-              stroke .3s ease;
-  transform-origin: 25px 25px;
+  transition: stroke-dashoffset .55s cubic-bezier(.4,0,.2,1), stroke .3s ease;
 }
 .menuicon__circle.is-open {
-  stroke: rgba(0,200,255,0.5);
+  stroke: rgba(0,200,255,.55);
   stroke-dashoffset: 0;
 }
 .nav-hamburger:hover .menuicon__circle {
-  stroke: rgba(0,200,255,0.25);
-  stroke-dashoffset: 72;
+  stroke: rgba(0,200,255,.2);
+  stroke-dashoffset: 80;
+}
+
+/* Bars — rect elements for reliable transform-origin */
+.menuicon__bar {
+  fill: var(--text-primary);
+  transition: transform .38s cubic-bezier(.4,0,.2,1),
+              opacity .22s ease;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* Bar 1 (top): y=15, height=2 → center y=16 */
+/* Bar 2 (mid): y=23, height=2 → center y=24 */
+/* Bar 3 (bot): y=31, height=2 → center y=32 */
+/* Open: bar1 rotate 45deg around center of bar2 */
+.nav-hamburger[aria-expanded="true"] .menuicon__bar--top {
+  transform: translateY(8px) rotate(45deg);
+}
+.nav-hamburger[aria-expanded="true"] .menuicon__bar--mid {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.nav-hamburger[aria-expanded="true"] .menuicon__bar--bot {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* ============================================================ BUTTONS ============================================================ */
