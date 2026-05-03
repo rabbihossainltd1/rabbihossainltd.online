@@ -203,11 +203,12 @@ import {
       {label:'পেমেন্ট কিভাবে করব?',    action:()=>handleChoice('payment')},
       {label:'কিভাবে অ্যাপ কিনব?',      action:()=>handleChoice('app')},
       {label:'গেমে টপআপ কিভাবে করব?',   action:()=>handleChoice('topup')},
+      {label:'কুপন কোড পাবো কিভাবে?',   action:()=>handleChoice('coupon')},
       {label:'এজেন্ট এর সাথে কথা বলবো', action:()=>handleChoice('agent')},
     ]);
   }
 
-  const LABELS={payment:'পেমেন্ট কিভাবে করব?',app:'কিভাবে অ্যাপ কিনব?',topup:'গেমে টপআপ কিভাবে করব?',agent:'এজেন্ট এর সাথে কথা বলবো'};
+  const LABELS={payment:'পেমেন্ট কিভাবে করব?',app:'কিভাবে অ্যাপ কিনব?',topup:'গেমে টপআপ কিভাবে করব?',coupon:'কুপন কোড পাবো কিভাবে?',agent:'এজেন্ট এর সাথে কথা বলবো'};
 
   async function handleChoice(choice){
     appendMsg('user',LABELS[choice],false); botState='answering';
@@ -244,6 +245,19 @@ import {
         `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>ধাপ ৪:</strong> পেমেন্ট করুন এবং কিছুক্ষণ অপেক্ষা করুন।</span></div>`+
         `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>টপআপ সাধারণত <strong style="color:#00ff88;">১৫ মিনিটের</strong> মধ্যে সম্পন্ন হয়।</span></div>`+
         `</div>`,true,950);
+      await new Promise(r=>setTimeout(r,350)); showBackToMenu();
+    } else if(choice==='coupon'){
+      const tgSVG=`<svg width="13" height="13" viewBox="0 0 24 24" fill="#0088cc"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.54c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.374 14.51l-2.95-.924c-.64-.203-.654-.64.136-.948l11.52-4.44c.532-.194.998.13.482.95z"/></svg>`;
+      await botSay(
+        `কুপন কোড পেতে আমাদের Telegram গ্রুপে যোগ দিন।<br><br>`+
+        `<div class="float-answer-list">`+
+        `<div class="float-answer-item">${tgSVG}<span>সেখানে নিয়মিত কুপন কোড পোস্ট করা হয়।</span></div>`+
+        `<div class="float-answer-item">${tgSVG}<span>Special অফার ও ডিসকাউন্ট সবার আগে পাবেন।</span></div>`+
+        `</div><br>`+
+        `<a href="https://t.me/CuponCodeForRH" target="_blank" rel="noopener" `+
+        `style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:rgba(0,136,204,.15);border:1px solid rgba(0,136,204,.35);border-radius:10px;color:#4db8e8;font-size:.84rem;font-weight:800;text-decoration:none;">`+
+        `${tgSVG} Telegram গ্রুপে যোগ দিন</a>`,
+        true,900);
       await new Promise(r=>setTimeout(r,350)); showBackToMenu();
     } else if(choice==='agent'){
       botState='agent_form';
