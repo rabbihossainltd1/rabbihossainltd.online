@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portfolio — MD Rabbi Hossain</title>
   <meta name="description" content="Selected works by MD Rabbi Hossain — web development, security, and digital design projects." />
-  <link rel="stylesheet" href="css/style.css" />
+    <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="css/style.min.css" as="style" />
+  <link rel="stylesheet" href="css/style.min.css" />
   <style>
     /* Page-specific portfolio extras */
     .filter-bar {
@@ -294,8 +299,8 @@
     </div>
   </footer>
 
-  <script src="js/lang.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/lang.js" defer></script>
+  <script src="js/main.js" defer></script>
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
@@ -312,7 +317,7 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
   </script>
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js" defer></script>
   <script>
     // Filter buttons (visual only — extend with JS filtering logic as needed)
     document.querySelectorAll('.filter-btn').forEach(btn => {

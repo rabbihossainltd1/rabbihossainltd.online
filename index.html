@@ -15,7 +15,12 @@
   <meta name="robots" content="index, follow" />
 
   <link rel="canonical" href="https://rabbihossainltd.online/" />
-  <link rel="stylesheet" href="css/style.css" />
+    <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="css/style.min.css" as="style" />
+  <link rel="stylesheet" href="css/style.min.css" />
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
 <body>
@@ -596,8 +601,8 @@
     </div>
   </footer>
 
-  <script src="js/lang.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/lang.js" defer></script>
+  <script src="js/main.js" defer></script>
   <script src="js/reviews.js" type="module"></script>
   <script>
   /* ── Full-width hero banner slider ── */
@@ -695,11 +700,11 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
   </script>
-  <script src="js/service-info.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/service-info.js" defer></script>
+  <script src="js/auth.js" defer></script>
   <script type="module" src="js/wallet.js"></script>
-  <script src="js/service-modal.js"></script>
-  <script src="js/typing.js"></script>
+  <script src="js/service-modal.js" defer></script>
+  <script src="js/typing.js" defer></script>
 
   <!-- Service Modal Overlay (needed for home page modal) -->
   <div id="serviceModal" class="service-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display:none;">

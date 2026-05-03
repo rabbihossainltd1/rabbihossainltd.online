@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Rabbi Hossain</title>
   <meta name="description" content="User dashboard for wallet balance, payment history, service orders and profile overview." />
-  <link rel="stylesheet" href="css/style.css" />
+    <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="css/style.min.css" as="style" />
+  <link rel="stylesheet" href="css/style.min.css" />
   <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
   <style>
     .dashboard-page { min-height:100vh; padding:0; background:var(--bg-primary); }
@@ -255,9 +260,9 @@
   }
   </script>
 
-  <script src="js/lang.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/lang.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/auth.js" defer></script>
   <script type="module" src="js/wallet.js"></script>
   <script>
     // Request browser notification permission once on dashboard load
