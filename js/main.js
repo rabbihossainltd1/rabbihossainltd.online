@@ -31,13 +31,30 @@
 
     hamburger.setAttribute('aria-expanded', String(isOpen));
 
-    const spans = hamburger.querySelectorAll('span');
-
-    if (spans.length >= 3) {
-      spans[0].style.transform = isOpen ? 'rotate(45deg) translate(5px, 5px)' : '';
-      spans[1].style.opacity   = isOpen ? '0' : '';
-      spans[2].style.transform = isOpen ? 'rotate(-45deg) translate(5px, -5px)' : '';
+    // SVG menuicon animation
+    const bars   = hamburger.querySelectorAll('.menuicon__bar');
+    const circle = hamburger.querySelector('.menuicon__circle');
+    if (bars.length >= 3) {
+      if (isOpen) {
+        // top bar → diagonal down-right
+        bars[0].setAttribute('x1','16'); bars[0].setAttribute('y1','16');
+        bars[0].setAttribute('x2','34'); bars[0].setAttribute('y2','34');
+        // middle bar → hide
+        bars[1].style.opacity = '0';
+        // bottom bar → diagonal up-right
+        bars[2].setAttribute('x1','16'); bars[2].setAttribute('y1','34');
+        bars[2].setAttribute('x2','34'); bars[2].setAttribute('y2','16');
+      } else {
+        bars[0].setAttribute('x1','13'); bars[0].setAttribute('y1','16.5');
+        bars[0].setAttribute('x2','37'); bars[0].setAttribute('y2','16.5');
+        bars[1].style.opacity = '';
+        bars[1].setAttribute('x1','13'); bars[1].setAttribute('y1','24.5');
+        bars[1].setAttribute('x2','37'); bars[1].setAttribute('y2','24.5');
+        bars[2].setAttribute('x1','13'); bars[2].setAttribute('y1','32.5');
+        bars[2].setAttribute('x2','37'); bars[2].setAttribute('y2','32.5');
+      }
     }
+    if (circle) circle.classList.toggle('is-open', isOpen);
   }
 
   function openMenu() {
