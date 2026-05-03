@@ -51,8 +51,8 @@
   <style>
     .nav-search-btn { background:none; border:none; cursor:pointer; color:#8aaac8; padding:6px; border-radius:8px; display:flex; align-items:center; transition:color .18s; margin-right:4px; }
     .nav-search-btn:hover { color:#00c8ff; }
-    #serviceSearchOverlay { position:fixed; inset:0; z-index:9999; background:rgba(2,5,10,.82); backdrop-filter:blur(12px); display:flex !important; align-items:flex-start; justify-content:center; padding-top:80px; }
-    #serviceSearchOverlay[style*="display:none"] { display:none !important; }
+    #serviceSearchOverlay { position:fixed; inset:0; z-index:9999; background:rgba(2,5,10,.82); backdrop-filter:blur(12px); display:none; align-items:flex-start; justify-content:center; padding-top:80px; }
+    #serviceSearchOverlay.is-open { display:flex; }
     #serviceSearchBox { width:100%; max-width:640px; background:rgba(15,22,35,.95); border:1px solid rgba(0,200,255,.18); border-radius:22px; padding:18px; box-shadow:0 40px 100px rgba(0,0,0,.6); }
     #serviceSearchInputRow { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:12px 14px; margin-bottom:14px; }
     #serviceSearchInput { flex:1; background:transparent; border:0; outline:none; color:#e8edf5; font-size:1rem; font-family:inherit; }
@@ -132,7 +132,7 @@
 
     function openSearch() {
       open = true;
-      overlay.style.display = '';
+      overlay.classList.add('is-open');
       input.value = '';
       showAll();
       setTimeout(() => input.focus(), 60);
@@ -140,7 +140,7 @@
 
     function closeSearch() {
       open = false;
-      overlay.style.display = 'none';
+      overlay.classList.remove('is-open');
     }
 
     function showAll() {
