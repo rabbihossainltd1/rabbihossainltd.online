@@ -145,15 +145,45 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 }
 
 .nav-hamburger {
-  display: none; flex-direction: column; gap: 5px;
-  cursor: pointer; padding: 6px; border-radius: var(--radius-xs);
-  transition: background var(--transition);
+  display: none;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.nav-hamburger:hover { background: var(--surface-2); }
-.nav-hamburger span {
-  display: block; width: 22px; height: 1.5px;
-  background: var(--text-primary); border-radius: 2px;
-  transition: all var(--transition);
+
+/* ── SVG Menuicon ── */
+.menuicon {
+  display: block;
+  overflow: visible;
+}
+.menuicon__bar {
+  stroke: var(--text-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dasharray .4s ease, stroke-dashoffset .4s ease,
+              x1 .3s ease, y1 .3s ease, x2 .3s ease, y2 .3s ease,
+              opacity .2s ease;
+}
+.menuicon__circle {
+  fill: none;
+  stroke: rgba(0,200,255,0);
+  stroke-width: 1.5;
+  stroke-dasharray: 144.51;
+  stroke-dashoffset: 144.51;
+  transition: stroke-dashoffset .5s cubic-bezier(.4,0,.2,1),
+              stroke .3s ease;
+  transform-origin: 25px 25px;
+}
+.menuicon__circle.is-open {
+  stroke: rgba(0,200,255,0.5);
+  stroke-dashoffset: 0;
+}
+.nav-hamburger:hover .menuicon__circle {
+  stroke: rgba(0,200,255,0.25);
+  stroke-dashoffset: 72;
 }
 
 /* ============================================================ BUTTONS ============================================================ */
