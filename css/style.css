@@ -1180,7 +1180,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 .radio-option {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 11px 14px;
   background: var(--surface-3);
   border: 1px solid var(--border);
@@ -1195,12 +1195,40 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   background: rgba(0,200,255,0.06);
   color: var(--text-primary);
 }
-.radio-option input[type="radio"] {
-  accent-color: var(--accent);
-  width: 16px; height: 16px;
-  cursor: pointer;
+/* hide native radio */
+.radio-option input[type="radio"] { display: none; }
+/* custom tick box */
+.radio-option::before {
+  content: '';
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.04);
   flex-shrink: 0;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  display: block;
 }
+.radio-option:has(input:checked)::before {
+  border-color: #00c8ff;
+  background: rgba(0,200,255,.15);
+  box-shadow: 0 0 0 3px rgba(0,200,255,.12);
+}
+/* tick mark via after on checked label */
+.radio-option::after {
+  content: '';
+  position: absolute;
+  width: 10px; height: 6px;
+  border-left: 2.5px solid #00c8ff;
+  border-bottom: 2.5px solid #00c8ff;
+  transform: rotate(-45deg) translateY(-1px);
+  opacity: 0;
+  transition: opacity .15s;
+  left: 19px;
+  top: 50%;
+  margin-top: -4px;
+}
+.radio-option { position: relative; }
+.radio-option:has(input:checked)::after { opacity: 1; }
 
 /* ── Desktop hero layout — profile centered ──────────────── */
 @media (min-width: 900px) {
