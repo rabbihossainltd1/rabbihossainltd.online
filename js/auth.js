@@ -14,6 +14,35 @@
 
   let currentUser = null;
   let currentUserData = null;
+
+  // ── Instant UI restore from cache (eliminates login-button flash) ──
+  (function instantRestoreUI() {
+    try {
+      const cached = localStorage.getItem('rh_user_cache');
+      if (!cached) return;
+      const u = JSON.parse(cached);
+      if (!u || !u.uid) return;
+      // Instantly show avatar, hide login button
+      const loginBtn = document.getElementById('navLoginBtn');
+      const avatar   = document.getElementById('navUserAvatar');
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (avatar)   avatar.style.display   = 'flex';
+      // Show cached name/email immediately
+      const nameEl  = document.getElementById('profileMenuName');
+      const emailEl = document.getElementById('profileMenuEmail');
+      const balEl   = document.getElementById('profileMenuBalance');
+      if (nameEl)  nameEl.textContent  = u.displayName || u.email || 'User';
+      if (emailEl) emailEl.textContent = u.email || '';
+      if (balEl)   balEl.textContent   = u.balance || '$0.00';
+      // Show cached avatar
+      if (u.photoURL) {
+        const img = document.getElementById('navAvatarImg');
+        const initEl = document.getElementById('navAvatarInitial');
+        if (img) { img.src = u.photoURL; img.style.display = 'block'; }
+        if (initEl) initEl.style.display = 'none';
+      }
+    } catch(e) {}
+  })();
   let currentIsAdmin = false;
   let authApi = null;
   let dbApi = null;
@@ -386,6 +415,16 @@
       if (!snap.exists()) return;
       currentUserData = snap.data();
       updateProfileMenu(user, currentUserData);
+      // Update cache with latest balance & photo
+      try {
+        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+        localStorage.setItem('rh_user_cache', JSON.stringify({
+          ...cached,
+          displayName: currentUserData.name || user.displayName || '',
+          photoURL: currentUserData.photoURL || user.photoURL || '',
+          balance: dollar(currentUserData.credit || 0)
+        }));
+      } catch(e) {}
       window.dispatchEvent(new CustomEvent('rabbi:userData', { detail: currentUserData }));
     });
   }
@@ -1126,6 +1165,15 @@
       if (user) {
         if (loginBtn) loginBtn.style.display = 'none';
         if (avatar) avatar.style.display = 'flex';
+        // Cache basic user info for instant next-load restore
+        try {
+          localStorage.setItem('rh_user_cache', JSON.stringify({
+            uid: user.uid,
+            displayName: user.displayName || '',
+            email: user.email || '',
+            photoURL: user.photoURL || ''
+          }));
+        } catch(e) {}
         await ensureUserDoc(user);
         await checkAdmin(user);
         listenUserDoc(user);
@@ -1143,6 +1191,7 @@
         currentUserData = null;
         currentIsAdmin = false;
         sessionStorage.removeItem('rabbiLoginRefreshDone');
+        localStorage.removeItem('rh_user_cache');
         if (unsubscribeUserDoc) { unsubscribeUserDoc(); unsubscribeUserDoc = null; }
         if (loginBtn) loginBtn.style.display = 'block';
         if (avatar) avatar.style.display = 'none';

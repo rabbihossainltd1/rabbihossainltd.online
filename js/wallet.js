@@ -934,13 +934,23 @@ window.loadUserDashboard = function () {
       return;
     }
 
-    // Fast first paint: show auth profile immediately, then sync Firestore data.
-    setText("dashboardName", user.displayName || user.email || "User");
-    setText("dashboardEmail", user.email || "");
+    // Fast first paint: show cached data instantly, then sync Firestore
+    let cached = {};
+    try { cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}'); } catch(e) {}
+
+    const cachedName    = cached.displayName || user.displayName || user.email || "User";
+    const cachedEmail   = cached.email       || user.email || "";
+    const cachedBalance = cached.balance     || "$0.00";
+    const cachedPhoto   = cached.photoURL    || user.photoURL || "";
+
+    setText("dashboardName",    cachedName);
+    setText("dashboardEmail",   cachedEmail);
+    setText("dashboardBalance", cachedBalance);
+
     const quickAvatar = document.getElementById("dashboardAvatar");
     if (quickAvatar) {
-      if (user.photoURL) quickAvatar.innerHTML = `<img src="${escapeHtml(user.photoURL)}" alt="Profile photo">`;
-      else quickAvatar.textContent = String(user.displayName || user.email || "U").charAt(0).toUpperCase();
+      if (cachedPhoto) quickAvatar.innerHTML = `<img src="${escapeHtml(cachedPhoto)}" alt="Profile photo">`;
+      else quickAvatar.textContent = String(cachedName).charAt(0).toUpperCase();
     }
 
     ensureUserDoc(user).catch((err) => console.warn("ensureUserDoc failed", err));
