@@ -2,6 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    // Instant auth restore — runs before defer scripts load (eliminates login flash)
+    (function(){
+      try{
+        var u=JSON.parse(localStorage.getItem('rh_user_cache')||'null');
+        if(!u||!u.uid) return;
+        // Inject a <style> that hides login btn and shows avatar immediately
+        var s=document.createElement('style');
+        s.id='rh-instant-auth';
+        s.textContent='#navLoginBtn{display:none!important}#navUserAvatar{display:flex!important}';
+        document.head.appendChild(s);
+      }catch(e){}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FAQ — RabbiHossainLTD</title>
   <meta name="description" content="Frequently Asked Questions about RabbiHossainLTD services — gaming top-ups, premium apps, web development, payments, and more." />
