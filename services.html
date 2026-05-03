@@ -178,25 +178,32 @@
 
     window.handleSearchClick = function(s) {
       closeSearch();
-      // Navigate to services page if not already there
-      const onServices = window.location.pathname.endsWith('services.html') || window.location.pathname === '/services.html';
-      if (!onServices) {
-        const param = s.action === 'proapp'
-          ? `?service=Premium+App+%26+Subscription&fields=proapp&app=${encodeURIComponent(s.proapp)}`
-          : `?service=${encodeURIComponent(s.service)}&fields=${encodeURIComponent(s.fields || '')}`;
-        window.location.href = 'services.html' + param;
-        return;
-      }
-      // Already on services page — trigger modal directly
-      if (s.action === 'proapp') {
-        const trigger = document.querySelector('[data-fields="proapp"][data-proapp="' + s.proapp + '"]');
-        if (trigger) { trigger.click(); return; }
-        const anyProapp = document.querySelector('[data-service="Premium App & Subscription"]');
-        if (anyProapp) { anyProapp.click(); setTimeout(() => { if (typeof window._proappSelect === 'function') window._proappSelect(s.proapp); }, 200); }
-      } else {
-        const trigger = document.querySelector('[data-service="' + s.service + '"]');
-        if (trigger) trigger.click();
-      }
+      // Wait for overlay to fully hide before opening modal (avoids z-index conflict)
+      setTimeout(() => {
+        const onServices = window.location.pathname.endsWith('services.html') || window.location.pathname === '/services.html' || window.location.pathname.endsWith('/');
+        if (!onServices) {
+          const param = s.action === 'proapp'
+            ? '?service=Premium+App+%26+Subscription&fields=proapp&app=' + encodeURIComponent(s.proapp || '')
+            : '?service=' + encodeURIComponent(s.service) + '&fields=' + encodeURIComponent(s.fields || '');
+          window.location.href = 'services.html' + param;
+          return;
+        }
+        if (s.action === 'proapp') {
+          const trigger = document.querySelector('[data-fields="proapp"][data-proapp="' + s.proapp + '"]');
+          if (trigger) { trigger.click(); return; }
+          const anyProapp = document.querySelector('[data-service="Premium App & Subscription"]');
+          if (anyProapp) {
+            anyProapp.click();
+            setTimeout(() => { if (typeof window._proappSelect === 'function') window._proappSelect(s.proapp); }, 300);
+          }
+        } else {
+          const trigger = document.querySelector('[data-service="' + s.service + '"]');
+          if (trigger) { trigger.click(); return; }
+          // fallback: find by data-fields
+          const byFields = document.querySelector('[data-fields="' + (s.fields || '') + '"]');
+          if (byFields) byFields.click();
+        }
+      }, 120);
     };
 
     if (document.readyState === 'loading') {

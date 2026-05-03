@@ -305,6 +305,7 @@
 
 <style>
 #floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
+    #floatChatToggle { display:none !important; } /* Hidden on dashboard — use Customer Service button instead */
 body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
 #floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s,box-shadow .2s; position:relative; }
 #floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(0,200,255,.38); }
@@ -378,54 +379,36 @@ body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
 
   <script>
     function openSupportChatFullscreen() {
-      const widget  = document.getElementById('floatChatWidget');
-      const winEl   = document.getElementById('floatChatWindow');
-      const toggle  = document.getElementById('floatChatToggle');
+      const widget = document.getElementById('floatChatWidget');
+      const winEl  = document.getElementById('floatChatWindow');
 
-      if (!widget) {
-        // widget not loaded yet, try again shortly
-        setTimeout(openSupportChatFullscreen, 600);
+      if (!widget || !winEl) {
+        setTimeout(openSupportChatFullscreen, 500);
         return;
       }
 
-      // Open the chat if not already open
-      if (winEl && winEl.style.display === 'none' || (winEl && !winEl.classList.contains('open'))) {
-        if (toggle) toggle.click();
-        else if (winEl) winEl.style.display = 'flex';
-      }
+      // Show the chat window
+      winEl.style.display = 'flex';
 
-      // Go fullscreen
-      widget.style.cssText = [
-        'position:fixed', 'inset:0', 'width:100vw', 'max-width:100vw',
-        'height:100vh', 'max-height:100vh', 'bottom:0', 'right:0',
-        'border-radius:0', 'z-index:9998', 'box-shadow:none'
-      ].join('!important;') + '!important';
-
-      if (winEl) {
-        winEl.style.cssText = [
-          'display:flex', 'flex-direction:column',
-          'height:100%', 'max-height:none', 'border-radius:0'
-        ].join('!important;') + '!important';
-      }
-
+      // Full screen overlay
+      widget.style.cssText = 'position:fixed!important;inset:0!important;width:100vw!important;max-width:100vw!important;height:100dvh!important;bottom:0!important;right:0!important;z-index:9998!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;';
+      winEl.style.cssText  = 'display:flex!important;flex-direction:column!important;width:100%!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;';
       document.body.style.overflow = 'hidden';
 
-      // Add a close/exit fullscreen button if not present
-      if (!document.getElementById('fsExitBtn')) {
-        const exitBtn = document.createElement('button');
-        exitBtn.id = 'fsExitBtn';
-        exitBtn.type = 'button';
-        exitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back`;
-        exitBtn.style.cssText = 'position:fixed;top:14px;left:14px;z-index:10000;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(10,18,30,.9);color:#9ab8d4;font-size:.8rem;font-weight:700;cursor:pointer;';
-        exitBtn.addEventListener('click', () => {
-          widget.style.cssText = '';
-          if (winEl) winEl.style.cssText = '';
-          document.body.style.overflow = '';
-          exitBtn.remove();
-        });
-        document.body.appendChild(exitBtn);
-      }
+      // Back button
+      document.getElementById('fsExitBtn')?.remove();
+      const exitBtn = document.createElement('button');
+      exitBtn.id = 'fsExitBtn';
+      exitBtn.type = 'button';
+      exitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back';
+      exitBtn.style.cssText = 'position:fixed;top:12px;left:12px;z-index:10000;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(8,16,28,.95);backdrop-filter:blur(10px);color:#9ab8d4;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;';
+      exitBtn.addEventListener('click', () => {
+        widget.style.cssText = '';
+        winEl.style.cssText  = 'display:none;';
+        document.body.style.overflow = '';
+        exitBtn.remove();
+      });
+      document.body.appendChild(exitBtn);
     }
   </script>
 </body>
-</html>
