@@ -222,18 +222,35 @@
           <!-- Chat window (shown when a ticket is selected) -->
           <div id="adminChatWindow" style="display:none; margin-top:14px;">
             <div class="admin-chat-header" id="adminChatHeaderBar">
-              <button type="button" class="admin-chat-back" onclick="adminCloseChat()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inbox
-              </button>
-              <div class="admin-chat-user-info">
-                <span id="adminChatUserName"></span>
-                <span id="adminChatTicketId"></span>
+              <div style="display:flex;align-items:center;gap:8px;width:100%;flex-wrap:wrap;">
+                <button type="button" class="admin-chat-back" onclick="adminCloseChat()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                  Inbox
+                </button>
+                <div class="admin-chat-user-info" style="flex:1;min-width:0;">
+                  <span id="adminChatUserName" style="font-weight:800;color:#e8edf5;font-size:.92rem;"></span>
+                  <span id="adminChatTicketId" style="font-size:.75rem;color:#00c8ff;margin-left:6px;"></span>
+                </div>
+                <button type="button" class="chat-solved-btn" onclick="adminMarkSolved()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Solved
+                </button>
               </div>
-              <button type="button" class="chat-solved-btn" onclick="adminMarkSolved()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Solved
-              </button>
+              <!-- User details row -->
+              <div id="adminChatUserDetails" style="width:100%;margin-top:8px;padding:10px 12px;background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.12);border-radius:10px;display:flex;flex-direction:column;gap:5px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:.75rem;color:#7a8ca8;">📧 Email:</span>
+                  <span id="adminChatUserEmail" style="font-size:.75rem;color:#c8ddf0;font-weight:600;"></span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:.75rem;color:#7a8ca8;">📞 Phone:</span>
+                  <span id="adminChatUserPhone" style="font-size:.75rem;color:#c8ddf0;font-weight:600;"></span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;">
+                  <span style="font-size:.75rem;color:#7a8ca8;white-space:nowrap;">💬 Complaint:</span>
+                  <span id="adminChatUserComplaint" style="font-size:.75rem;color:#c8ddf0;font-weight:600;line-height:1.5;"></span>
+                </div>
+              </div>
             </div>
             <div id="adminChatMsgs" class="admin-chat-msgs"></div>
             <div class="admin-chat-reply-row">
@@ -379,7 +396,8 @@
               <span class="inbox-status-dot ${isSolved?'solved':'open'}"></span>
               ${escHtml(d.displayName || d.userEmail || 'User')}
             </div>
-            ${d.ticketId ? `<div class="inbox-item-ticket">${escHtml(d.ticketId)}</div>` : ''}
+            ${d.ticketId ? `<div class="inbox-item-ticket">#${escHtml(d.ticketId)}</div>` : ''}
+            <div class="inbox-item-preview" style="font-size:.73rem;color:#5a7a9a;">📧 ${escHtml(d.userEmail||'—')} &nbsp;|&nbsp; 📞 ${escHtml(d.userPhone||'—')}</div>
             <div class="inbox-item-preview">${escHtml(d.lastMessage || '')}</div>
           </div>
           <div class="inbox-item-right">
@@ -405,6 +423,11 @@
     // Populate header
     document.getElementById('adminChatUserName').textContent = roomData?.displayName || roomData?.userEmail || 'User';
     document.getElementById('adminChatTicketId').textContent = roomData?.ticketId ? '#' + roomData.ticketId : '';
+    document.getElementById('adminChatUserEmail').textContent = roomData?.userEmail || '—';
+    document.getElementById('adminChatUserPhone').textContent = roomData?.userPhone || '—';
+    // Complaint: get from first user message in supportChats if not in roomData
+    const complaintEl = document.getElementById('adminChatUserComplaint');
+    complaintEl.textContent = roomData?.lastMessage || '—';
 
     chatWin.style.display = 'block';
     msgsEl.innerHTML = '';
