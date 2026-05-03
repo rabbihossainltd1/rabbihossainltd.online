@@ -48,8 +48,18 @@
         </button>
         <div class="auth-divider"><span>or</span></div>
         <div id="authEmailForm">
-          <div class="auth-form-group"><input class="auth-input" type="email" id="authEmail" placeholder="Email address" /></div>
-          <div class="auth-form-group"><input class="auth-input" type="password" id="authPassword" placeholder="Password (min 6 chars)" /></div>
+          <div class="auth-form-group">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 32 32" height="18"><g><path d="m30.853 13.87a15 15 0 0 0 -29.729 4.082 15.1 15.1 0 0 0 12.876 12.918 15.6 15.6 0 0 0 2.016.13 14.85 14.85 0 0 0 7.715-2.145 1 1 0 1 0 -1.031-1.711 13.007 13.007 0 1 1 5.458-6.529 2.149 2.149 0 0 1 -4.158-.759v-10.856a1 1 0 0 0 -2 0v1.726a8 8 0 1 0 .2 10.325 4.135 4.135 0 0 0 7.83.274 15.2 15.2 0 0 0 .823-7.455zm-14.853 8.13a6 6 0 1 1 6-6 6.006 6.006 0 0 1 -6 6z" fill="currentColor"></path></g></svg>
+              <input class="auth-input" type="email" id="authEmail" placeholder="Email address" />
+            </div>
+          </div>
+          <div class="auth-form-group">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="-64 0 512 512" height="18"><path d="m336 512h-288c-26.453125 0-48-21.523438-48-48v-224c0-26.476562 21.546875-48 48-48h288c26.453125 0 48 21.523438 48 48v224c0 26.476562-21.546875 48-48 48zm-288-288c-8.8125 0-16 7.167969-16 16v224c0 8.832031 7.1875 16 16 16h288c8.8125 0 16-7.167969 16-16v-224c0-8.832031-7.1875-16-16-16zm0 0" fill="currentColor"></path><path d="m304 224c-8.832031 0-16-7.167969-16-16v-80c0-52.929688-43.070312-96-96-96s-96 43.070312-96 96v80c0 8.832031-7.167969 16-16 16s-16-7.167969-16-16v-80c0-70.59375 57.40625-128 128-128s128 57.40625 128 128v80c0 8.832031-7.167969 16-16 16zm0 0" fill="currentColor"></path></svg>
+              <input class="auth-input" type="password" id="authPassword" placeholder="Password (min 6 chars)" />
+            </div>
+          </div>
           <div id="authError" class="auth-error" style="display:none;"></div>
           <button class="auth-submit-btn" id="authSignInBtn" type="button">Sign In</button>
           <button class="auth-toggle-btn" id="authToggleBtn" type="button">Don't have an account? <strong>Create one</strong></button>
@@ -97,8 +107,11 @@
       .auth-divider { display:flex;align-items:center;gap:12px;margin:16px 0;color:#3a4a5a;font-size:0.78rem; }
       .auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.08); }
       .auth-form-group { margin-bottom:12px; }
-      .auth-input { width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:#e8edf5;font-size:0.9rem;outline:none;transition:border-color 0.2s;font-family:inherit; }
-      .auth-input:focus { border-color:rgba(0,200,255,0.4); }
+      .auth-input-wrap { position:relative; display:flex; align-items:center; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:10px; transition:border-color .2s, box-shadow .2s; }
+      .auth-input-wrap:focus-within { border-color:rgba(0,200,255,0.5); box-shadow:0 0 0 3px rgba(0,200,255,0.08); }
+      .auth-input-icon { width:18px; height:18px; flex-shrink:0; margin-left:13px; color:#3a5a7a; pointer-events:none; }
+      .auth-input-wrap:focus-within .auth-input-icon { color:rgba(0,200,255,0.7); }
+      .auth-input { flex:1; padding:11px 14px 11px 10px; background:transparent; border:none; color:#e8edf5; font-size:0.9rem; outline:none; font-family:inherit; }
       .auth-input::placeholder { color:#3a4a5a; }
       .auth-error { background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:#ff8080;border-radius:8px;padding:10px 14px;font-size:0.82rem;margin-bottom:12px; }
       .auth-submit-btn { width:100%;padding:12px;background:var(--accent,#00c8ff);color:#020a10;border:none;border-radius:50px;font-weight:700;font-size:0.9rem;cursor:pointer;font-family:var(--font-display,'DM Sans',sans-serif);transition:all 0.2s;margin-bottom:10px; }
