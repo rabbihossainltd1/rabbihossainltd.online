@@ -374,8 +374,16 @@
 
         <button id="opGoNow" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
           background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
-          box-shadow:0 16px 40px rgba(0,200,255,.2);">
+          box-shadow:0 16px 40px rgba(0,200,255,.2);margin-bottom:10px;">
           View My Orders Now
+        </button>
+        <button id="opRateBtn" type="button" style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:16px;padding:12px;
+          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Rate Your Experience
         </button>
       </div>
     `;
@@ -398,10 +406,20 @@
       window.location.href = 'dashboard.html?tab=orders';
     });
 
-    // Auto redirect after 4 seconds
-    setTimeout(() => {
+    // Rate button → open review modal, cancel auto-redirect
+    const rateBtn = document.getElementById('opRateBtn');
+    let autoRedirect = setTimeout(() => {
       window.location.href = 'dashboard.html?tab=orders';
     }, 4000);
+
+    rateBtn?.addEventListener('click', () => {
+      clearTimeout(autoRedirect);
+      const ov = document.getElementById('orderPlacedOverlay');
+      if (ov) ov.remove();
+      if (typeof window.openReviewModal === 'function') {
+        window.openReviewModal(typeof activeServiceName !== 'undefined' ? activeServiceName : '');
+      }
+    });
   }
 
 
