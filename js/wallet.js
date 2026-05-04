@@ -20,10 +20,15 @@ import {
 const USD_TO_BDT = 125;
 
 const PAYMENT_NUMBERS = {
-  bKash: "01731410341",
+  bKash: "01349407692",
   Nagad: "01731410341",
   Rocket: "01731410341",
   Binance: "749542753",
+  "USDT BSC": "0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34",
+  "USDT TRX": "TUGdBjkWv1KN3otAYAPaWEDBknrCpBWmPf",
+  "USDT ETH": "0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34",
+  "USDT SOL": "BSbbZwdU9dKW7wxHdJLC4tKrHu3naTD14oGsmWmNfPsH",
+  "USDT TON": "UQA7DQ2Uc83sMxnShe5ctMYCdV8fJucB6bY3OOeQ9-TvtAUH",
 };
 
 const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
@@ -498,7 +503,7 @@ window.submitTopup = async function () {
     };
 
     // Normalize method for Firestore rules — Binance stored as 'Binance'
-    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
+    if (!['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'].includes(payload.method)) {
       payload.method = 'bKash'; // fallback
     }
 

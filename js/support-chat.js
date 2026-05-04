@@ -180,14 +180,14 @@ async function handleChoice(choice){
 appendMsg('user',LABELS[choice],false); botState='answering';
 if(choice==='payment'){
 await botSay(
-`<strong>পেমেন্ট করার নিয়ম:</strong><br><br>`+
+`<strong>নতুন Payment System ব্যবহার করার নিয়ম:</strong><br><br>`+
 `<div class="float-answer-list">`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance App &rarr; Pay &rarr; Send &rarr; আমাদের Binance ID দিন &rarr; USDT পাঠান।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Dashboard Wallet</strong> — Dashboard &rarr; Add Credit &rarr; সরাসরি ওয়ালেটে যোগ করুন।</span></div>`+
-`</div><br>পেমেন্টের পর Transaction ID বা Screenshot সহ এজেন্টকে জানান।`,
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Step 1</strong> — Add Credit পেজে যান, amount লিখুন, তারপর Add Credit button click করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Mobile Banking</strong> — bKash / Nagad / Rocket select করুন, Send Money করুন, Transaction ID দিন, তারপর VERIFY করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance Pay select করুন, QR/Pay ID/Button ব্যবহার করে payment করুন, Binance Order ID দিয়ে VERIFY করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Crypto Coin</strong> — USDT BSC / TRX / ETH / SOL / TON select করুন, exact network address/QR এ payment করুন, TXID/Hash দিয়ে VERIFY করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffdd57" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Important</strong> — Crypto payment এ network অবশ্যই match করবেন। ভুল network হলে payment recover নাও হতে পারে।</span></div>`+
+`</div><br>VERIFY করার পর admin approval হলে wallet credit update হবে।`,
 true,950);
 await new Promise(r=>setTimeout(r,350)); showBackToMenu();
 } else if(choice==='app'){
