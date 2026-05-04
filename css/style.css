@@ -1024,17 +1024,14 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   }
 }
 
-/* 3. Hamburger to LEFT side */
-.nav-inner {
-  flex-direction: row !important;
-}
-.nav-hamburger {
-  order: -1 !important;
-  margin-right: 4px !important;
-}
-/* On desktop keep hamburger hidden still */
-@media (min-width: 769px) {
-  .nav-hamburger { display: none !important; order: 0 !important; }
+/* 3. Hamburger to LEFT side — mobile only */
+@media (max-width: 768px) {
+  .nav-hamburger {
+    display: flex !important;
+    flex-direction: column !important;
+    order: -1 !important;
+    margin-right: 4px !important;
+  }
 }
 
 /* 4. Mobile nav drawer — professional style */
