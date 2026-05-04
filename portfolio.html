@@ -391,7 +391,7 @@
 
 <style>
 #floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
-body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
+body.has-bottom-nav #floatChatWidget { bottom:100px; right:16px; z-index:2500; }
 #floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s, box-shadow .2s; position:relative; }
 #floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(0,200,255,.38); }
 #floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #02050a; }
@@ -421,7 +421,7 @@ body.has-bottom-nav #floatChatWidget { bottom:90px; right:14px; }
 #floatChatInput::placeholder { color:#4a6070; }
 #floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:linear-gradient(135deg,#00c8ff,#00ff88); color:#02050a; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
 #floatChatSend:hover { transform:scale(1.08); }
-@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:10px; bottom:86px; } }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:12px; bottom:100px; z-index:2500; } }
 </style>
 
 <script type="module">
