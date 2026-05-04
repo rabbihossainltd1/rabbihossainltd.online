@@ -946,6 +946,11 @@
     body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:180px!important;}
     @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
   </style>
+
+  <style id="rh-new-payment-flow-css">
+    .flow-grid{width:min(980px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;align-items:start}.flow-card{background:linear-gradient(180deg,rgba(13,18,30,.98),rgba(8,12,20,.98));border:1px solid rgba(255,255,255,.08);border-radius:26px;padding:24px;box-shadow:0 22px 80px rgba(0,0,0,.42)}.flow-step{display:none;animation:fadeUp .35s ease both}.flow-step.active{display:block}.flow-title{font-family:var(--font-display);font-weight:900;font-size:1.35rem;margin-bottom:8px;color:#eef6ff}.flow-sub{color:#8da0bd;font-size:.9rem;line-height:1.7;margin-bottom:18px}.amount-box{display:grid;gap:10px}.amount-box label{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#72e6ff}.amount-input-wrap{display:flex;align-items:center;gap:10px;border:1px solid rgba(0,200,255,.18);background:rgba(255,255,255,.045);border-radius:20px;padding:15px 16px}.amount-input-wrap span{font-size:1.8rem;font-weight:900;color:#00ff88}.amount-input-wrap input{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:1.8rem;font-weight:900;font-family:var(--font-display)}.flow-primary{width:100%;min-height:56px;border-radius:18px;background:linear-gradient(135deg,#00c8ff,#00ff88);color:#020a10;font-weight:900;font-family:var(--font-display);font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 14px 38px rgba(0,200,255,.18);margin-top:16px}.flow-secondary{min-height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.04);color:#b9c8dc;font-weight:900;padding:0 16px}.option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.option-card{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.045);border-radius:22px;padding:18px;min-height:136px;text-align:left;color:#fff;display:flex;flex-direction:column;gap:12px;transition:.2s ease}.option-card:hover{transform:translateY(-2px);border-color:rgba(0,200,255,.35);background:rgba(0,200,255,.08)}.option-card img{width:54px;height:54px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.06);padding:6px}.option-card strong{font-size:1rem;font-family:var(--font-display)}.option-card span{font-size:.76rem;color:#89a1be;line-height:1.5}.payment-method-panel{border-radius:24px;overflow:hidden;background:var(--method-bg,linear-gradient(135deg,#101827,#07111d));border:1px solid rgba(255,255,255,.09)}.method-head{padding:22px;text-align:center;border-bottom:1px solid rgba(255,255,255,.12)}.method-logo{width:70px;height:70px;object-fit:contain;border-radius:18px;background:rgba(255,255,255,.92);padding:9px;margin:0 auto 12px}.method-head h2{font-family:var(--font-display);font-size:1.45rem;font-weight:900}.pay-amount-pill{display:inline-flex;gap:8px;align-items:center;margin-top:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.16);padding:9px 14px;border-radius:999px;color:#fff;font-weight:900}.method-body{padding:20px}.address-box{background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:14px;margin:12px 0;word-break:break-all}.address-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7);font-weight:900;margin-bottom:6px}.address-value{font-size:1rem;font-weight:900;color:#fff000}.copy-line{display:flex;gap:10px;align-items:center}.copy-line .address-box{flex:1}.copy-btn2{height:44px;min-width:92px;border-radius:14px;background:rgba(0,0,0,.24);color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:900;display:flex;align-items:center;justify-content:center;gap:7px}.copy-btn2 svg{width:18px;height:18px}.instruction-list{display:grid;gap:12px;margin:16px 0}.instruction-item{display:flex;gap:12px;color:rgba(255,255,255,.9);line-height:1.62;font-size:.92rem}.instruction-item b{color:#fff000}.instruction-item:before{content:'•';font-size:1.8rem;line-height:1;color:#fff}.qr-wrap{text-align:center;background:rgba(255,255,255,.96);border-radius:20px;padding:14px;margin:14px auto;max-width:210px}.qr-wrap img{width:180px;height:180px;object-fit:contain;margin:auto}.tx-box{margin-top:16px}.tx-box input{width:100%;height:58px;border-radius:17px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;padding:0 16px;font-size:1rem;font-weight:800;outline:0}.wallet-message{margin-top:14px;padding:12px 14px;border-radius:14px;font-size:.88rem;font-weight:800;display:none}.wallet-message.success{background:rgba(0,255,136,.12);color:#00ff88;border:1px solid rgba(0,255,136,.22)}.wallet-message.error{background:rgba(255,87,87,.12);color:#ff8a8a;border:1px solid rgba(255,87,87,.22)}.wallet-message.info{background:rgba(0,200,255,.1);color:#8ee8ff;border:1px solid rgba(0,200,255,.2)}.side-card{background:rgba(10,14,22,.72);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px}.mini-balance{display:grid;gap:8px;margin-bottom:16px}.mini-balance strong{font-size:1.15rem;color:#00ff88}.summary-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,.08);font-size:.86rem;color:#8da0bd}.summary-row b{color:#fff}.history-title{font-size:1rem!important}.request-list{max-height:420px;overflow:auto}.back-row{display:flex;gap:10px;margin-bottom:16px}.coin-note{font-size:.82rem;color:#ffe985;background:rgba(255,240,0,.08);border:1px solid rgba(255,240,0,.16);padding:12px;border-radius:14px;line-height:1.6;margin-top:10px}@media(max-width:860px){.flow-grid{grid-template-columns:1fr}.option-grid{grid-template-columns:1fr}.flow-card{padding:18px;border-radius:22px}.payment-page{padding-left:14px!important;padding-right:14px!important}.copy-line{align-items:stretch}.copy-btn2{min-width:82px}.method-body{padding:16px}}
+  </style>
+
 </head>
 
 <body class="has-bottom-nav" onload="loadWalletPage()">
@@ -966,343 +971,73 @@
     </div>
   </nav>
 
+
   <main class="payment-page">
     <section id="authRequired">
       <h1>Login Required</h1>
-      <p>Credit add বা service payment করতে হলে আগে account login করতে হবে।</p>
-      <button class="submit-btn" onclick="window.rabbiAuth ? window.rabbiAuth.openLogin() : location.href='index.html'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-        Login Now
-      </button>
+      <p>Credit add করতে হলে আগে account login করতে হবে।</p>
+      <button class="submit-btn" onclick="window.rabbiAuth ? window.rabbiAuth.openLogin() : location.href='index.html'">Login Now</button>
       <a class="back-link" href="index.html">Back to Home</a>
     </section>
 
-    <section id="walletContent" class="payment-shell" style="display:none;">
-      <header class="payment-header">
-        <div class="payment-badge">
-          Secure Automatic Payment · Live
-        </div>
+    <section id="walletContent" class="flow-grid" style="display:none;">
+      <header class="payment-header" style="grid-column:1/-1;">
+        <div class="payment-badge">Secure Payment Gateway · Live</div>
         <h1 id="walletPageTitle">Add <span>Credit</span></h1>
-        <p id="walletPageSub">bKash, Nagad অথবা Rocket personal number-এ Send Money করুন। USD amount auto BDT-তে convert হবে। Rate: <strong style="color:var(--pay-success);font-weight:800;">$1 / ৳125</strong></p>
+        <p id="walletPageSub">Amount set করুন, তারপর Mobile Banking অথবা Crypto payment method select করুন। Rate: <strong style="color:var(--pay-success);font-weight:800;">$1 / ৳125</strong></p>
       </header>
 
-      <section class="payment-card">
-        <div class="payment-card-inner">
-          <div class="purpose-row">
-            <div class="purpose-chip" id="paymentPurpose">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-              Wallet Credit Top-up
-            </div>
+      <section class="flow-card">
+        <input type="hidden" id="paymentMethod" value="" />
+        <select id="amount" onchange="handleAmountChange()" style="display:none;"><option value="custom" selected>Custom</option></select>
+        <div id="customAmountWrap" style="display:none;"></div>
 
-            <div class="balance-mini">
-              Current Balance
-              <strong id="userCredit">$0 / ৳0</strong>
-              <span id="userName">User</span>
-              <span id="userEmail" style="display:block;">Loading...</span>
-            </div>
-          </div>
-
-          <div class="section-label">Payment Method</div>
-          <input type="hidden" id="paymentMethod" value="bKash" />
-
-          <div class="method-grid">
-            <button class="method-btn bkash active" type="button" data-method="bKash" onclick="selectPremiumMethod('bKash')">
-              <span class="method-icon logo-icon">
-                <img src="images/bkash.png" alt="bKash logo" loading="lazy" decoding="async" />
-              </span>
-              <span>
-                <span class="method-name">bKash</span>
-                <span class="method-type">Personal</span>
-              </span>
-            </button>
-
-            <button class="method-btn nagad" type="button" data-method="Nagad" onclick="selectPremiumMethod('Nagad')">
-              <span class="method-icon logo-icon">
-                <img src="images/nagad.png" alt="Nagad logo" loading="lazy" decoding="async" />
-              </span>
-              <span>
-                <span class="method-name">Nagad</span>
-                <span class="method-type">Personal</span>
-              </span>
-            </button>
-
-            <button class="method-btn rocket" type="button" data-method="Rocket" onclick="selectPremiumMethod('Rocket')">
-              <span class="method-icon logo-icon">
-                <img src="images/rocket.png" alt="Rocket logo" loading="lazy" decoding="async" />
-              </span>
-              <span>
-                <span class="method-name">Rocket</span>
-                <span class="method-type">Personal</span>
-              </span>
-            </button>
-
-            <button class="method-btn binance" type="button" data-method="Binance" onclick="selectPremiumMethod('Binance')">
-              <span class="method-icon logo-icon">
-                <img src="images/binance.png" alt="Binance Pay logo" loading="lazy" decoding="async" />
-              </span>
-              <span>
-                <span class="method-name">Binance Pay</span>
-                <span class="method-type">Crypto</span>
-              </span>
-            </button>
-          </div><!-- end method-grid -->
-
-          <!-- Binance Pay panel (shown when Binance selected) -->
-          <div id="binancePanel" style="display:none;">
-            <div>
-              <div style="color:#f3ba2f;font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;justify-content:center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Scan QR to Pay
-              </div>
-              <div style="width:176px;height:176px;margin:0 auto 18px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(243,186,47,.15);">
-                <img src="images/binance-qr.png" alt="Binance QR Code" style="width:156px;height:156px;object-fit:contain;border-radius:12px;" />
-              </div>
-              <p style="color:rgba(201,162,39,0.8);font-size:.8rem;margin:0 0 16px;line-height:1.6;">Open Binance app → Pay → Scan QR Code</p>
-              <div style="background:rgba(0,0,0,.25);border:1px solid rgba(243,186,47,.16);border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;text-align:left;">
-                <div>
-                  <div style="color:rgba(138,112,64,0.9);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Binance Wallet ID</div>
-                  <div style="color:#f3ba2f;font-weight:800;font-size:.98rem;letter-spacing:.02em;font-family:'Outfit',sans-serif;" id="binanceWalletId">749542753</div>
-                </div>
-                <button type="button" class="copy-btn icon-only" onclick="copyTextValue('binanceWalletId','Binance Wallet ID')" aria-label="Copy Wallet ID">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
-              </div>
-              <a href="https://app.binance.com/uni-qr/EPRH9YyT" target="_blank" rel="noopener"
-                style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:14px;background:linear-gradient(135deg,#f3ba2f,#e8a410);color:#1a0c00;font-weight:900;font-size:.9rem;font-family:'Outfit',sans-serif;text-decoration:none;box-shadow:0 8px 30px rgba(243,186,47,.2);letter-spacing:.01em;">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                Pay with Binance App
-              </a>
-              <p style="color:rgba(138,112,64,0.7);font-size:.74rem;margin-top:10px;">Payment করার পর নিচে Binance Order ID দিন</p>
-            </div>
-          </div>
-
-          <div class="pay-divider"></div>
-
-          <div class="section-label">Payment Information</div>
-          <div class="info-stack">
-            <div class="info-row" id="walletNumberRow">
-              <div>
-                <div class="info-tag" id="walletTag">bKash Number</div>
-                <div class="info-value" id="paymentNumber">01731410341</div>
-                <span id="selectedMethod" style="display:none;">bKash</span>
-              </div>
-              <button class="copy-btn icon-only" type="button" aria-label="Copy wallet number" onclick="copyTextValue('paymentNumber','Wallet number')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
-            </div>
-
-            <div class="info-row">
-              <div>
-                <div class="info-tag">Payable Amount</div>
-                <div class="info-value amount-val" id="selectedBdtAmount">৳125</div>
-              </div>
-              <button class="copy-btn icon-only" type="button" aria-label="Copy payment amount" onclick="copyAmountValue('selectedBdtAmount')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="form-grid">
-            <div class="pay-field">
-              <label>Select Dollar Amount</label>
-              <select id="amount" onchange="handleAmountChange()">
-                <option value="1">$1 / ৳125</option>
-                <option value="5">$5 / ৳625</option>
-                <option value="10">$10 / ৳1,250</option>
-                <option value="20">$20 / ৳2,500</option>
-                <option value="50">$50 / ৳6,250</option>
-                <option value="custom">Custom Dollar Amount</option>
-              </select>
-            </div>
-
-            <div class="pay-field" id="customAmountWrap" style="display:none;">
-              <label>Custom Dollar Amount</label>
-              <input type="number" id="customAmount" placeholder="Enter dollar amount" min="1" step="0.01" oninput="handleAmountChange()" />
-            </div>
-
-            <div class="amount-grid">
-              <div class="amount-tile">
-                <span>Dollar</span>
-                <strong id="selectedUsdAmount">$1</strong>
-              </div>
-              <div class="amount-tile">
-                <span>BDT</span>
-                <strong id="selectedBdtMirror">৳125</strong>
-              </div>
-            </div>
-
-            <div class="pay-field">
-              <label>Transaction ID</label>
-              <input type="text" id="transactionId" placeholder="Paste Transaction ID" autocomplete="off" />
-            </div>
-
-            <div id="walletMessage" class="wallet-message"></div>
-
-            <button class="submit-btn" id="submitTopupBtn" type="button" onclick="submitTopup()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              Verify Payment
-            </button>
-
-            <a class="back-link" href="index.html">Back to Website</a>
-          </div>
-
-          <div class="payment-help open" id="paymentHelp">
-            <button class="help-header" type="button" onclick="document.getElementById('paymentHelp').classList.toggle('open')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              How to pay
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-
-            <div class="help-body">
-              <div class="step"><div class="step-num">1</div><div>Select bKash, Nagad, or Rocket.</div></div>
-              <div class="step"><div class="step-num">2</div><div>Copy the wallet number and send exact BDT amount by Send Money.</div></div>
-              <div class="step"><div class="step-num">3</div><div>Copy the Transaction ID from SMS/app and paste it here.</div></div>
-              <div class="step"><div class="step-num">4</div><div>Tap Verify Payment. System will verify and update status.</div></div>
-            </div>
-          </div>
+        <div class="flow-step active" id="stepAmount">
+          <div class="purpose-chip" id="paymentPurpose">Wallet Credit Top-up</div>
+          <h2 class="flow-title">Amount Set করুন</h2>
+          <p class="flow-sub">যত USD credit add করতে চান সেই amount লিখুন। নিচে BDT amount auto calculate হবে।</p>
+          <div class="amount-box"><label for="customAmount">Amount (USD)</label><div class="amount-input-wrap"><span>$</span><input id="customAmount" type="number" min="1" step="0.01" value="1" inputmode="decimal" oninput="handleAmountChange();syncPaymentMirror();" placeholder="Enter amount" /></div></div>
+          <div class="summary-row"><span>You will add</span><b id="selectedUsdAmount">$1</b></div>
+          <div class="summary-row"><span>BDT Amount</span><b id="selectedBdtAmount">৳125</b></div>
+          <button class="flow-primary" type="button" onclick="goPaymentStep('gateway')">Add Credit</button>
+          <div id="walletMessage" class="wallet-message"></div>
         </div>
+        <div class="flow-step" id="stepGateway"><div class="back-row"><button class="flow-secondary" type="button" onclick="goPaymentStep('amount')">← Back</button></div><h2 class="flow-title">Payment Option Select করুন</h2><p class="flow-sub">আপনার পছন্দের payment category select করুন।</p><div class="option-grid"><button class="option-card" type="button" onclick="goPaymentStep('mobile')"><img src="images/mobile-bank.png" alt="Mobile Banking"><strong>Mobile Banking</strong><span>bKash, Nagad, Rocket Send Money</span></button><button class="option-card" type="button" onclick="goPaymentStep('crypto')"><img src="images/crypto.png" alt="Crypto"><strong>Crypto</strong><span>Binance Pay অথবা USDT Network</span></button></div></div>
+        <div class="flow-step" id="stepMobile"><div class="back-row"><button class="flow-secondary" type="button" onclick="goPaymentStep('gateway')">← Back</button></div><h2 class="flow-title">Mobile Banking Select করুন</h2><p class="flow-sub">যে system দিয়ে Send Money করবেন সেটি select করুন।</p><div class="option-grid"><button class="option-card" type="button" onclick="openPaymentMethod('bKash')"><img src="images/bkash.png" alt="bKash"><strong>bKash</strong><span>Personal Send Money</span></button><button class="option-card" type="button" onclick="openPaymentMethod('Nagad')"><img src="images/nagad.png" alt="Nagad"><strong>Nagad</strong><span>Personal Send Money</span></button><button class="option-card" type="button" onclick="openPaymentMethod('Rocket')"><img src="images/rocket.png" alt="Rocket"><strong>Rocket</strong><span>Personal Send Money</span></button></div></div>
+        <div class="flow-step" id="stepCrypto"><div class="back-row"><button class="flow-secondary" type="button" onclick="goPaymentStep('gateway')">← Back</button></div><h2 class="flow-title">Crypto Payment Select করুন</h2><p class="flow-sub">Binance Pay অথবা direct USDT coin network select করুন।</p><div class="option-grid"><button class="option-card" type="button" onclick="openPaymentMethod('Binance')"><img src="images/binance.png" alt="Binance"><strong>Binance Pay</strong><span>QR / Pay ID / App Button</span></button><button class="option-card" type="button" onclick="goPaymentStep('coins')"><img src="images/coin.png" alt="Crypto Coin"><strong>Crypto Coin</strong><span>USDT BSC, TRX, ETH, SOL, TON</span></button></div></div>
+        <div class="flow-step" id="stepCoins"><div class="back-row"><button class="flow-secondary" type="button" onclick="goPaymentStep('crypto')">← Back</button></div><h2 class="flow-title">USDT Network Select করুন</h2><p class="flow-sub">যে network দিয়ে USDT পাঠাবেন সেটি select করুন। Network ভুল হলে payment lost হতে পারে।</p><div class="option-grid"><button class="option-card" type="button" onclick="openPaymentMethod('USDT BSC')"><img src="images/bsc.png" alt="BSC"><strong>USDT BSC</strong><span>BEP20 Network</span></button><button class="option-card" type="button" onclick="openPaymentMethod('USDT TRX')"><img src="images/trx.png" alt="TRX"><strong>USDT TRX</strong><span>TRC20 Network</span></button><button class="option-card" type="button" onclick="openPaymentMethod('USDT ETH')"><img src="images/eth.png" alt="ETH"><strong>USDT ETH</strong><span>ERC20 Network</span></button><button class="option-card" type="button" onclick="openPaymentMethod('USDT SOL')"><img src="images/sol.png" alt="SOL"><strong>USDT SOL</strong><span>Solana Network</span></button><button class="option-card" type="button" onclick="openPaymentMethod('USDT TON')"><img src="images/ton.png" alt="TON"><strong>USDT TON</strong><span>TON Network</span></button></div></div>
+        <div class="flow-step" id="stepPay"><div class="back-row"><button class="flow-secondary" type="button" onclick="backFromPay()">← Back</button></div><div id="paymentRender"></div></div>
       </section>
-
-      <aside class="payment-history-card">
-        <h2 class="history-title">My Payment Requests</h2>
-        <p class="history-sub">Payment verify হলে wallet credit বা service request automatically update হবে।</p>
-        <div class="request-list" id="myTopupList">
-          <div class="empty-state">Loading...</div>
-        </div>
-      </aside>
-
-      <div class="safe-note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Secure automatic payment · Auto system connected
-      </div>
+      <aside class="side-card"><div class="mini-balance"><span>Current Balance</span><strong id="userCredit">$0 / ৳0</strong><span id="userName">User</span><span id="userEmail">Loading...</span></div><div class="summary-row"><span>Selected Method</span><b id="selectedMethod">Not selected</b></div><div class="summary-row"><span>Selected USD</span><b id="selectedUsdMirror">$1</b></div><div class="summary-row"><span>Payable BDT</span><b id="selectedBdtMirror">৳125</b></div><div class="summary-row"><span>Rate</span><b>$1 = ৳125</b></div><h2 class="history-title" style="margin-top:18px;">My Payment Requests</h2><div class="request-list" id="myTopupList"><div class="empty-state">Loading...</div></div></aside>
     </section>
   </main>
 
+
+
   <script>
-    function copyAmountValue(elId) {
-      const el = document.getElementById(elId);
-      if (!el) return;
-      const raw = el.textContent.replace(/[৳,\s]/g, '').trim();
-      navigator.clipboard.writeText(raw).then(() => {
-        const btn = document.querySelector(`[onclick="copyAmountValue('${elId}')"]`);
-        if (btn) {
-          btn.classList.add('copied');
-          setTimeout(() => btn.classList.remove('copied'), 1800);
-        }
-      });
-    }
-
-    function selectPremiumMethod(method) {
-      const hidden = document.getElementById('paymentMethod');
-      if (hidden) hidden.value = method;
-
-      document.querySelectorAll('.method-btn').forEach(btn => btn.classList.remove('active'));
-      const active = document.querySelector(`.method-btn[data-method="${method}"]`);
-      if (active) active.classList.add('active');
-
-      const walletRow = document.getElementById('walletNumberRow');
-      const walletTag = document.getElementById('walletTag');
-      const binancePanel = document.getElementById('binancePanel');
-      const submitBtn = document.getElementById('submitTopupBtn');
-      const txInput = document.getElementById('transactionId');
-      let noticeEl = document.getElementById('bkashClosedNotice');
-      let binanceInstr = document.getElementById('binanceInstructions');
-
-      // Reset all panels first
-      if (binancePanel) binancePanel.style.display = 'none';
-      if (noticeEl) noticeEl.style.display = 'none';
-      if (binanceInstr) binanceInstr.style.display = 'none';
-      if (walletRow) walletRow.style.display = '';
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = ''; submitBtn.style.cursor = ''; }
-
-      if (walletTag) walletTag.textContent = method === 'Binance' ? 'Binance Wallet ID' : method + ' Number';
-      if (txInput) txInput.placeholder = method === 'Binance' ? 'Paste Binance Order ID' : 'Paste Transaction ID';
-
-      if (method === 'bKash') {
-        // bKash closed notice
-        if (!noticeEl) {
-          noticeEl = document.createElement('div');
-          noticeEl.id = 'bkashClosedNotice';
-          noticeEl.className = 'bkash-closed-notice';
-          noticeEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><div><strong>bKash Temporarily Unavailable</strong>আমাদের bKash account-এ সমস্যা হওয়ায় এই মুহূর্তে bKash Payment সম্ভব নয়। দয়া করে Nagad বা Rocket ব্যবহার করুন। অসুবিধার জন্য আন্তরিকভাবে দুঃখিত।</div>`;
-          const divider = document.querySelector('.pay-divider');
-          if (divider) divider.after(noticeEl);
-        }
-        noticeEl.style.display = 'flex';
-        if (walletRow) walletRow.style.display = 'none';
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '.4'; submitBtn.style.cursor = 'not-allowed'; }
-
-      } else if (method === 'Binance') {
-        // Binance Pay panel
-        if (binancePanel) binancePanel.style.display = '';
-        if (walletRow) walletRow.style.display = 'none';
-        // Binance payment instructions
-        if (!binanceInstr) {
-          binanceInstr = document.createElement('div');
-          binanceInstr.id = 'binanceInstructions';
-          binanceInstr.style.cssText = 'margin-top:12px;padding:14px 16px;border-radius:14px;background:rgba(243,186,47,.05);border:1px solid rgba(243,186,47,.14);';
-          binanceInstr.innerHTML = `
-            <div style="color:#f3ba2f;font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;font-family:'Outfit',sans-serif;">How to Pay with Binance</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Outfit',sans-serif;">1</span>
-                Binance App খুলুন → Pay অথবা QR Scan করুন
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Outfit',sans-serif;">2</span>
-                উপরের QR স্ক্যান করুন অথবা "Pay with Binance App" বাটনে click করুন
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Outfit',sans-serif;">3</span>
-                Payment সম্পন্ন হলে Binance থেকে Order ID কপি করুন
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-start;color:#c9a227;font-size:.84rem;line-height:1.55;">
-                <span style="background:rgba(243,186,47,.15);color:#f3ba2f;font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:'Outfit',sans-serif;">4</span>
-                নিচের "Binance Order ID" field-এ paste করুন → Verify Payment
-              </div>
-            </div>`;
-          const divider = document.querySelector('.pay-divider');
-          if (divider) divider.after(binanceInstr);
-        }
-        binanceInstr.style.display = '';
-      }
-
-      if (typeof window.updatePaymentNumber === 'function') window.updatePaymentNumber();
-    }
-
-    const originalHandleAmountChange = window.handleAmountChange;
-    window.syncPaymentMirror = function () {
-      const main = document.getElementById('selectedBdtAmount');
-      const mirror = document.getElementById('selectedBdtMirror');
-      if (main && mirror) mirror.textContent = main.textContent;
+    const PAYMENT_FLOW = {
+      'bKash': {type:'mobile', logo:'bkash.png', dial:'*247#', name:'bKash', number:'01349407692', tx:'Transaction ID', bg:'linear-gradient(135deg,#d92476,#9f104f)'},
+      'Nagad': {type:'mobile', logo:'nagad.png', dial:'*167#', name:'Nagad', number:'01731410341', tx:'Transaction ID', bg:'linear-gradient(135deg,#d80000,#a50000)'},
+      'Rocket': {type:'mobile', logo:'rocket.png', dial:'*322#', name:'Rocket', number:'01731410341', tx:'Transaction ID', bg:'linear-gradient(135deg,#8d2aa5,#6d1d8c)'},
+      'Binance': {type:'binance', logo:'binance.png', name:'Binance Pay', number:'749542753', qr:'binance-qr.png', tx:'Binance Order ID', bg:'linear-gradient(135deg,#f3ba2f,#9a7100)'},
+      'USDT BSC': {type:'coin', logo:'bsc.png', name:'USDT BSC', number:'0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34', qr:'bsc-qr.png', tx:'Transaction Hash / TXID', bg:'linear-gradient(135deg,#f0b90b,#725000)'},
+      'USDT TRX': {type:'coin', logo:'trx.png', name:'USDT TRX', number:'TUGdBjkWv1KN3otAYAPaWEDBknrCpBWmPf', qr:'trx-qr.png', tx:'Transaction Hash / TXID', bg:'linear-gradient(135deg,#ef0027,#7d0014)'},
+      'USDT ETH': {type:'coin', logo:'eth.png', name:'USDT ETH', number:'0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34', qr:'eth-qr.png', tx:'Transaction Hash / TXID', bg:'linear-gradient(135deg,#667eea,#343a8a)'},
+      'USDT SOL': {type:'coin', logo:'sol.png', name:'USDT SOL', number:'BSbbZwdU9dKW7wxHdJLC4tKrHu3naTD14oGsmWmNfPsH', qr:'sol-qr.png', tx:'Transaction Hash / TXID', bg:'linear-gradient(135deg,#14f195,#6d3cff)'},
+      'USDT TON': {type:'coin', logo:'ton.png', name:'USDT TON', number:'UQA7DQ2Uc83sMxnShe5ctMYCdV8fJucB6bY3OOeQ9-TvtAUH', qr:'ton-qr.png', tx:'Transaction Hash / TXID', bg:'linear-gradient(135deg,#0098ea,#005a9e)'}
     };
-
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(function () {
-        if (typeof window.updatePaymentNumber === 'function') window.updatePaymentNumber();
-        if (typeof window.handleAmountChange === 'function') window.handleAmountChange();
-        window.syncPaymentMirror();
-        // Show bKash notice by default since bKash is pre-selected
-        selectPremiumMethod('bKash');
-      }, 250);
-
-      document.addEventListener('change', function (e) {
-        if (e.target && (e.target.id === 'amount' || e.target.id === 'customAmount')) {
-          setTimeout(window.syncPaymentMirror, 50);
-        }
-      });
-
-      document.addEventListener('input', function (e) {
-        if (e.target && e.target.id === 'customAmount') {
-          setTimeout(window.syncPaymentMirror, 50);
-        }
-      });
-    });
-
-    const paymentMirrorTimer = setInterval(function () {
-      if (document.getElementById('selectedBdtAmount')) window.syncPaymentMirror();
-    }, 700);
+    let lastCategory = 'gateway';
+    function showStep(id){document.querySelectorAll('.flow-step').forEach(el=>el.classList.remove('active'));const el=document.getElementById('step'+id.charAt(0).toUpperCase()+id.slice(1));if(el)el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+    function amountValue(){return Number(document.getElementById('customAmount')?.value||0);}
+    function goPaymentStep(step){if(step!=='amount' && amountValue()<1){showMessage('Minimum $1 amount দিতে হবে।','error');return;} if(['mobile','crypto','coins','gateway'].includes(step)) lastCategory=step; showStep(step); syncPaymentMirror();}
+    function backFromPay(){showStep(lastCategory==='coins'?'coins':lastCategory==='crypto'?'crypto':lastCategory==='mobile'?'mobile':'gateway');}
+    function selectPremiumMethod(method){openPaymentMethod(method)}
+    function openPaymentMethod(method){const data=PAYMENT_FLOW[method]; if(!data) return; if(amountValue()<1){showMessage('Minimum $1 amount দিতে হবে।','error');return;} document.getElementById('paymentMethod').value=method; document.getElementById('selectedMethod').textContent=method; if(typeof window.updatePaymentNumber==='function') window.updatePaymentNumber(); renderPayment(data); showStep('pay');}
+    function renderPayment(data){const isMobile=data.type==='mobile', isBinance=data.type==='binance', isCoin=data.type==='coin'; const bdt=document.getElementById('selectedBdtAmount')?.textContent||'৳125'; const usd=document.getElementById('selectedUsdAmount')?.textContent||'$1'; const render=document.getElementById('paymentRender'); const qr=(isBinance||isCoin)?`<div class="qr-wrap"><img src="images/${data.qr}" alt="${data.name} QR"></div>`:''; const openBtn=isBinance?`<a class="flow-primary" href="https://app.binance.com/uni-qr/EPRH9YyT" target="_blank" rel="noopener" style="text-decoration:none;margin-top:10px;">Pay with Binance App</a>`:''; const first=isMobile?`<div class="instruction-item">Phone থেকে <b>${data.dial}</b> dial করুন অথবা ${data.name} App open করুন।</div><div class="instruction-item"><b>Send Money</b> option select করুন।</div><div class="instruction-item">প্রাপক নম্বর হিসেবে নিচের number ব্যবহার করুন।</div><div class="instruction-item">Amount exactly <b>${bdt}</b> পাঠান, তারপর ${data.tx} copy করুন।</div>`:isBinance?`<div class="instruction-item">Binance App open করুন → Pay অথবা QR Scan করুন।</div><div class="instruction-item">QR scan করুন, Pay ID copy করুন, অথবা নিচের Binance button use করুন।</div><div class="instruction-item">Amount exactly <b>${usd}</b> equivalent USDT pay করুন।</div><div class="instruction-item">Payment complete হলে Binance <b>Order ID</b> paste করুন।</div>`:`<div class="instruction-item">Selected network: <b>${data.name}</b>. Same network ছাড়া payment পাঠাবেন না।</div><div class="instruction-item">QR scan করুন অথবা নিচের address copy করে <b>${usd}</b> equivalent USDT পাঠান।</div><div class="instruction-item">Payment complete হলে blockchain <b>Transaction Hash / TXID</b> paste করুন।</div>`; render.innerHTML=`<div class="payment-method-panel" style="--method-bg:${data.bg}"><div class="method-head"><img class="method-logo" src="images/${data.logo}" alt="${data.name}"><h2>${data.name}</h2><div class="pay-amount-pill"><span>Amount:</span><strong>${isMobile?bdt:usd}</strong></div></div><div class="method-body">${qr}<div class="copy-line"><div class="address-box"><div class="address-label" id="walletTag">${isMobile?data.name+' Number':isBinance?'Binance Wallet ID':data.name+' Address'}</div><div class="address-value" id="paymentNumber">${data.number}</div></div><button type="button" class="copy-btn2" onclick="copyTextValue('paymentNumber','Payment info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div>${openBtn}${isCoin?'<div class="coin-note">Network অবশ্যই মিলিয়ে পাঠাবেন। ভুল network বা ভুল address এ পাঠালে payment recover করা সম্ভব নাও হতে পারে।</div>':''}<div class="instruction-list">${first}<div class="instruction-item">নিচে আপনার <b>${data.tx}</b> দিন এবং VERIFY button click করুন।</div></div><div class="tx-box"><input id="transactionId" type="text" placeholder="Paste ${data.tx}" autocomplete="off"></div><button id="submitTopupBtn" class="flow-primary" type="button" onclick="submitTopup()">VERIFY</button></div></div>`;}
+    window.syncPaymentMirror=function(){if(typeof window.handleAmountChange==='function') window.handleAmountChange(); const usd=document.getElementById('selectedUsdAmount')?.textContent||'$1'; const bdt=document.getElementById('selectedBdtAmount')?.textContent||'৳125'; const um=document.getElementById('selectedUsdMirror'), bm=document.getElementById('selectedBdtMirror'); if(um)um.textContent=usd; if(bm)bm.textContent=bdt;};
+    document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{syncPaymentMirror();},300);});
   </script>
+
 
   <script src="js/lang.js" defer></script>
   <script src="js/main.js" defer></script>
