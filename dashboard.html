@@ -120,7 +120,7 @@
     @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
   </style>
 </head>
-<body onload="loadUserDashboard()">
+<body class="has-bottom-nav" onload="loadUserDashboard()">
 
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
@@ -349,6 +349,7 @@
 
 <style>
 #floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
+    #floatChatToggle { display:none !important; }
 
 body.has-bottom-nav #floatChatWidget { bottom:100px; right:16px; z-index:2500; }
 #floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(0,200,255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#00c8ff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,200,255,.22); transition:transform .2s,box-shadow .2s; position:relative; }
