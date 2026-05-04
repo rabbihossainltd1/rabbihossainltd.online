@@ -145,17 +145,28 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 }
 
 .nav-hamburger {
-  display: none; flex-direction: column; gap: 5px;
-  cursor: pointer; padding: 6px; border-radius: var(--radius-xs);
-  transition: background var(--transition);
-  background: none; border: none; outline: none;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background .18s;
+  background: none;
+  border: none;
+  outline: none;
+  align-items: center;
+  justify-content: center;
   -webkit-tap-highlight-color: transparent;
 }
-.nav-hamburger:hover { background: var(--surface-2); }
+.nav-hamburger:hover { background: rgba(255,255,255,.07); }
 .nav-hamburger span {
-  display: block; width: 22px; height: 1.5px;
-  background: var(--text-primary); border-radius: 2px;
-  transition: all var(--transition);
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .18s;
 }
 
 /* ============================================================ BUTTONS ============================================================ */
@@ -564,107 +575,106 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 @media (max-width: 768px) {
   :root { --nav-h: 62px; }
   .nav-links, .nav-cta { display: none; }
-  .nav-hamburger { display: flex; }
+  .nav-hamburger { display: flex; flex-direction: column; }
 
-  /* Mobile menu — left drawer (compact & professional) */
+  /* ── Mobile Drawer ── */
   .nav-links.open {
     display: flex;
     flex-direction: column;
     position: fixed;
     top: 0; left: 0;
-    width: min(76vw, 272px);
+    width: 260px;
     height: 100vh;
-    background: rgba(6,12,22,0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #080f1c;
     z-index: 1002;
     padding: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 12px 0 50px rgba(0,0,0,0.75), 1px 0 0 rgba(0,200,255,0.1);
-    animation: slideInLeft 0.24s cubic-bezier(0.4,0,0.2,1) both;
+    border-right: 1px solid rgba(0,200,255,.1);
+    box-shadow: 8px 0 40px rgba(0,0,0,.7);
+    animation: slideInLeft .22s cubic-bezier(.4,0,.2,1) both;
     pointer-events: all;
-    border-right: 1px solid rgba(0,200,255,0.08);
   }
-
   @keyframes slideInLeft {
-    from { transform: translateX(-100%); opacity: 0.6; }
-    to   { transform: translateX(0);     opacity: 1; }
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
   }
 
-  /* Drawer header */
+  /* Header */
   .nav-links.open::before {
     content: 'Rabbi Hossain';
-    display: block !important;
+    display: flex !important;
+    align-items: center;
     font-family: var(--font-display);
-    font-size: .95rem;
+    font-size: .92rem;
     font-weight: 900;
-    color: var(--text-primary);
-    padding: 20px 16px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    letter-spacing: -0.02em;
+    color: #e8edf5;
+    padding: 18px 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    letter-spacing: -.01em;
     flex-shrink: 0;
     position: sticky;
     top: 0;
-    background: rgba(6,12,22,0.98);
+    background: #080f1c;
     z-index: 2;
   }
 
-  /* Each menu item row */
+  /* List items */
   .nav-links.open li {
     flex-shrink: 0;
-    padding: 3px 10px;
+    padding: 2px 8px;
   }
-  .nav-links.open li:first-child { padding-top: 8px; }
-  .nav-links.open li:last-child { padding-bottom: 8px; }
+  .nav-links.open li:first-child { padding-top: 10px; }
+  .nav-links.open li:last-child  { padding-bottom: 10px; }
 
+  /* Links */
   .nav-links.open a {
     display: flex;
     align-items: center;
-    gap: 11px;
+    gap: 12px;
     width: 100%;
-    font-size: .88rem;
+    font-size: .875rem;
     font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    padding: 10px 12px;
-    border-radius: 11px;
-    color: #8faec9;
-    transition: background .16s, color .16s;
+    font-weight: 600;
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: #7a9ab8;
+    transition: background .15s, color .15s;
+    text-decoration: none;
     pointer-events: all;
     position: relative;
     z-index: 1;
-    text-decoration: none;
   }
   .nav-links.open a::after { display: none; }
-  .nav-links.open a:hover { background: rgba(255,255,255,.05); color: #e8edf5; }
+  .nav-links.open a:hover  { background: rgba(255,255,255,.05); color: #cfe0f0; }
   .nav-links.open a.active {
     background: rgba(0,200,255,.1);
-    color: var(--accent);
-    border: 1px solid rgba(0,200,255,.18);
+    color: #00c8ff;
+    border: 1px solid rgba(0,200,255,.15);
   }
 
-  /* Icon */
+  /* Icon box */
   .nav-links.open a .nav-icon {
-    width: 32px; height: 32px;
+    width: 34px; height: 34px;
     background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    transition: background .16s, border-color .16s;
-    order: 0;
+    transition: background .15s, border-color .15s;
   }
-  .nav-links.open a:hover .nav-icon { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.14); }
-  .nav-links.open a.active .nav-icon { background: rgba(0,200,255,.14); border-color: rgba(0,200,255,.28); }
+  .nav-links.open a:hover  .nav-icon { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); }
+  .nav-links.open a.active .nav-icon { background: rgba(0,200,255,.12); border-color: rgba(0,200,255,.25); }
   .nav-links.open a .nav-icon svg {
-    width: 15px; height: 15px;
-    color: #5a7a9a;
-    transition: color .16s;
+    width: 16px; height: 16px;
+    color: #4a6a88;
+    transition: color .15s;
+    stroke-width: 1.8;
   }
-  .nav-links.open a:hover .nav-icon svg { color: #9ab8d4; }
-  .nav-links.open a.active .nav-icon svg { color: var(--accent); }
-  .section { padding: 72px 0; }
+  .nav-links.open a:hover  .nav-icon svg { color: #8ab0cc; }
+  .nav-links.open a.active .nav-icon svg { color: #00c8ff; }
+
+  .section { padding: 72px 0; }  .section { padding: 72px 0; }
   .contact-section { padding: 72px 0; }
   .nav-cards-grid { grid-template-columns: 1fr; }
   .hero-stats { gap: 24px; flex-wrap: wrap; }
@@ -738,19 +748,17 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
     flex-direction: column;
     position: fixed;
     top: 0; left: 0;
-    width: min(76vw, 272px);
+    width: 260px;
     height: 100vh;
-    background: rgba(6,12,22,0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #080f1c;
     z-index: 1205;
     padding: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 12px 0 50px rgba(0,0,0,0.75), 1px 0 0 rgba(0,200,255,0.1);
-    animation: slideInLeft 0.24s cubic-bezier(0.4,0,0.2,1) both;
+    border-right: 1px solid rgba(0,200,255,.1);
+    box-shadow: 8px 0 40px rgba(0,0,0,.7);
+    animation: slideInLeft .22s cubic-bezier(.4,0,.2,1) both;
     pointer-events: auto;
-    border-right: 1px solid rgba(0,200,255,0.08);
   }
 
   .nav-links.open a {
@@ -791,21 +799,22 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
     display: flex;
   }
 
-  /* Drawer header — defined above, kept in sync */
+  /* Drawer header (duplicate sync) */
   .nav-links.open::before {
     content: 'Rabbi Hossain';
-    display: block !important;
+    display: flex !important;
+    align-items: center;
     font-family: var(--font-display);
-    font-size: .95rem;
+    font-size: .92rem;
     font-weight: 900;
-    color: var(--text-primary);
-    padding: 20px 16px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    letter-spacing: -0.02em;
+    color: #e8edf5;
+    padding: 18px 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    letter-spacing: -.01em;
     flex-shrink: 0;
     position: sticky;
     top: 0;
-    background: rgba(6,12,22,0.98);
+    background: #080f1c;
     z-index: 2;
   }
   .nav-links.open::before span {
