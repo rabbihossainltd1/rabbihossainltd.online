@@ -1046,7 +1046,7 @@
   }
 
   function injectBottomNavigation() {
-    if (document.getElementById('rabbiBottomNav')) return;
+    if (document.getElementById('rabbiBottomNav')) return; // Already in HTML
     document.body.classList.add('has-bottom-nav');
     const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
     const qs = new URLSearchParams(location.search);
