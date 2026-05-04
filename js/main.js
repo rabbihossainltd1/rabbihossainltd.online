@@ -17,8 +17,12 @@ document.body.appendChild(backdrop);
 function setHamburgerState(isOpen) {
 if (!hamburger) return;
 hamburger.setAttribute('aria-expanded', String(isOpen));
-const circle = hamburger.querySelector('.menuicon__circle');
-if (circle) circle.classList.toggle('is-open', isOpen);
+const spans = hamburger.querySelectorAll('span');
+if (spans.length >= 3) {
+spans[0].style.transform = isOpen ? 'rotate(45deg) translate(5px, 5px)' : '';
+spans[1].style.opacity = isOpen ? '0' : '';
+spans[2].style.transform = isOpen ? 'rotate(-45deg) translate(5px, -5px)' : '';
+}
 }
 function openMenu() {
 if (!navLinks) return;
