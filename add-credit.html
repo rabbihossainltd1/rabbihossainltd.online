@@ -16,7 +16,7 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Credit | Rabbi Hossain LTD</title>
-  <meta name="description" content="Secure payment page for wallet credit. Mobile Banking or Crypto." />
+  <meta name="description" content="Secure payment page for wallet credit." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
   <style>
     :root{
       --bkash:#E2136E;--nagad:#F05A28;--rocket:#8B2FC9;--binance:#F3BA2F;
-      --pay-bg:#040608;--pay-border:rgba(255,255,255,0.07);
+      --pay-bg:#040608;
       --pay-text:#eef2ff;--pay-muted:#7a8fb5;
       --pay-success:#00e87a;--pay-accent:#4f8fff;--pay-accent-2:#00c8ff;
       --font-display:'Outfit',sans-serif;--font-body:'Manrope',sans-serif;
@@ -38,209 +38,188 @@
     body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 10% -10%,rgba(79,143,255,.14) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 90% 10%,rgba(0,232,122,.09) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 50% 100%,rgba(79,143,255,.06) 0%,transparent 60%);pointer-events:none;}
     body::after{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,black 0%,transparent 70%);pointer-events:none;}
 
-    .payment-page{min-height:100vh;padding:130px 20px 200px;position:relative;z-index:1;}
-    .payment-shell{width:min(1140px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:24px;align-items:start;}
-    @media(max-width:860px){.payment-shell{grid-template-columns:1fr;}}
+    .payment-page{min-height:100vh;padding:100px 20px 160px;position:relative;z-index:1;}
+    .payment-shell{width:min(560px,100%);margin:0 auto;}
 
-    /* Header */
-    .payment-header{grid-column:1/-1;text-align:center;margin-bottom:12px;animation:fadeUp .7s ease both;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-    .payment-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:999px;border:1px solid rgba(0,232,122,.2);background:rgba(0,232,122,.06);color:#7fffc4;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;}
-    .payment-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--pay-success);box-shadow:0 0 8px var(--pay-success);animation:pulse 2s infinite;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-    .payment-header h1{font-family:var(--font-display);font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;line-height:1;letter-spacing:-.02em;margin-bottom:14px;}
-    .payment-header h1 span{background:linear-gradient(135deg,var(--pay-accent-2),var(--pay-success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-    .payment-header p{color:var(--pay-muted);line-height:1.75;margin:0 auto;max-width:600px;font-size:.95rem;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-    /* Cards */
-    .payment-card,.payment-history-card,#authRequired{background:rgba(12,16,28,.85);border:1px solid rgba(255,255,255,.07);border-radius:28px;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 40px 100px rgba(0,0,0,.5);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);overflow:hidden;animation:fadeUp .7s ease both;animation-delay:.1s;}
-    #authRequired{max-width:620px;margin:0 auto;padding:40px;text-align:center;display:none;}
-    #authRequired h1{font-family:var(--font-display);font-size:2.4rem;margin-bottom:12px;}
+    /* Auth required */
+    #authRequired{background:rgba(12,16,28,.85);border:1px solid rgba(255,255,255,.07);border-radius:28px;box-shadow:0 40px 100px rgba(0,0,0,.5);backdrop-filter:blur(24px);padding:40px;text-align:center;display:none;animation:fadeUp .7s ease both;}
+    #authRequired h1{font-family:var(--font-display);font-size:2.2rem;margin-bottom:12px;}
     #authRequired p{color:var(--pay-muted);line-height:1.7;margin-bottom:24px;}
-    .payment-card-inner{padding:28px;}
+
+    /* Main card */
+    .payment-card{background:rgba(12,16,28,.85);border:1px solid rgba(255,255,255,.07);border-radius:28px;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 40px 100px rgba(0,0,0,.5);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);overflow:hidden;animation:fadeUp .6s ease both;}
+    .payment-card-inner{padding:26px;}
 
     /* Step system */
-    .step-screen{display:none;animation:fadeUp .35s ease both;}
+    .step-screen{display:none;animation:fadeUp .3s ease both;}
     .step-screen.active{display:block;}
 
-    /* Back button */
-    .back-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:none;color:var(--pay-muted);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:.84rem;padding:0;margin-bottom:20px;transition:color .18s;}
+    /* Back button — arrow only, no text beside it */
+    .back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--pay-muted);cursor:pointer;font-family:var(--font-body);font-weight:700;font-size:.84rem;padding:0;margin-bottom:22px;transition:color .18s;}
     .back-btn:hover{color:var(--pay-text);}
-    .back-btn svg{width:15px;height:15px;}
+    .back-btn svg{width:18px;height:18px;}
 
-    .section-label{font-size:.68rem;font-weight:700;letter-spacing:.14em;color:var(--pay-muted);text-transform:uppercase;margin:0 0 14px;}
+    .section-label{font-size:.66rem;font-weight:700;letter-spacing:.14em;color:var(--pay-muted);text-transform:uppercase;margin:0 0 16px;}
 
-    /* Purpose row */
-    .purpose-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:26px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.06);}
-    .purpose-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:14px;border:1px solid rgba(79,143,255,.2);background:rgba(79,143,255,.07);color:#a8c4ff;font-size:.82rem;font-weight:700;}
-    .purpose-chip svg{width:15px;height:15px;opacity:.8;}
-    .balance-mini{text-align:right;color:var(--pay-muted);font-size:.8rem;line-height:1.5;}
-    .balance-mini strong{display:block;color:var(--pay-success);font-family:var(--font-display);font-size:1.15rem;}
+    /* ── STEP 1: Amount input ── */
+    .amount-input-box{margin-bottom:20px;}
+    .amount-input-box label{display:block;color:#bcc8e0;font-weight:700;margin-bottom:10px;font-size:.86rem;}
+    .amount-input-row{display:flex;align-items:center;gap:0;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;transition:border-color .18s,box-shadow .18s;}
+    .amount-input-row:focus-within{border-color:rgba(79,143,255,.5);box-shadow:0 0 0 3px rgba(79,143,255,.1);}
+    .amount-prefix{padding:0 14px;color:var(--pay-success);font-family:var(--font-display);font-size:1.3rem;font-weight:900;flex-shrink:0;}
+    .amount-input-row input{flex:1;min-height:56px;background:transparent;border:none;outline:none;color:var(--pay-text);font-size:1.1rem;font-weight:800;font-family:var(--font-display);padding:13px 0;}
+    .amount-input-row input::placeholder{color:rgba(122,143,181,.5);font-weight:600;font-size:.95rem;}
+    .amount-bdt-badge{padding:0 16px;color:var(--pay-muted);font-size:.82rem;font-weight:700;flex-shrink:0;white-space:nowrap;}
 
-    /* Preset grid */
-    .preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
-    .preset-btn{border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.035);padding:14px 8px;cursor:pointer;color:var(--pay-text);font-family:var(--font-body);font-weight:800;transition:all .2s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center;gap:4px;}
-    .preset-btn .usd-val{font-family:var(--font-display);font-size:1.15rem;font-weight:900;color:var(--pay-success);}
-    .preset-btn .bdt-val{font-size:.72rem;color:var(--pay-muted);font-weight:600;}
-    .preset-btn:hover,.preset-btn.selected{border-color:rgba(0,232,122,.4);background:rgba(0,232,122,.08);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,232,122,.1);}
-
-    .custom-input-wrap{margin-bottom:16px;}
-    .custom-input-wrap label{display:block;color:#bcc8e0;font-weight:700;margin-bottom:8px;font-size:.84rem;}
-    .custom-input-wrap input{width:100%;min-height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.3);color:var(--pay-text);outline:none;padding:13px 16px;font-size:.96rem;font-weight:700;font-family:var(--font-body);transition:border-color .18s,box-shadow .18s;}
-    .custom-input-wrap input:focus{border-color:rgba(79,143,255,.5);box-shadow:0 0 0 3px rgba(79,143,255,.1);}
-
-    .amount-display{background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.14);border-radius:18px;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
-    .amount-display-item span{display:block;color:var(--pay-muted);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
-    .amount-display-item strong{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--pay-success);letter-spacing:-.02em;}
-
-    /* Category buttons */
+    /* ── Category buttons ── */
     .category-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .category-btn{border:1px solid rgba(255,255,255,.08);border-radius:22px;background:rgba(255,255,255,.03);padding:28px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--pay-text);transition:all .25s cubic-bezier(.34,1.56,.64,1);}
+    .category-btn{border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(255,255,255,.03);padding:26px 14px 20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--pay-text);transition:all .25s cubic-bezier(.34,1.56,.64,1);width:100%;}
     .category-btn:hover{transform:translateY(-4px) scale(1.02);}
-    .category-btn.mobile:hover{border-color:rgba(0,232,122,.4);background:rgba(0,232,122,.06);box-shadow:0 16px 48px rgba(0,232,122,.1);}
-    .category-btn.crypto:hover{border-color:rgba(243,186,47,.4);background:rgba(243,186,47,.06);box-shadow:0 16px 48px rgba(243,186,47,.1);}
-    .category-icon{width:64px;height:64px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.95);padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.3);}
+    .category-btn.mobile:hover{border-color:rgba(0,232,122,.4);background:rgba(0,232,122,.06);box-shadow:0 16px 40px rgba(0,232,122,.1);}
+    .category-btn.crypto:hover{border-color:rgba(243,186,47,.4);background:rgba(243,186,47,.06);box-shadow:0 16px 40px rgba(243,186,47,.1);}
+    .category-icon{width:60px;height:60px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.95);padding:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.3);}
     .category-icon img{width:100%;height:100%;object-fit:contain;}
-    .category-label{font-family:var(--font-display);font-size:1rem;font-weight:800;}
-    .category-sub{font-size:.74rem;color:var(--pay-muted);text-align:center;line-height:1.5;}
+    .category-label{font-family:var(--font-display);font-size:.95rem;font-weight:800;}
+    .category-sub{font-size:.71rem;color:var(--pay-muted);text-align:center;line-height:1.5;}
 
-    /* Sub-option grid */
+    /* ── Sub-option (bKash/Nagad/Rocket | Binance/Coin) ── */
     .suboption-grid{display:grid;gap:12px;}
     .suboption-grid.col-3{grid-template-columns:repeat(3,1fr);}
     .suboption-grid.col-2{grid-template-columns:repeat(2,1fr);}
-    .suboption-btn{border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(255,255,255,.035);padding:22px 12px 18px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--pay-text);transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+    .suboption-btn{border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.03);padding:20px 10px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--pay-text);transition:all .22s cubic-bezier(.34,1.56,.64,1);width:100%;}
     .suboption-btn:hover{transform:translateY(-3px) scale(1.03);}
-    .suboption-btn.bkash:hover{border-color:rgba(226,19,110,.5);background:rgba(226,19,110,.09);box-shadow:0 10px 32px rgba(226,19,110,.15);}
-    .suboption-btn.nagad:hover{border-color:rgba(240,90,40,.5);background:rgba(240,90,40,.09);box-shadow:0 10px 32px rgba(240,90,40,.15);}
-    .suboption-btn.rocket:hover{border-color:rgba(139,47,201,.5);background:rgba(139,47,201,.09);box-shadow:0 10px 32px rgba(139,47,201,.15);}
-    .suboption-btn.binance:hover{border-color:rgba(243,186,47,.5);background:rgba(243,186,47,.08);box-shadow:0 10px 32px rgba(243,186,47,.12);}
-    .suboption-btn.coin:hover{border-color:rgba(79,143,255,.5);background:rgba(79,143,255,.08);box-shadow:0 10px 32px rgba(79,143,255,.12);}
-    .suboption-icon{width:54px;height:54px;border-radius:15px;overflow:hidden;background:rgba(255,255,255,.97);padding:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+    .suboption-btn.bkash:hover{border-color:rgba(226,19,110,.5);background:rgba(226,19,110,.09);box-shadow:0 10px 30px rgba(226,19,110,.15);}
+    .suboption-btn.nagad:hover{border-color:rgba(240,90,40,.5);background:rgba(240,90,40,.09);box-shadow:0 10px 30px rgba(240,90,40,.15);}
+    .suboption-btn.rocket:hover{border-color:rgba(139,47,201,.5);background:rgba(139,47,201,.09);box-shadow:0 10px 30px rgba(139,47,201,.15);}
+    .suboption-btn.binance:hover{border-color:rgba(243,186,47,.5);background:rgba(243,186,47,.08);box-shadow:0 10px 30px rgba(243,186,47,.12);}
+    .suboption-btn.coin:hover{border-color:rgba(79,143,255,.5);background:rgba(79,143,255,.08);box-shadow:0 10px 30px rgba(79,143,255,.12);}
+    .suboption-icon{width:50px;height:50px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.97);padding:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);}
     .suboption-icon img{width:100%;height:100%;object-fit:contain;}
-    .suboption-name{font-weight:800;font-size:.9rem;}
-    .suboption-tag{color:var(--pay-muted);font-size:.68rem;}
+    .suboption-name{font-weight:800;font-size:.88rem;}
+    .suboption-tag{color:var(--pay-muted);font-size:.66rem;}
 
-    /* Coin grid */
-    .coin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:10px;}
-    .coin-btn{border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.03);padding:16px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--pay-text);transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+    /* ── Coin grid ── */
+    .coin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;}
+    .coin-btn{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03);padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--pay-text);transition:all .22s cubic-bezier(.34,1.56,.64,1);width:100%;}
     .coin-btn:hover{border-color:rgba(79,143,255,.45);background:rgba(79,143,255,.08);transform:translateY(-3px);box-shadow:0 10px 28px rgba(79,143,255,.12);}
-    .coin-icon{width:44px;height:44px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.97);padding:6px;box-shadow:0 3px 10px rgba(0,0,0,.25);}
+    .coin-icon{width:40px;height:40px;border-radius:11px;overflow:hidden;background:rgba(255,255,255,.97);padding:5px;box-shadow:0 3px 10px rgba(0,0,0,.25);}
     .coin-icon img{width:100%;height:100%;object-fit:contain;}
-    .coin-name{font-weight:800;font-size:.78rem;text-align:center;}
-    .coin-chain{font-size:.62rem;color:var(--pay-muted);font-weight:600;text-align:center;}
+    .coin-name{font-weight:800;font-size:.75rem;text-align:center;}
+    .coin-chain{font-size:.6rem;color:var(--pay-muted);font-weight:600;text-align:center;}
 
-    /* Mobile pay panel */
-    .pay-panel{border-radius:22px;padding:22px;margin-bottom:20px;}
-    .pay-panel.bkash-theme{background:rgba(226,19,110,.07);border:1px solid rgba(226,19,110,.22);}
-    .pay-panel.nagad-theme{background:rgba(240,90,40,.07);border:1px solid rgba(240,90,40,.22);}
-    .pay-panel.rocket-theme{background:rgba(139,47,201,.07);border:1px solid rgba(139,47,201,.22);}
-    .pay-panel-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06);}
-    .pay-panel-logo{width:46px;height:46px;border-radius:13px;overflow:hidden;background:#fff;padding:7px;box-shadow:0 4px 14px rgba(0,0,0,.3);flex-shrink:0;}
+    /* ── Mobile payment panel (themed) ── */
+    .pay-panel{border-radius:20px;padding:20px;margin-bottom:18px;}
+    .pay-panel.bkash-theme{background:rgba(226,19,110,.07);border:1px solid rgba(226,19,110,.2);}
+    .pay-panel.nagad-theme{background:rgba(240,90,40,.07);border:1px solid rgba(240,90,40,.2);}
+    .pay-panel.rocket-theme{background:rgba(139,47,201,.07);border:1px solid rgba(139,47,201,.2);}
+
+    .pay-panel-header{display:flex;align-items:center;gap:11px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+    .pay-panel-logo{width:42px;height:42px;border-radius:12px;overflow:hidden;background:#fff;padding:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);flex-shrink:0;}
     .pay-panel-logo img{width:100%;height:100%;object-fit:contain;}
-    .pay-panel-title{font-family:var(--font-display);font-weight:800;font-size:1rem;}
-    .pay-panel-sub{font-size:.75rem;color:var(--pay-muted);margin-top:2px;}
-    .pay-step-list{display:flex;flex-direction:column;gap:12px;margin-bottom:4px;}
-    .pay-step-row{display:flex;gap:12px;align-items:flex-start;font-size:.86rem;color:#c8d4ee;line-height:1.6;}
-    .pay-step-num{width:24px;height:24px;flex-shrink:0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.74rem;font-family:var(--font-display);margin-top:1px;}
+    .pay-panel-title{font-family:var(--font-display);font-weight:800;font-size:.95rem;}
+    .pay-panel-sub{font-size:.72rem;color:var(--pay-muted);margin-top:2px;}
+
+    /* Step rows inside panel */
+    .pay-step-list{display:flex;flex-direction:column;gap:0;}
+    .pay-step-row{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.84rem;color:#c8d4ee;line-height:1.65;}
+    .pay-step-row:last-child{border-bottom:none;}
+    .pay-step-num{width:22px;height:22px;flex-shrink:0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem;font-family:var(--font-display);margin-top:2px;}
     .bkash-theme .pay-step-num{background:rgba(226,19,110,.15);color:#ff6699;}
     .nagad-theme .pay-step-num{background:rgba(240,90,40,.15);color:#ff9966;}
     .rocket-theme .pay-step-num{background:rgba(139,47,201,.15);color:#cc88ff;}
-    .highlight-bkash{color:#ff6699;font-weight:900;font-size:.98rem;}
-    .highlight-nagad{color:#ff9966;font-weight:900;font-size:.98rem;}
-    .highlight-rocket{color:#cc88ff;font-weight:900;font-size:.98rem;}
 
-    /* Info rows */
-    .info-stack{display:grid;gap:10px;margin-bottom:18px;}
-    .info-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
-    .info-tag{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--pay-muted);margin-bottom:5px;font-weight:700;}
-    .info-value{color:var(--pay-text);font-size:1.22rem;font-weight:800;letter-spacing:.02em;font-family:var(--font-display);word-break:break-word;}
-    .info-value.amount-val{color:var(--pay-success);font-size:1.45rem;}
-    .copy-btn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--pay-muted);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0;}
-    .copy-btn svg{width:16px;height:16px;}
-    .copy-btn:hover,.copy-btn.copied{color:var(--pay-success);border-color:rgba(0,232,122,.3);background:rgba(0,232,122,.07);}
+    /* Inline copy row inside step — wallet number & amount */
+    .inline-copy-row{display:flex;align-items:center;gap:7px;margin-top:4px;}
+    .inline-val{font-weight:900;font-size:1rem;letter-spacing:.01em;}
+    .bkash-theme .inline-val{color:#ff6699;}
+    .nagad-theme .inline-val{color:#ff9966;}
+    .rocket-theme .inline-val{color:#cc88ff;}
+    .inline-copy-btn{display:inline-flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--pay-muted);padding:4px;border-radius:7px;transition:color .16s,background .16s;flex-shrink:0;}
+    .inline-copy-btn svg{width:15px;height:15px;}
+    .inline-copy-btn:hover,.inline-copy-btn.copied{color:var(--pay-success);}
 
-    .pay-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:20px 0;}
-
-    /* Form */
+    /* Transaction field & submit */
+    .pay-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:18px 0;}
     .pay-field{margin-bottom:14px;}
-    .pay-field label{display:block;color:#bcc8e0;font-weight:700;margin-bottom:8px;font-size:.84rem;}
-    .pay-field input{width:100%;min-height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.3);color:var(--pay-text);outline:none;padding:13px 16px;font-size:.96rem;font-weight:700;font-family:var(--font-body);letter-spacing:.05em;transition:border-color .18s,box-shadow .18s;}
+    .pay-field label{display:block;color:#bcc8e0;font-weight:700;margin-bottom:8px;font-size:.83rem;}
+    .pay-field input{width:100%;min-height:52px;border-radius:15px;border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.3);color:var(--pay-text);outline:none;padding:13px 16px;font-size:.95rem;font-weight:700;font-family:var(--font-body);letter-spacing:.04em;transition:border-color .18s,box-shadow .18s;}
     .pay-field input:focus{border-color:rgba(79,143,255,.5);box-shadow:0 0 0 3px rgba(79,143,255,.1);}
 
-    /* Submit */
-    .submit-btn{width:100%;border:none;border-radius:16px;padding:18px 20px;cursor:pointer;color:#02050a;background:linear-gradient(135deg,var(--pay-accent),var(--pay-accent-2),var(--pay-success));background-size:200% 200%;font-weight:900;font-size:.98rem;font-family:var(--font-display);letter-spacing:.01em;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 10px 40px rgba(79,143,255,.25);transition:all .24s;animation:gradientShift 4s ease infinite;margin-bottom:12px;}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .submit-btn{width:100%;border:none;border-radius:15px;padding:17px 20px;cursor:pointer;color:#02050a;background:linear-gradient(135deg,var(--pay-accent),var(--pay-accent-2),var(--pay-success));background-size:200% 200%;font-weight:900;font-size:.96rem;font-family:var(--font-display);letter-spacing:.01em;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 10px 40px rgba(79,143,255,.25);transition:all .24s;animation:gradientShift 4s ease infinite;margin-bottom:10px;}
     .submit-btn:hover{transform:translateY(-2px);box-shadow:0 16px 50px rgba(79,143,255,.3);}
-    .submit-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;animation:none;box-shadow:none;}
-    .submit-btn svg{width:18px;height:18px;}
-    .back-link{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--pay-muted);font-weight:700;margin-top:10px;width:100%;font-size:.88rem;padding:8px;transition:color .18s;}
-    .back-link:hover{color:var(--pay-text);}
+    .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;animation:none;box-shadow:none;}
+    .submit-btn svg{width:17px;height:17px;}
 
-    /* Messages */
-    .wallet-message{display:none;padding:14px 16px;border-radius:14px;font-size:.9rem;line-height:1.6;font-weight:500;margin-bottom:14px;}
+    .wallet-message{display:none;padding:12px 15px;border-radius:13px;font-size:.88rem;line-height:1.6;font-weight:500;margin-bottom:13px;}
     .wallet-message.success{display:block;color:#a0ffcf;background:rgba(0,232,122,.07);border:1px solid rgba(0,232,122,.2);}
     .wallet-message.error{display:block;color:#ffb0b0;background:rgba(255,80,80,.07);border:1px solid rgba(255,80,80,.2);}
 
-    /* Amount note */
-    .amount-note{background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.15);border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    .amount-note span{color:var(--pay-muted);font-size:.8rem;}
-    .amount-note strong{color:var(--pay-success);font-family:var(--font-display);font-size:1rem;}
-
-    /* Binance */
-    .binance-amount-note{background:rgba(243,186,47,.06);border:1px solid rgba(243,186,47,.18);border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    .binance-amount-note span{color:rgba(201,162,39,.85);font-size:.8rem;}
-    .binance-amount-note strong{color:#f3ba2f;font-family:var(--font-display);font-size:1rem;}
-    .binance-qr-box{background:rgba(243,186,47,.05);border:1px solid rgba(243,186,47,.18);border-radius:22px;padding:24px;margin-bottom:20px;text-align:center;}
-    .binance-qr-title{color:#f3ba2f;font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;justify-content:center;}
-    .binance-qr-wrap{width:176px;height:176px;margin:0 auto 18px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(243,186,47,.15);}
-    .binance-qr-wrap img{width:156px;height:156px;object-fit:contain;border-radius:12px;}
-    .wallet-id-row{background:rgba(0,0,0,.25);border:1px solid rgba(243,186,47,.16);border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;text-align:left;}
-    .wallet-id-label{color:rgba(138,112,64,.9);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-    .wallet-id-val{color:#f3ba2f;font-weight:800;font-size:.98rem;font-family:var(--font-display);}
-    .binance-open-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border-radius:14px;background:linear-gradient(135deg,#f3ba2f,#e8a410);color:#1a0c00;font-weight:900;font-size:.9rem;font-family:var(--font-display);text-decoration:none;box-shadow:0 8px 30px rgba(243,186,47,.2);margin-bottom:12px;transition:all .2s;}
-    .binance-open-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(243,186,47,.3);}
-    .binance-hint{color:rgba(138,112,64,.7);font-size:.74rem;margin-bottom:18px;}
-    .instr-box{border-radius:14px;padding:14px 16px;margin-bottom:18px;text-align:left;}
-    .instr-box.gold{background:rgba(243,186,47,.05);border:1px solid rgba(243,186,47,.14);}
-    .instr-box.blue{background:rgba(79,143,255,.05);border:1px solid rgba(79,143,255,.14);}
-    .instr-title{font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+    /* ── Binance panel ── */
+    .binance-amount-note{background:rgba(243,186,47,.06);border:1px solid rgba(243,186,47,.16);border-radius:13px;padding:11px 15px;margin-bottom:15px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .binance-amount-note span{color:rgba(201,162,39,.85);font-size:.78rem;}
+    .binance-amount-note strong{color:#f3ba2f;font-family:var(--font-display);font-size:.98rem;}
+    .binance-qr-box{background:rgba(243,186,47,.04);border:1px solid rgba(243,186,47,.16);border-radius:20px;padding:22px;margin-bottom:18px;text-align:center;}
+    .binance-qr-title{color:#f3ba2f;font-weight:800;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:7px;justify-content:center;}
+    .binance-qr-wrap{width:170px;height:170px;margin:0 auto 16px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 36px rgba(0,0,0,.35),0 0 0 1px rgba(243,186,47,.14);}
+    .binance-qr-wrap img{width:152px;height:152px;object-fit:contain;border-radius:10px;}
+    .wallet-id-row{background:rgba(0,0,0,.22);border:1px solid rgba(243,186,47,.14);border-radius:13px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;text-align:left;}
+    .wallet-id-label{color:rgba(138,112,64,.85);font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+    .wallet-id-val{color:#f3ba2f;font-weight:800;font-size:.96rem;font-family:var(--font-display);}
+    .copy-btn-sm{display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid rgba(255,255,255,.09);border-radius:10px;width:34px;height:34px;cursor:pointer;color:var(--pay-muted);transition:all .16s;flex-shrink:0;}
+    .copy-btn-sm svg{width:14px;height:14px;}
+    .copy-btn-sm:hover,.copy-btn-sm.copied{color:var(--pay-success);border-color:rgba(0,232,122,.3);background:rgba(0,232,122,.07);}
+    .binance-open-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:13px;background:linear-gradient(135deg,#f3ba2f,#e8a410);color:#1a0c00;font-weight:900;font-size:.88rem;font-family:var(--font-display);text-decoration:none;box-shadow:0 8px 28px rgba(243,186,47,.2);margin-bottom:11px;transition:all .2s;}
+    .binance-open-btn:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(243,186,47,.3);}
+    .binance-hint{color:rgba(138,112,64,.65);font-size:.72rem;margin-bottom:16px;}
+    .instr-box{border-radius:13px;padding:13px 15px;margin-bottom:16px;text-align:left;}
+    .instr-box.gold{background:rgba(243,186,47,.04);border:1px solid rgba(243,186,47,.12);}
+    .instr-box.blue{background:rgba(79,143,255,.04);border:1px solid rgba(79,143,255,.12);}
+    .instr-title{font-weight:800;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px;}
     .instr-title.gold{color:#f3ba2f;}
     .instr-title.blue{color:var(--pay-accent);}
-    .instr-step{display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.55;margin-bottom:8px;}
+    .instr-step{display:flex;gap:9px;align-items:flex-start;font-size:.82rem;line-height:1.55;margin-bottom:7px;}
     .instr-step:last-child{margin-bottom:0;}
     .instr-step.gold{color:#c9a227;}
     .instr-step.blue{color:#c9d6ef;}
-    .step-num-badge{font-weight:800;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.74rem;font-family:var(--font-display);}
+    .step-num-badge{font-weight:800;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;font-family:var(--font-display);}
     .step-num-badge.gold{background:rgba(243,186,47,.15);color:#f3ba2f;}
     .step-num-badge.blue{background:rgba(79,143,255,.15);color:var(--pay-accent);}
 
-    /* Crypto coin */
-    .crypto-pay-box{background:rgba(79,143,255,.05);border:1px solid rgba(79,143,255,.18);border-radius:22px;padding:24px;margin-bottom:20px;text-align:center;}
-    .crypto-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;justify-content:center;}
-    .crypto-logo{width:48px;height:48px;border-radius:14px;overflow:hidden;background:#fff;padding:6px;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+    /* ── Crypto coin panel ── */
+    .crypto-pay-box{background:rgba(79,143,255,.04);border:1px solid rgba(79,143,255,.16);border-radius:20px;padding:22px;margin-bottom:18px;text-align:center;}
+    .crypto-header{display:flex;align-items:center;gap:11px;margin-bottom:18px;justify-content:center;}
+    .crypto-logo{width:44px;height:44px;border-radius:13px;overflow:hidden;background:#fff;padding:5px;box-shadow:0 4px 12px rgba(0,0,0,.25);}
     .crypto-logo img{width:100%;height:100%;object-fit:contain;}
-    .crypto-name{font-family:var(--font-display);font-size:1.1rem;font-weight:800;}
-    .crypto-chain-label{font-size:.75rem;color:var(--pay-muted);}
-    .crypto-qr-wrap{width:176px;height:176px;margin:0 auto 18px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 0 1px rgba(79,143,255,.15);}
-    .crypto-qr-wrap img{width:156px;height:156px;object-fit:contain;border-radius:12px;}
-    .address-row{background:rgba(0,0,0,.25);border:1px solid rgba(79,143,255,.16);border-radius:14px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;}
-    .address-label{color:var(--pay-muted);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-    .address-val{color:var(--pay-accent-2);font-weight:800;font-size:.82rem;font-family:var(--font-display);word-break:break-all;}
+    .crypto-name-label{font-family:var(--font-display);font-size:1.05rem;font-weight:800;}
+    .crypto-chain-label{font-size:.72rem;color:var(--pay-muted);}
+    .crypto-qr-wrap{width:170px;height:170px;margin:0 auto 16px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 36px rgba(0,0,0,.35),0 0 0 1px rgba(79,143,255,.14);}
+    .crypto-qr-wrap img{width:152px;height:152px;object-fit:contain;border-radius:10px;}
+    .address-row{background:rgba(0,0,0,.22);border:1px solid rgba(79,143,255,.14);border-radius:13px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;}
+    .address-label{color:var(--pay-muted);font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+    .address-val{color:var(--pay-accent-2);font-weight:800;font-size:.8rem;font-family:var(--font-display);word-break:break-all;}
+    .coin-amount-note{background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.14);border-radius:13px;padding:11px 15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .coin-amount-note span{color:var(--pay-muted);font-size:.78rem;}
+    .coin-amount-note strong{color:var(--pay-success);font-family:var(--font-display);font-size:.98rem;}
 
-    /* History panel */
-    .payment-history-card{padding:24px;animation:fadeUp .7s ease both;animation-delay:.2s;}
-    .history-title{color:var(--pay-text);font-size:1.2rem;margin:0 0 6px;font-family:var(--font-display);}
-    .history-sub{color:var(--pay-muted);line-height:1.65;font-size:.85rem;margin:0 0 18px;}
-    .request-list{display:grid;gap:10px;}
-    .request-card,.empty-state{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;color:#bcc8e0;font-size:.85rem;}
-    .request-card div{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px;}
-    .request-card p{color:var(--pay-muted);margin:6px 0 0;word-break:break-word;font-size:.82rem;}
-    .status{padding:4px 10px;border-radius:999px;font-size:.68rem;text-transform:uppercase;font-weight:800;letter-spacing:.06em;}
-    .status.pending{color:#ffd98a;background:rgba(255,200,80,.1);border:1px solid rgba(255,200,80,.18);}
-    .status.approved,.status.confirmed{color:#a0ffcf;background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.18);}
-    .status.declined,.status.cancelled{color:#ffb0b0;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.18);}
-    .safe-note{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(122,143,181,.6);font-size:.76rem;margin-top:-4px;letter-spacing:.04em;}
-    .safe-note svg{width:13px;height:13px;}
+    /* ── Full-screen verifying overlay ── */
+    .verify-overlay{position:fixed;inset:0;z-index:9999;background:rgba(4,6,8,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;animation:fadeUp .3s ease both;}
+    .verify-spinner{width:72px;height:72px;border-radius:50%;border:3px solid rgba(79,143,255,.15);border-top-color:var(--pay-accent);border-right-color:var(--pay-accent-2);animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .verify-pulse-ring{position:absolute;width:100px;height:100px;border-radius:50%;border:1px solid rgba(0,232,122,.2);animation:ringPulse 2s ease infinite;}
+    @keyframes ringPulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+    .verify-spinner-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:100px;height:100px;}
+    .verify-title{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--pay-text);}
+    .verify-sub{color:var(--pay-muted);font-size:.88rem;text-align:center;max-width:260px;line-height:1.6;}
+    .verify-orders-btn{margin-top:12px;display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:14px;background:rgba(79,143,255,.12);border:1px solid rgba(79,143,255,.3);color:var(--pay-accent);font-weight:800;font-size:.88rem;font-family:var(--font-display);text-decoration:none;transition:all .2s;}
+    .verify-orders-btn:hover{background:rgba(79,143,255,.2);transform:translateY(-1px);}
+    .verify-orders-btn svg{width:15px;height:15px;}
+
+    .safe-note{display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(122,143,181,.5);font-size:.72rem;margin-top:16px;letter-spacing:.04em;}
+    .safe-note svg{width:12px;height:12px;}
   </style>
 </head>
 
@@ -264,74 +243,38 @@
 
   <main class="payment-page">
 
+    <!-- Auth Required -->
     <section id="authRequired">
       <h1>Login Required</h1>
-      <p>Credit add বা service payment করতে হলে আগে account login করতে হবে।</p>
+      <p>Credit add করতে হলে আগে login করতে হবে।</p>
       <button class="submit-btn" onclick="window.rabbiAuth?window.rabbiAuth.openLogin():location.href='index.html'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
         Login Now
       </button>
-      <a class="back-link" href="index.html">Back to Home</a>
     </section>
 
-    <section id="walletContent" class="payment-shell" style="display:none;">
+    <!-- Main Content -->
+    <div id="walletContent" class="payment-shell" style="display:none;">
 
-      <header class="payment-header">
-        <div class="payment-badge">Secure Payment · Auto System</div>
-        <h1 id="walletPageTitle">Add <span>Credit</span></h1>
-        <p id="walletPageSub">Mobile Banking বা Crypto দিয়ে wallet ক্রেডিট যোগ করুন। Rate: <strong style="color:var(--pay-success);font-weight:800;">$1 / ৳125</strong></p>
-      </header>
-
-      <section class="payment-card">
+      <div class="payment-card">
         <div class="payment-card-inner">
-
-          <div class="purpose-row">
-            <div class="purpose-chip" id="paymentPurpose">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-              Wallet Credit Top-up
-            </div>
-            <div class="balance-mini">
-              Current Balance
-              <strong id="userCredit">$0 / ৳0</strong>
-              <span id="userName">User</span>
-              <span id="userEmail" style="display:block;">Loading...</span>
-            </div>
-          </div>
 
           <!-- STEP 1: Amount -->
           <div id="step1" class="step-screen active">
-            <div class="section-label">কত ক্রেডিট যোগ করবেন?</div>
-            <div class="preset-grid">
-              <button class="preset-btn selected" onclick="selectPreset(1)">
-                <span class="usd-val">$1</span><span class="bdt-val">৳125</span>
-              </button>
-              <button class="preset-btn" onclick="selectPreset(5)">
-                <span class="usd-val">$5</span><span class="bdt-val">৳625</span>
-              </button>
-              <button class="preset-btn" onclick="selectPreset(10)">
-                <span class="usd-val">$10</span><span class="bdt-val">৳1,250</span>
-              </button>
-              <button class="preset-btn" onclick="selectPreset(20)">
-                <span class="usd-val">$20</span><span class="bdt-val">৳2,500</span>
-              </button>
-              <button class="preset-btn" onclick="selectPreset(50)">
-                <span class="usd-val">$50</span><span class="bdt-val">৳6,250</span>
-              </button>
-              <button class="preset-btn" id="customPresetBtn" onclick="toggleCustom()">
-                <span class="usd-val" style="font-size:1rem;">Custom</span>
-                <span class="bdt-val">নিজে লিখুন</span>
-              </button>
-            </div>
-            <div class="custom-input-wrap" id="customInputWrap" style="display:none;">
+            <div class="section-label">Credit যোগ করুন</div>
+
+            <div class="amount-input-box">
               <label>Dollar Amount লিখুন</label>
-              <input type="number" id="customAmount" placeholder="যেমন: 15" min="1" step="0.01" oninput="updateAmountDisplay()" />
+              <div class="amount-input-row">
+                <span class="amount-prefix">$</span>
+                <input type="number" id="amountInput" placeholder="0.00" min="1" step="0.01" oninput="onAmountInput()" />
+                <span class="amount-bdt-badge" id="bdtBadge">৳ 0</span>
+              </div>
             </div>
-            <div class="amount-display">
-              <div class="amount-display-item"><span>Dollar</span><strong id="dispUsd">$1</strong></div>
-              <div class="amount-display-item"><span>BDT</span><strong id="dispBdt">৳125</strong></div>
-            </div>
-            <input type="hidden" id="selectedUsd" value="1" />
-            <input type="hidden" id="selectedBdt" value="125" />
+
+            <input type="hidden" id="selectedUsd" value="0" />
+            <input type="hidden" id="selectedBdt" value="0" />
+
             <button class="submit-btn" onclick="goToStep2()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
               Add Credit
@@ -341,9 +284,9 @@
           <!-- STEP 2: Category -->
           <div id="step2" class="step-screen">
             <button class="back-btn" onclick="showStep(1)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
-            <div class="section-label">Payment Category বেছে নিন</div>
+            <div class="section-label">Payment Method বেছে নিন</div>
             <div class="category-grid">
               <button class="category-btn mobile" onclick="showStep('3mobile')">
                 <div class="category-icon"><img src="images/mobile-bank.png" alt="Mobile Banking" /></div>
@@ -353,15 +296,15 @@
               <button class="category-btn crypto" onclick="showStep('3crypto')">
                 <div class="category-icon"><img src="images/crypto.png" alt="Crypto" /></div>
                 <div class="category-label">Crypto</div>
-                <div class="category-sub">Binance Pay · USDT Coins</div>
+                <div class="category-sub">Binance Pay · USDT</div>
               </button>
             </div>
           </div>
 
-          <!-- STEP 3mobile: Mobile Banking Select -->
+          <!-- STEP 3mobile: Choose bank -->
           <div id="step3mobile" class="step-screen">
             <button class="back-btn" onclick="showStep(2)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <div class="section-label">Mobile Banking বেছে নিন</div>
             <div class="suboption-grid col-3">
@@ -383,33 +326,13 @@
             </div>
           </div>
 
-          <!-- STEP 4mobile: Mobile Payment Screen -->
+          <!-- STEP 4mobile: Mobile payment screen -->
           <div id="step4mobile" class="step-screen">
             <button class="back-btn" onclick="showStep('3mobile')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <input type="hidden" id="paymentMethod" value="" />
             <div id="dynamicPayPanel"></div>
-            <div class="info-stack">
-              <div class="info-row">
-                <div>
-                  <div class="info-tag" id="walletTag">Wallet Number</div>
-                  <div class="info-value" id="paymentNumber">—</div>
-                </div>
-                <button class="copy-btn" onclick="doCopy('paymentNumber')" aria-label="Copy number">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
-              </div>
-              <div class="info-row">
-                <div>
-                  <div class="info-tag">Payable Amount</div>
-                  <div class="info-value amount-val" id="mobileAmountDisplay">৳125</div>
-                </div>
-                <button class="copy-btn" onclick="doCopyBdt('mobileAmountDisplay')" aria-label="Copy amount">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
-              </div>
-            </div>
             <div class="pay-divider"></div>
             <div class="pay-field">
               <label>Transaction ID</label>
@@ -420,13 +343,12 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
               Verify Payment
             </button>
-            <a class="back-link" href="index.html">Back to Website</a>
           </div>
 
-          <!-- STEP 3crypto: Crypto Select -->
+          <!-- STEP 3crypto: Choose crypto type -->
           <div id="step3crypto" class="step-screen">
             <button class="back-btn" onclick="showStep(2)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <div class="section-label">Crypto Method বেছে নিন</div>
             <div class="suboption-grid col-2">
@@ -436,7 +358,7 @@
                 <div class="suboption-tag">QR · App Pay</div>
               </button>
               <button class="suboption-btn coin" onclick="showStep('4coin')">
-                <div class="suboption-icon"><img src="images/coin.png" alt="Crypto Coin" /></div>
+                <div class="suboption-icon"><img src="images/coin.png" alt="Coin" /></div>
                 <div class="suboption-name">Crypto Coin</div>
                 <div class="suboption-tag">USDT · On-chain</div>
               </button>
@@ -446,77 +368,75 @@
           <!-- STEP 4binance: Binance Pay -->
           <div id="step4binance" class="step-screen">
             <button class="back-btn" onclick="showStep('3crypto')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <input type="hidden" id="paymentMethodBinance" value="Binance" />
             <div class="binance-amount-note">
               <span>Selected Amount</span>
-              <strong id="binanceAmtNote">$1 / ৳125</strong>
+              <strong id="binanceAmtNote">$1</strong>
             </div>
             <div class="binance-qr-box">
               <div class="binance-qr-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Scan QR to Pay
               </div>
               <div class="binance-qr-wrap"><img src="images/binance-qr.png" alt="Binance QR" /></div>
-              <p style="color:rgba(201,162,39,.8);font-size:.8rem;margin:0 0 16px;line-height:1.6;">Open Binance App → Pay → Scan QR Code</p>
+              <p style="color:rgba(201,162,39,.75);font-size:.77rem;margin:0 0 14px;line-height:1.6;">Open Binance App → Pay → Scan QR Code</p>
               <div class="wallet-id-row">
                 <div>
                   <div class="wallet-id-label">Binance Wallet ID</div>
                   <div class="wallet-id-val" id="binanceWalletId">749542753</div>
                 </div>
-                <button type="button" class="copy-btn" onclick="doCopy('binanceWalletId')" aria-label="Copy Wallet ID">
+                <button type="button" class="copy-btn-sm" onclick="doCopy('binanceWalletId',this)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
               <a href="https://app.binance.com/uni-qr/EPRH9YyT" target="_blank" rel="noopener" class="binance-open-btn">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 Pay with Binance App
               </a>
               <p class="binance-hint">Payment করার পর নিচে Binance Order ID দিন</p>
             </div>
             <div class="instr-box gold">
-              <div class="instr-title gold">How to Pay with Binance</div>
+              <div class="instr-title gold">How to Pay</div>
               <div class="instr-step gold"><span class="step-num-badge gold">1</span>Binance App খুলুন → Pay বা QR Scan করুন</div>
-              <div class="instr-step gold"><span class="step-num-badge gold">2</span>উপরের QR স্ক্যান করুন অথবা "Pay with Binance App" বাটনে click করুন</div>
-              <div class="instr-step gold"><span class="step-num-badge gold">3</span>Selected amount <strong id="binanceAmtInstr">$1</strong> পাঠান</div>
-              <div class="instr-step gold"><span class="step-num-badge gold">4</span>Payment সম্পন্ন হলে Binance থেকে Order ID কপি করুন</div>
-              <div class="instr-step gold"><span class="step-num-badge gold">5</span>নিচে Order ID paste করুন → Verify Payment</div>
+              <div class="instr-step gold"><span class="step-num-badge gold">2</span>উপরের QR স্ক্যান করুন বা "Pay with Binance App" এ click করুন</div>
+              <div class="instr-step gold"><span class="step-num-badge gold">3</span>Amount পাঠান → Payment সম্পন্ন হলে Order ID কপি করুন</div>
+              <div class="instr-step gold"><span class="step-num-badge gold">4</span>নিচে Order ID paste করুন → Verify Payment</div>
             </div>
             <div class="pay-field">
               <label>Binance Order ID</label>
-              <input type="text" id="transactionIdBinance" placeholder="Binance Order ID এখানে paste করুন" autocomplete="off" />
+              <input type="text" id="transactionIdBinance" placeholder="Binance Order ID paste করুন" autocomplete="off" />
             </div>
             <div id="walletMessageBinance" class="wallet-message"></div>
             <button class="submit-btn" id="submitBinanceBtn" type="button" onclick="submitBinanceTopup()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
               Verify Payment
             </button>
-            <a class="back-link" href="index.html">Back to Website</a>
           </div>
 
-          <!-- STEP 4coin: Coin Selection -->
+          <!-- STEP 4coin: Choose coin network -->
           <div id="step4coin" class="step-screen">
             <button class="back-btn" onclick="showStep('3crypto')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <div class="section-label">USDT Network বেছে নিন</div>
             <div class="coin-grid">
               <button class="coin-btn" onclick="goToCoin('USDT BSC','BSC (BEP20)','bsc.png','bsc-qr.png','0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34')">
                 <div class="coin-icon"><img src="images/bsc.png" alt="BSC" /></div>
-                <div class="coin-name">USDT</div><div class="coin-chain">BSC (BEP20)</div>
+                <div class="coin-name">USDT</div><div class="coin-chain">BSC</div>
               </button>
               <button class="coin-btn" onclick="goToCoin('USDT TRX','TRON (TRC20)','trx.png','trx-qr.png','TUGdBjkWv1KN3otAYAPaWEDBknrCpBWmPf')">
                 <div class="coin-icon"><img src="images/trx.png" alt="TRX" /></div>
-                <div class="coin-name">USDT</div><div class="coin-chain">TRON (TRC20)</div>
+                <div class="coin-name">USDT</div><div class="coin-chain">TRC20</div>
               </button>
               <button class="coin-btn" onclick="goToCoin('USDT ETH','Ethereum (ERC20)','eth.png','eth-qr.png','0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34')">
                 <div class="coin-icon"><img src="images/eth.png" alt="ETH" /></div>
-                <div class="coin-name">USDT</div><div class="coin-chain">ETH (ERC20)</div>
+                <div class="coin-name">USDT</div><div class="coin-chain">ERC20</div>
               </button>
               <button class="coin-btn" onclick="goToCoin('USDT SOL','Solana (SPL)','sol.png','sol-qr.png','BSbbZwdU9dKW7wxHdJLC4tKrHu3naTD14oGsmWmNfPsH')">
                 <div class="coin-icon"><img src="images/sol.png" alt="SOL" /></div>
-                <div class="coin-name">USDT</div><div class="coin-chain">Solana (SPL)</div>
+                <div class="coin-name">USDT</div><div class="coin-chain">SOL</div>
               </button>
               <button class="coin-btn" onclick="goToCoin('USDT TON','TON Network','ton.png','ton-qr.png','UQA7DQ2Uc83sMxnShe5ctMYCdV8fJucB6bY3OOeQ9-TvtAUH')">
                 <div class="coin-icon"><img src="images/ton.png" alt="TON" /></div>
@@ -525,18 +445,18 @@
             </div>
           </div>
 
-          <!-- STEP 5coin: Coin Payment -->
+          <!-- STEP 5coin: Specific coin payment -->
           <div id="step5coin" class="step-screen">
             <button class="back-btn" onclick="showStep('4coin')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
             <input type="hidden" id="paymentMethodCoin" value="" />
             <div class="crypto-pay-box">
               <div class="crypto-header">
                 <div class="crypto-logo"><img id="coinLogoImg" src="" alt="Coin" /></div>
                 <div>
-                  <div class="crypto-name" id="coinDisplayName">USDT BSC</div>
-                  <div class="crypto-chain-label" id="coinDisplayChain">BEP20 Network</div>
+                  <div class="crypto-name-label" id="coinDisplayName">USDT</div>
+                  <div class="crypto-chain-label" id="coinDisplayChain">BSC</div>
                 </div>
               </div>
               <div class="crypto-qr-wrap"><img id="coinQrImg" src="" alt="QR" /></div>
@@ -545,99 +465,67 @@
                   <div class="address-label">Wallet Address</div>
                   <div class="address-val" id="coinAddress">—</div>
                 </div>
-                <button type="button" class="copy-btn" onclick="doCopy('coinAddress')" aria-label="Copy address" style="flex-shrink:0;">
+                <button type="button" class="copy-btn-sm" onclick="doCopy('coinAddress',this)" style="flex-shrink:0;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
             </div>
-            <div class="amount-note">
+            <div class="coin-amount-note">
               <span>পরিশোধযোগ্য পরিমাণ</span>
               <strong id="coinAmtDisplay">$1</strong>
             </div>
             <div class="instr-box blue">
               <div class="instr-title blue">Payment Instructions</div>
-              <div class="instr-step blue"><span class="step-num-badge blue">1</span>আপনার Wallet বা Exchange থেকে উপরের address-এ USDT পাঠান</div>
-              <div class="instr-step blue"><span class="step-num-badge blue">2</span><strong id="coinNetworkWarn">সঠিক Network</strong> select করুন — ভুল network-এ পাঠালে fund হারাতে পারেন</div>
-              <div class="instr-step blue"><span class="step-num-badge blue">3</span>Selected amount <strong id="coinAmtInstr">$1</strong> এর সমপরিমাণ USDT পাঠান</div>
-              <div class="instr-step blue"><span class="step-num-badge blue">4</span>Transaction Hash (TxID) কপি করুন</div>
-              <div class="instr-step blue"><span class="step-num-badge blue">5</span>নিচে Transaction Hash দিন → Verify Payment</div>
+              <div class="instr-step blue"><span class="step-num-badge blue">1</span>Wallet বা Exchange থেকে উপরের address-এ USDT পাঠান</div>
+              <div class="instr-step blue"><span class="step-num-badge blue">2</span><strong id="coinNetworkWarn">সঠিক Network</strong> — ভুল network-এ পাঠালে fund হারাবেন</div>
+              <div class="instr-step blue"><span class="step-num-badge blue">3</span>Transaction সম্পন্ন হলে Transaction Hash (TxID) কপি করুন</div>
+              <div class="instr-step blue"><span class="step-num-badge blue">4</span>নিচে TxID paste করুন → Verify Payment</div>
             </div>
             <div class="pay-field">
               <label>Transaction Hash / TxID</label>
-              <input type="text" id="transactionIdCoin" placeholder="Transaction hash এখানে paste করুন" autocomplete="off" />
+              <input type="text" id="transactionIdCoin" placeholder="Transaction hash paste করুন" autocomplete="off" />
             </div>
             <div id="walletMessageCoin" class="wallet-message"></div>
             <button class="submit-btn" id="submitCoinBtn" type="button" onclick="submitCoinTopup()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
               Verify Payment
             </button>
-            <a class="back-link" href="index.html">Back to Website</a>
           </div>
 
         </div>
-      </section>
-
-      <!-- History Panel -->
-      <aside class="payment-history-card">
-        <h2 class="history-title">My Payment Requests</h2>
-        <p class="history-sub">Payment verify হলে wallet credit automatically update হবে।</p>
-        <div class="request-list" id="myTopupList">
-          <div class="empty-state">Loading...</div>
-        </div>
-      </aside>
+      </div>
 
       <div class="safe-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Secure payment · Auto system connected
       </div>
 
-    </section>
+    </div>
   </main>
 
   <script>
     const USD_TO_BDT = 125;
-    let selectedUsdAmount = 1;
-    let customMode = false;
+    let selectedUsdAmount = 0;
 
     const PAYMENT_NUMBERS = { bKash:'01349407692', Nagad:'01731410341', Rocket:'01731410341' };
     const MOBILE_INFO = {
-      bKash: { theme:'bkash-theme', name:'bKash', dial:'*247#', icon:'images/bkash.png', label:'bKash Number', hlClass:'highlight-bkash' },
-      Nagad: { theme:'nagad-theme', name:'Nagad', dial:'*167#', icon:'images/nagad.png', label:'Nagad Number', hlClass:'highlight-nagad' },
-      Rocket:{ theme:'rocket-theme', name:'Rocket', dial:'*322#', icon:'images/rocket.png', label:'Rocket Number', hlClass:'highlight-rocket' }
+      bKash: { theme:'bkash-theme', name:'bKash', dial:'*247#', icon:'images/bkash.png', hlClass:'highlight-bkash' },
+      Nagad: { theme:'nagad-theme', name:'Nagad', dial:'*167#', icon:'images/nagad.png', hlClass:'highlight-nagad' },
+      Rocket:{ theme:'rocket-theme', name:'Rocket', dial:'*322#', icon:'images/rocket.png', hlClass:'highlight-rocket' }
     };
+
+    const copySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 
     function fmtUsd(n){ return '$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:2}); }
     function fmtBdt(n){ return '৳'+Math.round(n).toLocaleString('en-BD'); }
 
-    function selectPreset(usd){
-      customMode = false;
-      selectedUsdAmount = usd;
-      document.getElementById('customInputWrap').style.display = 'none';
-      document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('selected'));
-      const presets=[1,5,10,20,50];
-      const idx=presets.indexOf(usd);
-      if(idx>=0) document.querySelectorAll('.preset-btn')[idx].classList.add('selected');
-      updateAmountDisplay();
-    }
-
-    function toggleCustom(){
-      customMode = true;
-      document.getElementById('customInputWrap').style.display = 'block';
-      document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('selected'));
-      document.getElementById('customPresetBtn').classList.add('selected');
-      document.getElementById('customAmount').focus();
-    }
-
-    function updateAmountDisplay(){
-      if(customMode){
-        const v = parseFloat(document.getElementById('customAmount').value)||0;
-        selectedUsdAmount = v;
-      }
-      const bdt = selectedUsdAmount * USD_TO_BDT;
-      document.getElementById('dispUsd').textContent = fmtUsd(selectedUsdAmount);
-      document.getElementById('dispBdt').textContent = fmtBdt(bdt);
-      document.getElementById('selectedUsd').value = selectedUsdAmount;
-      document.getElementById('selectedBdt').value = Math.round(bdt);
+    function onAmountInput(){
+      const v = parseFloat(document.getElementById('amountInput').value)||0;
+      selectedUsdAmount = v;
+      const bdt = Math.round(v * USD_TO_BDT);
+      document.getElementById('bdtBadge').textContent = v > 0 ? fmtBdt(bdt) : '৳ 0';
+      document.getElementById('selectedUsd').value = v;
+      document.getElementById('selectedBdt').value = bdt;
     }
 
     function showStep(id){
@@ -647,7 +535,7 @@
     }
 
     function goToStep2(){
-      if(!selectedUsdAmount||selectedUsdAmount<1){ alert('Minimum $1 amount select করুন।'); return; }
+      if(!selectedUsdAmount||selectedUsdAmount<1){ alert('Minimum $1 amount দিন।'); return; }
       showStep(2);
     }
 
@@ -655,11 +543,10 @@
       const info = MOBILE_INFO[method];
       const usd = selectedUsdAmount;
       const bdt = Math.round(usd * USD_TO_BDT);
+      const num = PAYMENT_NUMBERS[method];
       document.getElementById('paymentMethod').value = method;
-      document.getElementById('walletTag').textContent = info.label;
-      document.getElementById('paymentNumber').textContent = PAYMENT_NUMBERS[method];
-      document.getElementById('mobileAmountDisplay').textContent = fmtBdt(bdt);
 
+      // Build panel — inline copy buttons inside step rows, no separate info-row section
       document.getElementById('dynamicPayPanel').innerHTML = `
         <div class="pay-panel ${info.theme}">
           <div class="pay-panel-header">
@@ -670,12 +557,42 @@
             </div>
           </div>
           <div class="pay-step-list">
-            <div class="pay-step-row"><div class="pay-step-num">1</div><div><span class="${info.hlClass}">${info.dial}</span> ডায়াল করুন অথবা <strong>${info.name} App</strong> খুলুন</div></div>
-            <div class="pay-step-row"><div class="pay-step-num">2</div><div><span class="${info.hlClass}">"Send Money"</span> -তে ক্লিক করুন</div></div>
-            <div class="pay-step-row"><div class="pay-step-num">3</div><div>প্রাপক নম্বর: <span class="${info.hlClass}">${PAYMENT_NUMBERS[method]}</span></div></div>
-            <div class="pay-step-row"><div class="pay-step-num">4</div><div>পরিমাণ: <span class="${info.hlClass}">${fmtBdt(bdt)}</span> দিন</div></div>
-            <div class="pay-step-row"><div class="pay-step-num">5</div><div>${info.name} PIN দিয়ে confirm করুন। Confirmation SMS আসবে।</div></div>
-            <div class="pay-step-row"><div class="pay-step-num">6</div><div>SMS থেকে <strong>Transaction ID</strong> কপি করে নিচে paste করুন → <strong>Verify Payment</strong></div></div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">1</div>
+              <div><span style="font-weight:800;">${info.dial}</span> ডায়াল করুন অথবা <strong>${info.name} App</strong> খুলুন</div>
+            </div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">2</div>
+              <div><span style="font-weight:800;">"Send Money"</span> তে ক্লিক করুন</div>
+            </div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">3</div>
+              <div>
+                প্রাপক নম্বর হিসেবে এই নম্বরটি লিখুন
+                <div class="inline-copy-row">
+                  <span class="inline-val" id="mobileNum_${method}">${num}</span>
+                  <button type="button" class="inline-copy-btn" onclick="doCopyInline('mobileNum_${method}',this)">${copySvg}</button>
+                </div>
+              </div>
+            </div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">4</div>
+              <div>
+                টাকার পরিমাণ
+                <div class="inline-copy-row">
+                  <span class="inline-val" id="mobileBdt_${method}">${fmtBdt(bdt)}</span>
+                  <button type="button" class="inline-copy-btn" onclick="doCopyBdtInline('mobileBdt_${method}',this)">${copySvg}</button>
+                </div>
+              </div>
+            </div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">5</div>
+              <div>${info.name} মোবাইল মেনু PIN লিখুন। সবকিছু ঠিক থাকলে ${info.name} থেকে একটি নিশ্চিতকরণ বার্তা পাবেন।</div>
+            </div>
+            <div class="pay-step-row">
+              <div class="pay-step-num">6</div>
+              <div>এখন উপরের বক্সে আপনার <strong>Transaction ID</strong> দিন এবং নিচের <strong>VERIFY</strong> বাটনে ক্লিক করুন।</div>
+            </div>
           </div>
         </div>`;
 
@@ -688,9 +605,7 @@
 
     function goToBinance(){
       const usd = selectedUsdAmount;
-      const bdt = Math.round(usd * USD_TO_BDT);
-      document.getElementById('binanceAmtNote').textContent = `${fmtUsd(usd)} / ${fmtBdt(bdt)}`;
-      document.getElementById('binanceAmtInstr').textContent = fmtUsd(usd);
+      document.getElementById('binanceAmtNote').textContent = fmtUsd(usd);
       const msg = document.getElementById('walletMessageBinance');
       if(msg){ msg.className='wallet-message'; msg.style.display='none'; }
       const tx = document.getElementById('transactionIdBinance');
@@ -702,11 +617,10 @@
       document.getElementById('paymentMethodCoin').value = name;
       document.getElementById('coinDisplayName').textContent = name;
       document.getElementById('coinDisplayChain').textContent = chainLabel;
-      document.getElementById('coinLogoImg').src = 'images/' + imgFile;
-      document.getElementById('coinQrImg').src = 'images/' + qrFile;
+      document.getElementById('coinLogoImg').src = 'images/'+imgFile;
+      document.getElementById('coinQrImg').src = 'images/'+qrFile;
       document.getElementById('coinAddress').textContent = address;
       document.getElementById('coinAmtDisplay').textContent = fmtUsd(selectedUsdAmount);
-      document.getElementById('coinAmtInstr').textContent = fmtUsd(selectedUsdAmount);
       document.getElementById('coinNetworkWarn').textContent = chainLabel;
       const msg = document.getElementById('walletMessageCoin');
       if(msg){ msg.className='wallet-message'; msg.style.display='none'; }
@@ -715,22 +629,29 @@
       showStep('5coin');
     }
 
-    function doCopy(id){
+    function doCopy(id, btn){
       const el = document.getElementById(id);
       if(!el) return;
-      const text = el.textContent.trim();
-      const btn = event?.currentTarget;
-      const doFlash = () => { if(btn){ btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),1800); } };
-      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(doFlash); }
-      else { const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);doFlash(); }
+      _copyText(el.textContent.trim(), btn);
     }
 
-    function doCopyBdt(id){
+    function doCopyInline(id, btn){
+      const el = document.getElementById(id);
+      if(!el) return;
+      _copyText(el.textContent.trim(), btn);
+    }
+
+    function doCopyBdtInline(id, btn){
       const el = document.getElementById(id);
       if(!el) return;
       const raw = el.textContent.replace(/[৳,\s]/g,'').trim();
-      const btn = event?.currentTarget;
-      navigator.clipboard?.writeText(raw).then(()=>{ if(btn){ btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),1800); } });
+      _copyText(raw, btn);
+    }
+
+    function _copyText(text, btn){
+      const flash = ()=>{ if(btn){ btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),1800); } };
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).then(flash); }
+      else{ const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);flash(); }
     }
 
     function showMsg(elId, text, type){
@@ -741,40 +662,54 @@
       el.style.display = 'block';
     }
 
+    // ── Full-screen verifying overlay ──
+    function showVerifyingOverlay(){
+      const ov = document.createElement('div');
+      ov.className = 'verify-overlay';
+      ov.id = 'verifyOverlay';
+      ov.innerHTML = `
+        <div class="verify-spinner-wrap">
+          <div class="verify-pulse-ring"></div>
+          <div class="verify-spinner"></div>
+        </div>
+        <div class="verify-title">Verifying Payment</div>
+        <div class="verify-sub">আপনার payment request submit হয়েছে। Admin review করে approve করবেন।</div>
+        <a href="dashboard.html?tab=orders" class="verify-orders-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
+          View My Orders
+        </a>`;
+      document.body.appendChild(ov);
+    }
+
     // ── Submit handlers ──
     window.submitTopup = async function(){
-      const user = await (window.waitForActiveUser ? window.waitForActiveUser() : Promise.resolve(null));
       const method = document.getElementById('paymentMethod')?.value;
       const transactionId = document.getElementById('transactionId')?.value.trim();
       if(!method){ showMsg('walletMessage','Payment method select করো।','error'); return; }
       if(!selectedUsdAmount||selectedUsdAmount<1){ showMsg('walletMessage','Minimum $1 amount দিতে হবে।','error'); return; }
       if(!transactionId||transactionId.length<5){ showMsg('walletMessage','Valid Transaction ID দাও।','error'); return; }
-      if(window._submitTopupInternal) window._submitTopupInternal({method, transactionId});
+      if(window._submitTopupInternal) window._submitTopupInternal({method, transactionId, msgEl:'walletMessage', btnEl:'submitTopupBtn', onSuccess: showVerifyingOverlay});
     };
 
     window.submitBinanceTopup = async function(){
       const transactionId = document.getElementById('transactionIdBinance')?.value.trim();
-      if(!selectedUsdAmount||selectedUsdAmount<1){ showMsg('walletMessageBinance','Amount select করুন।','error'); return; }
+      if(!selectedUsdAmount||selectedUsdAmount<1){ showMsg('walletMessageBinance','Amount দিন।','error'); return; }
       if(!transactionId||transactionId.length<5){ showMsg('walletMessageBinance','Valid Binance Order ID দাও।','error'); return; }
-      if(window._submitTopupInternal) window._submitTopupInternal({method:'Binance', transactionId, msgEl:'walletMessageBinance', btnEl:'submitBinanceBtn'});
+      if(window._submitTopupInternal) window._submitTopupInternal({method:'Binance', transactionId, msgEl:'walletMessageBinance', btnEl:'submitBinanceBtn', onSuccess: showVerifyingOverlay});
     };
 
     window.submitCoinTopup = async function(){
       const method = document.getElementById('paymentMethodCoin')?.value;
       const transactionId = document.getElementById('transactionIdCoin')?.value.trim();
       if(!method){ showMsg('walletMessageCoin','Coin select করুন।','error'); return; }
-      if(!selectedUsdAmount||selectedUsdAmount<1){ showMsg('walletMessageCoin','Amount select করুন।','error'); return; }
+      if(!selectedUsdAmount||selectedUsdAmount<1){ showMsg('walletMessageCoin','Amount দিন।','error'); return; }
       if(!transactionId||transactionId.length<5){ showMsg('walletMessageCoin','Valid Transaction Hash দাও।','error'); return; }
-      if(window._submitTopupInternal) window._submitTopupInternal({method, transactionId, msgEl:'walletMessageCoin', btnEl:'submitCoinBtn'});
+      if(window._submitTopupInternal) window._submitTopupInternal({method, transactionId, msgEl:'walletMessageCoin', btnEl:'submitCoinBtn', onSuccess: showVerifyingOverlay});
     };
 
-    // Expose helpers for wallet.js to hook into
     window._currentSelectedUsd = () => selectedUsdAmount;
-    window.handleAmountChange = updateAmountDisplay;
+    window.handleAmountChange = function(){};
     window.updatePaymentNumber = function(){};
-
-    // Initialise
-    selectPreset(1);
   </script>
 
   <script src="js/lang.js" defer></script>
