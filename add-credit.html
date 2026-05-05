@@ -52,7 +52,7 @@
 
     /* Main card */
     .payment-card{background:rgba(12,16,28,.85);border:1px solid rgba(255,255,255,.07);border-radius:28px;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 40px 100px rgba(0,0,0,.5);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);overflow:hidden;animation:fadeUp .6s ease both;}
-    .payment-card-inner{padding:26px;}
+    .payment-card-inner{padding:26px;position:relative;}
 
     /* Step system */
     .step-screen{display:none;animation:fadeUp .3s ease both;}
@@ -207,17 +207,32 @@
     .coin-amount-note strong{color:var(--pay-success);font-family:var(--font-display);font-size:.98rem;}
 
     /* ── Full-screen verifying overlay ── */
-    .verify-overlay{position:fixed;inset:0;z-index:9999;background:rgba(4,6,8,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;animation:fadeUp .3s ease both;}
+    .verify-overlay{position:fixed;inset:0;z-index:9999;background:rgba(4,6,8,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;animation:fadeUp .3s ease both;}
     .verify-spinner{width:72px;height:72px;border-radius:50%;border:3px solid rgba(79,143,255,.15);border-top-color:var(--pay-accent);border-right-color:var(--pay-accent-2);animation:spin 1s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
     .verify-pulse-ring{position:absolute;width:100px;height:100px;border-radius:50%;border:1px solid rgba(0,232,122,.2);animation:ringPulse 2s ease infinite;}
     @keyframes ringPulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.6);opacity:0}}
     .verify-spinner-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:100px;height:100px;}
     .verify-title{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--pay-text);}
-    .verify-sub{color:var(--pay-muted);font-size:.88rem;text-align:center;max-width:260px;line-height:1.6;}
-    .verify-orders-btn{margin-top:12px;display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:14px;background:rgba(79,143,255,.12);border:1px solid rgba(79,143,255,.3);color:var(--pay-accent);font-weight:800;font-size:.88rem;font-family:var(--font-display);text-decoration:none;transition:all .2s;}
+    .verify-sub{color:var(--pay-muted);font-size:.88rem;text-align:center;max-width:280px;line-height:1.7;}
+    .verify-eta{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:30px;background:rgba(79,143,255,.08);border:1px solid rgba(79,143,255,.18);color:rgba(130,160,210,.75);font-size:.76rem;font-weight:700;letter-spacing:.04em;}
+    .verify-eta svg{width:13px;height:13px;flex-shrink:0;}
+    .verify-orders-btn{margin-top:4px;display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:14px;background:rgba(79,143,255,.12);border:1px solid rgba(79,143,255,.3);color:var(--pay-accent);font-weight:800;font-size:.88rem;font-family:var(--font-display);text-decoration:none;transition:all .2s;}
     .verify-orders-btn:hover{background:rgba(79,143,255,.2);transform:translateY(-1px);}
     .verify-orders-btn svg{width:15px;height:15px;}
+    /* Green approved tick */
+    .verify-tick-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:100px;height:100px;}
+    .verify-tick-ring{position:absolute;width:100px;height:100px;border-radius:50%;border:2px solid rgba(0,232,122,.35);animation:ringPulse 2s ease infinite;}
+    .verify-tick-circle{width:72px;height:72px;border-radius:50%;background:rgba(0,232,122,.12);border:2.5px solid #00e87a;display:flex;align-items:center;justify-content:center;animation:tickPop .5s cubic-bezier(.34,1.56,.64,1) both;}
+    @keyframes tickPop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+    .verify-tick-svg{width:36px;height:36px;stroke:#00e87a;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:40;stroke-dashoffset:40;animation:drawTick .5s .3s ease forwards;}
+    @keyframes drawTick{to{stroke-dashoffset:0}}
+    .verify-approved-title{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:#00e87a;}
+    .verify-approved-sub{color:rgba(130,210,160,.75);font-size:.88rem;text-align:center;max-width:260px;line-height:1.6;}
+    /* Step transition loading */
+    .step-loading-overlay{position:absolute;inset:0;z-index:10;background:rgba(4,6,8,.7);border-radius:28px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;}
+    .step-loading-overlay.active{opacity:1;pointer-events:all;}
+    .step-loader{width:36px;height:36px;border-radius:50%;border:3px solid rgba(79,143,255,.15);border-top-color:var(--pay-accent);animation:spin .7s linear infinite;}
 
     .safe-note{display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(122,143,181,.5);font-size:.72rem;margin-top:16px;letter-spacing:.04em;}
     .safe-note svg{width:12px;height:12px;}
@@ -259,6 +274,7 @@
 
       <div class="payment-card">
         <div class="payment-card-inner">
+          <div class="step-loading-overlay" id="stepLoadingOverlay"><div class="step-loader"></div></div>
 
           <!-- STEP 1: Amount -->
           <div id="step1" class="step-screen active">
@@ -530,9 +546,14 @@
     }
 
     function showStep(id){
-      document.querySelectorAll('.step-screen').forEach(s=>s.classList.remove('active'));
-      const el = document.getElementById('step'+id);
-      if(el) el.classList.add('active');
+      const loader = document.getElementById('stepLoadingOverlay');
+      if(loader){ loader.classList.add('active'); }
+      setTimeout(()=>{
+        document.querySelectorAll('.step-screen').forEach(s=>s.classList.remove('active'));
+        const el = document.getElementById('step'+id);
+        if(el) el.classList.add('active');
+        if(loader){ loader.classList.remove('active'); }
+      }, 500);
     }
 
     function goToStep2(){
@@ -664,7 +685,7 @@
     }
 
     // ── Full-screen verifying overlay ──
-    window.showVerifyingOverlay = function showVerifyingOverlay(){
+    window.showVerifyingOverlay = function showVerifyingOverlay(topupDocId){
       const ov = document.createElement('div');
       ov.className = 'verify-overlay';
       ov.id = 'verifyOverlay';
@@ -674,12 +695,43 @@
           <div class="verify-spinner"></div>
         </div>
         <div class="verify-title">Verifying Payment</div>
-        <div class="verify-sub">আপনার payment request submit হয়েছে। Admin review করে approve করবেন।</div>
+        <div class="verify-sub">আপনার payment request সফলভাবে submit হয়েছে।<br>সাধারণত <strong style="color:var(--pay-text);">1–2 minutes</strong> এর মধ্যে verification proceed হবে।</div>
+        <div class="verify-eta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Estimated review time: 1–2 minutes
+        </div>
         <a href="dashboard.html?tab=orders" class="verify-orders-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
           View My Orders
         </a>`;
       document.body.appendChild(ov);
+
+      // Listen for admin approval on this topup doc
+      if(topupDocId && window._db && window._onSnapshot && window._doc && window._collection){
+        try {
+          const docRef = window._doc(window._collection(window._db,'topups'), topupDocId);
+          const unsub = window._onSnapshot(docRef, (snap) => {
+            const data = snap.data();
+            if(data && data.status === 'approved'){
+              unsub();
+              showApprovedTick(ov);
+            }
+          });
+        } catch(e){ console.warn('Approval listener failed:', e); }
+      }
+    };
+
+    function showApprovedTick(ov){
+      ov.innerHTML = `
+        <div class="verify-tick-wrap">
+          <div class="verify-tick-ring"></div>
+          <div class="verify-tick-circle">
+            <svg class="verify-tick-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="verify-approved-title">Payment Approved!</div>
+        <div class="verify-approved-sub">আপনার payment সফলভাবে verify হয়েছে। Account এ credit যোগ হয়ে গেছে।</div>`;
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 2200);
     }
 
     // ── Submit handlers ──
