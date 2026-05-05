@@ -157,7 +157,7 @@
           Live Support
           <span class="admin-nav-badge" id="badgeSupport" style="display:none;"></span>
         </button>
-        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('History')" id="navBtnHistory">
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('History'); historyShowSub('Transaction');" id="navBtnHistory">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
           History
         </button>
@@ -488,22 +488,24 @@
     onSnapshot(query(collection(db, 'supportRooms'), orderBy('lastAt', 'desc')), (snap) => {
       roomsEl.innerHTML = '';
       const badge = document.getElementById('badgeSupport');
-      const openCount = snap.docs.filter(d => d.data().status !== 'solved').length;
+      // Only open/unsolved chats for Live Support
+      const openDocs = snap.docs.filter(d => d.data().status !== 'solved');
+      const openCount = openDocs.length;
       if (badge) { badge.textContent = openCount || ''; badge.style.display = openCount ? 'flex' : 'none'; }
-      if (snap.empty) {
-        roomsEl.innerHTML = '<div style="padding:18px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো support ticket নেই।</div>';
+      if (openDocs.length === 0) {
+        roomsEl.innerHTML = '<div style="padding:18px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো open support ticket নেই। Solved chats History → Support এ দেখুন।</div>';
         return;
       }
-      snap.forEach(docSnap => {
+      // Render only OPEN (unsolved) tickets in Live Support
+      openDocs.forEach(docSnap => {
         const d = docSnap.data();
         const uid = docSnap.id;
-        const isSolved = d.status === 'solved';
         const el = document.createElement('div');
         el.className = 'inbox-item' + (activeChatUid === uid ? ' active' : '');
         el.innerHTML = `
           <div class="inbox-item-left">
             <div class="inbox-item-name">
-              <span class="inbox-status-dot ${isSolved?'solved':'open'}"></span>
+              <span class="inbox-status-dot open"></span>
               ${escHtml(d.displayName || d.userEmail || 'User')}
             </div>
             ${d.ticketId ? `<div class="inbox-item-ticket">#${escHtml(d.ticketId)}</div>` : ''}
@@ -511,8 +513,8 @@
             <div class="inbox-item-preview">${escHtml(d.lastMessage || '')}</div>
           </div>
           <div class="inbox-item-right">
-            ${(d.unreadAdmin && !isSolved) ? `<span class="inbox-unread-badge">${d.unreadAdmin}</span>` : ''}
-            <span class="inbox-status-label ${isSolved?'solved':'open'}">${isSolved?'Solved':'Open'}</span>
+            ${d.unreadAdmin ? `<span class="inbox-unread-badge">${d.unreadAdmin}</span>` : ''}
+            <span class="inbox-status-label open">Open</span>
           </div>`;
         el.addEventListener('click', () => {
           document.querySelectorAll('.inbox-item').forEach(r => r.classList.remove('active'));
@@ -521,8 +523,56 @@
         });
         roomsEl.appendChild(el);
       });
+
+      // Also reload history support list (solved chats)
+      loadSupportHistory(snap.docs);
     });
   }
+
+  /* ── History: Support (solved chats) ── */
+  function loadSupportHistory(allDocs) {
+    const histList = document.getElementById('adminSupportHistoryList');
+    if (!histList) return;
+    const solvedDocs = (allDocs || []).filter(d => d.data().status === 'solved');
+    histList.innerHTML = '';
+    if (solvedDocs.length === 0) {
+      histList.innerHTML = '<div class="empty-state">কোনো solved support ticket নেই।</div>';
+      return;
+    }
+    solvedDocs.forEach(docSnap => {
+      const d = docSnap.data();
+      const uid = docSnap.id;
+      const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
+      histList.innerHTML += `<div class="admin-card history-card" style="cursor:pointer;" onclick="adminShowSolvedChat('${uid}')">
+        <div class="admin-card-head">
+          <div>
+            <h3>🟢 ${escHtml(d.displayName || d.userEmail || 'User')}</h3>
+            ${d.ticketId ? `<p style="font-family:monospace;font-size:.72rem;color:#5a7090;">#${escHtml(d.ticketId)}</p>` : ''}
+          </div>
+          <span class="status completed">Solved</span>
+        </div>
+        <p>📧 ${escHtml(d.userEmail||'—')} &nbsp;|&nbsp; 📞 ${escHtml(d.userPhone||'—')}</p>
+        <p>Last: ${escHtml(d.lastMessage||'—')}</p>
+        ${lastAt ? `<p style="color:#4a6070;">Date: ${lastAt}</p>` : ''}
+      </div>`;
+    });
+  }
+
+  /* ── View solved chat from history ── */
+  window.adminShowSolvedChat = function(uid) {
+    // Switch to Live Support panel and open the chat read-only
+    adminShowPanel('Support');
+    getDoc(doc(db, 'supportRooms', uid)).then(snap => {
+      if (snap.exists()) {
+        openAdminChat(uid, snap.data());
+        // Hide reply box for solved chats
+        const replyRow = document.querySelector('.admin-chat-reply-row');
+        if (replyRow) replyRow.style.display = 'none';
+        const solvedBtn = document.querySelector('.chat-solved-btn');
+        if (solvedBtn) solvedBtn.style.display = 'none';
+      }
+    }).catch(() => {});
+  };
 
   function openAdminChat(uid, roomData) {
     activeChatUid = uid;
@@ -530,12 +580,17 @@
     const msgsEl  = document.getElementById('adminChatMsgs');
     if (!chatWin || !msgsEl) return;
 
+    // Restore reply row visibility (may have been hidden for solved chat view)
+    const replyRow = document.querySelector('.admin-chat-reply-row');
+    if (replyRow) replyRow.style.display = 'flex';
+    const solvedBtn = document.querySelector('.chat-solved-btn');
+    if (solvedBtn) solvedBtn.style.display = roomData?.status === 'solved' ? 'none' : 'flex';
+
     // Populate header
     document.getElementById('adminChatUserName').textContent = roomData?.displayName || roomData?.userEmail || 'User';
     document.getElementById('adminChatTicketId').textContent = roomData?.ticketId ? '#' + roomData.ticketId : '';
     document.getElementById('adminChatUserEmail').textContent = roomData?.userEmail || '—';
     document.getElementById('adminChatUserPhone').textContent = roomData?.userPhone || '—';
-    // Complaint: get from first user message in supportChats if not in roomData
     const complaintEl = document.getElementById('adminChatUserComplaint');
     complaintEl.textContent = roomData?.lastMessage || '—';
 
@@ -551,7 +606,7 @@
       snap.docChanges().forEach(change => {
         if (change.type !== 'added') return;
         const d = change.doc.data();
-        if (d.role === 'system') return; // skip system messages
+        if (d.role === 'system') return;
         const isAdm = d.role === 'admin';
         const wrap = document.createElement('div');
         wrap.className = isAdm ? 'chat-msg-admin' : 'chat-msg-user';
@@ -561,7 +616,6 @@
         msgsEl.scrollTop = msgsEl.scrollHeight;
       });
     });
-    // Scroll chat into view
     chatWin.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
