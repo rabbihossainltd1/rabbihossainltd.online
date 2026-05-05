@@ -24,11 +24,12 @@ const PAYMENT_NUMBERS = {
   Nagad: "01731410341",
   Rocket: "01731410341",
   Binance: "749542753",
-  "USDT BSC": "0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34",
-  "USDT TRX": "TUGdBjkWv1KN3otAYAPaWEDBknrCpBWmPf",
-  "USDT ETH": "0x930ab32689e9dd79814cbd14e4fb0e77f3f89a34",
-  "USDT SOL": "BSbbZwdU9dKW7wxHdJLC4tKrHu3naTD14oGsmWmNfPsH",
-  "USDT TON": "UQA7DQ2Uc83sMxnShe5ctMYCdV8fJucB6bY3OOeQ9-TvtAUH",
+  // Crypto coin methods — no wallet number (address used instead)
+  "USDT BSC": "",
+  "USDT TRX": "",
+  "USDT ETH": "",
+  "USDT SOL": "",
+  "USDT TON": "",
 };
 
 const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
@@ -303,6 +304,14 @@ function listenUserCredit(user) {
 }
 
 function getSelectedUsdAmount() {
+  // New multi-step UI: selectedUsd hidden field or window._currentSelectedUsd
+  if (typeof window._currentSelectedUsd === 'function') {
+    const v = window._currentSelectedUsd();
+    if (v && Number.isFinite(Number(v))) return normalizeUsd(v);
+  }
+  const hiddenEl = document.getElementById("selectedUsd");
+  if (hiddenEl && hiddenEl.value) return normalizeUsd(hiddenEl.value);
+  // Legacy fallback (old UI with #amount select)
   const amountEl = document.getElementById("amount");
   const amountValue = amountEl ? amountEl.value : "1";
   const customAmount = Number(document.getElementById("customAmount")?.value || 0);
@@ -335,12 +344,24 @@ function setupPageMode() {
     setText("walletPageSub", "Service payment manually পাঠান। Payment verify হলে service request active হবে।");
     setText("paymentPurpose", `Service: ${servicePaymentInfo.serviceName}`);
 
+    // New step-based UI: set the hidden field and update display
+    const hiddenUsd = document.getElementById("selectedUsd");
+    const hiddenBdt = document.getElementById("selectedBdt");
+    const dispUsd = document.getElementById("dispUsd");
+    const dispBdt = document.getElementById("dispBdt");
+    const amt = servicePaymentInfo.amountUsd;
+    if (hiddenUsd) hiddenUsd.value = String(amt);
+    if (hiddenBdt) hiddenBdt.value = String(Math.round(amt * USD_TO_BDT));
+    if (dispUsd) dispUsd.textContent = `$${amt}`;
+    if (dispBdt) dispBdt.textContent = `৳${Math.round(amt * USD_TO_BDT).toLocaleString()}`;
+
+    // Legacy UI support
     const amountEl = document.getElementById("amount");
     const customWrap = document.getElementById("customAmountWrap");
     const customAmount = document.getElementById("customAmount");
     if (amountEl && customAmount) {
       amountEl.value = "custom";
-      customAmount.value = String(servicePaymentInfo.amountUsd);
+      customAmount.value = String(amt);
       if (customWrap) customWrap.style.display = "block";
     }
   } else {
@@ -422,40 +443,25 @@ window.copyTextValue = async function (targetId, label = "Text") {
   }
 };
 
-window.submitTopup = async function () {
+// ── Unified internal submit (called by all payment methods) ──
+window._submitTopupInternal = async function({ method, transactionId, msgEl = 'walletMessage', btnEl = 'submitTopupBtn' } = {}) {
   const user = await waitForActiveUser();
   if (!user) {
-    showMessage("আগে Login করো, তারপর payment request submit হবে।", "error");
+    showMsgEl(msgEl, "আগে Login করো, তারপর payment request submit হবে।", "error");
     openLoginOrHome();
     return;
   }
   currentUser = user;
 
-  const method = document.getElementById("paymentMethod")?.value;
-  const transactionId = document.getElementById("transactionId")?.value.trim();
   const amountUsd = normalizeUsd(getSelectedUsdAmount());
   const amountBdt = toBdt(amountUsd);
 
-  if (!method) {
-    showMessage("Payment method select করো।", "error");
-    return;
-  }
+  if (!method) { showMsgEl(msgEl, "Payment method select করো।", "error"); return; }
+  if (!amountUsd || amountUsd < 1) { showMsgEl(msgEl, "Minimum $1 amount দিতে হবে।", "error"); return; }
+  if (!transactionId || transactionId.length < 5) { showMsgEl(msgEl, "Valid Transaction ID / Hash দাও।", "error"); return; }
 
-  if (!amountUsd || amountUsd < 1) {
-    showMessage("Minimum $1 amount দিতে হবে।", "error");
-    return;
-  }
-
-  if (!transactionId || transactionId.length < 5) {
-    showMessage("Valid Transaction ID দাও।", "error");
-    return;
-  }
-
-  const submitBtn = document.getElementById("submitTopupBtn");
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-  }
+  const submitBtn = document.getElementById(btnEl);
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Submitting..."; }
 
   try {
     await ensureUserDoc(user);
@@ -470,14 +476,11 @@ window.submitTopup = async function () {
         transactionId,
         serviceDetails: details
       });
-
       sessionStorage.removeItem("pendingServicePayment");
-      showMessage("Service payment request submitted. Admin review pending.", "success");
+      showMsgEl(msgEl, "Service payment request submitted. Admin review pending.", "success");
       const tx = document.getElementById("transactionId");
       if (tx) tx.value = "";
-      setTimeout(() => {
-        window.location.href = "dashboard.html?tab=orders";
-      }, 900);
+      setTimeout(() => { window.location.href = "dashboard.html?tab=orders"; }, 900);
       return;
     }
 
@@ -502,30 +505,41 @@ window.submitTopup = async function () {
       updatedAt: serverTimestamp()
     };
 
-    // Normalize method for Firestore rules — Binance stored as 'Binance'
-    if (!['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'].includes(payload.method)) {
-      payload.method = 'bKash'; // fallback
-    }
-
     await addDoc(collection(db, "topups"), payload);
-    showMessage("Credit request submitted. Admin approval pending.", "success");
+    showMsgEl(msgEl, "Credit request submitted! Admin approval pending. ধন্যবাদ!", "success");
 
-    const tx = document.getElementById("transactionId");
-    if (tx) tx.value = "";
+    // Clear the transaction field
+    const txIds = ["transactionId", "transactionIdBinance", "transactionIdCoin"];
+    txIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
   } catch (error) {
     console.error("submitTopup failed:", error);
     if (error.code === "NOT_LOGGED_IN") {
-      showMessage("Please login first.", "error");
+      showMsgEl(msgEl, "Please login first.", "error");
       openLoginOrHome();
     } else {
-      showMessage(error.message || "Payment request failed.", "error");
+      showMsgEl(msgEl, error.message || "Payment request failed.", "error");
     }
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = pageMode === "service" ? "Verify Service Payment" : "Verify Payment";
+      submitBtn.textContent = "Verify Payment";
     }
   }
+};
+
+function showMsgEl(elId, text, type) {
+  // Try the specific element first, fall back to walletMessage
+  const el = document.getElementById(elId) || document.getElementById("walletMessage");
+  if (!el) return;
+  el.textContent = text;
+  el.className = `wallet-message ${type}`;
+  el.style.display = "block";
+}
+
+window.submitTopup = async function () {
+  const method = document.getElementById("paymentMethod")?.value;
+  const transactionId = document.getElementById("transactionId")?.value.trim();
+  await window._submitTopupInternal({ method, transactionId, msgEl: 'walletMessage', btnEl: 'submitTopupBtn' });
 };
 
 window.loadMyTopups = function () {

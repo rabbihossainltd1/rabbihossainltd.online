@@ -180,14 +180,16 @@ async function handleChoice(choice){
 appendMsg('user',LABELS[choice],false); botState='answering';
 if(choice==='payment'){
 await botSay(
-`<strong>নতুন Payment System ব্যবহার করার নিয়ম:</strong><br><br>`+
+`<strong>পেমেন্ট করার নিয়ম:</strong><br><br>`+
 `<div class="float-answer-list">`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Step 1</strong> — Add Credit পেজে যান, amount লিখুন, তারপর Add Credit button click করুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Mobile Banking</strong> — bKash / Nagad / Rocket select করুন, Send Money করুন, Transaction ID দিন, তারপর VERIFY করুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance Pay select করুন, QR/Pay ID/Button ব্যবহার করে payment করুন, Binance Order ID দিয়ে VERIFY করুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Crypto Coin</strong> — USDT BSC / TRX / ETH / SOL / TON select করুন, exact network address/QR এ payment করুন, TXID/Hash দিয়ে VERIFY করুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffdd57" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Important</strong> — Crypto payment এ network অবশ্যই match করবেন। ভুল network হলে payment recover নাও হতে পারে।</span></div>`+
-`</div><br>VERIFY করার পর admin approval হলে wallet credit update হবে।`,
+`<div style="color:#7fffc4;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📱 Mobile Banking</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> (01349407692) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> (01731410341) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> (01731410341) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
+`<div style="color:#f3ba2f;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;">₿ Crypto</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance App &rarr; Pay &rarr; QR Scan করুন বা Wallet ID: 749542753 দিন &rarr; পাঠান &rarr; Order ID দিন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>USDT (BSC/TRX/ETH/SOL/TON)</strong> — Add Credit &rarr; Crypto &rarr; Coin বেছে নিন &rarr; Address-এ পাঠান &rarr; TxHash দিন।</span></div>`+
+`</div><br><strong>সব Payment Method:</strong> Add Credit পেজে যান &rarr; Amount দিন &rarr; পদ্ধতি বেছে নিন &rarr; Verify করুন।`,
 true,950);
 await new Promise(r=>setTimeout(r,350)); showBackToMenu();
 } else if(choice==='app'){
