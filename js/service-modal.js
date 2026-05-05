@@ -611,25 +611,72 @@
     if (activeFieldsType !== 'ff' || !form) return data;
 
     const selectedPackage = form.querySelector('input[name="ff_package"]:checked');
-    const ffUid = document.getElementById('mo_ff_uid')?.value.trim() || '';
+    const ffUid = (document.getElementById('mo_ff_uid')?.value || '').trim();
 
     if (selectedPackage) {
-      const productId = selectedPackage.dataset.productId || selectedPackage.getAttribute('data-product-id') || '';
-      const gameId = selectedPackage.dataset.gameId || selectedPackage.getAttribute('data-game-id') || 'free_fire_direct_topup_bangladesh_499';
+      // Prefer item4gamer data attributes set by item4gamer.js rendered radios
+      const item4gamerProductId =
+        selectedPackage.dataset.item4gamerProductId ||
+        selectedPackage.getAttribute('data-item4gamer-product-id') ||
+        selectedPackage.dataset.productId ||
+        selectedPackage.getAttribute('data-product-id') ||
+        '';
 
+      const productId =
+        selectedPackage.dataset.productId ||
+        selectedPackage.getAttribute('data-product-id') ||
+        item4gamerProductId;
+
+      const gameId =
+        selectedPackage.dataset.gameId ||
+        selectedPackage.getAttribute('data-game-id') ||
+        'freefire';
+
+      const packageName =
+        selectedPackage.dataset.packageName ||
+        selectedPackage.getAttribute('data-package-name') ||
+        selectedPackage.value ||
+        '';
+
+      const amountUsd =
+        parseFloat(selectedPackage.dataset.amountUsd || selectedPackage.getAttribute('data-amount-usd') || 0) ||
+        _currentAmountUsd ||
+        0;
+
+      const amountBDT =
+        parseInt(selectedPackage.dataset.amountBdt || selectedPackage.getAttribute('data-amount-bdt') || 0, 10) ||
+        Math.round(amountUsd * 125);
+
+      const provider =
+        selectedPackage.dataset.provider ||
+        selectedPackage.getAttribute('data-provider') ||
+        'item4gamer';
+
+      // Core identifiers — all populated
+      data.item4gamerProductId = item4gamerProductId;
       data.productId = productId;
       data.product_id = productId;
-      data.fazercardsProductId = productId;
+      data.productName = packageName;
       data.gameId = gameId;
       data.game_id = gameId;
-      data.packageName = selectedPackage.dataset.packageName || selectedPackage.value || '';
-      data.provider = 'fazercards';
-      data.autoTopupReady = !!productId;
+      data.packageName = packageName;
+      data.provider = provider;
+      data.autoTopupReady = !!(item4gamerProductId || productId);
+
+      // Pricing
+      data.amountUsd = amountUsd;
+      data.amountBDT = amountBDT;
+
+      // Legacy keys kept for backward-compat with admin panel
+      data.fazercardsProductId = productId;
     }
 
-    data.freeFireUid = ffUid;
-    data.playerId = ffUid;
-    data.user_id = ffUid;
+    // UID — prefer verified UID stored by item4gamer.js check-player
+    const resolvedUid = ffUid || (window._i4gVerifiedUid || '');
+    data.freeFireUid = resolvedUid;
+    data.playerId = resolvedUid;
+    data.user_id = resolvedUid;
+    data.ff_uid = resolvedUid;
 
     return data;
   }
@@ -676,7 +723,7 @@
     }
 
     if (activeFieldsType === 'ff') {
-      const ffUid = document.getElementById('mo_ff_uid')?.value.trim();
+      const ffUid = (document.getElementById('mo_ff_uid')?.value || '').trim();
       const selectedPackage = form?.querySelector('input[name="ff_package"]:checked');
       if (!selectedPackage) {
         showStatus('প্রথমে Free Fire package select করো।', 'error');
@@ -686,9 +733,15 @@
         showStatus('Free Fire UID লিখে দিন।', 'error');
         return false;
       }
-      if (!selectedPackage.dataset.productId) {
-        showStatus('এই package-এর auto top-up product ID missing. System automatically process করবে।', 'error');
-        return false;
+      // item4gamer products may use item4gamerProductId or productId — both are valid
+      const hasProductId =
+        selectedPackage.dataset.productId ||
+        selectedPackage.getAttribute('data-product-id') ||
+        selectedPackage.dataset.item4gamerProductId ||
+        selectedPackage.getAttribute('data-item4gamer-product-id');
+      if (!hasProductId) {
+        // Warn but do not block — admin order flow handles manual processing
+        console.warn('[ServiceModal] No item4gamer productId on selected package. Order will proceed for manual admin processing.');
       }
     }
 
