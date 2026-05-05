@@ -74,6 +74,7 @@
     .amount-input-row input{flex:1;min-height:56px;background:transparent;border:none;outline:none;color:var(--pay-text);font-size:1.1rem;font-weight:800;font-family:var(--font-display);padding:13px 0;}
     .amount-input-row input::placeholder{color:rgba(122,143,181,.5);font-weight:600;font-size:.95rem;}
     .amount-bdt-badge{padding:0 16px;color:var(--pay-muted);font-size:.82rem;font-weight:700;flex-shrink:0;white-space:nowrap;}
+    .amount-bdt-hint{margin-top:7px;padding:0 4px;color:rgba(138,162,201,.65);font-size:.78rem;font-weight:600;min-height:1.1em;letter-spacing:.01em;transition:color .2s;}
 
     /* ── Category buttons ── */
     .category-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -268,8 +269,8 @@
               <div class="amount-input-row">
                 <span class="amount-prefix">$</span>
                 <input type="number" id="amountInput" placeholder="0.00" min="1" step="0.01" oninput="onAmountInput()" />
-                <span class="amount-bdt-badge" id="bdtBadge">৳ 0</span>
               </div>
+              <div class="amount-bdt-hint" id="bdtBadge">≈ ৳ 0 BDT</div>
             </div>
 
             <input type="hidden" id="selectedUsd" value="0" />
@@ -523,7 +524,7 @@
       const v = parseFloat(document.getElementById('amountInput').value)||0;
       selectedUsdAmount = v;
       const bdt = Math.round(v * USD_TO_BDT);
-      document.getElementById('bdtBadge').textContent = v > 0 ? fmtBdt(bdt) : '৳ 0';
+      document.getElementById('bdtBadge').textContent = v > 0 ? `≈ ${fmtBdt(bdt)} BDT` : '≈ ৳ 0 BDT';
       document.getElementById('selectedUsd').value = v;
       document.getElementById('selectedBdt').value = bdt;
     }
@@ -663,7 +664,7 @@
     }
 
     // ── Full-screen verifying overlay ──
-    function showVerifyingOverlay(){
+    window.showVerifyingOverlay = function showVerifyingOverlay(){
       const ov = document.createElement('div');
       ov.className = 'verify-overlay';
       ov.id = 'verifyOverlay';
