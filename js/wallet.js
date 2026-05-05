@@ -17,6 +17,12 @@ import {
   increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+// Expose Firestore helpers for add-credit.html overlay listener
+window._db = db;
+window._doc = doc;
+window._collection = collection;
+window._onSnapshot = onSnapshot;
+
 const USD_TO_BDT = 125;
 
 const PAYMENT_NUMBERS = {
@@ -505,10 +511,10 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl = 'w
       updatedAt: serverTimestamp()
     };
 
-    await addDoc(collection(db, "topups"), payload);
+    const topupRef = await addDoc(collection(db, "topups"), payload);
     // Trigger success overlay if provided
     if (typeof onSuccess === 'function') {
-      onSuccess();
+      onSuccess(topupRef.id);
     } else {
       showMsgEl(msgEl, "Credit request submitted! Admin approval pending. ধন্যবাদ!", "success");
     }
