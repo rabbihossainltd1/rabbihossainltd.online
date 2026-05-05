@@ -13,7 +13,7 @@
     .admin-denied div { max-width:400px; background:rgba(255,255,255,.06); border:1px solid rgba(255,80,80,.22); border-radius:24px; padding:34px; }
     .admin-denied a { color:#00c8ff; text-decoration:none; font-weight:700; }
     .admin-nav { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-    @media(min-width:640px){ .admin-nav { grid-template-columns:repeat(4,1fr); } }
+    @media(min-width:640px){ .admin-nav { grid-template-columns:repeat(5,1fr); } }
     .admin-nav-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px 12px; border-radius:20px; border:1px solid rgba(0,200,255,.16); background:rgba(255,255,255,.04); color:#8aaac8; font-weight:900; font-size:.82rem; cursor:pointer; transition:.22s ease; text-align:center; position:relative; font-family:inherit; }
     .admin-nav-btn svg { width:26px; height:26px; stroke-width:1.6; color:#00c8ff; flex-shrink:0; }
     .admin-nav-btn:hover { border-color:rgba(0,200,255,.35); background:rgba(0,200,255,.07); color:#c2e4f8; transform:translateY(-2px); }
@@ -53,6 +53,24 @@
     .coupon-msg.success { background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.25); color:#a7ffcf; display:block; }
     .coupon-msg.error { background:rgba(255,80,80,.10); border:1px solid rgba(255,80,80,.22); color:#ffb0b0; display:block; }
     .support-grid { display:none; } /* legacy — replaced */
+    /* ── History Panel ── */
+    .history-sub-nav { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .history-sub-btn { flex:1; min-width:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; padding:14px 10px; border-radius:16px; border:1px solid rgba(0,200,255,.18); background:rgba(255,255,255,.04); color:#8aaac8; font-weight:900; font-size:.8rem; cursor:pointer; transition:.2s ease; font-family:inherit; }
+    .history-sub-btn svg { width:20px; height:20px; stroke-width:1.6; color:#00c8ff; }
+    .history-sub-btn:hover { border-color:rgba(0,200,255,.4); background:rgba(0,200,255,.08); color:#c2e4f8; }
+    .history-sub-btn.active { background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(0,255,136,.10)); border-color:rgba(0,200,255,.5); color:#e8edf5; box-shadow:0 6px 22px rgba(0,200,255,.12); }
+    .history-search-wrap { position:relative; margin-bottom:14px; }
+    .history-search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#4a6880; pointer-events:none; stroke-width:2; }
+    .history-search-input { width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px 12px 10px 38px; color:#e8edf5; font-size:.88rem; font-family:inherit; outline:none; box-sizing:border-box; }
+    .history-search-input:focus { border-color:rgba(0,200,255,.42); }
+    .history-sub-panel { display:none; }
+    .history-sub-panel.active { display:block; }
+    /* compact history cards */
+    .history-card { padding:12px 14px !important; border-radius:14px !important; }
+    .history-card h3 { font-size:.88rem !important; margin:0 0 3px !important; }
+    .history-card p  { font-size:.75rem !important; margin:2px 0 !important; color:#8fa2bb !important; }
+    .history-card .admin-card-head { margin-bottom:5px !important; }
+    .history-card .status { font-size:.65rem !important; padding:3px 8px !important; }
     /* ── Admin Inbox list ── */
     .admin-inbox-list { display:flex; flex-direction:column; gap:0; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.07); }
     .inbox-item { padding:13px 16px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:background .15s; display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; background:rgba(0,0,0,.15); }
@@ -138,6 +156,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
           Live Support
           <span class="admin-nav-badge" id="badgeSupport" style="display:none;"></span>
+        </button>
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('History')" id="navBtnHistory">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
+          History
         </button>
       </nav>
 
@@ -262,20 +284,108 @@
         </div>
       </div>
 
+      <!-- Panel: History -->
+      <div class="admin-panel" id="panelHistory">
+        <div class="admin-card-shell">
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h2>History</h2>
+          </div>
+
+          <!-- Sub-nav: Transaction / Services / Support -->
+          <div class="history-sub-nav">
+            <button class="history-sub-btn active" type="button" onclick="historyShowSub('Transaction')" id="histSubBtnTransaction">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5"/></svg>
+              Transaction
+            </button>
+            <button class="history-sub-btn" type="button" onclick="historyShowSub('Services')" id="histSubBtnServices">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
+              Services
+            </button>
+            <button class="history-sub-btn" type="button" onclick="historyShowSub('Support')" id="histSubBtnSupport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              Support
+            </button>
+          </div>
+
+          <!-- Search box -->
+          <div class="history-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" class="history-search-input" id="historySearchInput" placeholder="Search by Transaction ID, Support ID, name, email..." oninput="historySearch(this.value)" />
+          </div>
+
+          <!-- Transaction History -->
+          <div class="history-sub-panel active" id="histPanelTransaction">
+            <div id="adminTopupHistoryList" class="admin-list">
+              <div class="empty-state">Loading transaction history...</div>
+            </div>
+          </div>
+
+          <!-- Services History -->
+          <div class="history-sub-panel" id="histPanelServices">
+            <div id="adminOrderHistoryList" class="admin-list">
+              <div class="empty-state">Loading service history...</div>
+            </div>
+          </div>
+
+          <!-- Support History -->
+          <div class="history-sub-panel" id="histPanelSupport">
+            <div id="adminSupportHistoryList" class="admin-list">
+              <div class="empty-state">Loading support history...</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <p id="adminInfo" style="color:#4a6070;font-size:.78rem;text-align:center;margin-top:14px;"></p>
 
     </div>
   </main>
 
   <script>
+  // ── Admin nav panel switcher ──
   function adminShowPanel(name) {
-    ['Services','Transactions','Coupons','Support'].forEach(p => {
+    ['Services','Transactions','Coupons','Support','History'].forEach(p => {
       const panel = document.getElementById('panel' + p);
-      const btn = document.getElementById('navBtn' + p);
+      const btn   = document.getElementById('navBtn' + p);
       if (panel) panel.classList.toggle('active', p === name);
-      if (btn) btn.classList.toggle('active', p === name);
+      if (btn)   btn.classList.toggle('active', p === name);
     });
+    // reset search when switching to History
+    if (name === 'History') {
+      const inp = document.getElementById('historySearchInput');
+      if (inp) { inp.value = ''; historySearch(''); }
+    }
   }
+
+  // ── History sub-panel switcher ──
+  window.historyShowSub = function(name) {
+    ['Transaction','Services','Support'].forEach(s => {
+      const panel = document.getElementById('histPanel' + s);
+      const btn   = document.getElementById('histSubBtn' + s);
+      if (panel) panel.classList.toggle('active', s === name);
+      if (btn)   btn.classList.toggle('active', s === name);
+    });
+    // re-apply search filter for new sub-panel
+    const inp = document.getElementById('historySearchInput');
+    if (inp) historySearch(inp.value);
+  };
+
+  // ── History search ──
+  window.historySearch = function(query) {
+    const q = query.trim().toLowerCase();
+    // Find which sub-panel is active
+    ['histPanelTransaction','histPanelServices','histPanelSupport'].forEach(panelId => {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      const cards = panel.querySelectorAll('.history-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+    });
+  };
   </script>
 
   <script src="js/main.js"></script>
