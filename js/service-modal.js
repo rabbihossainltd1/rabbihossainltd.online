@@ -768,51 +768,6 @@
   }
 
   /* ── iOS Panel Key Delivery ── */
-  async function deliverIosKey(amountUsd, result) {
-    // Determine variant by amount
-    let keyFile = '1d';
-    if (amountUsd >= 25) keyFile = '31d';
-    else if (amountUsd >= 14) keyFile = '7d';
-
-    let deliveredKey = null;
-
-    try {
-      // Fetch the key file
-      const resp = await fetch(`../keys/ios/${keyFile}.txt?nocache=${Date.now()}`);
-      if (!resp.ok) throw new Error('Key file not found');
-      const text = await resp.text();
-      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-      if (lines.length === 0) throw new Error('No keys available');
-
-      // Use Firestore to track which key index to use (atomic)
-      const { db: fsDb } = await import('./firebase-core.js');
-      const { doc: fsDoc, getDoc: fsGetDoc, runTransaction } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
-
-      const counterRef = fsDoc(fsDb, 'iosKeyCounters', keyFile);
-      let keyIndex = 0;
-
-      await runTransaction(fsDb, async (tx) => {
-        const snap = await tx.get(counterRef);
-        keyIndex = snap.exists() ? (snap.data().nextIndex || 0) : 0;
-        if (keyIndex >= lines.length) throw new Error('OUT_OF_STOCK');
-        tx.set(counterRef, { nextIndex: keyIndex + 1, total: lines.length });
-      });
-
-      deliveredKey = lines[keyIndex];
-    } catch (err) {
-      if (err.message === 'OUT_OF_STOCK') {
-        showIosKeyModal(null, amountUsd, 'স্টক শেষ হয়ে গেছে। Admin এর সাথে যোগাযোগ করুন।');
-        return;
-      }
-      // Fallback: show success without key
-      showIosKeyModal(null, amountUsd, 'Key লোড করতে সমস্যা হয়েছে। Admin এর সাথে যোগাযোগ করুন।');
-      return;
-    }
-
-    showIosKeyModal(deliveredKey, amountUsd, null);
-  }
-
   function showIosKeyModal(key, amountUsd, errorMsg) {
     const overlay = document.getElementById('serviceModal');
     if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
@@ -913,7 +868,6 @@
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
 
-    // ── Balance check BEFORE placing order ──────────────────────────
     if (!baseAmountUsd || baseAmountUsd <= 0) {
       showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
       return;
@@ -924,29 +878,30 @@
       : null;
 
     if (currentCredit !== null && currentCredit < amountUsd) {
-      // Insufficient balance — redirect to add-credit immediately
       showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
-      setTimeout(() => {
-        window.location.href = 'add-credit.html';
-      }, 1200);
+      setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
       return;
     }
-    // ────────────────────────────────────────────────────────────────
 
     const btn = document.getElementById('buyWithCreditBtn');
     const old = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;animation:spin .7s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Processing…'; }
 
     const details = collectFormData();
-    // Attach coupon info to details so it's saved in order
     if (_activeCoupon) {
       details.couponCode = _activeCoupon.code;
       details.discountPercent = _activeCoupon.discountPercent;
       details.originalAmountUsd = baseAmountUsd;
     }
 
-    // Call backend first — only show success if backend confirms
-    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd: baseAmountUsd, details });
+    // ── iOS Panel: সরাসরি credit deduct + key deliver, কোনো admin approval নেই ──
+    if (activeFieldsType === 'ffIos') {
+      await handleIosPurchase(amountUsd, baseAmountUsd, details, btn, old);
+      return;
+    }
+
+    // ── অন্য সব service: backend approval flow ──
+    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd, details });
 
     if (!result.ok) {
       if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
@@ -962,16 +917,96 @@
       return;
     }
 
-    // Backend confirmed — now check if this is iOS panel — deliver key
-    if (activeFieldsType === 'ffIos') {
-      await deliverIosKey(amountUsd, result);
-      sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_ios_key_delivered', _amount_usd: amountUsd }).catch(() => {});
-      return;
-    }
-
-    // Backend confirmed — now show success
     showServiceSuccess(result, amountUsd);
     sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
+  }
+
+  // ── iOS Purchase: credit deduct করো, key দাও, Firestore-এ order save করো ──
+  async function handleIosPurchase(amountUsd, baseAmountUsd, details, btn, oldBtnHtml) {
+    try {
+      const { auth: fsAuth, db: fsDb } = await import('./firebase-core.js');
+      const {
+        doc, getDoc, runTransaction, collection, addDoc, serverTimestamp
+      } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+      const user = window.rabbiAuth.getUser();
+      const uid = user.uid;
+
+      // Variant নির্ধারণ
+      let keyFile = '1d';
+      if (amountUsd >= 25) keyFile = '31d';
+      else if (amountUsd >= 14) keyFile = '7d';
+
+      // Key file fetch
+      const resp = await fetch(`../keys/ios/${keyFile}.txt?nocache=${Date.now()}`);
+      if (!resp.ok) throw new Error('KEY_FILE_MISSING');
+      const text = await resp.text();
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length === 0) throw new Error('OUT_OF_STOCK');
+
+      // Atomic transaction: credit deduct + key index increment
+      const userRef = doc(fsDb, 'users', uid);
+      const counterRef = doc(fsDb, 'iosKeyCounters', keyFile);
+      let deliveredKey = null;
+
+      await runTransaction(fsDb, async (tx) => {
+        const userSnap    = await tx.get(userRef);
+        const counterSnap = await tx.get(counterRef);
+
+        // Balance check inside transaction
+        const creditField = userSnap.data()?.creditUSD ?? userSnap.data()?.credit ?? 0;
+        if (creditField < amountUsd) throw new Error('INSUFFICIENT_BALANCE');
+
+        // Key index
+        const keyIndex = counterSnap.exists() ? (counterSnap.data().nextIndex || 0) : 0;
+        if (keyIndex >= lines.length) throw new Error('OUT_OF_STOCK');
+
+        deliveredKey = lines[keyIndex];
+
+        // Deduct credit
+        const newCredit = Math.round((creditField - amountUsd) * 10000) / 10000;
+        if (userSnap.data()?.creditUSD !== undefined) {
+          tx.update(userRef, { creditUSD: newCredit });
+        } else {
+          tx.update(userRef, { credit: newCredit });
+        }
+
+        // Increment key counter
+        tx.set(counterRef, { nextIndex: keyIndex + 1, total: lines.length });
+      });
+
+      // Order Firestore-এ save করো (history-র জন্য)
+      await addDoc(collection(fsDb, 'serviceOrders'), {
+        userId: uid,
+        userEmail: user.email,
+        serviceName: 'Free Fire iPhone Panel (iOS)',
+        serviceId: 'ffIos',
+        variant: keyFile,
+        amountUsd,
+        paymentMethod: 'credit',
+        status: 'completed',
+        keyDelivered: true,
+        serviceDetails: details,
+        createdAt: serverTimestamp(),
+      }).catch(() => {});
+
+      // Key show করো
+      showIosKeyModal(deliveredKey, amountUsd, null);
+      sendToFormspree({ _payment_method: 'credit', _payment_status: 'ios_key_delivered', _amount_usd: amountUsd, _variant: keyFile }).catch(() => {});
+
+    } catch (err) {
+      if (btn) { btn.disabled = false; btn.innerHTML = oldBtnHtml || 'Place Order'; }
+      if (err.message === 'OUT_OF_STOCK') {
+        showIosKeyModal(null, amountUsd, 'স্টক শেষ হয়ে গেছে। Admin এর সাথে যোগাযোগ করুন।');
+      } else if (err.message === 'INSUFFICIENT_BALANCE') {
+        showStatus('Insufficient balance. Add Credit করো।', 'error');
+        setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
+      } else if (err.message === 'KEY_FILE_MISSING') {
+        showIosKeyModal(null, amountUsd, 'Key লোড করতে সমস্যা হয়েছে। Admin এর সাথে যোগাযোগ করুন।');
+      } else {
+        showStatus('কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।', 'error');
+      }
+    }
   }
 
   function handleInstantPay() {
