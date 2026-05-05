@@ -801,27 +801,32 @@ window.loadAdminPanel = function () {
       });
     });
 
-    // ── Support History ──
+    // ── Support History (Solved only) ──
     const supportHistoryList = document.getElementById("adminSupportHistoryList");
     if (supportHistoryList) {
       onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
         supportHistoryList.innerHTML = "";
-        if (snapshot.empty) {
-          supportHistoryList.innerHTML = `<div class="empty-state">No support history yet.</div>`;
+        const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
+        if (solvedDocs.length === 0) {
+          supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
           return;
         }
-        snapshot.forEach((docSnap) => {
+        solvedDocs.forEach((docSnap) => {
           const d = docSnap.data() || {};
-          const isSolved = d.status === "solved";
+          const uid = docSnap.id;
+          const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
           supportHistoryList.innerHTML += `
-            <div class="admin-card history-card">
+            <div class="admin-card history-card" style="cursor:pointer;" onclick="window.adminShowSolvedChat && window.adminShowSolvedChat('${escapeHtml(uid)}')">
               <div class="admin-card-head">
-                <h3>${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
-                <span class="status ${isSolved ? "approved" : "pending"}">${isSolved ? "Solved" : "Open"}</span>
+                <div>
+                  <h3>🟢 ${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
+                  ${d.ticketId ? `<p style="font-family:monospace;font-size:.68rem;color:#5a7090;">#${escapeHtml(d.ticketId)}</p>` : ''}
+                </div>
+                <span class="status completed">Solved</span>
               </div>
-              <p><b>Ticket:</b> ${d.ticketId ? "#" + escapeHtml(d.ticketId) : "—"}</p>
-              <p><b>Email:</b> ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; <b>Phone:</b> ${escapeHtml(d.userPhone || "—")}</p>
-              <p><b>Last:</b> ${escapeHtml(d.lastMessage || "—")}</p>
+              <p>📧 ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; 📞 ${escapeHtml(d.userPhone || "—")}</p>
+              <p>Last: ${escapeHtml(d.lastMessage || "—")}</p>
+              ${lastAt ? `<p style="color:#4a6070;font-size:.7rem;">Date: ${lastAt}</p>` : ''}
             </div>
           `;
         });

@@ -624,7 +624,7 @@
       data.game_id = gameId;
       data.packageName = selectedPackage.dataset.packageName || selectedPackage.value || '';
       data.provider = 'fazercards';
-      data.autoTopupReady = !!(productId && ffUid);
+      data.autoTopupReady = !!productId;
     }
 
     data.freeFireUid = ffUid;
@@ -767,6 +767,140 @@
     document.body.style.overflow = '';
   }
 
+  /* ── iOS Panel Key Delivery ── */
+  async function deliverIosKey(amountUsd, result) {
+    // Determine variant by amount
+    let keyFile = '1d';
+    if (amountUsd >= 25) keyFile = '31d';
+    else if (amountUsd >= 14) keyFile = '7d';
+
+    let deliveredKey = null;
+
+    try {
+      // Fetch the key file
+      const resp = await fetch(`../keys/ios/${keyFile}.txt?nocache=${Date.now()}`);
+      if (!resp.ok) throw new Error('Key file not found');
+      const text = await resp.text();
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      if (lines.length === 0) throw new Error('No keys available');
+
+      // Use Firestore to track which key index to use (atomic)
+      const { db: fsDb } = await import('./firebase-core.js');
+      const { doc: fsDoc, getDoc: fsGetDoc, runTransaction } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+      const counterRef = fsDoc(fsDb, 'iosKeyCounters', keyFile);
+      let keyIndex = 0;
+
+      await runTransaction(fsDb, async (tx) => {
+        const snap = await tx.get(counterRef);
+        keyIndex = snap.exists() ? (snap.data().nextIndex || 0) : 0;
+        if (keyIndex >= lines.length) throw new Error('OUT_OF_STOCK');
+        tx.set(counterRef, { nextIndex: keyIndex + 1, total: lines.length });
+      });
+
+      deliveredKey = lines[keyIndex];
+    } catch (err) {
+      if (err.message === 'OUT_OF_STOCK') {
+        showIosKeyModal(null, amountUsd, 'স্টক শেষ হয়ে গেছে। Admin এর সাথে যোগাযোগ করুন।');
+        return;
+      }
+      // Fallback: show success without key
+      showIosKeyModal(null, amountUsd, 'Key লোড করতে সমস্যা হয়েছে। Admin এর সাথে যোগাযোগ করুন।');
+      return;
+    }
+
+    showIosKeyModal(deliveredKey, amountUsd, null);
+  }
+
+  function showIosKeyModal(key, amountUsd, errorMsg) {
+    const overlay = document.getElementById('serviceModal');
+    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+    let ov = document.getElementById('orderPlacedOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'orderPlacedOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);padding:20px;';
+      document.body.appendChild(ov);
+    }
+
+    const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
+
+    ov.innerHTML = `
+      <div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
+        background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,200,255,.06) 100%);
+        border:1px solid rgba(0,191,255,.35);
+        box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 60px rgba(0,191,255,.10);
+        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
+
+        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
+          background:rgba(0,191,255,.14);border:2px solid rgba(0,191,255,.40);
+          display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📱</div>
+
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
+          background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);
+          color:#7ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
+          iOS Panel — Order Complete
+        </div>
+
+        <h2 style="font-size:1.5rem;color:#f0f8ff;margin:0 0 8px;">আপনার Key এসে গেছে!</h2>
+
+        ${errorMsg ? `
+          <div style="background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.25);border-radius:14px;
+            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;">
+            ⚠️ ${errorMsg}
+          </div>
+        ` : `
+          <p style="color:#8faec9;font-size:.88rem;margin:0 0 18px;">নিচের Key টি কপি করুন এবং সংরক্ষণ করুন।</p>
+
+          <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.25);border-radius:16px;
+            padding:18px;margin:0 0 18px;position:relative;">
+            <div style="font-family:monospace;font-size:1.05rem;color:#00d4ff;letter-spacing:.08em;
+              word-break:break-all;line-height:1.6;user-select:all;" id="iosDeliveredKey">
+              ${key}
+            </div>
+          </div>
+
+          <button id="iosCopyBtn" type="button" onclick="(function(){
+            navigator.clipboard.writeText('${key}').then(()=>{
+              const b=document.getElementById('iosCopyBtn');
+              b.textContent='✅ Copied!';
+              b.style.background='rgba(0,255,136,.15)';
+              b.style.borderColor='rgba(0,255,136,.4)';
+              b.style.color='#a7ffcf';
+              setTimeout(()=>{b.textContent='📋 Key Copy করুন';b.style.background='';b.style.borderColor='';b.style.color='';},2000);
+            });
+          })()" style="width:100%;border:1px solid rgba(0,191,255,.35);border-radius:14px;padding:13px;
+            background:rgba(0,191,255,.10);color:#7ee8ff;font-weight:900;font-size:.95rem;cursor:pointer;
+            margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">
+            📋 Key Copy করুন
+          </button>
+
+          <div style="background:rgba(255,166,0,.08);border:1px solid rgba(255,166,0,.20);border-radius:12px;
+            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;">
+            ⚠️ এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
+          </div>
+        `}
+
+        ${usdStr ? `<div style="margin-bottom:14px;"><span style="padding:8px 16px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#7ee8ff;font-weight:900;font-size:.88rem;">${usdStr}</span></div>` : ''}
+
+        <button type="button" onclick="window.location.href='dashboard.html?tab=orders'"
+          style="width:100%;border:none;border-radius:14px;padding:14px;
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;">
+          My Orders দেখুন
+        </button>
+      </div>
+    `;
+
+    if (!document.getElementById('opAnimStyle')) {
+      const s = document.createElement('style');
+      s.id = 'opAnimStyle';
+      s.textContent = `@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}`;
+      document.head.appendChild(s);
+    }
+  }
+
   async function handleBuyWithCredit() {
     if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
       window.rabbiAuth && window.rabbiAuth.openLogin('apply');
@@ -825,6 +959,13 @@
       } else {
         showStatus(result.message || 'Order failed. আবার চেষ্টা করো।', 'error');
       }
+      return;
+    }
+
+    // Backend confirmed — now check if this is iOS panel — deliver key
+    if (activeFieldsType === 'ffIos') {
+      await deliverIosKey(amountUsd, result);
+      sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_ios_key_delivered', _amount_usd: amountUsd }).catch(() => {});
       return;
     }
 
