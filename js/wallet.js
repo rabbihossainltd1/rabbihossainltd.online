@@ -17,25 +17,13 @@ import {
   increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-// Expose Firestore helpers for add-credit.html overlay listener
-window._db = db;
-window._doc = doc;
-window._collection = collection;
-window._onSnapshot = onSnapshot;
-
 const USD_TO_BDT = 125;
 
 const PAYMENT_NUMBERS = {
-  bKash: "01349407692",
+  bKash: "01731410341",
   Nagad: "01731410341",
   Rocket: "01731410341",
   Binance: "749542753",
-  // Crypto coin methods — no wallet number (address used instead)
-  "USDT BSC": "",
-  "USDT TRX": "",
-  "USDT ETH": "",
-  "USDT SOL": "",
-  "USDT TON": "",
 };
 
 const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
@@ -310,14 +298,6 @@ function listenUserCredit(user) {
 }
 
 function getSelectedUsdAmount() {
-  // New multi-step UI: selectedUsd hidden field or window._currentSelectedUsd
-  if (typeof window._currentSelectedUsd === 'function') {
-    const v = window._currentSelectedUsd();
-    if (v && Number.isFinite(Number(v))) return normalizeUsd(v);
-  }
-  const hiddenEl = document.getElementById("selectedUsd");
-  if (hiddenEl && hiddenEl.value) return normalizeUsd(hiddenEl.value);
-  // Legacy fallback (old UI with #amount select)
   const amountEl = document.getElementById("amount");
   const amountValue = amountEl ? amountEl.value : "1";
   const customAmount = Number(document.getElementById("customAmount")?.value || 0);
@@ -350,24 +330,12 @@ function setupPageMode() {
     setText("walletPageSub", "Service payment manually পাঠান। Payment verify হলে service request active হবে।");
     setText("paymentPurpose", `Service: ${servicePaymentInfo.serviceName}`);
 
-    // New step-based UI: set the hidden field and update display
-    const hiddenUsd = document.getElementById("selectedUsd");
-    const hiddenBdt = document.getElementById("selectedBdt");
-    const dispUsd = document.getElementById("dispUsd");
-    const dispBdt = document.getElementById("dispBdt");
-    const amt = servicePaymentInfo.amountUsd;
-    if (hiddenUsd) hiddenUsd.value = String(amt);
-    if (hiddenBdt) hiddenBdt.value = String(Math.round(amt * USD_TO_BDT));
-    if (dispUsd) dispUsd.textContent = `$${amt}`;
-    if (dispBdt) dispBdt.textContent = `৳${Math.round(amt * USD_TO_BDT).toLocaleString()}`;
-
-    // Legacy UI support
     const amountEl = document.getElementById("amount");
     const customWrap = document.getElementById("customAmountWrap");
     const customAmount = document.getElementById("customAmount");
     if (amountEl && customAmount) {
       amountEl.value = "custom";
-      customAmount.value = String(amt);
+      customAmount.value = String(servicePaymentInfo.amountUsd);
       if (customWrap) customWrap.style.display = "block";
     }
   } else {
@@ -449,25 +417,40 @@ window.copyTextValue = async function (targetId, label = "Text") {
   }
 };
 
-// ── Unified internal submit (called by all payment methods) ──
-window._submitTopupInternal = async function({ method, transactionId, msgEl = 'walletMessage', btnEl = 'submitTopupBtn', onSuccess = null } = {}) {
+window.submitTopup = async function () {
   const user = await waitForActiveUser();
   if (!user) {
-    showMsgEl(msgEl, "আগে Login করো, তারপর payment request submit হবে।", "error");
+    showMessage("আগে Login করো, তারপর payment request submit হবে।", "error");
     openLoginOrHome();
     return;
   }
   currentUser = user;
 
+  const method = document.getElementById("paymentMethod")?.value;
+  const transactionId = document.getElementById("transactionId")?.value.trim();
   const amountUsd = normalizeUsd(getSelectedUsdAmount());
   const amountBdt = toBdt(amountUsd);
 
-  if (!method) { showMsgEl(msgEl, "Payment method select করো।", "error"); return; }
-  if (!amountUsd || amountUsd < 1) { showMsgEl(msgEl, "Minimum $1 amount দিতে হবে।", "error"); return; }
-  if (!transactionId || transactionId.length < 5) { showMsgEl(msgEl, "Valid Transaction ID / Hash দাও।", "error"); return; }
+  if (!method) {
+    showMessage("Payment method select করো।", "error");
+    return;
+  }
 
-  const submitBtn = document.getElementById(btnEl);
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Submitting..."; }
+  if (!amountUsd || amountUsd < 1) {
+    showMessage("Minimum $1 amount দিতে হবে।", "error");
+    return;
+  }
+
+  if (!transactionId || transactionId.length < 5) {
+    showMessage("Valid Transaction ID দাও।", "error");
+    return;
+  }
+
+  const submitBtn = document.getElementById("submitTopupBtn");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+  }
 
   try {
     await ensureUserDoc(user);
@@ -482,11 +465,14 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl = 'w
         transactionId,
         serviceDetails: details
       });
+
       sessionStorage.removeItem("pendingServicePayment");
-      showMsgEl(msgEl, "Service payment request submitted. Admin review pending.", "success");
+      showMessage("Service payment request submitted. Admin review pending.", "success");
       const tx = document.getElementById("transactionId");
       if (tx) tx.value = "";
-      setTimeout(() => { window.location.href = "dashboard.html?tab=orders"; }, 900);
+      setTimeout(() => {
+        window.location.href = "dashboard.html?tab=orders";
+      }, 900);
       return;
     }
 
@@ -511,47 +497,30 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl = 'w
       updatedAt: serverTimestamp()
     };
 
-    const topupRef = await addDoc(collection(db, "topups"), payload);
-    // Trigger success overlay if provided
-    if (typeof onSuccess === 'function') {
-      onSuccess(topupRef.id);
-    } else {
-      showMsgEl(msgEl, "Credit request submitted! Admin approval pending. ধন্যবাদ!", "success");
+    // Normalize method for Firestore rules — Binance stored as 'Binance'
+    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
+      payload.method = 'bKash'; // fallback
     }
 
-    // Clear the transaction field
-    const txIds = ["transactionId", "transactionIdBinance", "transactionIdCoin"];
-    txIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    await addDoc(collection(db, "topups"), payload);
+    showMessage("Credit request submitted. Admin approval pending.", "success");
+
+    const tx = document.getElementById("transactionId");
+    if (tx) tx.value = "";
   } catch (error) {
     console.error("submitTopup failed:", error);
     if (error.code === "NOT_LOGGED_IN") {
-      showMsgEl(msgEl, "Please login first.", "error");
+      showMessage("Please login first.", "error");
       openLoginOrHome();
     } else {
-      showMsgEl(msgEl, error.message || "Payment request failed.", "error");
+      showMessage(error.message || "Payment request failed.", "error");
     }
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Verify Payment";
+      submitBtn.textContent = pageMode === "service" ? "Verify Service Payment" : "Verify Payment";
     }
   }
-};
-
-function showMsgEl(elId, text, type) {
-  // Try the specific element first, fall back to walletMessage
-  const el = document.getElementById(elId) || document.getElementById("walletMessage");
-  if (!el) return;
-  el.textContent = text;
-  el.className = `wallet-message ${type}`;
-  el.style.display = "block";
-}
-
-window.submitTopup = async function () {
-  const method = document.getElementById("paymentMethod")?.value;
-  const transactionId = document.getElementById("transactionId")?.value.trim();
-  const onSuccess = typeof window.showVerifyingOverlay === 'function' ? window.showVerifyingOverlay : null;
-  await window._submitTopupInternal({ method, transactionId, msgEl: 'walletMessage', btnEl: 'submitTopupBtn', onSuccess });
 };
 
 window.loadMyTopups = function () {
@@ -659,6 +628,8 @@ window.loadAdminPanel = function () {
       if (orderList) orderList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
       if (topupHistoryList) topupHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
       if (orderHistoryList) orderHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      const shl = document.getElementById("adminSupportHistoryList");
+      if (shl) shl.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
       return;
     }
 
@@ -668,12 +639,8 @@ window.loadAdminPanel = function () {
 
     if (!adminSnap.exists() && !emailIsAdmin) {
       document.body.innerHTML = `
-        <main class="admin-denied">
-          <div>
-            <h1>Access Denied</h1>
-            <p>This page is only for admin.</p>
-            <a href="index.html">Go Back</a>
-          </div>
+        <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;">
+          <img src="images/hukar.gif" alt="" style="max-width:100%;max-height:100vh;display:block;" />
         </main>
       `;
       return;
@@ -833,6 +800,33 @@ window.loadAdminPanel = function () {
         `;
       });
     });
+
+    // ── Support History ──
+    const supportHistoryList = document.getElementById("adminSupportHistoryList");
+    if (supportHistoryList) {
+      onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
+        supportHistoryList.innerHTML = "";
+        if (snapshot.empty) {
+          supportHistoryList.innerHTML = `<div class="empty-state">No support history yet.</div>`;
+          return;
+        }
+        snapshot.forEach((docSnap) => {
+          const d = docSnap.data() || {};
+          const isSolved = d.status === "solved";
+          supportHistoryList.innerHTML += `
+            <div class="admin-card history-card">
+              <div class="admin-card-head">
+                <h3>${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
+                <span class="status ${isSolved ? "approved" : "pending"}">${isSolved ? "Solved" : "Open"}</span>
+              </div>
+              <p><b>Ticket:</b> ${d.ticketId ? "#" + escapeHtml(d.ticketId) : "—"}</p>
+              <p><b>Email:</b> ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; <b>Phone:</b> ${escapeHtml(d.userPhone || "—")}</p>
+              <p><b>Last:</b> ${escapeHtml(d.lastMessage || "—")}</p>
+            </div>
+          `;
+        });
+      });
+    }
   });
 };
 
