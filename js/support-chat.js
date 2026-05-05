@@ -182,14 +182,14 @@ if(choice==='payment'){
 await botSay(
 `<strong>পেমেন্ট করার নিয়ম:</strong><br><br>`+
 `<div class="float-answer-list">`+
-`<div style="color:#7fffc4;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📱 Mobile Banking</div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> (01349407692) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> (01731410341) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> (01731410341) — App খুলুন &rarr; Send Money &rarr; নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div style="color:#f3ba2f;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;">₿ Crypto</div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance App &rarr; Pay &rarr; QR Scan করুন বা Wallet ID: 749542753 দিন &rarr; পাঠান &rarr; Order ID দিন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>USDT (BSC/TRX/ETH/SOL/TON)</strong> — Add Credit &rarr; Crypto &rarr; Coin বেছে নিন &rarr; Address-এ পাঠান &rarr; TxHash দিন।</span></div>`+
-`</div><br><strong>সব Payment Method:</strong> Add Credit পেজে যান &rarr; Amount দিন &rarr; পদ্ধতি বেছে নিন &rarr; Verify করুন।`,
+`<div style="color:#7fffc4;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:'Outfit',sans-serif;">Mobile Banking</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> — Add Credit পেজ খুলুন &rarr; bKash select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> — Add Credit পেজ খুলুন &rarr; Nagad select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> — Add Credit পেজ খুলুন &rarr; Rocket select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div style="color:#f3ba2f;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;font-family:'Outfit',sans-serif;">Crypto</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Add Credit &rarr; Crypto &rarr; Binance Pay &rarr; QR Scan বা App দিয়ে pay করুন &rarr; Order ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>USDT (BSC/TRX/ETH/SOL/TON)</strong> — Add Credit &rarr; Crypto &rarr; Coin &rarr; Network বেছে দেখানো address-এ পাঠান &rarr; TxHash দিয়ে Verify করুন।</span></div>`+
+`</div>`,
 true,950);
 await new Promise(r=>setTimeout(r,350)); showBackToMenu();
 } else if(choice==='app'){

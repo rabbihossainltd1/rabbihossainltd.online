@@ -444,7 +444,7 @@ window.copyTextValue = async function (targetId, label = "Text") {
 };
 
 // ── Unified internal submit (called by all payment methods) ──
-window._submitTopupInternal = async function({ method, transactionId, msgEl = 'walletMessage', btnEl = 'submitTopupBtn' } = {}) {
+window._submitTopupInternal = async function({ method, transactionId, msgEl = 'walletMessage', btnEl = 'submitTopupBtn', onSuccess = null } = {}) {
   const user = await waitForActiveUser();
   if (!user) {
     showMsgEl(msgEl, "আগে Login করো, তারপর payment request submit হবে।", "error");
@@ -506,7 +506,12 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl = 'w
     };
 
     await addDoc(collection(db, "topups"), payload);
-    showMsgEl(msgEl, "Credit request submitted! Admin approval pending. ধন্যবাদ!", "success");
+    // Trigger success overlay if provided
+    if (typeof onSuccess === 'function') {
+      onSuccess();
+    } else {
+      showMsgEl(msgEl, "Credit request submitted! Admin approval pending. ধন্যবাদ!", "success");
+    }
 
     // Clear the transaction field
     const txIds = ["transactionId", "transactionIdBinance", "transactionIdCoin"];
