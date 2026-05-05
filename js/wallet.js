@@ -544,7 +544,8 @@ function showMsgEl(elId, text, type) {
 window.submitTopup = async function () {
   const method = document.getElementById("paymentMethod")?.value;
   const transactionId = document.getElementById("transactionId")?.value.trim();
-  await window._submitTopupInternal({ method, transactionId, msgEl: 'walletMessage', btnEl: 'submitTopupBtn' });
+  const onSuccess = typeof window.showVerifyingOverlay === 'function' ? window.showVerifyingOverlay : null;
+  await window._submitTopupInternal({ method, transactionId, msgEl: 'walletMessage', btnEl: 'submitTopupBtn', onSuccess });
 };
 
 window.loadMyTopups = function () {
