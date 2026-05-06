@@ -102,6 +102,21 @@ child.classList.add('reveal');
 function initReveal() {
 const reveals = document.querySelectorAll('.reveal');
 if (!reveals.length) return;
+// On desktop (>=900px), grid wrappers should be visible immediately
+// to avoid content hiding on scroll due to observer timing issues
+const isDesktop = window.innerWidth >= 900;
+if (isDesktop) {
+reveals.forEach(el => {
+// Make grid containers always visible on desktop
+if (
+el.classList.contains('home-svc-grid') ||
+el.classList.contains('service-banner-grid')
+) {
+el.classList.add('visible');
+return;
+}
+});
+}
 if (!('IntersectionObserver' in window)) {
 reveals.forEach(el => el.classList.add('visible'));
 return;
@@ -115,7 +130,7 @@ observer.unobserve(entry.target);
 }
 });
 },
-{ threshold: 0, rootMargin: '0px 0px 80px 0px' }
+{ threshold: 0, rootMargin: '0px 0px 120px 0px' }
 );
 reveals.forEach(el => observer.observe(el));
 }
