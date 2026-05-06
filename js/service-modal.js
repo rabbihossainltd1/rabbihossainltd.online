@@ -559,6 +559,15 @@
       if (d.expiresAt && d.expiresAt.toMillis && d.expiresAt.toMillis() < Date.now()) { showCouponMsg('This coupon has expired.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
       const dp = Number(d.discountPercent || 0);
       if (!dp || dp <= 0 || dp > 100) { showCouponMsg('Invalid coupon.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
+
+      // ── Service restriction check ──
+      if (d.validFor && Array.isArray(d.validFor) && d.validFor.length > 0) {
+        if (!d.validFor.includes(activeFieldsType)) {
+          showCouponMsg('এই coupon এই service-এ valid নয়।', 'error');
+          _activeCoupon = null; refreshCouponPriceUI(); return;
+        }
+      }
+
       _activeCoupon = { code, discountPercent: dp };
       refreshCouponPriceUI();
       showCouponMsg('Coupon applied! ' + dp + '% discount added.', 'success');
@@ -727,7 +736,16 @@
     } catch (err) { /* non-blocking */ }
   }
 
-  function openModal(serviceName, fieldsType) {    if (!overlay || !form) return;
+  function openModal(serviceName, fieldsType) {
+    if (!overlay || !form) return;
+
+    // ── Login check — modal খোলার আগেই check ──
+    if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
+      // pending service সংরক্ষণ করো যাতে login-এর পরে resume করা যায়
+      window._pendingService = { service: serviceName, fields: fieldsType || '' };
+      window.rabbiAuth && window.rabbiAuth.openLogin('apply');
+      return;
+    }
 
     injectCheckoutPanel();
 
@@ -767,95 +785,6 @@
     document.body.style.overflow = '';
   }
 
-  /* ── iOS Panel Key Delivery ── */
-  function showIosKeyModal(key, amountUsd, errorMsg) {
-    const overlay = document.getElementById('serviceModal');
-    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-
-    let ov = document.getElementById('orderPlacedOverlay');
-    if (!ov) {
-      ov = document.createElement('div');
-      ov.id = 'orderPlacedOverlay';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);padding:20px;';
-      document.body.appendChild(ov);
-    }
-
-    const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
-
-    ov.innerHTML = `
-      <div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
-        background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,200,255,.06) 100%);
-        border:1px solid rgba(0,191,255,.35);
-        box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 60px rgba(0,191,255,.10);
-        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
-
-        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
-          background:rgba(0,191,255,.14);border:2px solid rgba(0,191,255,.40);
-          display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📱</div>
-
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
-          background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);
-          color:#7ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
-          iOS Panel — Order Complete
-        </div>
-
-        <h2 style="font-size:1.5rem;color:#f0f8ff;margin:0 0 8px;">আপনার Key এসে গেছে!</h2>
-
-        ${errorMsg ? `
-          <div style="background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.25);border-radius:14px;
-            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;">
-            ⚠️ ${errorMsg}
-          </div>
-        ` : `
-          <p style="color:#8faec9;font-size:.88rem;margin:0 0 18px;">নিচের Key টি কপি করুন এবং সংরক্ষণ করুন।</p>
-
-          <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.25);border-radius:16px;
-            padding:18px;margin:0 0 18px;position:relative;">
-            <div style="font-family:monospace;font-size:1.05rem;color:#00d4ff;letter-spacing:.08em;
-              word-break:break-all;line-height:1.6;user-select:all;" id="iosDeliveredKey">
-              ${key}
-            </div>
-          </div>
-
-          <button id="iosCopyBtn" type="button" onclick="(function(){
-            navigator.clipboard.writeText('${key}').then(()=>{
-              const b=document.getElementById('iosCopyBtn');
-              b.textContent='✅ Copied!';
-              b.style.background='rgba(0,255,136,.15)';
-              b.style.borderColor='rgba(0,255,136,.4)';
-              b.style.color='#a7ffcf';
-              setTimeout(()=>{b.textContent='📋 Key Copy করুন';b.style.background='';b.style.borderColor='';b.style.color='';},2000);
-            });
-          })()" style="width:100%;border:1px solid rgba(0,191,255,.35);border-radius:14px;padding:13px;
-            background:rgba(0,191,255,.10);color:#7ee8ff;font-weight:900;font-size:.95rem;cursor:pointer;
-            margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">
-            📋 Key Copy করুন
-          </button>
-
-          <div style="background:rgba(255,166,0,.08);border:1px solid rgba(255,166,0,.20);border-radius:12px;
-            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;">
-            ⚠️ এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
-          </div>
-        `}
-
-        ${usdStr ? `<div style="margin-bottom:14px;"><span style="padding:8px 16px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#7ee8ff;font-weight:900;font-size:.88rem;">${usdStr}</span></div>` : ''}
-
-        <button type="button" onclick="window.location.href='dashboard.html?tab=orders'"
-          style="width:100%;border:none;border-radius:14px;padding:14px;
-          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;">
-          My Orders দেখুন
-        </button>
-      </div>
-    `;
-
-    if (!document.getElementById('opAnimStyle')) {
-      const s = document.createElement('style');
-      s.id = 'opAnimStyle';
-      s.textContent = `@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}`;
-      document.head.appendChild(s);
-    }
-  }
-
   async function handleBuyWithCredit() {
     if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
       window.rabbiAuth && window.rabbiAuth.openLogin('apply');
@@ -868,6 +797,7 @@
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
 
+    // ── Balance check BEFORE placing order ──────────────────────────
     if (!baseAmountUsd || baseAmountUsd <= 0) {
       showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
       return;
@@ -878,30 +808,29 @@
       : null;
 
     if (currentCredit !== null && currentCredit < amountUsd) {
+      // Insufficient balance — redirect to add-credit immediately
       showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
-      setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
+      setTimeout(() => {
+        window.location.href = 'add-credit.html';
+      }, 1200);
       return;
     }
+    // ────────────────────────────────────────────────────────────────
 
     const btn = document.getElementById('buyWithCreditBtn');
     const old = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px;animation:spin .7s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Processing…'; }
 
     const details = collectFormData();
+    // Attach coupon info to details so it's saved in order
     if (_activeCoupon) {
       details.couponCode = _activeCoupon.code;
       details.discountPercent = _activeCoupon.discountPercent;
       details.originalAmountUsd = baseAmountUsd;
     }
 
-    // ── iOS Panel: সরাসরি credit deduct + key deliver, কোনো admin approval নেই ──
-    if (activeFieldsType === 'ffIos') {
-      await handleIosPurchase(amountUsd, baseAmountUsd, details, btn, old);
-      return;
-    }
-
-    // ── অন্য সব service: backend approval flow ──
-    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd, details });
+    // Call backend first — only show success if backend confirms
+    const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd: baseAmountUsd, details });
 
     if (!result.ok) {
       if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
@@ -917,96 +846,9 @@
       return;
     }
 
+    // Backend confirmed — now show success
     showServiceSuccess(result, amountUsd);
     sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
-  }
-
-  // ── iOS Purchase: credit deduct করো, key দাও, Firestore-এ order save করো ──
-  async function handleIosPurchase(amountUsd, baseAmountUsd, details, btn, oldBtnHtml) {
-    try {
-      const { auth: fsAuth, db: fsDb } = await import('./firebase-core.js');
-      const {
-        doc, getDoc, runTransaction, collection, addDoc, serverTimestamp
-      } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
-
-      const user = window.rabbiAuth.getUser();
-      const uid = user.uid;
-
-      // Variant নির্ধারণ
-      let keyFile = '1d';
-      if (amountUsd >= 25) keyFile = '31d';
-      else if (amountUsd >= 14) keyFile = '7d';
-
-      // Key file fetch
-      const resp = await fetch(`../keys/ios/${keyFile}.txt?nocache=${Date.now()}`);
-      if (!resp.ok) throw new Error('KEY_FILE_MISSING');
-      const text = await resp.text();
-      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length === 0) throw new Error('OUT_OF_STOCK');
-
-      // Atomic transaction: credit deduct + key index increment
-      const userRef = doc(fsDb, 'users', uid);
-      const counterRef = doc(fsDb, 'iosKeyCounters', keyFile);
-      let deliveredKey = null;
-
-      await runTransaction(fsDb, async (tx) => {
-        const userSnap    = await tx.get(userRef);
-        const counterSnap = await tx.get(counterRef);
-
-        // Balance check inside transaction
-        const creditField = userSnap.data()?.creditUSD ?? userSnap.data()?.credit ?? 0;
-        if (creditField < amountUsd) throw new Error('INSUFFICIENT_BALANCE');
-
-        // Key index
-        const keyIndex = counterSnap.exists() ? (counterSnap.data().nextIndex || 0) : 0;
-        if (keyIndex >= lines.length) throw new Error('OUT_OF_STOCK');
-
-        deliveredKey = lines[keyIndex];
-
-        // Deduct credit
-        const newCredit = Math.round((creditField - amountUsd) * 10000) / 10000;
-        if (userSnap.data()?.creditUSD !== undefined) {
-          tx.update(userRef, { creditUSD: newCredit });
-        } else {
-          tx.update(userRef, { credit: newCredit });
-        }
-
-        // Increment key counter
-        tx.set(counterRef, { nextIndex: keyIndex + 1, total: lines.length });
-      });
-
-      // Order Firestore-এ save করো (history-র জন্য)
-      await addDoc(collection(fsDb, 'serviceOrders'), {
-        userId: uid,
-        userEmail: user.email,
-        serviceName: 'Free Fire iPhone Panel (iOS)',
-        serviceId: 'ffIos',
-        variant: keyFile,
-        amountUsd,
-        paymentMethod: 'credit',
-        status: 'completed',
-        keyDelivered: true,
-        serviceDetails: details,
-        createdAt: serverTimestamp(),
-      }).catch(() => {});
-
-      // Key show করো
-      showIosKeyModal(deliveredKey, amountUsd, null);
-      sendToFormspree({ _payment_method: 'credit', _payment_status: 'ios_key_delivered', _amount_usd: amountUsd, _variant: keyFile }).catch(() => {});
-
-    } catch (err) {
-      if (btn) { btn.disabled = false; btn.innerHTML = oldBtnHtml || 'Place Order'; }
-      if (err.message === 'OUT_OF_STOCK') {
-        showIosKeyModal(null, amountUsd, 'স্টক শেষ হয়ে গেছে। Admin এর সাথে যোগাযোগ করুন।');
-      } else if (err.message === 'INSUFFICIENT_BALANCE') {
-        showStatus('Insufficient balance. Add Credit করো।', 'error');
-        setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
-      } else if (err.message === 'KEY_FILE_MISSING') {
-        showIosKeyModal(null, amountUsd, 'Key লোড করতে সমস্যা হয়েছে। Admin এর সাথে যোগাযোগ করুন।');
-      } else {
-        showStatus('কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।', 'error');
-      }
-    }
   }
 
   function handleInstantPay() {

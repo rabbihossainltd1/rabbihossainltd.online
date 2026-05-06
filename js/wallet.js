@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/f
 import {
   doc,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
   collection,
@@ -13,6 +14,7 @@ import {
   onSnapshot,
   query,
   where,
+  orderBy,
   runTransaction,
   increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -502,6 +504,19 @@ window.submitTopup = async function () {
       payload.method = 'bKash'; // fallback only for truly unknown methods
     }
 
+    // ── Duplicate transaction check ──
+    const dupSnap = await getDocs(
+      query(collection(db, "topups"),
+        where("transactionId", "==", transactionId),
+        where("userId", "==", user.uid)
+      )
+    );
+    if (!dupSnap.empty) {
+      showMessage("এই Transaction ID আগে submit করা হয়েছে। Duplicate submission গ্রহণযোগ্য নয়।", "error");
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = pageMode === "service" ? "Verify Service Payment" : "Verify Payment"; }
+      return;
+    }
+
     await addDoc(collection(db, "topups"), payload);
     showMessage("Credit request submitted. Admin approval pending.", "success");
 
@@ -801,27 +816,29 @@ window.loadAdminPanel = function () {
       });
     });
 
-    // ── Support History ──
+    // ── Support History (solved only) ──
     const supportHistoryList = document.getElementById("adminSupportHistoryList");
     if (supportHistoryList) {
       onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
         supportHistoryList.innerHTML = "";
-        if (snapshot.empty) {
-          supportHistoryList.innerHTML = `<div class="empty-state">No support history yet.</div>`;
+        const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
+        if (solvedDocs.length === 0) {
+          supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
           return;
         }
-        snapshot.forEach((docSnap) => {
+        solvedDocs.forEach((docSnap) => {
           const d = docSnap.data() || {};
-          const isSolved = d.status === "solved";
+          const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
           supportHistoryList.innerHTML += `
-            <div class="admin-card history-card">
-              <div class="admin-card-head">
-                <h3>${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
-                <span class="status ${isSolved ? "approved" : "pending"}">${isSolved ? "Solved" : "Open"}</span>
+            <div class="admin-card history-card" style="padding:12px 16px;">
+              <div class="admin-card-head" style="margin-bottom:6px;">
+                <h3 style="font-size:.88rem;">🟢 ${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
+                <span class="status approved" style="font-size:.7rem;">Solved</span>
               </div>
-              <p><b>Ticket:</b> ${d.ticketId ? "#" + escapeHtml(d.ticketId) : "—"}</p>
-              <p><b>Email:</b> ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; <b>Phone:</b> ${escapeHtml(d.userPhone || "—")}</p>
-              <p><b>Last:</b> ${escapeHtml(d.lastMessage || "—")}</p>
+              ${d.ticketId ? `<p style="font-family:monospace;font-size:.7rem;color:#5a7090;">#${escapeHtml(d.ticketId)}</p>` : ''}
+              <p style="font-size:.78rem;">📧 ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; 📞 ${escapeHtml(d.userPhone || "—")}</p>
+              <p style="font-size:.78rem;">Last: ${escapeHtml(d.lastMessage || "—")}</p>
+              ${lastAt ? `<p style="color:#4a6070;font-size:.7rem;">Date: ${lastAt}</p>` : ''}
             </div>
           `;
         });
@@ -1244,12 +1261,12 @@ window.cancelServiceOrderRequest = async function (orderId) {
 };
 
 // ── Expose Firestore helpers for add-credit.html overlay ──
-window._db = db;
-window._doc = doc;
+window._db         = db;
+window._doc        = doc;
 window._collection = collection;
 window._onSnapshot = onSnapshot;
 
-// ── _submitTopupInternal — used by all payment submit buttons ──
+// ── _submitTopupInternal — used by all payment submit buttons in add-credit.html ──
 window._submitTopupInternal = async function ({ method, transactionId, msgEl, btnEl, onSuccess }) {
   const showMsg = (msg, type) => {
     const el = document.getElementById(msgEl);
@@ -1260,6 +1277,7 @@ window._submitTopupInternal = async function ({ method, transactionId, msgEl, bt
   };
 
   const btn = document.getElementById(btnEl);
+  const origBtnHtml = btn ? btn.innerHTML : '';
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Submitting…`;
@@ -1269,7 +1287,7 @@ window._submitTopupInternal = async function ({ method, transactionId, msgEl, bt
     const user = await waitForActiveUser();
     if (!user) {
       showMsg('আগে Login করো।', 'error');
-      if (btn) { btn.disabled = false; btn.innerHTML = 'Verify Payment'; }
+      if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
       openLoginOrHome();
       return;
     }
@@ -1284,39 +1302,49 @@ window._submitTopupInternal = async function ({ method, transactionId, msgEl, bt
     const amountBdt = toBdt(amountUsd);
 
     const validMethods = ['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'];
-    const finalMethod = validMethods.includes(method) ? method : 'bKash';
+    const finalMethod  = validMethods.includes(method) ? method : 'bKash';
+
+    // ── Duplicate transaction check ──
+    const dupSnap = await getDocs(
+      query(collection(db, 'topups'),
+        where('transactionId', '==', transactionId),
+        where('userId', '==', user.uid)
+      )
+    );
+    if (!dupSnap.empty) {
+      showMsg('এই Transaction ID আগে submit করা হয়েছে। Duplicate submission গ্রহণযোগ্য নয়।', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
+      return;
+    }
 
     const payload = {
-      userId: user.uid,
-      userName: user.displayName || 'User',
-      userEmail: user.email || '',
-      purpose: 'credit',
+      userId:     user.uid,
+      userName:   user.displayName || 'User',
+      userEmail:  user.email || '',
+      purpose:    'credit',
       serviceName: '',
       serviceDetails: {},
       amountUsd,
-      amountUSD: amountUsd,
+      amountUSD:  amountUsd,
       amountBdt,
-      amountBDT: amountBdt,
-      rate: USD_TO_BDT,
-      rateBDT: USD_TO_BDT,
-      method: finalMethod,
+      amountBDT:  amountBdt,
+      rate:       USD_TO_BDT,
+      rateBDT:    USD_TO_BDT,
+      method:     finalMethod,
       paymentNumber: PAYMENT_NUMBERS[finalMethod] || '',
       transactionId,
-      status: 'pending',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      status:     'pending',
+      createdAt:  serverTimestamp(),
+      updatedAt:  serverTimestamp()
     };
 
     const docRef = await addDoc(collection(db, 'topups'), payload);
 
-    // Call the overlay/animation callback with the new doc ID
     if (typeof onSuccess === 'function') onSuccess(docRef.id);
 
   } catch (error) {
     console.error('_submitTopupInternal failed:', error);
-    if (btn) { btn.disabled = false; btn.innerHTML = 'Verify Payment'; }
-    const msg = error?.message || 'Payment submit failed. আবার চেষ্টা করো।';
-    showMsg(msg, 'error');
+    if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
+    showMsg(error?.message || 'Payment submit failed. আবার চেষ্টা করো।', 'error');
   }
 };
-
