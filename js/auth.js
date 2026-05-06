@@ -1141,7 +1141,9 @@
         closeLoginModal();
         setTimeout(closeLoginModal, 50);
         window.dispatchEvent(new CustomEvent('rabbi:loggedin', { detail: user }));
-        if (sessionStorage.getItem('rabbiLoginJustCompleted') === '1' || wasLoginOpen) {
+        // If a pending service modal is waiting, skip reload so it can open directly
+        const hasPendingService = !!window._pendingService;
+        if (!hasPendingService && (sessionStorage.getItem('rabbiLoginJustCompleted') === '1' || wasLoginOpen)) {
           sessionStorage.removeItem('rabbiLoginJustCompleted');
           localStorage.removeItem('rabbiLandingPopupSeen');
           sessionStorage.setItem('rabbiShowLandingPopup', '1');

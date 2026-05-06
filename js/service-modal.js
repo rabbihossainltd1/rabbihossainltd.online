@@ -846,6 +846,21 @@
       return;
     }
 
+    // ── iOS Panel: auto-deliver key from Firestore ──────────────────
+    if (activeFieldsType === 'ffIos') {
+      try {
+        const iosKey = await deliverIosKey(details, result.orderId, amountUsd);
+        if (iosKey) {
+          showIosKeySuccess(iosKey, amountUsd, result);
+          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_auto_delivered', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
+          return;
+        }
+      } catch (e) {
+        console.warn('[iOS Key] Auto-deliver failed, falling back to normal flow:', e);
+      }
+    }
+    // ───────────────────────────────────────────────────────────────
+
     // Backend confirmed — now show success
     showServiceSuccess(result, amountUsd);
     sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
@@ -993,4 +1008,115 @@
       }
     });
   }
+
+  // ══════════════════════════════════════════════════════════════════
+  //  iOS Key Auto-Delivery System
+  //  Firestore collection: iosKeys
+  //  Each doc fields: { variant: "1d"|"7d"|"31d", key: "...", sold: false }
+  // ══════════════════════════════════════════════════════════════════
+
+  async function deliverIosKey(details, orderId, amountUsd) {
+    const variantRadio = document.querySelector('input[name="ff_ios_variant"]:checked');
+    if (!variantRadio) return null;
+
+    let variant = '1d';
+    const val = (variantRadio.value || '').toLowerCase();
+    if (val.includes('31')) variant = '31d';
+    else if (val.includes('7')) variant = '7d';
+
+    const { getApps } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js');
+    const { getFirestore, collection, query, where, limit, getDocs, runTransaction, serverTimestamp }
+      = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+    const app = getApps()[0];
+    if (!app) return null;
+    const db = getFirestore(app);
+    const user = window.rabbiAuth.getUser();
+
+    const keysRef = collection(db, 'iosKeys');
+    const q = query(keysRef, where('variant', '==', variant), where('sold', '==', false), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+
+    const keyDocRef = snap.docs[0].ref;
+    let deliveredKey = null;
+
+    await runTransaction(db, async (tx) => {
+      const fresh = await tx.get(keyDocRef);
+      if (!fresh.exists() || fresh.data().sold) throw new Error('KEY_ALREADY_SOLD');
+      deliveredKey = fresh.data().key;
+      tx.update(keyDocRef, {
+        sold: true,
+        soldTo: user.uid,
+        soldEmail: user.email || '',
+        orderId: orderId || null,
+        soldAt: serverTimestamp()
+      });
+    });
+
+    return deliveredKey;
+  }
+
+  function showIosKeySuccess(key, amountUsd, result) {
+    const ov_close = document.getElementById('serviceModal');
+    if (ov_close) { ov_close.classList.remove('open'); document.body.style.overflow = ''; }
+
+    let ov = document.getElementById('orderPlacedOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'orderPlacedOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(16px);padding:20px;';
+      document.body.appendChild(ov);
+    }
+
+    const usdStr = amountUsd ? '$' + Number(amountUsd).toFixed(2) : '';
+    const bdtAmt = Math.round((amountUsd || 0) * 125);
+    const bdtStr = bdtAmt ? '৳' + bdtAmt.toLocaleString() : '';
+
+    if (!document.getElementById('opAnimStyle')) {
+      const s = document.createElement('style');
+      s.id = 'opAnimStyle';
+      s.textContent = '@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}@keyframes opDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}';
+      document.head.appendChild(s);
+    }
+
+    ov.innerHTML = '<div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,255,136,.06) 100%);border:1px solid rgba(0,191,255,.32);box-shadow:0 40px 100px rgba(0,0,0,.55),0 0 60px rgba(0,191,255,.10);animation:opIn .45s cubic-bezier(.2,1,.2,1) both;">'
+      + '<div style="width:80px;height:80px;border-radius:50%;margin:0 auto 20px;background:rgba(0,191,255,.12);border:2px solid rgba(0,191,255,.4);display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🔑</div>'
+      + '<div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);color:#9ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;"><span style="width:7px;height:7px;border-radius:50%;background:#00bfff;display:inline-block;animation:opDot 1s ease-in-out infinite;"></span> Key Delivered</div>'
+      + '<h2 style="font-family:var(--font-display,inherit);font-size:1.55rem;color:#f0f8ff;margin:0 0 8px;">iOS Panel Key Ready!</h2>'
+      + '<p style="color:#8faec9;font-size:.88rem;margin:0 0 20px;line-height:1.6;">নিচের key টি copy করো এবং সুরক্ষিত রাখো।<br/><span style="color:#ffa94d;font-size:.8rem;">এই key শুধুমাত্র একবার sell হবে।</span></p>'
+      + (usdStr ? '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;">'
+          + '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#9ee8ff;font-weight:900;font-size:.85rem;">' + usdStr + '</span>'
+          + (bdtStr ? '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.18);color:#a7ffcf;font-weight:900;font-size:.85rem;">' + bdtStr + '</span>' : '')
+          + '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,191,255,.08);border:1px solid rgba(0,191,255,.18);color:#6ecfff;font-weight:800;font-size:.85rem;">✓ Paid</span>'
+          + '</div>' : '')
+      + '<div style="background:rgba(0,0,0,.45);border:1.5px solid rgba(0,191,255,.35);border-radius:16px;padding:18px 20px;margin-bottom:16px;text-align:left;">'
+      + '<div style="color:#5a7a94;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Your Key</div>'
+      + '<div id="iosKeyText" style="font-family:monospace;font-size:1.05rem;color:#00e5ff;word-break:break-all;line-height:1.6;user-select:all;">' + key + '</div>'
+      + '</div>'
+      + '<button id="copyIosKey" type="button" style="width:100%;border:none;border-radius:14px;padding:15px;background:linear-gradient(135deg,#00bfff,#00e5ff);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;box-shadow:0 12px 36px rgba(0,191,255,.25);margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Key</button>'
+      + '<button id="opGoNow2" type="button" style="width:100%;border:1px solid rgba(0,191,255,.25);border-radius:14px;padding:12px;background:rgba(0,191,255,.07);color:#7dd3f8;font-weight:800;font-size:.88rem;cursor:pointer;">View My Orders</button>'
+      + '</div>';
+
+    const copyBtn = document.getElementById('copyIosKey');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(key);
+          copyBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg> Copied!';
+          copyBtn.style.background = 'linear-gradient(135deg,#00ff88,#00e5c0)';
+          setTimeout(() => {
+            copyBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Key';
+            copyBtn.style.background = 'linear-gradient(135deg,#00bfff,#00e5ff)';
+          }, 2500);
+        } catch(e) {
+          const el = document.getElementById('iosKeyText');
+          if (el) { const r = document.createRange(); r.selectNodeContents(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }
+        }
+      });
+    }
+    const goBtn = document.getElementById('opGoNow2');
+    if (goBtn) goBtn.addEventListener('click', () => { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); window.location.href = 'dashboard.html'; });
+  }
+
 })();
