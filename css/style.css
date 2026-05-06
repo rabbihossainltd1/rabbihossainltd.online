@@ -1411,6 +1411,9 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 /* Arrows */
 .hbs-arrow {
@@ -1544,11 +1547,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   height: 100%;
   display: block;
 }
-.hbs-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
+/* hbs-label flex merged into main rule above */
 .home-svc-icon {
   width: 42px;
   height: 42px;
