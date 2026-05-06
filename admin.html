@@ -249,53 +249,33 @@
             </div>
             <div style="margin-bottom:12px;">
               <label class="form-label-small" style="display:block;margin-bottom:6px;">Valid For Services <span style="color:#4a6070;font-weight:400;">(খালি রাখলে সব services-এ কাজ করবে)</span></label>
-              <!-- Hidden checkboxes (read by adminCreateCoupon) -->
-              <div id="couponServiceCheckboxes" style="display:none;">
-                <input type="checkbox" value="ff"><input type="checkbox" value="ffDrip"><input type="checkbox" value="ffFf4x">
-                <input type="checkbox" value="ffIos"><input type="checkbox" value="ffPc"><input type="checkbox" value="card">
-                <input type="checkbox" value="meta"><input type="checkbox" value="pubg"><input type="checkbox" value="mlbb">
-                <input type="checkbox" value="proapp"><input type="checkbox" value="security"><input type="checkbox" value="android">
-                <input type="checkbox" value="webDev">
-              </div>
-              <!-- Selector button -->
-              <button type="button" id="svcSelectorBtn" onclick="openServiceSelector()"
-                style="width:100%;background:rgba(0,200,255,.07);border:1.5px solid rgba(0,200,255,.28);border-radius:12px;padding:11px 16px;color:#9ee8ff;font-size:.84rem;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;transition:.2s;">
-                Select Services (All if empty) ▾
-              </button>
-            </div>
-
-            <!-- Service Selector Modal -->
-            <div id="svcSelectorModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,5,10,.82);align-items:center;justify-content:center;padding:16px;">
-              <div style="background:#0d1825;border:1.5px solid rgba(0,200,255,.25);border-radius:20px;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.6);">
-                <!-- Modal header -->
-                <div style="padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;">
-                  <span style="font-weight:900;color:#e8edf5;font-size:1rem;flex:1;">Select Services</span>
-                  <button type="button" onclick="closeSvcSelector()" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#7a8ca8;cursor:pointer;padding:5px 11px;font-size:.82rem;">Close</button>
-                </div>
-                <!-- Search -->
-                <div style="padding:12px 18px 8px;">
-                  <input type="text" id="svcSelectorSearch" placeholder="Search service..."
-                    oninput="svcSelectorSearch(this.value)"
-                    style="width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(0,200,255,.22);border-radius:999px;padding:10px 16px;color:#e8edf5;font-size:.88rem;font-family:inherit;outline:none;box-sizing:border-box;" />
-                </div>
-                <!-- Select all / clear -->
-                <div style="padding:0 18px 8px;display:flex;gap:8px;">
-                  <button type="button" onclick="svcSelectorSelectAll()" style="flex:1;background:rgba(0,200,255,.10);border:1px solid rgba(0,200,255,.25);border-radius:8px;color:#9ee8ff;font-size:.78rem;font-weight:700;cursor:pointer;padding:6px;font-family:inherit;">Select All</button>
-                  <button type="button" onclick="svcSelectorClearAll()" style="flex:1;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.22);border-radius:8px;color:#ffb0b0;font-size:.78rem;font-weight:700;cursor:pointer;padding:6px;font-family:inherit;">Clear All</button>
-                </div>
-                <!-- List -->
-                <div id="svcSelectorList" style="overflow-y:auto;padding:4px 18px 12px;flex:1;display:flex;flex-direction:column;gap:4px;"></div>
-                <!-- Done button -->
-                <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);">
-                  <button type="button" onclick="svcSelectorDone()" style="width:100%;background:linear-gradient(135deg,#00c8ff,#00ff88);border:0;border-radius:999px;padding:12px;font-weight:900;color:#02050a;font-size:.92rem;cursor:pointer;font-family:inherit;">Done</button>
-                </div>
+              <div id="couponServiceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ff" style="accent-color:#00c8ff;"> Free Fire
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffDrip" style="accent-color:#00c8ff;"> FF Drip
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffFf4x" style="accent-color:#00c8ff;"> FF 4X
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffIos" style="accent-color:#00c8ff;"> iOS Panel
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffPc" style="accent-color:#00c8ff;"> FF PC Panel
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="card" style="accent-color:#00c8ff;"> Card Services
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="pubg" style="accent-color:#00c8ff;"> PUBG
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="mlbb" style="accent-color:#00c8ff;"> Mobile Legends
+                </label>
               </div>
             </div>
-            <style>
-              .svc-sel-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.82rem;color:#a0c4d8;transition:.15s;}
-              .svc-sel-item:hover{background:rgba(0,200,255,.10);border-color:rgba(0,200,255,.28);}
-              .svc-sel-item input{accent-color:#00c8ff;flex-shrink:0;}
-            </style>
             <button type="button" class="btn-confirm" style="width:100%;margin-top:4px;" onclick="adminCreateCoupon()">
               Create Coupon
             </button>
@@ -430,11 +410,10 @@
       if (panel) panel.classList.toggle('active', p === name);
       if (btn)   btn.classList.toggle('active', p === name);
     });
-    // reset search when switching to History (no scroll)
+    // reset search when switching to History
     if (name === 'History') {
       const inp = document.getElementById('historySearchInput');
-      if (inp) { inp.value = ''; }
-      window.historySearch('');
+      if (inp) { inp.value = ''; historySearch(''); }
     }
   }
 
@@ -448,12 +427,12 @@
     });
     // re-apply search filter for new sub-panel
     const inp = document.getElementById('historySearchInput');
-    if (inp) window.historySearch(inp.value);
+    if (inp) historySearch(inp.value);
   };
 
-  // ── History search (global, called by wallet.js after render too) ──
+  // ── History search ──
   window.historySearch = function(query) {
-    const q = (query || '').trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     ['histPanelTransaction','histPanelServices','histPanelSupport'].forEach(panelId => {
       const panel = document.getElementById(panelId);
       if (!panel) return;
@@ -464,102 +443,6 @@
       });
     });
   };
-
-  // ── Coupon service selector modal ──
-  const ALL_SERVICES = [
-    { value: 'ff',        label: 'Free Fire Diamond Top-up' },
-    { value: 'ffDrip',    label: 'Free Fire Android Panel (Drip)' },
-    { value: 'ffFf4x',    label: 'Free Fire Android Panel (FF4X)' },
-    { value: 'ffIos',     label: 'Free Fire iPhone Panel (iOS)' },
-    { value: 'ffPc',      label: 'Free Fire PC Panel' },
-    { value: 'card',      label: 'Visa / Mastercard' },
-    { value: 'meta',      label: 'Facebook Meta Verified' },
-    { value: 'pubg',      label: 'PUBG' },
-    { value: 'mlbb',      label: 'Mobile Legends (MLBB)' },
-    { value: 'proapp',    label: 'Premium App & Subscription' },
-    { value: 'security',  label: 'Ethical Hacking / Security Audit' },
-    { value: 'android',   label: 'Android App Development' },
-    { value: 'webDev',    label: 'Website Development' },
-  ];
-
-  let _couponSelected = [];
-
-  window.openServiceSelector = function() {
-    _couponSelected = Array.from(
-      document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]:checked')
-    ).map(c => c.value);
-
-    const modal = document.getElementById('svcSelectorModal');
-    if (!modal) return;
-    renderSvcList('');
-    modal.style.display = 'flex';
-    const si = document.getElementById('svcSelectorSearch');
-    if (si) { si.value = ''; si.focus(); }
-  };
-
-  window.closeSvcSelector = function() {
-    document.getElementById('svcSelectorModal').style.display = 'none';
-  };
-
-  window.svcSelectorSearch = function(q) {
-    renderSvcList(q);
-  };
-
-  function renderSvcList(q) {
-    const filtered = ALL_SERVICES.filter(s =>
-      !q || s.label.toLowerCase().includes(q.toLowerCase()) || s.value.toLowerCase().includes(q.toLowerCase())
-    );
-    const list = document.getElementById('svcSelectorList');
-    if (!list) return;
-    list.innerHTML = filtered.map(s => `
-      <label class="svc-sel-item">
-        <input type="checkbox" value="${s.value}" ${_couponSelected.includes(s.value) ? 'checked' : ''}
-          onchange="svcToggle('${s.value}', this.checked)" />
-        <span>${s.label}</span>
-      </label>
-    `).join('');
-  }
-
-  window.svcToggle = function(val, checked) {
-    if (checked) { if (!_couponSelected.includes(val)) _couponSelected.push(val); }
-    else { _couponSelected = _couponSelected.filter(v => v !== val); }
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorSelectAll = function() {
-    _couponSelected = ALL_SERVICES.map(s => s.value);
-    renderSvcList(document.getElementById('svcSelectorSearch')?.value || '');
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorClearAll = function() {
-    _couponSelected = [];
-    renderSvcList(document.getElementById('svcSelectorSearch')?.value || '');
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorDone = function() {
-    // sync back to hidden checkboxes
-    document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]').forEach(cb => {
-      cb.checked = _couponSelected.includes(cb.value);
-    });
-    // update display button label
-    updateSvcSelectorDisplay();
-    closeSvcSelector();
-  };
-
-  function updateSvcSelectorDisplay() {
-    const btn = document.getElementById('svcSelectorBtn');
-    if (!btn) return;
-    if (_couponSelected.length === 0) {
-      btn.textContent = 'Select Services (All if empty) ▾';
-    } else if (_couponSelected.length === ALL_SERVICES.length) {
-      btn.textContent = 'All Services selected ▾';
-    } else {
-      const names = _couponSelected.map(v => ALL_SERVICES.find(s=>s.value===v)?.label || v);
-      btn.textContent = names.slice(0,2).join(', ') + (_couponSelected.length > 2 ? ` +${_couponSelected.length-2} more ▾` : ' ▾');
-    }
-  }
   </script>
 
   <script src="js/main.js"></script>
