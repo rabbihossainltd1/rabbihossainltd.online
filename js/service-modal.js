@@ -227,6 +227,7 @@
   let activeServiceName = '';
   let activeFieldsType = '';
   let _currentAmountUsd = 0;
+  let _isSubmitting = false; // double-click / double-order prevention
 
   // Global setter so proapp plan picker can update amount directly
   window.setServiceAmountUsd = function(usd) {
@@ -799,19 +800,26 @@
   }
 
   async function handleBuyWithCredit() {
+    // ── Double-click / duplicate order prevention ─────────────────
+    if (_isSubmitting) return;
+    _isSubmitting = true;
+    // ──────────────────────────────────────────────────────────────
+
     if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
+      _isSubmitting = false;
       window.rabbiAuth && window.rabbiAuth.openLogin('apply');
       window._pendingService = { service: activeServiceName, fields: activeFieldsType };
       return;
     }
 
-    if (!validateBasicDetails()) return;
+    if (!validateBasicDetails()) { _isSubmitting = false; return; }
 
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
 
     if (!baseAmountUsd || baseAmountUsd <= 0) {
       showStatus('প্রথমে একটি package/variant select করো।', 'error');
+      _isSubmitting = false;
       return;
     }
 
@@ -839,6 +847,7 @@
     if (currentCredit === null) {
       // userdata load হয়নি — block করো, add-credit এ নেওয়া যাবে না
       showStatus('Balance load হয়নি। Page refresh করে আবার চেষ্টা করো।', 'error');
+      _isSubmitting = false;
       return;
     }
 
@@ -848,6 +857,7 @@
         'error'
       );
       setTimeout(() => { window.location.href = 'add-credit.html'; }, 2000);
+      _isSubmitting = false;
       return;
     }
     // ────────────────────────────────────────────────────────────────
@@ -869,6 +879,7 @@
 
     if (!result.ok) {
       if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
+      _isSubmitting = false;
       if (result.reason === 'insufficient') {
         showStatus('Insufficient balance. Add Credit করো।', 'error');
         setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
@@ -886,8 +897,13 @@
       try {
         const iosKey = await deliverIosKey(details, result.orderId, amountUsd);
         if (iosKey) {
+          // Order status "completed" করো — admin approval দরকার নেই
+          await markOrderDelivered(result.orderId, iosKey).catch((e) => {
+            console.warn('[iOS Key] markOrderDelivered failed (non-critical):', e);
+          });
           showIosKeySuccess(iosKey, amountUsd, result);
           sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_auto_delivered', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
+          _isSubmitting = false;
           return;
         }
       } catch (e) {
@@ -897,6 +913,7 @@
     // ───────────────────────────────────────────────────────────────
 
     // Backend confirmed — now show success
+    _isSubmitting = false;
     showServiceSuccess(result, amountUsd);
     sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
   }
@@ -1049,6 +1066,33 @@
   //  Firestore collection: iosKeys
   //  Each doc fields: { variant: "1d"|"7d"|"31d", key: "...", sold: false }
   // ══════════════════════════════════════════════════════════════════
+
+  // Order status "completed" করো যখন iOS key auto-deliver হয়
+  // Backend-এ Admin approval দরকার নেই — key already delivered
+  async function markOrderDelivered(orderId, deliveredKey) {
+    if (!orderId) return;
+    const db = window._firebaseDb;
+    if (!db) return;
+
+    const { doc, updateDoc, serverTimestamp }
+      = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+    const updateData = {
+      status: 'completed',
+      deliveredKey: deliveredKey || null,
+      deliveredAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      autoDelivered: true
+    };
+
+    // serviceOrders এ update করো (primary collection)
+    try {
+      await updateDoc(doc(db, 'serviceOrders', orderId), updateData);
+    } catch (e) {
+      // legacy orders collection এও try করো
+      await updateDoc(doc(db, 'orders', orderId), updateData);
+    }
+  }
 
   async function deliverIosKey(details, orderId, amountUsd) {
     const variantRadio = document.querySelector('input[name="ff_ios_variant"]:checked');
