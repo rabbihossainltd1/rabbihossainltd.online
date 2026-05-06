@@ -157,7 +157,7 @@
           Live Support
           <span class="admin-nav-badge" id="badgeSupport" style="display:none;"></span>
         </button>
-        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('History'); historyShowSub('Transaction');" id="navBtnHistory">
+        <button class="admin-nav-btn" type="button" onclick="adminShowPanel('History')" id="navBtnHistory">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
           History
         </button>
@@ -215,6 +215,35 @@
               <div>
                 <label class="form-label-small">Max Uses (optional)</label>
                 <input id="newCouponMaxUses" type="number" min="1" placeholder="e.g. 50 (unlimited if blank)" class="form-input-small" />
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label class="form-label-small" style="display:block;margin-bottom:6px;">Valid For Services <span style="color:#4a6070;font-weight:400;">(খালি রাখলে সব services-এ কাজ করবে)</span></label>
+              <div id="couponServiceCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ff" style="accent-color:#00c8ff;"> Free Fire
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffDrip" style="accent-color:#00c8ff;"> FF Drip
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffFf4x" style="accent-color:#00c8ff;"> FF 4X
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffIos" style="accent-color:#00c8ff;"> iOS Panel
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="ffPc" style="accent-color:#00c8ff;"> FF PC Panel
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="card" style="accent-color:#00c8ff;"> Card Services
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="pubg" style="accent-color:#00c8ff;"> PUBG
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.78rem;color:#a0c4d8;">
+                  <input type="checkbox" value="mlbb" style="accent-color:#00c8ff;"> Mobile Legends
+                </label>
               </div>
             </div>
             <button type="button" class="btn-confirm" style="width:100%;margin-top:4px;" onclick="adminCreateCoupon()">
@@ -429,10 +458,12 @@
         const active = d.active !== false;
         const exp = d.expiresAt ? (d.expiresAt.toDate ? d.expiresAt.toDate().toLocaleDateString() : d.expiresAt) : 'No expiry';
         const usageInfo = d.maxUses ? `${d.usedCount||0}/${d.maxUses} used` : `${d.usedCount||0} used (unlimited)`;
+        const validForStr = (d.validFor && d.validFor.length > 0) ? d.validFor.join(', ') : 'All Services';
         list.innerHTML += `<div class="admin-card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <div style="flex:1;">
             <h3 style="font-family:monospace;letter-spacing:.06em;">${escHtml(code)}</h3>
             <p>${d.discountPercent}% discount &mdash; Expires: ${escHtml(String(exp))} &mdash; <strong>${escHtml(usageInfo)}</strong></p>
+            <p style="font-size:.75rem;color:#4a8090;">🎯 Valid for: ${escHtml(validForStr)}</p>
           </div>
           <span class="status ${active ? 'approved' : 'declined'}">${active ? 'Active' : 'Inactive'}</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -449,18 +480,25 @@
     const pct     = Number(document.getElementById('newCouponDiscount')?.value);
     const expVal  = document.getElementById('newCouponExpiry')?.value;
     const maxUses = Number(document.getElementById('newCouponMaxUses')?.value) || null;
+
+    // Collect selected services
+    const checked = document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]:checked');
+    const validFor = checked.length > 0 ? Array.from(checked).map(c => c.value) : [];
+
     if (!code) { showCouponMsg('Enter a coupon code.', 'error'); return; }
     if (!pct || pct <= 0 || pct > 100) { showCouponMsg('Enter a valid discount % (1-100).', 'error'); return; }
     try {
       const data = { discountPercent: pct, active: true, usedCount: 0, createdAt: serverTimestamp() };
-      if (expVal)   data.expiresAt = Timestamp.fromDate(new Date(expVal));
-      if (maxUses)  data.maxUses   = maxUses;
+      if (expVal)         data.expiresAt = Timestamp.fromDate(new Date(expVal));
+      if (maxUses)        data.maxUses   = maxUses;
+      if (validFor.length > 0) data.validFor = validFor; // empty = all services
       await setDoc(doc(db, 'coupons', code), data);
       showCouponMsg('Coupon created: ' + code, 'success');
       document.getElementById('newCouponCode').value     = '';
       document.getElementById('newCouponDiscount').value = '';
       document.getElementById('newCouponExpiry').value   = '';
       document.getElementById('newCouponMaxUses').value  = '';
+      document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]').forEach(c => c.checked = false);
     } catch(e) { showCouponMsg('Error: ' + e.message, 'error'); }
   };
 
@@ -488,24 +526,22 @@
     onSnapshot(query(collection(db, 'supportRooms'), orderBy('lastAt', 'desc')), (snap) => {
       roomsEl.innerHTML = '';
       const badge = document.getElementById('badgeSupport');
-      // Only open/unsolved chats for Live Support
-      const openDocs = snap.docs.filter(d => d.data().status !== 'solved');
-      const openCount = openDocs.length;
+      const openCount = snap.docs.filter(d => d.data().status !== 'solved').length;
       if (badge) { badge.textContent = openCount || ''; badge.style.display = openCount ? 'flex' : 'none'; }
-      if (openDocs.length === 0) {
-        roomsEl.innerHTML = '<div style="padding:18px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো open support ticket নেই। Solved chats History → Support এ দেখুন।</div>';
+      if (snap.empty) {
+        roomsEl.innerHTML = '<div style="padding:18px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো support ticket নেই।</div>';
         return;
       }
-      // Render only OPEN (unsolved) tickets in Live Support
-      openDocs.forEach(docSnap => {
+      snap.forEach(docSnap => {
         const d = docSnap.data();
         const uid = docSnap.id;
+        const isSolved = d.status === 'solved';
         const el = document.createElement('div');
         el.className = 'inbox-item' + (activeChatUid === uid ? ' active' : '');
         el.innerHTML = `
           <div class="inbox-item-left">
             <div class="inbox-item-name">
-              <span class="inbox-status-dot open"></span>
+              <span class="inbox-status-dot ${isSolved?'solved':'open'}"></span>
               ${escHtml(d.displayName || d.userEmail || 'User')}
             </div>
             ${d.ticketId ? `<div class="inbox-item-ticket">#${escHtml(d.ticketId)}</div>` : ''}
@@ -513,8 +549,8 @@
             <div class="inbox-item-preview">${escHtml(d.lastMessage || '')}</div>
           </div>
           <div class="inbox-item-right">
-            ${d.unreadAdmin ? `<span class="inbox-unread-badge">${d.unreadAdmin}</span>` : ''}
-            <span class="inbox-status-label open">Open</span>
+            ${(d.unreadAdmin && !isSolved) ? `<span class="inbox-unread-badge">${d.unreadAdmin}</span>` : ''}
+            <span class="inbox-status-label ${isSolved?'solved':'open'}">${isSolved?'Solved':'Open'}</span>
           </div>`;
         el.addEventListener('click', () => {
           document.querySelectorAll('.inbox-item').forEach(r => r.classList.remove('active'));
@@ -523,56 +559,8 @@
         });
         roomsEl.appendChild(el);
       });
-
-      // Also reload history support list (solved chats)
-      loadSupportHistory(snap.docs);
     });
   }
-
-  /* ── History: Support (solved chats) ── */
-  function loadSupportHistory(allDocs) {
-    const histList = document.getElementById('adminSupportHistoryList');
-    if (!histList) return;
-    const solvedDocs = (allDocs || []).filter(d => d.data().status === 'solved');
-    histList.innerHTML = '';
-    if (solvedDocs.length === 0) {
-      histList.innerHTML = '<div class="empty-state">কোনো solved support ticket নেই।</div>';
-      return;
-    }
-    solvedDocs.forEach(docSnap => {
-      const d = docSnap.data();
-      const uid = docSnap.id;
-      const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
-      histList.innerHTML += `<div class="admin-card history-card" style="cursor:pointer;" onclick="adminShowSolvedChat('${uid}')">
-        <div class="admin-card-head">
-          <div>
-            <h3>🟢 ${escHtml(d.displayName || d.userEmail || 'User')}</h3>
-            ${d.ticketId ? `<p style="font-family:monospace;font-size:.72rem;color:#5a7090;">#${escHtml(d.ticketId)}</p>` : ''}
-          </div>
-          <span class="status completed">Solved</span>
-        </div>
-        <p>📧 ${escHtml(d.userEmail||'—')} &nbsp;|&nbsp; 📞 ${escHtml(d.userPhone||'—')}</p>
-        <p>Last: ${escHtml(d.lastMessage||'—')}</p>
-        ${lastAt ? `<p style="color:#4a6070;">Date: ${lastAt}</p>` : ''}
-      </div>`;
-    });
-  }
-
-  /* ── View solved chat from history ── */
-  window.adminShowSolvedChat = function(uid) {
-    // Switch to Live Support panel and open the chat read-only
-    adminShowPanel('Support');
-    getDoc(doc(db, 'supportRooms', uid)).then(snap => {
-      if (snap.exists()) {
-        openAdminChat(uid, snap.data());
-        // Hide reply box for solved chats
-        const replyRow = document.querySelector('.admin-chat-reply-row');
-        if (replyRow) replyRow.style.display = 'none';
-        const solvedBtn = document.querySelector('.chat-solved-btn');
-        if (solvedBtn) solvedBtn.style.display = 'none';
-      }
-    }).catch(() => {});
-  };
 
   function openAdminChat(uid, roomData) {
     activeChatUid = uid;
@@ -580,17 +568,12 @@
     const msgsEl  = document.getElementById('adminChatMsgs');
     if (!chatWin || !msgsEl) return;
 
-    // Restore reply row visibility (may have been hidden for solved chat view)
-    const replyRow = document.querySelector('.admin-chat-reply-row');
-    if (replyRow) replyRow.style.display = 'flex';
-    const solvedBtn = document.querySelector('.chat-solved-btn');
-    if (solvedBtn) solvedBtn.style.display = roomData?.status === 'solved' ? 'none' : 'flex';
-
     // Populate header
     document.getElementById('adminChatUserName').textContent = roomData?.displayName || roomData?.userEmail || 'User';
     document.getElementById('adminChatTicketId').textContent = roomData?.ticketId ? '#' + roomData.ticketId : '';
     document.getElementById('adminChatUserEmail').textContent = roomData?.userEmail || '—';
     document.getElementById('adminChatUserPhone').textContent = roomData?.userPhone || '—';
+    // Complaint: get from first user message in supportChats if not in roomData
     const complaintEl = document.getElementById('adminChatUserComplaint');
     complaintEl.textContent = roomData?.lastMessage || '—';
 
@@ -606,7 +589,7 @@
       snap.docChanges().forEach(change => {
         if (change.type !== 'added') return;
         const d = change.doc.data();
-        if (d.role === 'system') return;
+        if (d.role === 'system') return; // skip system messages
         const isAdm = d.role === 'admin';
         const wrap = document.createElement('div');
         wrap.className = isAdm ? 'chat-msg-admin' : 'chat-msg-user';
@@ -616,6 +599,7 @@
         msgsEl.scrollTop = msgsEl.scrollHeight;
       });
     });
+    // Scroll chat into view
     chatWin.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
