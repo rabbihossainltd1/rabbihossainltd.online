@@ -497,9 +497,9 @@ window.submitTopup = async function () {
       updatedAt: serverTimestamp()
     };
 
-    // Normalize method for Firestore rules — Binance stored as 'Binance'
-    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
-      payload.method = 'bKash'; // fallback
+    // Validate method — allow all supported payment methods including crypto
+    if (!['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'].includes(payload.method)) {
+      payload.method = 'bKash'; // fallback only for truly unknown methods
     }
 
     await addDoc(collection(db, "topups"), payload);
@@ -801,32 +801,27 @@ window.loadAdminPanel = function () {
       });
     });
 
-    // ── Support History (Solved only) ──
+    // ── Support History ──
     const supportHistoryList = document.getElementById("adminSupportHistoryList");
     if (supportHistoryList) {
       onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
         supportHistoryList.innerHTML = "";
-        const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
-        if (solvedDocs.length === 0) {
-          supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
+        if (snapshot.empty) {
+          supportHistoryList.innerHTML = `<div class="empty-state">No support history yet.</div>`;
           return;
         }
-        solvedDocs.forEach((docSnap) => {
+        snapshot.forEach((docSnap) => {
           const d = docSnap.data() || {};
-          const uid = docSnap.id;
-          const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
+          const isSolved = d.status === "solved";
           supportHistoryList.innerHTML += `
-            <div class="admin-card history-card" style="cursor:pointer;" onclick="window.adminShowSolvedChat && window.adminShowSolvedChat('${escapeHtml(uid)}')">
+            <div class="admin-card history-card">
               <div class="admin-card-head">
-                <div>
-                  <h3>🟢 ${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
-                  ${d.ticketId ? `<p style="font-family:monospace;font-size:.68rem;color:#5a7090;">#${escapeHtml(d.ticketId)}</p>` : ''}
-                </div>
-                <span class="status completed">Solved</span>
+                <h3>${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
+                <span class="status ${isSolved ? "approved" : "pending"}">${isSolved ? "Solved" : "Open"}</span>
               </div>
-              <p>📧 ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; 📞 ${escapeHtml(d.userPhone || "—")}</p>
-              <p>Last: ${escapeHtml(d.lastMessage || "—")}</p>
-              ${lastAt ? `<p style="color:#4a6070;font-size:.7rem;">Date: ${lastAt}</p>` : ''}
+              <p><b>Ticket:</b> ${d.ticketId ? "#" + escapeHtml(d.ticketId) : "—"}</p>
+              <p><b>Email:</b> ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; <b>Phone:</b> ${escapeHtml(d.userPhone || "—")}</p>
+              <p><b>Last:</b> ${escapeHtml(d.lastMessage || "—")}</p>
             </div>
           `;
         });
