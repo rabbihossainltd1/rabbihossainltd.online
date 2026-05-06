@@ -1192,11 +1192,10 @@
   </section>
 <script src="js/lang.js" defer></script>
   <script src="js/main.js" defer></script>
-  <!-- Firebase init — db globally exposed for service-modal.js -->
+  <!-- Firebase -->
   <script type="module">
-    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
     const firebaseConfig = {
       apiKey: "AIzaSyA7VMETaS1R4hq1WUBXgsVnvgEyzFhKGfs",
       authDomain: "rabbihossainltd-63709.firebaseapp.com",
@@ -1206,10 +1205,8 @@
       appId: "1:658498014345:web:89db9e029a6930d3e2ca58",
       measurementId: "G-RT4WQL8R0H"
     };
-    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
-    // db globally expose করো যাতে service-modal.js সরাসরি use করতে পারে
-    window._firebaseDb = getFirestore(app);
   </script>
   <script src="js/service-info.js" defer></script>
   <script src="js/auth.js" defer></script>
