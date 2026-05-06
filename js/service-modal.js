@@ -810,22 +810,44 @@
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
 
-    // ── Balance check BEFORE placing order ──────────────────────────
     if (!baseAmountUsd || baseAmountUsd <= 0) {
-      showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
+      showStatus('প্রথমে একটি package/variant select করো।', 'error');
       return;
     }
 
-    const currentCredit = window.rabbiAuth && typeof window.rabbiAuth.getCredit === 'function'
-      ? window.rabbiAuth.getCredit()
-      : null;
+    // ── Balance check — userdata load হওয়া পর্যন্ত wait করো ────────
+    showStatus('Balance check করা হচ্ছে…', 'info');
 
-    if (currentCredit !== null && currentCredit < amountUsd) {
-      // Insufficient balance — redirect to add-credit immediately
-      showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
-      setTimeout(() => {
-        window.location.href = 'add-credit.html';
-      }, 1200);
+    // সর্বোচ্চ ৫ সেকেন্ড wait — userdata না আসা পর্যন্ত
+    const userData = await new Promise((resolve) => {
+      // Already loaded
+      if (window.rabbiAuth.getUserData && window.rabbiAuth.getUserData()) {
+        return resolve(window.rabbiAuth.getUserData());
+      }
+      // Wait for rabbi:userData event
+      const deadline = Date.now() + 5000;
+      const check = setInterval(() => {
+        const d = window.rabbiAuth.getUserData && window.rabbiAuth.getUserData();
+        if (d || Date.now() > deadline) { clearInterval(check); resolve(d || null); }
+      }, 100);
+    });
+
+    const currentCredit = userData ? Number(userData.credit || 0) : null;
+
+    showStatus('', '');
+
+    if (currentCredit === null) {
+      // userdata load হয়নি — block করো, add-credit এ নেওয়া যাবে না
+      showStatus('Balance load হয়নি। Page refresh করে আবার চেষ্টা করো।', 'error');
+      return;
+    }
+
+    if (currentCredit < amountUsd) {
+      showStatus(
+        `Insufficient balance — আপনার কাছে $${currentCredit.toFixed(2)} আছে কিন্তু $${amountUsd.toFixed(2)} দরকার।`,
+        'error'
+      );
+      setTimeout(() => { window.location.href = 'add-credit.html'; }, 2000);
       return;
     }
     // ────────────────────────────────────────────────────────────────
