@@ -558,10 +558,6 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 .delay-4 { animation-delay: 0.12s; }
 .delay-5 { animation-delay: 0.15s; }
 .reveal { opacity: 0; transform: translateY(6px); transition: opacity 0.14s ease, transform 0.14s ease; }
-/* Desktop: never hide content with reveal — observer timing issues cause content to stay invisible */
-@media (min-width: 900px) {
-  .reveal { opacity: 1 !important; transform: none !important; }
-}
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* ============================================================ RESPONSIVE ============================================================ */
@@ -1727,7 +1723,6 @@ img {
 .home-apple-icon svg{width:34px;height:34px;display:block;color:#eaf3ff}
 
 /* Service Hub — vertical scroll layout */
-/* service-banner-grid: mobile = 1col, desktop = 2col */
 .service-banner-grid{
   display:grid!important;
   grid-template-columns:1fr!important;
@@ -1735,17 +1730,12 @@ img {
   overflow-x:unset;
   padding:0;
 }
-@media(min-width:900px){
-  .service-banner-grid{
-    grid-template-columns:repeat(2,1fr)!important;
-  }
-}
 .service-banner-grid::-webkit-scrollbar{display:none}
 .service-banner-card{
   flex:unset!important;
   display:grid;
-  grid-template-columns:160px 1fr;
-  min-height:160px;
+  grid-template-columns:200px 1fr;
+  min-height:180px;
   align-items:center;
   border-radius:22px;
   border:1px solid rgba(0,200,255,.16);
@@ -1755,7 +1745,7 @@ img {
   text-decoration:none;
 }
 .service-banner-card:hover{transform:translateY(-4px);border-color:rgba(0,200,255,.38);box-shadow:0 26px 70px rgba(0,0,0,.38),0 0 28px rgba(0,200,255,.10);}
-.service-banner-media{width:160px!important;height:160px!important;border-radius:0!important;overflow:hidden;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;}
+.service-banner-media{width:200px!important;height:180px!important;border-radius:0!important;overflow:hidden;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;}
 .service-banner-media img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
 .service-banner-content{padding:20px 22px;}
 @media(max-width:720px){
@@ -2587,101 +2577,4 @@ img {
   width: 100% !important;
   justify-content: center;
   margin-top: 0;
-}
-
-
-/* ═══════════════════════════════════════════════════════════
-   HOME PAGE DESKTOP FIX — alignment + reveal visibility
-   ═══════════════════════════════════════════════════════════ */
-
-/* FIX 1: Grid containers must never start invisible on desktop.
-   Only individual cards get the reveal animation, not the grid wrapper. */
-@media (min-width: 900px) {
-  .home-svc-grid.reveal,
-  .service-banner-grid.reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* FIX 2: Home service cards — proper 4-col desktop layout with centering */
-@media (min-width: 900px) {
-  .home-service-cards {
-    padding: 40px 0 48px;
-  }
-  .home-svc-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 18px !important;
-    align-items: stretch;
-  }
-  .home-svc-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    height: 100% !important;
-    min-height: 180px;
-    padding: 24px 20px !important;
-  }
-  .home-svc-action-row {
-    margin-top: auto !important;
-    width: 100%;
-  }
-}
-
-/* FIX 3: Service Banner Hub — 2-col grid on desktop, NOT 1-col */
-@media (min-width: 900px) {
-  .service-banner-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 20px !important;
-    overflow-x: unset !important;
-  }
-  .service-banner-card {
-    display: grid !important;
-    grid-template-columns: 160px 1fr !important;
-    min-height: 160px !important;
-    align-items: center !important;
-  }
-  .service-banner-media {
-    width: 160px !important;
-    height: 160px !important;
-    border-radius: 0 !important;
-  }
-}
-
-@media (min-width: 1200px) {
-  .service-banner-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  .home-svc-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-}
-
-/* FIX 4: Ensure container is properly centered on wide screens */
-@media (min-width: 900px) {
-  .home-service-cards .container,
-  .service-banner-hub .container {
-    max-width: 1160px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-}
-
-/* FIX 5: On mobile keep single-col for service-banner */
-@media (max-width: 899px) {
-  .service-banner-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .service-banner-card {
-    grid-template-columns: 1fr !important;
-    min-height: unset !important;
-  }
-  .service-banner-media {
-    width: 100% !important;
-    height: 180px !important;
-  }
 }
