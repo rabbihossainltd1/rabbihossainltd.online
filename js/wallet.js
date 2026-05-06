@@ -1243,3 +1243,80 @@ window.cancelServiceOrderRequest = async function (orderId) {
   }
 };
 
+// ── Expose Firestore helpers for add-credit.html overlay ──
+window._db = db;
+window._doc = doc;
+window._collection = collection;
+window._onSnapshot = onSnapshot;
+
+// ── _submitTopupInternal — used by all payment submit buttons ──
+window._submitTopupInternal = async function ({ method, transactionId, msgEl, btnEl, onSuccess }) {
+  const showMsg = (msg, type) => {
+    const el = document.getElementById(msgEl);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'wallet-message ' + type;
+    el.style.display = 'block';
+  };
+
+  const btn = document.getElementById(btnEl);
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Submitting…`;
+  }
+
+  try {
+    const user = await waitForActiveUser();
+    if (!user) {
+      showMsg('আগে Login করো।', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = 'Verify Payment'; }
+      openLoginOrHome();
+      return;
+    }
+
+    await ensureUserDoc(user);
+
+    const amountUsd = normalizeUsd(
+      typeof window._currentSelectedUsd === 'function'
+        ? window._currentSelectedUsd()
+        : getSelectedUsdAmount()
+    );
+    const amountBdt = toBdt(amountUsd);
+
+    const validMethods = ['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'];
+    const finalMethod = validMethods.includes(method) ? method : 'bKash';
+
+    const payload = {
+      userId: user.uid,
+      userName: user.displayName || 'User',
+      userEmail: user.email || '',
+      purpose: 'credit',
+      serviceName: '',
+      serviceDetails: {},
+      amountUsd,
+      amountUSD: amountUsd,
+      amountBdt,
+      amountBDT: amountBdt,
+      rate: USD_TO_BDT,
+      rateBDT: USD_TO_BDT,
+      method: finalMethod,
+      paymentNumber: PAYMENT_NUMBERS[finalMethod] || '',
+      transactionId,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, 'topups'), payload);
+
+    // Call the overlay/animation callback with the new doc ID
+    if (typeof onSuccess === 'function') onSuccess(docRef.id);
+
+  } catch (error) {
+    console.error('_submitTopupInternal failed:', error);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Verify Payment'; }
+    const msg = error?.message || 'Payment submit failed. আবার চেষ্টা করো।';
+    showMsg(msg, 'error');
+  }
+};
+
