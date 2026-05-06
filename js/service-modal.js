@@ -874,7 +874,43 @@
       details.originalAmountUsd = baseAmountUsd;
     }
 
-    // Call backend first — only show success if backend confirms
+    // ── iOS Panel: client-side atomic transaction (backend bypass) ──
+    // Backend সবসময় "pending" status দেয় — iOS এর জন্য আমরা
+    // সরাসরি Firestore transaction এ credit deduct + order create +
+    // key deliver একসাথে করব, যাতে status "completed" হয়।
+    if (activeFieldsType === 'ffIos') {
+      try {
+        showStatus('Key deliver করা হচ্ছে…', 'info');
+        const iosResult = await iosOrderAndDeliver({ details, amountUsd, baseAmountUsd });
+        if (iosResult.ok) {
+          showIosKeySuccess(iosResult.key, amountUsd, { orderId: iosResult.orderId });
+          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_auto_delivered', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
+          _isSubmitting = false;
+          return;
+        }
+        // iosResult.ok === false হলে reason দেখে handle করো
+        if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
+        _isSubmitting = false;
+        if (iosResult.reason === 'no_key') {
+          showStatus('এই variant এর key stock এ নেই। Admin কে জানাও।', 'error');
+        } else if (iosResult.reason === 'insufficient') {
+          showStatus('Insufficient balance. Add Credit করো।', 'error');
+          setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
+        } else {
+          showStatus(iosResult.message || 'Key deliver failed. আবার চেষ্টা করো।', 'error');
+        }
+        return;
+      } catch (e) {
+        console.warn('[iOS Key] Client-side flow failed:', e);
+        if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
+        _isSubmitting = false;
+        showStatus('Key deliver হয়নি। আবার চেষ্টা করো।', 'error');
+        return;
+      }
+    }
+    // ───────────────────────────────────────────────────────────────
+
+    // Non-iOS: backend call করো
     const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd: baseAmountUsd, details });
 
     if (!result.ok) {
@@ -891,26 +927,6 @@
       }
       return;
     }
-
-    // ── iOS Panel: auto-deliver key from Firestore ──────────────────
-    if (activeFieldsType === 'ffIos') {
-      try {
-        const iosKey = await deliverIosKey(details, result.orderId, amountUsd);
-        if (iosKey) {
-          // Order status "completed" করো — admin approval দরকার নেই
-          await markOrderDelivered(result.orderId, iosKey).catch((e) => {
-            console.warn('[iOS Key] markOrderDelivered failed (non-critical):', e);
-          });
-          showIosKeySuccess(iosKey, amountUsd, result);
-          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_auto_delivered', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
-          _isSubmitting = false;
-          return;
-        }
-      } catch (e) {
-        console.warn('[iOS Key] Auto-deliver failed, falling back to normal flow:', e);
-      }
-    }
-    // ───────────────────────────────────────────────────────────────
 
     // Backend confirmed — now show success
     _isSubmitting = false;
@@ -1067,77 +1083,93 @@
   //  Each doc fields: { variant: "1d"|"7d"|"31d", key: "...", sold: false }
   // ══════════════════════════════════════════════════════════════════
 
-  // Order status "completed" করো যখন iOS key auto-deliver হয়
-  // Backend-এ Admin approval দরকার নেই — key already delivered
-  async function markOrderDelivered(orderId, deliveredKey) {
-    if (!orderId) return;
+  //  iOS Panel — atomic client-side order + key delivery
+  //  একটা Firestore transaction এ:
+  //    1. User credit check + deduct
+  //    2. serviceOrders এ "completed" status দিয়ে order create
+  //    3. iosKeys এ key mark as sold
+  //  Backend bypass — কোনো admin approval দরকার নেই
+  // ══════════════════════════════════════════════════════════════════
+
+  async function iosOrderAndDeliver({ details, amountUsd, baseAmountUsd }) {
     const db = window._firebaseDb;
-    if (!db) return;
+    if (!db) return { ok: false, reason: 'db', message: 'Firebase not ready.' };
 
-    const { doc, updateDoc, serverTimestamp }
-      = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+    const user = window.rabbiAuth && window.rabbiAuth.getUser();
+    if (!user) return { ok: false, reason: 'login', message: 'Not logged in.' };
 
-    const updateData = {
-      status: 'completed',
-      deliveredKey: deliveredKey || null,
-      deliveredAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      autoDelivered: true
-    };
-
-    // serviceOrders এ update করো (primary collection)
-    try {
-      await updateDoc(doc(db, 'serviceOrders', orderId), updateData);
-    } catch (e) {
-      // legacy orders collection এও try করো
-      await updateDoc(doc(db, 'orders', orderId), updateData);
-    }
-  }
-
-  async function deliverIosKey(details, orderId, amountUsd) {
+    // variant detect করো
     const variantRadio = document.querySelector('input[name="ff_ios_variant"]:checked');
-    if (!variantRadio) return null;
-
+    if (!variantRadio) return { ok: false, reason: 'no_variant', message: 'Variant select করো।' };
     let variant = '1d';
     const val = (variantRadio.value || '').toLowerCase();
     if (val.includes('31')) variant = '31d';
     else if (val.includes('7')) variant = '7d';
 
-    // window._firebaseDb — services.html এর module script থেকে expose করা হয়েছে
-    const db = window._firebaseDb;
-    if (!db) {
-      console.warn('[iOS Key] _firebaseDb not ready, falling back');
-      return null;
-    }
+    const {
+      collection, query, where, limit, getDocs,
+      runTransaction, serverTimestamp, doc, addDoc
+    } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
 
-    const { collection, query, where, limit, getDocs, runTransaction, serverTimestamp }
-      = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
-
-    const user = window.rabbiAuth.getUser();
-    if (!user) return null;
-
+    // unsold key খুঁজে নাও (transaction এর বাইরে — read-only)
     const keysRef = collection(db, 'iosKeys');
     const q = query(keysRef, where('variant', '==', variant), where('sold', '==', false), limit(1));
     const snap = await getDocs(q);
-    if (snap.empty) return null;
+    if (snap.empty) return { ok: false, reason: 'no_key', message: 'Stock নেই।' };
 
     const keyDocRef = snap.docs[0].ref;
+    const userDocRef = doc(db, 'users', user.uid);
+
     let deliveredKey = null;
+    let orderId = null;
 
     await runTransaction(db, async (tx) => {
-      const fresh = await tx.get(keyDocRef);
-      if (!fresh.exists() || fresh.data().sold) throw new Error('KEY_ALREADY_SOLD');
-      deliveredKey = fresh.data().key;
+      // 1. User doc পড়ো
+      const userSnap = await tx.get(userDocRef);
+      if (!userSnap.exists()) throw Object.assign(new Error('User not found.'), { code: 'NO_USER' });
+      const credit = Number(userSnap.data().credit || 0);
+      if (credit < amountUsd) throw Object.assign(new Error('Insufficient balance.'), { code: 'INSUFFICIENT_BALANCE' });
+
+      // 2. Key doc পড়ো — race condition check
+      const keySnap = await tx.get(keyDocRef);
+      if (!keySnap.exists() || keySnap.data().sold) throw Object.assign(new Error('Key already sold.'), { code: 'KEY_SOLD' });
+      deliveredKey = keySnap.data().key;
+
+      // 3. Credit deduct করো
+      const newCredit = Math.round((credit - amountUsd) * 100) / 100;
+      tx.update(userDocRef, { credit: newCredit, updatedAt: serverTimestamp() });
+
+      // 4. Order create করো "completed" status দিয়ে
+      const orderRef = doc(collection(db, 'serviceOrders'));
+      orderId = orderRef.id;
+      tx.set(orderRef, {
+        userId: user.uid,
+        userEmail: user.email || '',
+        serviceName: 'Free Fire iPhone Panel (iOS)',
+        serviceId: 'ffIos',
+        amountUsd: amountUsd,
+        paymentMethod: 'credit',
+        status: 'completed',
+        autoDelivered: true,
+        deliveredKey: deliveredKey,
+        variant: variant,
+        serviceDetails: details || {},
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        deliveredAt: serverTimestamp()
+      });
+
+      // 5. Key mark as sold
       tx.update(keyDocRef, {
         sold: true,
         soldTo: user.uid,
         soldEmail: user.email || '',
-        orderId: orderId || null,
+        orderId: orderId,
         soldAt: serverTimestamp()
       });
     });
 
-    return deliveredKey;
+    return { ok: true, key: deliveredKey, orderId };
   }
 
   function showIosKeySuccess(key, amountUsd, result) {
