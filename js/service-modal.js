@@ -24,7 +24,20 @@
   }
 
   async function backendPost(path, payload) {
-    if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn() || !window.rabbiAuth.getUser()) {
+    // Firebase user এখনো ready না হলে সর্বোচ্চ 4 সেকেন্ড wait করো
+    if (!window.rabbiAuth || !window.rabbiAuth.getUser()) {
+      await new Promise((resolve) => {
+        const deadline = Date.now() + 4000;
+        const check = setInterval(() => {
+          if ((window.rabbiAuth && window.rabbiAuth.getUser()) || Date.now() > deadline) {
+            clearInterval(check);
+            resolve();
+          }
+        }, 80);
+      });
+    }
+
+    if (!window.rabbiAuth || !window.rabbiAuth.getUser()) {
       throw new Error('NOT_LOGGED_IN');
     }
 
@@ -1024,14 +1037,18 @@
     if (val.includes('31')) variant = '31d';
     else if (val.includes('7')) variant = '7d';
 
-    const { getApps } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js');
-    const { getFirestore, collection, query, where, limit, getDocs, runTransaction, serverTimestamp }
+    // window._firebaseDb — services.html এর module script থেকে expose করা হয়েছে
+    const db = window._firebaseDb;
+    if (!db) {
+      console.warn('[iOS Key] _firebaseDb not ready, falling back');
+      return null;
+    }
+
+    const { collection, query, where, limit, getDocs, runTransaction, serverTimestamp }
       = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
 
-    const app = getApps()[0];
-    if (!app) return null;
-    const db = getFirestore(app);
     const user = window.rabbiAuth.getUser();
+    if (!user) return null;
 
     const keysRef = collection(db, 'iosKeys');
     const q = query(keysRef, where('variant', '==', variant), where('sold', '==', false), limit(1));

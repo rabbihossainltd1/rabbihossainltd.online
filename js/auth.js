@@ -1105,8 +1105,17 @@
       if (el) { el.textContent = ''; el.style.display = 'none'; }
     }
 
+    // Cache-based instant login check — Firebase initialize হওয়ার আগেও কাজ করে
+    function isCachedLoggedIn() {
+      if (currentUser) return true;
+      try {
+        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || 'null');
+        return !!(cached && cached.uid);
+      } catch(e) { return false; }
+    }
+
     window.rabbiAuth = {
-      isLoggedIn: () => !!currentUser,
+      isLoggedIn: () => isCachedLoggedIn(),
       getUser: () => currentUser,
       getUserData: () => currentUserData,
       getCredit: () => Number(currentUserData?.credit || 0),
