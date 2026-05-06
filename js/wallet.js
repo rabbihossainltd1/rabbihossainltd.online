@@ -765,24 +765,29 @@ window.loadAdminPanel = function () {
       const limited = docs.slice(0, 80);
       topupHistoryList.innerHTML = "";
       if (!limited.length) {
-        topupHistoryList.innerHTML = `<div class="empty-state">No payment transaction history yet.</div>`;
+        topupHistoryList.innerHTML = `<div class="hist-empty">No payment transaction history yet.</div>`;
         return;
       }
       limited.forEach((docSnap) => {
-        const data = docSnap.data() || {};
-        const purpose = data.purpose || "credit";
+        const d = docSnap.data() || {};
+        const purpose = d.purpose || "credit";
+        const title  = purpose === "service" ? escapeHtml(d.serviceName || "Instant Payment") : "Credit Top-up";
+        const meta   = `${escapeHtml(d.userName || "User")} · ${escapeHtml(d.method || "Manual")}${d.transactionId ? " · " + escapeHtml(d.transactionId) : ""}`;
+        const amount = d.amountUsd || d.amountUSD || d.amount || 0;
+        const date   = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : "";
         topupHistoryList.innerHTML += `
-          <div class="admin-card history-card">
-            <div class="admin-card-head">
-              <h3>${purpose === "service" ? escapeHtml(data.serviceName || "Instant Service Payment") : "Credit Top-up"}</h3>
-              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
+          <div class="hist-item" data-search="${escapeHtml(((d.userName||"")+" "+(d.userEmail||"")+" "+(d.transactionId||"")+" "+(d.method||"")).toLowerCase())}">
+            <div class="hist-item-left">
+              <div class="hist-item-name">${title}</div>
+              <div class="hist-item-meta">${meta}</div>
+              <div class="hist-item-meta">${escapeHtml(d.userEmail || "")}</div>
             </div>
-            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</p>
-            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
-            <p><b>Method:</b> ${escapeHtml(data.method || "Manual")} ${data.transactionId ? "• TX: " + escapeHtml(data.transactionId) : ""}</p>
-            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
-          </div>
-        `;
+            <div class="hist-item-right">
+              <div class="hist-item-amount">$${Number(amount).toFixed(2)}</div>
+              <span class="hist-status ${statusClass(d.status)}">${statusLabel(d.status)}</span>
+              ${date ? `<div class="hist-item-date">${date}</div>` : ""}
+            </div>
+          </div>`;
       });
     });
 
@@ -795,24 +800,27 @@ window.loadAdminPanel = function () {
       const limited = docs.slice(0, 100);
       orderHistoryList.innerHTML = "";
       if (!limited.length) {
-        orderHistoryList.innerHTML = `<div class="empty-state">No service transaction history yet.</div>`;
+        orderHistoryList.innerHTML = `<div class="hist-empty">No service history yet.</div>`;
         return;
       }
       limited.forEach((docSnap) => {
-        const data = docSnap.data() || {};
+        const d = docSnap.data() || {};
+        const amount = d.amountUsd || d.amountUSD || 0;
+        const date   = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : "";
+        const meta   = `${escapeHtml(d.userName || "User")} · ${escapeHtml(d.paymentMethod || "credit")}${d.transactionId ? " · " + escapeHtml(d.transactionId) : ""}`;
         orderHistoryList.innerHTML += `
-          <div class="admin-card history-card">
-            <div class="admin-card-head">
-              <h3>${escapeHtml(data.serviceName || "Service")}</h3>
-              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
+          <div class="hist-item" data-search="${escapeHtml(((d.userName||"")+" "+(d.userEmail||"")+" "+(d.serviceName||"")+" "+(d.transactionId||"")).toLowerCase())}">
+            <div class="hist-item-left">
+              <div class="hist-item-name">${escapeHtml(d.serviceName || "Service")}</div>
+              <div class="hist-item-meta">${meta}</div>
+              <div class="hist-item-meta">${escapeHtml(d.userEmail || "")}</div>
             </div>
-            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
-            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
-            <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}${data.transactionId ? " • TX: " + escapeHtml(data.transactionId) : ""}</p>
-            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
-            ${adminOrderDetailsHtml(data)}
-          </div>
-        `;
+            <div class="hist-item-right">
+              <div class="hist-item-amount">$${Number(amount).toFixed(2)}</div>
+              <span class="hist-status ${statusClass(d.status)}">${statusLabel(d.status)}</span>
+              ${date ? `<div class="hist-item-date">${date}</div>` : ""}
+            </div>
+          </div>`;
       });
     });
 
@@ -823,24 +831,24 @@ window.loadAdminPanel = function () {
         supportHistoryList.innerHTML = "";
         const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
         if (solvedDocs.length === 0) {
-          supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
+          supportHistoryList.innerHTML = `<div class="hist-empty">কোনো solved support ticket নেই।</div>`;
           return;
         }
         solvedDocs.forEach((docSnap) => {
           const d = docSnap.data() || {};
-          const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
+          const date = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : "";
           supportHistoryList.innerHTML += `
-            <div class="admin-card history-card" style="padding:12px 16px;">
-              <div class="admin-card-head" style="margin-bottom:6px;">
-                <h3 style="font-size:.88rem;">🟢 ${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
-                <span class="status approved" style="font-size:.7rem;">Solved</span>
+            <div class="hist-item" data-search="${escapeHtml(((d.displayName||"")+" "+(d.userEmail||"")+" "+(d.ticketId||"")).toLowerCase())}">
+              <div class="hist-item-left">
+                <div class="hist-item-name">${escapeHtml(d.displayName || d.userEmail || "User")}</div>
+                <div class="hist-item-meta">${d.ticketId ? "#" + escapeHtml(d.ticketId) + " · " : ""}${escapeHtml(d.userEmail || "—")}</div>
+                <div class="hist-item-meta">${escapeHtml(d.lastMessage || "—")}</div>
               </div>
-              ${d.ticketId ? `<p style="font-family:monospace;font-size:.7rem;color:#5a7090;">#${escapeHtml(d.ticketId)}</p>` : ''}
-              <p style="font-size:.78rem;">📧 ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; 📞 ${escapeHtml(d.userPhone || "—")}</p>
-              <p style="font-size:.78rem;">Last: ${escapeHtml(d.lastMessage || "—")}</p>
-              ${lastAt ? `<p style="color:#4a6070;font-size:.7rem;">Date: ${lastAt}</p>` : ''}
-            </div>
-          `;
+              <div class="hist-item-right">
+                <span class="hist-status solved">Solved</span>
+                ${date ? `<div class="hist-item-date">${date}</div>` : ""}
+              </div>
+            </div>`;
         });
       });
     }
