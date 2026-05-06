@@ -558,6 +558,10 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 .delay-4 { animation-delay: 0.12s; }
 .delay-5 { animation-delay: 0.15s; }
 .reveal { opacity: 0; transform: translateY(6px); transition: opacity 0.14s ease, transform 0.14s ease; }
+/* Desktop: never hide content with reveal — observer timing issues cause content to stay invisible */
+@media (min-width: 900px) {
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* ============================================================ RESPONSIVE ============================================================ */
@@ -1723,6 +1727,7 @@ img {
 .home-apple-icon svg{width:34px;height:34px;display:block;color:#eaf3ff}
 
 /* Service Hub — vertical scroll layout */
+/* service-banner-grid: mobile = 1col, desktop = 2col */
 .service-banner-grid{
   display:grid!important;
   grid-template-columns:1fr!important;
@@ -1730,12 +1735,17 @@ img {
   overflow-x:unset;
   padding:0;
 }
+@media(min-width:900px){
+  .service-banner-grid{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+}
 .service-banner-grid::-webkit-scrollbar{display:none}
 .service-banner-card{
   flex:unset!important;
   display:grid;
-  grid-template-columns:200px 1fr;
-  min-height:180px;
+  grid-template-columns:160px 1fr;
+  min-height:160px;
   align-items:center;
   border-radius:22px;
   border:1px solid rgba(0,200,255,.16);
@@ -1745,7 +1755,7 @@ img {
   text-decoration:none;
 }
 .service-banner-card:hover{transform:translateY(-4px);border-color:rgba(0,200,255,.38);box-shadow:0 26px 70px rgba(0,0,0,.38),0 0 28px rgba(0,200,255,.10);}
-.service-banner-media{width:200px!important;height:180px!important;border-radius:0!important;overflow:hidden;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;}
+.service-banner-media{width:160px!important;height:160px!important;border-radius:0!important;overflow:hidden;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;}
 .service-banner-media img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
 .service-banner-content{padding:20px 22px;}
 @media(max-width:720px){
