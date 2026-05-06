@@ -24,20 +24,7 @@
   }
 
   async function backendPost(path, payload) {
-    // Firebase user এখনো ready না হলে সর্বোচ্চ 4 সেকেন্ড wait করো
-    if (!window.rabbiAuth || !window.rabbiAuth.getUser()) {
-      await new Promise((resolve) => {
-        const deadline = Date.now() + 4000;
-        const check = setInterval(() => {
-          if ((window.rabbiAuth && window.rabbiAuth.getUser()) || Date.now() > deadline) {
-            clearInterval(check);
-            resolve();
-          }
-        }, 80);
-      });
-    }
-
-    if (!window.rabbiAuth || !window.rabbiAuth.getUser()) {
+    if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn() || !window.rabbiAuth.getUser()) {
       throw new Error('NOT_LOGGED_IN');
     }
 
@@ -227,7 +214,6 @@
   let activeServiceName = '';
   let activeFieldsType = '';
   let _currentAmountUsd = 0;
-  let _isSubmitting = false; // double-click / double-order prevention
 
   // Global setter so proapp plan picker can update amount directly
   window.setServiceAmountUsd = function(usd) {
@@ -800,64 +786,33 @@
   }
 
   async function handleBuyWithCredit() {
-    // ── Double-click / duplicate order prevention ─────────────────
-    if (_isSubmitting) return;
-    _isSubmitting = true;
-    // ──────────────────────────────────────────────────────────────
-
     if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
-      _isSubmitting = false;
       window.rabbiAuth && window.rabbiAuth.openLogin('apply');
       window._pendingService = { service: activeServiceName, fields: activeFieldsType };
       return;
     }
 
-    if (!validateBasicDetails()) { _isSubmitting = false; return; }
+    if (!validateBasicDetails()) return;
 
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
 
+    // ── Balance check BEFORE placing order ──────────────────────────
     if (!baseAmountUsd || baseAmountUsd <= 0) {
-      showStatus('প্রথমে একটি package/variant select করো।', 'error');
-      _isSubmitting = false;
+      showStatus('Valid service price পাওয়া যায়নি। আবার চেষ্টা করো।', 'error');
       return;
     }
 
-    // ── Balance check — userdata load হওয়া পর্যন্ত wait করো ────────
-    showStatus('Balance check করা হচ্ছে…', 'info');
+    const currentCredit = window.rabbiAuth && typeof window.rabbiAuth.getCredit === 'function'
+      ? window.rabbiAuth.getCredit()
+      : null;
 
-    // সর্বোচ্চ ৫ সেকেন্ড wait — userdata না আসা পর্যন্ত
-    const userData = await new Promise((resolve) => {
-      // Already loaded
-      if (window.rabbiAuth.getUserData && window.rabbiAuth.getUserData()) {
-        return resolve(window.rabbiAuth.getUserData());
-      }
-      // Wait for rabbi:userData event
-      const deadline = Date.now() + 5000;
-      const check = setInterval(() => {
-        const d = window.rabbiAuth.getUserData && window.rabbiAuth.getUserData();
-        if (d || Date.now() > deadline) { clearInterval(check); resolve(d || null); }
-      }, 100);
-    });
-
-    const currentCredit = userData ? Number(userData.credit || 0) : null;
-
-    showStatus('', '');
-
-    if (currentCredit === null) {
-      // userdata load হয়নি — block করো, add-credit এ নেওয়া যাবে না
-      showStatus('Balance load হয়নি। Page refresh করে আবার চেষ্টা করো।', 'error');
-      _isSubmitting = false;
-      return;
-    }
-
-    if (currentCredit < amountUsd) {
-      showStatus(
-        `Insufficient balance — আপনার কাছে $${currentCredit.toFixed(2)} আছে কিন্তু $${amountUsd.toFixed(2)} দরকার।`,
-        'error'
-      );
-      setTimeout(() => { window.location.href = 'add-credit.html'; }, 2000);
-      _isSubmitting = false;
+    if (currentCredit !== null && currentCredit < amountUsd) {
+      // Insufficient balance — redirect to add-credit immediately
+      showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
+      setTimeout(() => {
+        window.location.href = 'add-credit.html';
+      }, 1200);
       return;
     }
     // ────────────────────────────────────────────────────────────────
@@ -874,48 +829,11 @@
       details.originalAmountUsd = baseAmountUsd;
     }
 
-    // ── iOS Panel: client-side atomic transaction (backend bypass) ──
-    // Backend সবসময় "pending" status দেয় — iOS এর জন্য আমরা
-    // সরাসরি Firestore transaction এ credit deduct + order create +
-    // key deliver একসাথে করব, যাতে status "completed" হয়।
-    if (activeFieldsType === 'ffIos') {
-      try {
-        showStatus('Key deliver করা হচ্ছে…', 'info');
-        const iosResult = await iosOrderAndDeliver({ details, amountUsd, baseAmountUsd });
-        if (iosResult.ok) {
-          showIosKeySuccess(iosResult.key, amountUsd, { orderId: iosResult.orderId });
-          sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_auto_delivered', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
-          _isSubmitting = false;
-          return;
-        }
-        // iosResult.ok === false হলে reason দেখে handle করো
-        if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
-        _isSubmitting = false;
-        if (iosResult.reason === 'no_key') {
-          showStatus('এই variant এর key stock এ নেই। Admin কে জানাও।', 'error');
-        } else if (iosResult.reason === 'insufficient') {
-          showStatus('Insufficient balance. Add Credit করো।', 'error');
-          setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
-        } else {
-          showStatus(iosResult.message || 'Key deliver failed. আবার চেষ্টা করো।', 'error');
-        }
-        return;
-      } catch (e) {
-        console.warn('[iOS Key] Client-side flow failed:', e);
-        if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
-        _isSubmitting = false;
-        showStatus('Key deliver হয়নি। আবার চেষ্টা করো।', 'error');
-        return;
-      }
-    }
-    // ───────────────────────────────────────────────────────────────
-
-    // Non-iOS: backend call করো
+    // Call backend first — only show success if backend confirms
     const result = await buyServiceWithCreditDirect({ serviceName: activeServiceName, fieldsType: activeFieldsType, amountUsd, baseAmountUsd: baseAmountUsd, details });
 
     if (!result.ok) {
       if (btn) { btn.disabled = false; btn.innerHTML = old || 'Pay with Credit'; }
-      _isSubmitting = false;
       if (result.reason === 'insufficient') {
         showStatus('Insufficient balance. Add Credit করো।', 'error');
         setTimeout(() => { window.location.href = 'add-credit.html'; }, 1200);
@@ -929,7 +847,6 @@
     }
 
     // Backend confirmed — now show success
-    _isSubmitting = false;
     showServiceSuccess(result, amountUsd);
     sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_credit_pending_review', _amount_usd: amountUsd, _amount_bdt: Math.round(amountUsd * 125) }).catch(() => {});
   }
@@ -1076,162 +993,4 @@
       }
     });
   }
-
-  // ══════════════════════════════════════════════════════════════════
-  //  iOS Key Auto-Delivery System
-  //  Firestore collection: iosKeys
-  //  Each doc fields: { variant: "1d"|"7d"|"31d", key: "...", sold: false }
-  // ══════════════════════════════════════════════════════════════════
-
-  //  iOS Panel — atomic client-side order + key delivery
-  //  একটা Firestore transaction এ:
-  //    1. User credit check + deduct
-  //    2. serviceOrders এ "completed" status দিয়ে order create
-  //    3. iosKeys এ key mark as sold
-  //  Backend bypass — কোনো admin approval দরকার নেই
-  // ══════════════════════════════════════════════════════════════════
-
-  async function iosOrderAndDeliver({ details, amountUsd, baseAmountUsd }) {
-    const db = window._firebaseDb;
-    if (!db) return { ok: false, reason: 'db', message: 'Firebase not ready.' };
-
-    const user = window.rabbiAuth && window.rabbiAuth.getUser();
-    if (!user) return { ok: false, reason: 'login', message: 'Not logged in.' };
-
-    // variant detect করো
-    const variantRadio = document.querySelector('input[name="ff_ios_variant"]:checked');
-    if (!variantRadio) return { ok: false, reason: 'no_variant', message: 'Variant select করো।' };
-    let variant = '1d';
-    const val = (variantRadio.value || '').toLowerCase();
-    if (val.includes('31')) variant = '31d';
-    else if (val.includes('7')) variant = '7d';
-
-    const {
-      collection, query, where, limit, getDocs,
-      runTransaction, serverTimestamp, doc, addDoc
-    } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
-
-    // unsold key খুঁজে নাও (transaction এর বাইরে — read-only)
-    const keysRef = collection(db, 'iosKeys');
-    const q = query(keysRef, where('variant', '==', variant), where('sold', '==', false), limit(1));
-    const snap = await getDocs(q);
-    if (snap.empty) return { ok: false, reason: 'no_key', message: 'Stock নেই।' };
-
-    const keyDocRef = snap.docs[0].ref;
-    const userDocRef = doc(db, 'users', user.uid);
-
-    let deliveredKey = null;
-    let orderId = null;
-
-    await runTransaction(db, async (tx) => {
-      // 1. User doc পড়ো
-      const userSnap = await tx.get(userDocRef);
-      if (!userSnap.exists()) throw Object.assign(new Error('User not found.'), { code: 'NO_USER' });
-      const credit = Number(userSnap.data().credit || 0);
-      if (credit < amountUsd) throw Object.assign(new Error('Insufficient balance.'), { code: 'INSUFFICIENT_BALANCE' });
-
-      // 2. Key doc পড়ো — race condition check
-      const keySnap = await tx.get(keyDocRef);
-      if (!keySnap.exists() || keySnap.data().sold) throw Object.assign(new Error('Key already sold.'), { code: 'KEY_SOLD' });
-      deliveredKey = keySnap.data().key;
-
-      // 3. Credit deduct করো
-      const newCredit = Math.round((credit - amountUsd) * 100) / 100;
-      tx.update(userDocRef, { credit: newCredit, updatedAt: serverTimestamp() });
-
-      // 4. Order create করো "completed" status দিয়ে
-      const orderRef = doc(collection(db, 'serviceOrders'));
-      orderId = orderRef.id;
-      tx.set(orderRef, {
-        userId: user.uid,
-        userEmail: user.email || '',
-        serviceName: 'Free Fire iPhone Panel (iOS)',
-        serviceId: 'ffIos',
-        amountUsd: amountUsd,
-        paymentMethod: 'credit',
-        status: 'completed',
-        autoDelivered: true,
-        deliveredKey: deliveredKey,
-        variant: variant,
-        serviceDetails: details || {},
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        deliveredAt: serverTimestamp()
-      });
-
-      // 5. Key mark as sold
-      tx.update(keyDocRef, {
-        sold: true,
-        soldTo: user.uid,
-        soldEmail: user.email || '',
-        orderId: orderId,
-        soldAt: serverTimestamp()
-      });
-    });
-
-    return { ok: true, key: deliveredKey, orderId };
-  }
-
-  function showIosKeySuccess(key, amountUsd, result) {
-    const ov_close = document.getElementById('serviceModal');
-    if (ov_close) { ov_close.classList.remove('open'); document.body.style.overflow = ''; }
-
-    let ov = document.getElementById('orderPlacedOverlay');
-    if (!ov) {
-      ov = document.createElement('div');
-      ov.id = 'orderPlacedOverlay';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(16px);padding:20px;';
-      document.body.appendChild(ov);
-    }
-
-    const usdStr = amountUsd ? '$' + Number(amountUsd).toFixed(2) : '';
-    const bdtAmt = Math.round((amountUsd || 0) * 125);
-    const bdtStr = bdtAmt ? '৳' + bdtAmt.toLocaleString() : '';
-
-    if (!document.getElementById('opAnimStyle')) {
-      const s = document.createElement('style');
-      s.id = 'opAnimStyle';
-      s.textContent = '@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}@keyframes opDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}';
-      document.head.appendChild(s);
-    }
-
-    ov.innerHTML = '<div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,255,136,.06) 100%);border:1px solid rgba(0,191,255,.32);box-shadow:0 40px 100px rgba(0,0,0,.55),0 0 60px rgba(0,191,255,.10);animation:opIn .45s cubic-bezier(.2,1,.2,1) both;">'
-      + '<div style="width:80px;height:80px;border-radius:50%;margin:0 auto 20px;background:rgba(0,191,255,.12);border:2px solid rgba(0,191,255,.4);display:flex;align-items:center;justify-content:center;font-size:2.2rem;">🔑</div>'
-      + '<div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);color:#9ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;"><span style="width:7px;height:7px;border-radius:50%;background:#00bfff;display:inline-block;animation:opDot 1s ease-in-out infinite;"></span> Key Delivered</div>'
-      + '<h2 style="font-family:var(--font-display,inherit);font-size:1.55rem;color:#f0f8ff;margin:0 0 8px;">iOS Panel Key Ready!</h2>'
-      + '<p style="color:#8faec9;font-size:.88rem;margin:0 0 20px;line-height:1.6;">নিচের key টি copy করো এবং সুরক্ষিত রাখো।<br/><span style="color:#ffa94d;font-size:.8rem;">এই key শুধুমাত্র একবার sell হবে।</span></p>'
-      + (usdStr ? '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;">'
-          + '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#9ee8ff;font-weight:900;font-size:.85rem;">' + usdStr + '</span>'
-          + (bdtStr ? '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.18);color:#a7ffcf;font-weight:900;font-size:.85rem;">' + bdtStr + '</span>' : '')
-          + '<span style="padding:7px 14px;border-radius:999px;background:rgba(0,191,255,.08);border:1px solid rgba(0,191,255,.18);color:#6ecfff;font-weight:800;font-size:.85rem;">✓ Paid</span>'
-          + '</div>' : '')
-      + '<div style="background:rgba(0,0,0,.45);border:1.5px solid rgba(0,191,255,.35);border-radius:16px;padding:18px 20px;margin-bottom:16px;text-align:left;">'
-      + '<div style="color:#5a7a94;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Your Key</div>'
-      + '<div id="iosKeyText" style="font-family:monospace;font-size:1.05rem;color:#00e5ff;word-break:break-all;line-height:1.6;user-select:all;">' + key + '</div>'
-      + '</div>'
-      + '<button id="copyIosKey" type="button" style="width:100%;border:none;border-radius:14px;padding:15px;background:linear-gradient(135deg,#00bfff,#00e5ff);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;box-shadow:0 12px 36px rgba(0,191,255,.25);margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Key</button>'
-      + '<button id="opGoNow2" type="button" style="width:100%;border:1px solid rgba(0,191,255,.25);border-radius:14px;padding:12px;background:rgba(0,191,255,.07);color:#7dd3f8;font-weight:800;font-size:.88rem;cursor:pointer;">View My Orders</button>'
-      + '</div>';
-
-    const copyBtn = document.getElementById('copyIosKey');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(key);
-          copyBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg> Copied!';
-          copyBtn.style.background = 'linear-gradient(135deg,#00ff88,#00e5c0)';
-          setTimeout(() => {
-            copyBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Key';
-            copyBtn.style.background = 'linear-gradient(135deg,#00bfff,#00e5ff)';
-          }, 2500);
-        } catch(e) {
-          const el = document.getElementById('iosKeyText');
-          if (el) { const r = document.createRange(); r.selectNodeContents(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }
-        }
-      });
-    }
-    const goBtn = document.getElementById('opGoNow2');
-    if (goBtn) goBtn.addEventListener('click', () => { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); window.location.href = 'dashboard.html'; });
-  }
-
 })();
