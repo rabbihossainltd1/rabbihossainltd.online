@@ -639,12 +639,11 @@ window.loadAdminPanel = function () {
     const adminInfo = document.getElementById("adminInfo");
 
     if (!user) {
-      if (topupList) topupList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (orderList) orderList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (topupHistoryList) topupHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (orderHistoryList) orderHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      const shl = document.getElementById("adminSupportHistoryList");
-      if (shl) shl.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      document.body.innerHTML = `
+        <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;">
+          <img src="images/hukar.png" alt="" style="max-width:100%;max-height:100vh;display:block;" />
+        </main>
+      `;
       return;
     }
 
@@ -789,6 +788,9 @@ window.loadAdminPanel = function () {
             </div>
           </div>`;
       });
+      // re-apply active search after render
+      const _sq1 = document.getElementById("historySearchInput");
+      if (_sq1 && window.historySearch) window.historySearch(_sq1.value);
     });
 
     const orderHistoryQuery = query(collection(db, "serviceOrders"));
@@ -822,6 +824,9 @@ window.loadAdminPanel = function () {
             </div>
           </div>`;
       });
+      // re-apply active search after render
+      const _sq2 = document.getElementById("historySearchInput");
+      if (_sq2 && window.historySearch) window.historySearch(_sq2.value);
     });
 
     // ── Support History (solved only) ──
@@ -850,6 +855,9 @@ window.loadAdminPanel = function () {
               </div>
             </div>`;
         });
+        // re-apply active search after render
+        const _sq3 = document.getElementById("historySearchInput");
+        if (_sq3 && window.historySearch) window.historySearch(_sq3.value);
       });
     }
   });
