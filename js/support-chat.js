@@ -85,19 +85,6 @@ const email=document.getElementById('afEmail')?.value.trim();
 const phone=document.getElementById('afPhone')?.value.trim();
 const problem=document.getElementById('afProblem')?.value.trim();
 const submitEl=document.getElementById('afSubmit');
-
-// ── Login required ──
-if(!currentUser){
-  // Form বন্ধ করো, login দেখাও
-  document.getElementById('floatAgentForm')?.remove();
-  if(window.rabbiAuth && window.rabbiAuth.openLogin) {
-    window.rabbiAuth.openLogin('support');
-  } else {
-    window.location.href = 'index.html?login=1';
-  }
-  return;
-}
-
 if(!name||!email||!phone||!problem){
 if(submitEl){ const orig=submitEl.innerHTML; submitEl.textContent='সব ঘর পূরণ করুন!'; submitEl.style.cssText='background:rgba(255,80,80,.2);border-color:rgba(255,80,80,.5);'; setTimeout(()=>{ submitEl.innerHTML=orig; submitEl.style.cssText=''; },2200); } return;
 }
@@ -195,12 +182,14 @@ if(choice==='payment'){
 await botSay(
 `<strong>পেমেন্ট করার নিয়ম:</strong><br><br>`+
 `<div class="float-answer-list">`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> — App খুলুন &rarr; Send Money &rarr; আমাদের নম্বরে পাঠান &rarr; Transaction ID রাখুন।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Binance App &rarr; Pay &rarr; Send &rarr; আমাদের Binance ID দিন &rarr; USDT পাঠান।</span></div>`+
-`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Dashboard Wallet</strong> — Dashboard &rarr; Add Credit &rarr; সরাসরি ওয়ালেটে যোগ করুন।</span></div>`+
-`</div><br>পেমেন্টের পর Transaction ID বা Screenshot সহ এজেন্টকে জানান।`,
+`<div style="color:#7fffc4;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:'Outfit',sans-serif;">Mobile Banking</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> — Add Credit পেজ খুলুন &rarr; bKash select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> — Add Credit পেজ খুলুন &rarr; Nagad select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> — Add Credit পেজ খুলুন &rarr; Rocket select করুন &rarr; দেখানো নম্বরে Send Money করুন &rarr; Transaction ID দিয়ে Verify করুন।</span></div>`+
+`<div style="color:#f3ba2f;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;font-family:'Outfit',sans-serif;">Crypto</div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Add Credit &rarr; Crypto &rarr; Binance Pay &rarr; QR Scan বা App দিয়ে pay করুন &rarr; Order ID দিয়ে Verify করুন।</span></div>`+
+`<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>USDT (BSC/TRX/ETH/SOL/TON)</strong> — Add Credit &rarr; Crypto &rarr; Coin &rarr; Network বেছে দেখানো address-এ পাঠান &rarr; TxHash দিয়ে Verify করুন।</span></div>`+
+`</div>`,
 true,950);
 await new Promise(r=>setTimeout(r,350)); showBackToMenu();
 } else if(choice==='app'){

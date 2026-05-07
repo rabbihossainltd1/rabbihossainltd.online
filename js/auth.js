@@ -1105,17 +1105,8 @@
       if (el) { el.textContent = ''; el.style.display = 'none'; }
     }
 
-    // Cache-based instant login check — Firebase initialize হওয়ার আগেও কাজ করে
-    function isCachedLoggedIn() {
-      if (currentUser) return true;
-      try {
-        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || 'null');
-        return !!(cached && cached.uid);
-      } catch(e) { return false; }
-    }
-
     window.rabbiAuth = {
-      isLoggedIn: () => isCachedLoggedIn(),
+      isLoggedIn: () => !!currentUser,
       getUser: () => currentUser,
       getUserData: () => currentUserData,
       getCredit: () => Number(currentUserData?.credit || 0),
@@ -1150,9 +1141,7 @@
         closeLoginModal();
         setTimeout(closeLoginModal, 50);
         window.dispatchEvent(new CustomEvent('rabbi:loggedin', { detail: user }));
-        // If a pending service modal is waiting, skip reload so it can open directly
-        const hasPendingService = !!window._pendingService;
-        if (!hasPendingService && (sessionStorage.getItem('rabbiLoginJustCompleted') === '1' || wasLoginOpen)) {
+        if (sessionStorage.getItem('rabbiLoginJustCompleted') === '1' || wasLoginOpen) {
           sessionStorage.removeItem('rabbiLoginJustCompleted');
           localStorage.removeItem('rabbiLandingPopupSeen');
           sessionStorage.setItem('rabbiShowLandingPopup', '1');

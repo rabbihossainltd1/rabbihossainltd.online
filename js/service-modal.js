@@ -34,6 +34,7 @@
     }
 
     const token = await user.getIdToken(true);
+    console.log('[ServiceModal] Calling backend:', path, payload);
 
     const response = await fetch(BACKEND_API_BASE + backendRoute(path), {
       method: 'POST',
@@ -359,19 +360,30 @@
           <span style="padding:8px 16px;border-radius:999px;background:rgba(255,166,0,.10);border:1px solid rgba(255,166,0,.20);color:#ffd580;font-weight:900;font-size:.88rem;">Processing</span>
         </div>` : ''}
 
-        <!-- Rate first, then optionally go to orders -->
-        <button id="opRateBtn" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
-          background:linear-gradient(135deg,#ffa500,#ffcc44);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
-          box-shadow:0 16px 40px rgba(255,165,0,.22);margin-bottom:10px;
-          display:flex;align-items:center;justify-content:center;gap:9px;">
+        <!-- Redirect info -->
+        <div style="padding:14px 16px;border-radius:16px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.14);
+          display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:22px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          <div>
+            <div style="color:#9ee8ff;font-weight:900;font-size:.83rem;">Redirecting to My Orders…</div>
+            <div style="color:#5a7a94;font-size:.76rem;margin-top:2px;">Track your order status live from there.</div>
+          </div>
+        </div>
+
+        <button id="opGoNow" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
+          box-shadow:0 16px 40px rgba(0,200,255,.2);margin-bottom:10px;">
+          View My Orders Now
+        </button>
+        <button id="opRateBtn" type="button" style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:16px;padding:12px;
+          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;gap:8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
           Rate Your Experience
-        </button>
-        <button id="opGoNow" type="button" style="width:100%;border:1px solid rgba(0,200,255,.25);border-radius:16px;padding:12px;
-          background:rgba(0,200,255,.07);color:#9ee8ff;font-weight:800;font-size:.88rem;cursor:pointer;">
-          View My Orders
         </button>
       </div>
     `;
@@ -389,19 +401,24 @@
       document.head.appendChild(s);
     }
 
-    // Rate button → open review modal (no auto-redirect)
+    // Button click → go to orders
+    document.getElementById('opGoNow')?.addEventListener('click', () => {
+      window.location.href = 'dashboard.html?tab=orders';
+    });
+
+    // Rate button → open review modal, cancel auto-redirect
     const rateBtn = document.getElementById('opRateBtn');
+    let autoRedirect = setTimeout(() => {
+      window.location.href = 'dashboard.html?tab=orders';
+    }, 4000);
+
     rateBtn?.addEventListener('click', () => {
+      clearTimeout(autoRedirect);
       const ov = document.getElementById('orderPlacedOverlay');
       if (ov) ov.remove();
       if (typeof window.openReviewModal === 'function') {
         window.openReviewModal(typeof activeServiceName !== 'undefined' ? activeServiceName : '');
       }
-    });
-
-    // "View My Orders" button — manual navigation only, no auto-redirect
-    document.getElementById('opGoNow')?.addEventListener('click', () => {
-      window.location.href = 'dashboard.html?tab=orders';
     });
   }
 
@@ -542,15 +559,6 @@
       if (d.expiresAt && d.expiresAt.toMillis && d.expiresAt.toMillis() < Date.now()) { showCouponMsg('This coupon has expired.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
       const dp = Number(d.discountPercent || 0);
       if (!dp || dp <= 0 || dp > 100) { showCouponMsg('Invalid coupon.', 'error'); _activeCoupon = null; refreshCouponPriceUI(); return; }
-
-      // ── Service restriction check ──
-      if (d.validFor && Array.isArray(d.validFor) && d.validFor.length > 0) {
-        if (!d.validFor.includes(activeFieldsType)) {
-          showCouponMsg('এই coupon এই service-এ valid নয়।', 'error');
-          _activeCoupon = null; refreshCouponPriceUI(); return;
-        }
-      }
-
       _activeCoupon = { code, discountPercent: dp };
       refreshCouponPriceUI();
       showCouponMsg('Coupon applied! ' + dp + '% discount added.', 'success');
@@ -719,16 +727,7 @@
     } catch (err) { /* non-blocking */ }
   }
 
-  function openModal(serviceName, fieldsType) {
-    if (!overlay || !form) return;
-
-    // ── Login check — modal খোলার আগেই check ──
-    if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
-      // pending service সংরক্ষণ করো যাতে login-এর পরে resume করা যায়
-      window._pendingService = { service: serviceName, fields: fieldsType || '' };
-      window.rabbiAuth && window.rabbiAuth.openLogin('apply');
-      return;
-    }
+  function openModal(serviceName, fieldsType) {    if (!overlay || !form) return;
 
     injectCheckoutPanel();
 
@@ -768,6 +767,140 @@
     document.body.style.overflow = '';
   }
 
+  /* ── iOS Panel Key Delivery ── */
+  async function deliverIosKey(amountUsd, result) {
+    // Determine variant by amount
+    let keyFile = '1d';
+    if (amountUsd >= 25) keyFile = '31d';
+    else if (amountUsd >= 14) keyFile = '7d';
+
+    let deliveredKey = null;
+
+    try {
+      // Fetch the key file
+      const resp = await fetch(`../keys/ios/${keyFile}.txt?nocache=${Date.now()}`);
+      if (!resp.ok) throw new Error('Key file not found');
+      const text = await resp.text();
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      if (lines.length === 0) throw new Error('No keys available');
+
+      // Use Firestore to track which key index to use (atomic)
+      const { db: fsDb } = await import('./firebase-core.js');
+      const { doc: fsDoc, getDoc: fsGetDoc, runTransaction } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+
+      const counterRef = fsDoc(fsDb, 'iosKeyCounters', keyFile);
+      let keyIndex = 0;
+
+      await runTransaction(fsDb, async (tx) => {
+        const snap = await tx.get(counterRef);
+        keyIndex = snap.exists() ? (snap.data().nextIndex || 0) : 0;
+        if (keyIndex >= lines.length) throw new Error('OUT_OF_STOCK');
+        tx.set(counterRef, { nextIndex: keyIndex + 1, total: lines.length });
+      });
+
+      deliveredKey = lines[keyIndex];
+    } catch (err) {
+      if (err.message === 'OUT_OF_STOCK') {
+        showIosKeyModal(null, amountUsd, 'স্টক শেষ হয়ে গেছে। Admin এর সাথে যোগাযোগ করুন।');
+        return;
+      }
+      // Fallback: show success without key
+      showIosKeyModal(null, amountUsd, 'Key লোড করতে সমস্যা হয়েছে। Admin এর সাথে যোগাযোগ করুন।');
+      return;
+    }
+
+    showIosKeyModal(deliveredKey, amountUsd, null);
+  }
+
+  function showIosKeyModal(key, amountUsd, errorMsg) {
+    const overlay = document.getElementById('serviceModal');
+    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+    let ov = document.getElementById('orderPlacedOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'orderPlacedOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);padding:20px;';
+      document.body.appendChild(ov);
+    }
+
+    const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
+
+    ov.innerHTML = `
+      <div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
+        background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,200,255,.06) 100%);
+        border:1px solid rgba(0,191,255,.35);
+        box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 60px rgba(0,191,255,.10);
+        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
+
+        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
+          background:rgba(0,191,255,.14);border:2px solid rgba(0,191,255,.40);
+          display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📱</div>
+
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
+          background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);
+          color:#7ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
+          iOS Panel — Order Complete
+        </div>
+
+        <h2 style="font-size:1.5rem;color:#f0f8ff;margin:0 0 8px;">আপনার Key এসে গেছে!</h2>
+
+        ${errorMsg ? `
+          <div style="background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.25);border-radius:14px;
+            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;">
+            ⚠️ ${errorMsg}
+          </div>
+        ` : `
+          <p style="color:#8faec9;font-size:.88rem;margin:0 0 18px;">নিচের Key টি কপি করুন এবং সংরক্ষণ করুন।</p>
+
+          <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.25);border-radius:16px;
+            padding:18px;margin:0 0 18px;position:relative;">
+            <div style="font-family:monospace;font-size:1.05rem;color:#00d4ff;letter-spacing:.08em;
+              word-break:break-all;line-height:1.6;user-select:all;" id="iosDeliveredKey">
+              ${key}
+            </div>
+          </div>
+
+          <button id="iosCopyBtn" type="button" onclick="(function(){
+            navigator.clipboard.writeText('${key}').then(()=>{
+              const b=document.getElementById('iosCopyBtn');
+              b.textContent='✅ Copied!';
+              b.style.background='rgba(0,255,136,.15)';
+              b.style.borderColor='rgba(0,255,136,.4)';
+              b.style.color='#a7ffcf';
+              setTimeout(()=>{b.textContent='📋 Key Copy করুন';b.style.background='';b.style.borderColor='';b.style.color='';},2000);
+            });
+          })()" style="width:100%;border:1px solid rgba(0,191,255,.35);border-radius:14px;padding:13px;
+            background:rgba(0,191,255,.10);color:#7ee8ff;font-weight:900;font-size:.95rem;cursor:pointer;
+            margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">
+            📋 Key Copy করুন
+          </button>
+
+          <div style="background:rgba(255,166,0,.08);border:1px solid rgba(255,166,0,.20);border-radius:12px;
+            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;">
+            ⚠️ এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
+          </div>
+        `}
+
+        ${usdStr ? `<div style="margin-bottom:14px;"><span style="padding:8px 16px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#7ee8ff;font-weight:900;font-size:.88rem;">${usdStr}</span></div>` : ''}
+
+        <button type="button" onclick="window.location.href='dashboard.html?tab=orders'"
+          style="width:100%;border:none;border-radius:14px;padding:14px;
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;">
+          My Orders দেখুন
+        </button>
+      </div>
+    `;
+
+    if (!document.getElementById('opAnimStyle')) {
+      const s = document.createElement('style');
+      s.id = 'opAnimStyle';
+      s.textContent = `@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}`;
+      document.head.appendChild(s);
+    }
+  }
+
   async function handleBuyWithCredit() {
     if (!window.rabbiAuth || !window.rabbiAuth.isLoggedIn()) {
       window.rabbiAuth && window.rabbiAuth.openLogin('apply');
@@ -776,34 +909,6 @@
     }
 
     if (!validateBasicDetails()) return;
-
-    // ── iOS Panel: dedicated auto-delivery handler ──────────────
-    if (activeFieldsType === 'ffIos') {
-      const variantInput = form && form.querySelector('input[name="ff_ios_variant"]:checked');
-      const emailInput = document.getElementById('mo_ios_email');
-      const btn = document.getElementById('buyWithCreditBtn');
-
-      if (!variantInput) { showStatus('প্রথমে একটি variant select করো।', 'error'); return; }
-      if (!emailInput || !emailInput.value.trim()) { showStatus('Email address দাও।', 'error'); return; }
-
-      // Detect variant key from radio value or price
-      const rawVal = (variantInput.value || '').toLowerCase();
-      let variantKey = null;
-      if (rawVal.startsWith('1 day') || rawVal.includes('$5'))      variantKey = '1d';
-      else if (rawVal.startsWith('7 day') || rawVal.includes('$14')) variantKey = '7d';
-      else if (rawVal.startsWith('31 day') || rawVal.includes('$25')) variantKey = '31d';
-      else if (rawVal.includes('set-up') || rawVal.includes('$40')) variantKey = 'setup';
-
-      if (!variantKey) { showStatus('Variant identify করা যাচ্ছে না।', 'error'); return; }
-
-      if (typeof window.placeIosOrder === 'function') {
-        window.placeIosOrder(variantKey, emailInput.value.trim(), btn);
-      } else {
-        showStatus('iOS panel module লোড হয়নি। Page refresh করো।', 'error');
-      }
-      return;
-    }
-    // ────────────────────────────────────────────────────────────
 
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
@@ -854,6 +959,13 @@
       } else {
         showStatus(result.message || 'Order failed. আবার চেষ্টা করো।', 'error');
       }
+      return;
+    }
+
+    // Backend confirmed — now check if this is iOS panel — deliver key
+    if (activeFieldsType === 'ffIos') {
+      await deliverIosKey(amountUsd, result);
+      sendToFormspree({ _payment_method: 'credit', _payment_status: 'paid_ios_key_delivered', _amount_usd: amountUsd }).catch(() => {});
       return;
     }
 
