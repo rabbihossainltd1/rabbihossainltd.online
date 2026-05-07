@@ -686,6 +686,10 @@
 
     // ── Full-screen verifying overlay ──
     window.showVerifyingOverlay = function showVerifyingOverlay(topupDocId){
+      // Remove any old overlay
+      const old = document.getElementById('verifyOverlay');
+      if (old) old.remove();
+
       const ov = document.createElement('div');
       ov.className = 'verify-overlay';
       ov.id = 'verifyOverlay';
@@ -694,31 +698,68 @@
           <div class="verify-pulse-ring"></div>
           <div class="verify-spinner"></div>
         </div>
-        <div class="verify-title">Verifying Payment</div>
-        <div class="verify-sub">আপনার payment request সফলভাবে submit হয়েছে।<br>সাধারণত <strong style="color:var(--pay-text);">1–2 minutes</strong> এর মধ্যে verification proceed হবে।</div>
+        <div class="verify-title">Verifying Payment…</div>
+        <div class="verify-sub">আপনার payment request সফলভাবে submit হয়েছে।<br>সাধারণত <strong style="color:var(--pay-text);">1 minute</strong> এর মধ্যে verify হবে।</div>
         <div class="verify-eta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          Estimated review time: 1–2 minutes
+          Max wait time: 1 minute
         </div>
-        <a href="dashboard.html?tab=orders" class="verify-orders-btn">
+        <a href="dashboard.html?tab=payments" class="verify-orders-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
           View My Orders
         </a>`;
       document.body.appendChild(ov);
 
-      // Listen for admin approval on this topup doc
-      if(topupDocId && window._db && window._onSnapshot && window._doc && window._collection){
-        try {
-          const docRef = window._doc(window._collection(window._db,'topups'), topupDocId);
-          const unsub = window._onSnapshot(docRef, (snap) => {
-            const data = snap.data();
-            if(data && data.status === 'approved'){
-              unsub();
-              showApprovedTick(ov);
-            }
-          });
-        } catch(e){ console.warn('Approval listener failed:', e); }
-      }
+      if (!topupDocId) return;
+
+      // Wait for wallet.js to expose _db/_onSnapshot (they load async as module)
+      let unsub = null;
+      let approved = false;
+      const MAX_WAIT_MS = 60000; // 1 minute
+      const started = Date.now();
+
+      // Auto-timeout after 1 min — show a friendly message
+      const timeout = setTimeout(() => {
+        if (approved) return;
+        if (unsub) try { unsub(); } catch(e){}
+        ov.innerHTML = `
+          <div class="verify-spinner-wrap" style="opacity:.35;">
+            <div class="verify-spinner"></div>
+          </div>
+          <div class="verify-title" style="color:var(--pay-muted);">Still Verifying…</div>
+          <div class="verify-sub">Admin এখনো verify করেননি। একটু পরে My Orders চেক করুন।</div>
+          <a href="dashboard.html?tab=payments" class="verify-orders-btn" style="margin-top:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
+            Go to My Orders
+          </a>`;
+      }, MAX_WAIT_MS);
+
+      // Poll every 200ms until wallet.js globals appear, then subscribe
+      const trySubscribe = () => {
+        if (approved) return;
+        if (Date.now() - started > MAX_WAIT_MS) return;
+
+        if (window._db && window._onSnapshot && window._doc && window._collection) {
+          try {
+            const docRef = window._doc(window._db, 'topups', topupDocId);
+            unsub = window._onSnapshot(docRef, (snap) => {
+              if (!snap.exists()) return;
+              const data = snap.data();
+              if (data && (data.status === 'approved' || data.status === 'completed')) {
+                approved = true;
+                clearTimeout(timeout);
+                if (unsub) try { unsub(); } catch(e){}
+                showApprovedTick(ov);
+              }
+            });
+          } catch(e) {
+            console.warn('[verifyOverlay] Firestore listener error:', e);
+          }
+        } else {
+          setTimeout(trySubscribe, 200);
+        }
+      };
+      trySubscribe();
     };
 
     function showApprovedTick(ov){
@@ -730,7 +771,7 @@
           </div>
         </div>
         <div class="verify-approved-title">Payment Approved!</div>
-        <div class="verify-approved-sub">আপনার payment সফলভাবে verify হয়েছে। Account এ credit যোগ হয়ে গেছে।</div>`;
+        <div class="verify-approved-sub">আপনার payment সফলভাবে verify হয়েছে।<br>Account এ credit যোগ হয়ে গেছে।</div>`;
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 2200);
     }
 
