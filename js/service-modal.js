@@ -34,7 +34,6 @@
     }
 
     const token = await user.getIdToken(true);
-    console.log('[ServiceModal] Calling backend:', path, payload);
 
     const response = await fetch(BACKEND_API_BASE + backendRoute(path), {
       method: 'POST',
@@ -360,30 +359,19 @@
           <span style="padding:8px 16px;border-radius:999px;background:rgba(255,166,0,.10);border:1px solid rgba(255,166,0,.20);color:#ffd580;font-weight:900;font-size:.88rem;">Processing</span>
         </div>` : ''}
 
-        <!-- Redirect info -->
-        <div style="padding:14px 16px;border-radius:16px;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.14);
-          display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:22px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-          <div>
-            <div style="color:#9ee8ff;font-weight:900;font-size:.83rem;">Redirecting to My Orders…</div>
-            <div style="color:#5a7a94;font-size:.76rem;margin-top:2px;">Track your order status live from there.</div>
-          </div>
-        </div>
-
-        <button id="opGoNow" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
-          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
-          box-shadow:0 16px 40px rgba(0,200,255,.2);margin-bottom:10px;">
-          View My Orders Now
-        </button>
-        <button id="opRateBtn" type="button" style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:16px;padding:12px;
-          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
-          display:flex;align-items:center;justify-content:center;gap:8px;">
+        <!-- Rate first, then optionally go to orders -->
+        <button id="opRateBtn" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
+          background:linear-gradient(135deg,#ffa500,#ffcc44);color:#02050a;font-weight:950;font-size:.98rem;cursor:pointer;
+          box-shadow:0 16px 40px rgba(255,165,0,.22);margin-bottom:10px;
+          display:flex;align-items:center;justify-content:center;gap:9px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
           Rate Your Experience
+        </button>
+        <button id="opGoNow" type="button" style="width:100%;border:1px solid rgba(0,200,255,.25);border-radius:16px;padding:12px;
+          background:rgba(0,200,255,.07);color:#9ee8ff;font-weight:800;font-size:.88rem;cursor:pointer;">
+          View My Orders
         </button>
       </div>
     `;
@@ -401,24 +389,19 @@
       document.head.appendChild(s);
     }
 
-    // Button click → go to orders
-    document.getElementById('opGoNow')?.addEventListener('click', () => {
-      window.location.href = 'dashboard.html?tab=orders';
-    });
-
-    // Rate button → open review modal, cancel auto-redirect
+    // Rate button → open review modal (no auto-redirect)
     const rateBtn = document.getElementById('opRateBtn');
-    let autoRedirect = setTimeout(() => {
-      window.location.href = 'dashboard.html?tab=orders';
-    }, 4000);
-
     rateBtn?.addEventListener('click', () => {
-      clearTimeout(autoRedirect);
       const ov = document.getElementById('orderPlacedOverlay');
       if (ov) ov.remove();
       if (typeof window.openReviewModal === 'function') {
         window.openReviewModal(typeof activeServiceName !== 'undefined' ? activeServiceName : '');
       }
+    });
+
+    // "View My Orders" button — manual navigation only, no auto-redirect
+    document.getElementById('opGoNow')?.addEventListener('click', () => {
+      window.location.href = 'dashboard.html?tab=orders';
     });
   }
 
@@ -793,6 +776,34 @@
     }
 
     if (!validateBasicDetails()) return;
+
+    // ── iOS Panel: dedicated auto-delivery handler ──────────────
+    if (activeFieldsType === 'ffIos') {
+      const variantInput = form && form.querySelector('input[name="ff_ios_variant"]:checked');
+      const emailInput = document.getElementById('mo_ios_email');
+      const btn = document.getElementById('buyWithCreditBtn');
+
+      if (!variantInput) { showStatus('প্রথমে একটি variant select করো।', 'error'); return; }
+      if (!emailInput || !emailInput.value.trim()) { showStatus('Email address দাও।', 'error'); return; }
+
+      // Detect variant key from radio value or price
+      const rawVal = (variantInput.value || '').toLowerCase();
+      let variantKey = null;
+      if (rawVal.startsWith('1 day') || rawVal.includes('$5'))      variantKey = '1d';
+      else if (rawVal.startsWith('7 day') || rawVal.includes('$14')) variantKey = '7d';
+      else if (rawVal.startsWith('31 day') || rawVal.includes('$25')) variantKey = '31d';
+      else if (rawVal.includes('set-up') || rawVal.includes('$40')) variantKey = 'setup';
+
+      if (!variantKey) { showStatus('Variant identify করা যাচ্ছে না।', 'error'); return; }
+
+      if (typeof window.placeIosOrder === 'function') {
+        window.placeIosOrder(variantKey, emailInput.value.trim(), btn);
+      } else {
+        showStatus('iOS panel module লোড হয়নি। Page refresh করো।', 'error');
+      }
+      return;
+    }
+    // ────────────────────────────────────────────────────────────
 
     const amountUsd = getFinalAmountUsd();
     const baseAmountUsd = getServiceAmount();
