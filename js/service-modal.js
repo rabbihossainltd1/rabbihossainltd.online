@@ -810,7 +810,26 @@
       return;
     }
 
+    // Mark order as completed in Firestore (no admin approval needed for iOS)
+    await markIosOrderCompleted(result && result.orderId, deliveredKey);
+
     showIosKeyModal(deliveredKey, amountUsd, null);
+  }
+
+  async function markIosOrderCompleted(orderId, deliveredKey) {
+    if (!orderId) return;
+    try {
+      const { db: fsDb } = await import('./firebase-core.js');
+      const { doc: fsDoc, updateDoc: fsUpdate, serverTimestamp: fsST } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      await fsUpdate(fsDoc(fsDb, 'serviceOrders', orderId), {
+        status: 'completed',
+        deliveredKey: deliveredKey || '',
+        completedAt: fsST(),
+        updatedAt: fsST()
+      });
+    } catch (e) {
+      console.warn('[iOS] Could not mark order completed:', e);
+    }
   }
 
   function showIosKeyModal(key, amountUsd, errorMsg) {
@@ -836,7 +855,11 @@
 
         <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
           background:rgba(0,191,255,.14);border:2px solid rgba(0,191,255,.40);
-          display:flex;align-items:center;justify-content:center;font-size:2.2rem;">📱</div>
+          display:flex;align-items:center;justify-content:center;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>
+          </svg>
+        </div>
 
         <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
           background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);
@@ -848,8 +871,10 @@
 
         ${errorMsg ? `
           <div style="background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.25);border-radius:14px;
-            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;">
-            ⚠️ ${errorMsg}
+            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;
+            display:flex;align-items:center;gap:10px;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            ${errorMsg}
           </div>
         ` : `
           <p style="color:#8faec9;font-size:.88rem;margin:0 0 18px;">নিচের Key টি কপি করুন এবং সংরক্ষণ করুন।</p>
@@ -865,21 +890,25 @@
           <button id="iosCopyBtn" type="button" onclick="(function(){
             navigator.clipboard.writeText('${key}').then(()=>{
               const b=document.getElementById('iosCopyBtn');
-              b.textContent='✅ Copied!';
+              const orig=b.innerHTML;
+              b.innerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2.5\\' stroke-linecap=\\'round\\'><path d=\\'M20 6 9 17l-5-5\\'/></svg> Copied!';
               b.style.background='rgba(0,255,136,.15)';
               b.style.borderColor='rgba(0,255,136,.4)';
               b.style.color='#a7ffcf';
-              setTimeout(()=>{b.textContent='📋 Key Copy করুন';b.style.background='';b.style.borderColor='';b.style.color='';},2000);
+              setTimeout(()=>{b.innerHTML=orig;b.style.background='';b.style.borderColor='';b.style.color='';},2000);
             });
           })()" style="width:100%;border:1px solid rgba(0,191,255,.35);border-radius:14px;padding:13px;
             background:rgba(0,191,255,.10);color:#7ee8ff;font-weight:900;font-size:.95rem;cursor:pointer;
             margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">
-            📋 Key Copy করুন
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Key Copy করুন
           </button>
 
           <div style="background:rgba(255,166,0,.08);border:1px solid rgba(255,166,0,.20);border-radius:12px;
-            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;">
-            ⚠️ এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
+            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;
+            display:flex;align-items:flex-start;gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
           </div>
         `}
 
@@ -887,9 +916,17 @@
 
         <button type="button" onclick="window.location.href='dashboard.html?tab=orders'"
           style="width:100%;border:none;border-radius:14px;padding:14px;
-          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;">
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;margin-bottom:10px;">
           My Orders দেখুন
         </button>
+        ${!errorMsg ? `
+        <button id="iosRateBtn" type="button"
+          style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:14px;padding:12px;
+          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Rate Your Experience
+        </button>` : ''}
       </div>
     `;
 
@@ -898,6 +935,18 @@
       s.id = 'opAnimStyle';
       s.textContent = `@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}`;
       document.head.appendChild(s);
+    }
+
+    // Rate button — open review modal
+    const iosRateBtn = document.getElementById('iosRateBtn');
+    if (iosRateBtn) {
+      iosRateBtn.addEventListener('click', () => {
+        const ov2 = document.getElementById('orderPlacedOverlay');
+        if (ov2) ov2.remove();
+        if (typeof window.openReviewModal === 'function') {
+          window.openReviewModal('Free Fire iPhone Panel (iOS)');
+        }
+      });
     }
   }
 
@@ -919,12 +968,18 @@
       return;
     }
 
-    const currentCredit = window.rabbiAuth && typeof window.rabbiAuth.getCredit === 'function'
-      ? window.rabbiAuth.getCredit()
-      : null;
+    // Wait up to 2s for credit value to be available from Firestore
+    let currentCredit = null;
+    for (let i = 0; i < 20; i++) {
+      const val = window.rabbiAuth && typeof window.rabbiAuth.getCredit === 'function'
+        ? window.rabbiAuth.getCredit()
+        : null;
+      if (val !== null && val !== undefined) { currentCredit = val; break; }
+      await new Promise(r => setTimeout(r, 100));
+    }
 
     if (currentCredit !== null && currentCredit < amountUsd) {
-      // Insufficient balance — redirect to add-credit immediately
+      // Insufficient balance — redirect to add-credit
       showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
       setTimeout(() => {
         window.location.href = 'add-credit.html';

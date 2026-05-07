@@ -5,7 +5,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/f
 import {
   doc,
   getDoc,
-  getDocs,
   setDoc,
   updateDoc,
   collection,
@@ -14,7 +13,6 @@ import {
   onSnapshot,
   query,
   where,
-  orderBy,
   runTransaction,
   increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -499,22 +497,9 @@ window.submitTopup = async function () {
       updatedAt: serverTimestamp()
     };
 
-    // Validate method — allow all supported payment methods including crypto
-    if (!['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'].includes(payload.method)) {
-      payload.method = 'bKash'; // fallback only for truly unknown methods
-    }
-
-    // ── Duplicate transaction check ──
-    const dupSnap = await getDocs(
-      query(collection(db, "topups"),
-        where("transactionId", "==", transactionId),
-        where("userId", "==", user.uid)
-      )
-    );
-    if (!dupSnap.empty) {
-      showMessage("এই Transaction ID আগে submit করা হয়েছে। Duplicate submission গ্রহণযোগ্য নয়।", "error");
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = pageMode === "service" ? "Verify Service Payment" : "Verify Payment"; }
-      return;
+    // Normalize method for Firestore rules — Binance stored as 'Binance'
+    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
+      payload.method = 'bKash'; // fallback
     }
 
     await addDoc(collection(db, "topups"), payload);
@@ -765,29 +750,24 @@ window.loadAdminPanel = function () {
       const limited = docs.slice(0, 80);
       topupHistoryList.innerHTML = "";
       if (!limited.length) {
-        topupHistoryList.innerHTML = `<div class="hist-empty">No payment transaction history yet.</div>`;
+        topupHistoryList.innerHTML = `<div class="empty-state">No payment transaction history yet.</div>`;
         return;
       }
       limited.forEach((docSnap) => {
-        const d = docSnap.data() || {};
-        const purpose = d.purpose || "credit";
-        const title  = purpose === "service" ? escapeHtml(d.serviceName || "Instant Payment") : "Credit Top-up";
-        const meta   = `${escapeHtml(d.userName || "User")} · ${escapeHtml(d.method || "Manual")}${d.transactionId ? " · " + escapeHtml(d.transactionId) : ""}`;
-        const amount = d.amountUsd || d.amountUSD || d.amount || 0;
-        const date   = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : "";
+        const data = docSnap.data() || {};
+        const purpose = data.purpose || "credit";
         topupHistoryList.innerHTML += `
-          <div class="hist-item" data-search="${escapeHtml(((d.userName||"")+" "+(d.userEmail||"")+" "+(d.transactionId||"")+" "+(d.method||"")).toLowerCase())}">
-            <div class="hist-item-left">
-              <div class="hist-item-name">${title}</div>
-              <div class="hist-item-meta">${meta}</div>
-              <div class="hist-item-meta">${escapeHtml(d.userEmail || "")}</div>
+          <div class="admin-card history-card">
+            <div class="admin-card-head">
+              <h3>${purpose === "service" ? escapeHtml(data.serviceName || "Instant Service Payment") : "Credit Top-up"}</h3>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
             </div>
-            <div class="hist-item-right">
-              <div class="hist-item-amount">$${Number(amount).toFixed(2)}</div>
-              <span class="hist-status ${statusClass(d.status)}">${statusLabel(d.status)}</span>
-              ${date ? `<div class="hist-item-date">${date}</div>` : ""}
-            </div>
-          </div>`;
+            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD || data.amount || 0, data.amountBdt || data.amountBDT)}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
+            <p><b>Method:</b> ${escapeHtml(data.method || "Manual")} ${data.transactionId ? "• TX: " + escapeHtml(data.transactionId) : ""}</p>
+            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
+          </div>
+        `;
       });
     });
 
@@ -800,55 +780,55 @@ window.loadAdminPanel = function () {
       const limited = docs.slice(0, 100);
       orderHistoryList.innerHTML = "";
       if (!limited.length) {
-        orderHistoryList.innerHTML = `<div class="hist-empty">No service history yet.</div>`;
+        orderHistoryList.innerHTML = `<div class="empty-state">No service transaction history yet.</div>`;
         return;
       }
       limited.forEach((docSnap) => {
-        const d = docSnap.data() || {};
-        const amount = d.amountUsd || d.amountUSD || 0;
-        const date   = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : "";
-        const meta   = `${escapeHtml(d.userName || "User")} · ${escapeHtml(d.paymentMethod || "credit")}${d.transactionId ? " · " + escapeHtml(d.transactionId) : ""}`;
+        const data = docSnap.data() || {};
         orderHistoryList.innerHTML += `
-          <div class="hist-item" data-search="${escapeHtml(((d.userName||"")+" "+(d.userEmail||"")+" "+(d.serviceName||"")+" "+(d.transactionId||"")).toLowerCase())}">
-            <div class="hist-item-left">
-              <div class="hist-item-name">${escapeHtml(d.serviceName || "Service")}</div>
-              <div class="hist-item-meta">${meta}</div>
-              <div class="hist-item-meta">${escapeHtml(d.userEmail || "")}</div>
+          <div class="admin-card history-card">
+            <div class="admin-card-head">
+              <h3>${escapeHtml(data.serviceName || "Service")}</h3>
+              <span class="status ${statusClass(data.status)}">${statusLabel(data.status)}</span>
             </div>
-            <div class="hist-item-right">
-              <div class="hist-item-amount">$${Number(amount).toFixed(2)}</div>
-              <span class="hist-status ${statusClass(d.status)}">${statusLabel(d.status)}</span>
-              ${date ? `<div class="hist-item-date">${date}</div>` : ""}
-            </div>
-          </div>`;
+            <p><b>Amount:</b> ${moneyPair(data.amountUsd || data.amountUSD, data.amountBdt || data.amountBDT)}</p>
+            <p><b>User:</b> ${escapeHtml(data.userName || "User")} — ${escapeHtml(data.userEmail || "No email")}</p>
+            <p><b>Payment:</b> ${escapeHtml(data.paymentMethod || "credit")}${data.transactionId ? " • TX: " + escapeHtml(data.transactionId) : ""}</p>
+            <p><b>Admin Action:</b> ${adminActionText(data)}${adminMetaLine(data) ? " • " + adminMetaLine(data) : ""}</p>
+            ${adminOrderDetailsHtml(data)}
+          </div>
+        `;
       });
     });
 
-    // ── Support History (solved only) ──
+    // ── Support History (Solved only) ──
     const supportHistoryList = document.getElementById("adminSupportHistoryList");
     if (supportHistoryList) {
       onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
         supportHistoryList.innerHTML = "";
         const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
         if (solvedDocs.length === 0) {
-          supportHistoryList.innerHTML = `<div class="hist-empty">কোনো solved support ticket নেই।</div>`;
+          supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
           return;
         }
         solvedDocs.forEach((docSnap) => {
           const d = docSnap.data() || {};
-          const date = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : "";
+          const uid = docSnap.id;
+          const lastAt = d.lastAt?.toDate ? d.lastAt.toDate().toLocaleDateString() : '';
           supportHistoryList.innerHTML += `
-            <div class="hist-item" data-search="${escapeHtml(((d.displayName||"")+" "+(d.userEmail||"")+" "+(d.ticketId||"")).toLowerCase())}">
-              <div class="hist-item-left">
-                <div class="hist-item-name">${escapeHtml(d.displayName || d.userEmail || "User")}</div>
-                <div class="hist-item-meta">${d.ticketId ? "#" + escapeHtml(d.ticketId) + " · " : ""}${escapeHtml(d.userEmail || "—")}</div>
-                <div class="hist-item-meta">${escapeHtml(d.lastMessage || "—")}</div>
+            <div class="admin-card history-card" style="cursor:pointer;" onclick="window.adminShowSolvedChat && window.adminShowSolvedChat('${escapeHtml(uid)}')">
+              <div class="admin-card-head">
+                <div>
+                  <h3>🟢 ${escapeHtml(d.displayName || d.userEmail || "User")}</h3>
+                  ${d.ticketId ? `<p style="font-family:monospace;font-size:.68rem;color:#5a7090;">#${escapeHtml(d.ticketId)}</p>` : ''}
+                </div>
+                <span class="status completed">Solved</span>
               </div>
-              <div class="hist-item-right">
-                <span class="hist-status solved">Solved</span>
-                ${date ? `<div class="hist-item-date">${date}</div>` : ""}
-              </div>
-            </div>`;
+              <p>📧 ${escapeHtml(d.userEmail || "—")} &nbsp;|&nbsp; 📞 ${escapeHtml(d.userPhone || "—")}</p>
+              <p>Last: ${escapeHtml(d.lastMessage || "—")}</p>
+              ${lastAt ? `<p style="color:#4a6070;font-size:.7rem;">Date: ${lastAt}</p>` : ''}
+            </div>
+          `;
         });
       });
     }
@@ -1213,6 +1193,34 @@ function loadDashboardOrders(user) {
         const svgTag = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
         return `<span style="color:#a7ffcf;">${svgTag} ${escapeHtml(data.couponCode)}${data.discountPercent ? ` (${data.discountPercent}% off)` : ''}</span>`;
       })() : '';
+      const isIosOrder = String(data.serviceName || '').toLowerCase().includes('iphone') || String(data.serviceId || '').toLowerCase().includes('ffios') || String(data.serviceDetails?.fieldsType || data.details?.fieldsType || '').toLowerCase().includes('ffios');
+      const deliveredKey = data.deliveredKey || data.serviceDetails?.deliveredKey || data.details?.deliveredKey || '';
+      const iosKeyBlock = (isIosOrder && deliveredKey) ? `
+        <div style="background:rgba(0,0,0,.32);border:1px solid rgba(0,191,255,.25);border-radius:12px;padding:14px;margin:10px 0 0;text-align:left;">
+          <div style="color:#8faec9;font-size:.75rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="17" r="3"/><path d="M10.5 13.5 21 3"/><path d="M18 5l1 1M15 8l1 1"/></svg>
+            Delivered Key
+          </div>
+          <div style="font-family:monospace;font-size:.92rem;color:#00d4ff;letter-spacing:.06em;word-break:break-all;line-height:1.5;user-select:all;" id="iosKey_${docSnap.id}">${escapeHtml(deliveredKey)}</div>
+          <button type="button" onclick="(function(){
+            navigator.clipboard.writeText('${deliveredKey.replace(/'/g,"\\'")}').then(()=>{
+              const b=document.getElementById('iosCopy_${docSnap.id}');
+              const orig=b.innerHTML;
+              b.innerHTML='<svg width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2.5\\' stroke-linecap=\\'round\\'><path d=\\'M20 6 9 17l-5-5\\'/></svg> Copied!';
+              b.style.background='rgba(0,255,136,.15)';b.style.borderColor='rgba(0,255,136,.4)';b.style.color='#a7ffcf';
+              setTimeout(()=>{b.innerHTML=orig;b.style.background='';b.style.borderColor='';b.style.color='';},2000);
+            });
+          })()"
+            id="iosCopy_${docSnap.id}"
+            style="margin-top:10px;border:1px solid rgba(0,191,255,.30);border-radius:10px;padding:8px 14px;
+            background:rgba(0,191,255,.08);color:#7ee8ff;font-weight:800;font-size:.8rem;cursor:pointer;
+            display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Key
+          </button>
+        </div>
+      ` : '';
+
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1230,6 +1238,7 @@ function loadDashboardOrders(user) {
             ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>
           </div>
+          ${iosKeyBlock}
           ${pendingNote}
           ${failReason}
         </div>
@@ -1268,91 +1277,3 @@ window.cancelServiceOrderRequest = async function (orderId) {
   }
 };
 
-// ── Expose Firestore helpers for add-credit.html overlay ──
-window._db         = db;
-window._doc        = doc;
-window._collection = collection;
-window._onSnapshot = onSnapshot;
-
-// ── _submitTopupInternal — used by all payment submit buttons in add-credit.html ──
-window._submitTopupInternal = async function ({ method, transactionId, msgEl, btnEl, onSuccess }) {
-  const showMsg = (msg, type) => {
-    const el = document.getElementById(msgEl);
-    if (!el) return;
-    el.textContent = msg;
-    el.className = 'wallet-message ' + type;
-    el.style.display = 'block';
-  };
-
-  const btn = document.getElementById(btnEl);
-  const origBtnHtml = btn ? btn.innerHTML : '';
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Submitting…`;
-  }
-
-  try {
-    const user = await waitForActiveUser();
-    if (!user) {
-      showMsg('আগে Login করো।', 'error');
-      if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
-      openLoginOrHome();
-      return;
-    }
-
-    await ensureUserDoc(user);
-
-    const amountUsd = normalizeUsd(
-      typeof window._currentSelectedUsd === 'function'
-        ? window._currentSelectedUsd()
-        : getSelectedUsdAmount()
-    );
-    const amountBdt = toBdt(amountUsd);
-
-    const validMethods = ['bKash', 'Nagad', 'Rocket', 'Binance', 'USDT BSC', 'USDT TRX', 'USDT ETH', 'USDT SOL', 'USDT TON'];
-    const finalMethod  = validMethods.includes(method) ? method : 'bKash';
-
-    // ── Duplicate transaction check ──
-    const dupSnap = await getDocs(
-      query(collection(db, 'topups'),
-        where('transactionId', '==', transactionId),
-        where('userId', '==', user.uid)
-      )
-    );
-    if (!dupSnap.empty) {
-      showMsg('এই Transaction ID আগে submit করা হয়েছে। Duplicate submission গ্রহণযোগ্য নয়।', 'error');
-      if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
-      return;
-    }
-
-    const payload = {
-      userId:     user.uid,
-      userName:   user.displayName || 'User',
-      userEmail:  user.email || '',
-      purpose:    'credit',
-      serviceName: '',
-      serviceDetails: {},
-      amountUsd,
-      amountUSD:  amountUsd,
-      amountBdt,
-      amountBDT:  amountBdt,
-      rate:       USD_TO_BDT,
-      rateBDT:    USD_TO_BDT,
-      method:     finalMethod,
-      paymentNumber: PAYMENT_NUMBERS[finalMethod] || '',
-      transactionId,
-      status:     'pending',
-      createdAt:  serverTimestamp(),
-      updatedAt:  serverTimestamp()
-    };
-
-    const docRef = await addDoc(collection(db, 'topups'), payload);
-
-    if (typeof onSuccess === 'function') onSuccess(docRef.id);
-
-  } catch (error) {
-    console.error('_submitTopupInternal failed:', error);
-    if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
-    showMsg(error?.message || 'Payment submit failed. আবার চেষ্টা করো।', 'error');
-  }
-};
