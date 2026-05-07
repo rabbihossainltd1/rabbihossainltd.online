@@ -125,3 +125,24 @@ async function handleBuyWithCredit(planOptions) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = { buyWithCredit, handleBuyWithCredit };
 }
+
+window.placeIosOrder = async function (variantKey, email, btnEl) {
+  const variants = {
+    "1d": { label: "1 Day", price: 5 },
+    "7d": { label: "7 Days", price: 14 },
+    "31d": { label: "31 Days", price: 25 },
+    "setup": { label: "Full Set-up", price: 40 }
+  };
+
+  const plan = variants[variantKey];
+  if (!plan) throw new Error("Invalid iOS panel variant.");
+
+  return handleBuyWithCredit({
+    variant: variantKey,
+    variantLabel: plan.label,
+    amountUsd: plan.price,
+    email,
+    serviceId: "ffIos",
+    serviceName: "Free Fire iPhone Panel (iOS)"
+  });
+};
