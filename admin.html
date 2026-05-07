@@ -53,54 +53,24 @@
     .coupon-msg.success { background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.25); color:#a7ffcf; display:block; }
     .coupon-msg.error { background:rgba(255,80,80,.10); border:1px solid rgba(255,80,80,.22); color:#ffb0b0; display:block; }
     .support-grid { display:none; } /* legacy — replaced */
-    /* ── History Panel — Full Page Style ── */
-    #panelHistory { margin-top:0 !important; }
-    #panelHistory .admin-card-shell { background:transparent; border:none; box-shadow:none; padding:0; }
-    .hist-page { min-height:60vh; }
-
-    /* Header */
-    .hist-header { text-align:center; padding:28px 0 22px; }
-    .hist-header h1 { font-size:2.4rem; font-weight:900; letter-spacing:-.02em; background:linear-gradient(135deg,#00c8ff,#00ff88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin:0; font-family:var(--font-display,'Outfit',sans-serif); }
-
-    /* Search bar */
-    .hist-search-wrap { position:relative; margin:0 0 22px; }
-    .hist-search-wrap svg { position:absolute; right:16px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:#00c8ff; pointer-events:none; stroke-width:2.2; }
-    .hist-search-input { width:100%; background:rgba(255,255,255,.07); border:1.5px solid rgba(0,200,255,.22); border-radius:999px; padding:14px 48px 14px 22px; color:#e8edf5; font-size:.95rem; font-family:inherit; outline:none; box-sizing:border-box; transition:border-color .2s; }
-    .hist-search-input:focus { border-color:rgba(0,200,255,.55); background:rgba(0,200,255,.06); }
-    .hist-search-input::placeholder { color:#4a6880; }
-
-    /* Tab pills */
-    .hist-tabs { display:flex; gap:10px; margin-bottom:22px; }
-    .hist-tab-btn { flex:1; padding:11px 10px; border-radius:999px; border:1.5px solid rgba(0,200,255,.22); background:rgba(255,255,255,.04); color:#6a8aa8; font-weight:900; font-size:.85rem; cursor:pointer; transition:.2s ease; font-family:inherit; text-align:center; }
-    .hist-tab-btn:hover { border-color:rgba(0,200,255,.45); color:#c2e4f8; background:rgba(0,200,255,.07); }
-    .hist-tab-btn.active { background:linear-gradient(135deg,#00c8ff,#00ff88); border-color:transparent; color:#02050a; box-shadow:0 6px 24px rgba(0,200,255,.25); }
-
-    /* Sub panels */
-    .hist-sub-panel { display:none; animation:panelIn .2s ease; }
-    .hist-sub-panel.active { display:block; }
-
-    /* Section label */
-    .hist-section-label { font-size:.75rem; font-weight:900; color:#4a6880; text-transform:uppercase; letter-spacing:.08em; margin:0 0 12px 2px; }
-
-    /* List items — compact row style */
-    .hist-list { display:flex; flex-direction:column; gap:0; }
-    .hist-item { display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.06); cursor:default; transition:background .15s; }
-    .hist-item:last-child { border-bottom:none; }
-    .hist-item-left { min-width:0; }
-    .hist-item-name { font-weight:800; font-size:.88rem; color:#e8edf5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .hist-item-meta { font-size:.72rem; color:#5a7a9a; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .hist-item-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
-    .hist-item-amount { font-weight:900; font-size:.88rem; color:#00ff88; }
-    .hist-item-date { font-size:.68rem; color:#4a6070; }
-    .hist-status { padding:3px 9px; border-radius:999px; font-size:.65rem; font-weight:900; text-transform:uppercase; }
-    .hist-status.approved,.hist-status.completed,.hist-status.confirmed { color:#a7ffcf; background:rgba(0,255,136,.12); }
-    .hist-status.pending { color:#ffe7a3; background:rgba(255,200,80,.12); }
-    .hist-status.declined,.hist-status.cancelled { color:#ffb0b0; background:rgba(255,80,80,.12); }
-    .hist-status.solved { color:#a7ffcf; background:rgba(0,255,136,.12); }
-    .hist-empty { color:#4a6070; text-align:center; padding:40px 0; font-size:.88rem; }
-
-    /* hide old history classes */
-    .history-sub-nav,.history-search-wrap,.history-sub-panel,.history-sub-btn { display:none !important; }
+    /* ── History Panel ── */
+    .history-sub-nav { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .history-sub-btn { flex:1; min-width:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; padding:14px 10px; border-radius:16px; border:1px solid rgba(0,200,255,.18); background:rgba(255,255,255,.04); color:#8aaac8; font-weight:900; font-size:.8rem; cursor:pointer; transition:.2s ease; font-family:inherit; }
+    .history-sub-btn svg { width:20px; height:20px; stroke-width:1.6; color:#00c8ff; }
+    .history-sub-btn:hover { border-color:rgba(0,200,255,.4); background:rgba(0,200,255,.08); color:#c2e4f8; }
+    .history-sub-btn.active { background:linear-gradient(135deg,rgba(0,200,255,.18),rgba(0,255,136,.10)); border-color:rgba(0,200,255,.5); color:#e8edf5; box-shadow:0 6px 22px rgba(0,200,255,.12); }
+    .history-search-wrap { position:relative; margin-bottom:14px; }
+    .history-search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#4a6880; pointer-events:none; stroke-width:2; }
+    .history-search-input { width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px 12px 10px 38px; color:#e8edf5; font-size:.88rem; font-family:inherit; outline:none; box-sizing:border-box; }
+    .history-search-input:focus { border-color:rgba(0,200,255,.42); }
+    .history-sub-panel { display:none; }
+    .history-sub-panel.active { display:block; }
+    /* compact history cards */
+    .history-card { padding:12px 14px !important; border-radius:14px !important; }
+    .history-card h3 { font-size:.88rem !important; margin:0 0 3px !important; }
+    .history-card p  { font-size:.75rem !important; margin:2px 0 !important; color:#8fa2bb !important; }
+    .history-card .admin-card-head { margin-bottom:5px !important; }
+    .history-card .status { font-size:.65rem !important; padding:3px 8px !important; }
     /* ── Admin Inbox list ── */
     .admin-inbox-list { display:flex; flex-direction:column; gap:0; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.07); }
     .inbox-item { padding:13px 16px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:background .15s; display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; background:rgba(0,0,0,.15); }
@@ -247,55 +217,6 @@
                 <input id="newCouponMaxUses" type="number" min="1" placeholder="e.g. 50 (unlimited if blank)" class="form-input-small" />
               </div>
             </div>
-            <div style="margin-bottom:12px;">
-              <label class="form-label-small" style="display:block;margin-bottom:6px;">Valid For Services <span style="color:#4a6070;font-weight:400;">(খালি রাখলে সব services-এ কাজ করবে)</span></label>
-              <!-- Hidden checkboxes (read by adminCreateCoupon) -->
-              <div id="couponServiceCheckboxes" style="display:none;">
-                <input type="checkbox" value="ff"><input type="checkbox" value="ffDrip"><input type="checkbox" value="ffFf4x">
-                <input type="checkbox" value="ffIos"><input type="checkbox" value="ffPc"><input type="checkbox" value="card">
-                <input type="checkbox" value="meta"><input type="checkbox" value="pubg"><input type="checkbox" value="mlbb">
-                <input type="checkbox" value="proapp"><input type="checkbox" value="security"><input type="checkbox" value="android">
-                <input type="checkbox" value="webDev">
-              </div>
-              <!-- Selector button -->
-              <button type="button" id="svcSelectorBtn" onclick="openServiceSelector()"
-                style="width:100%;background:rgba(0,200,255,.07);border:1.5px solid rgba(0,200,255,.28);border-radius:12px;padding:11px 16px;color:#9ee8ff;font-size:.84rem;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;transition:.2s;">
-                Select Services (All if empty) ▾
-              </button>
-            </div>
-
-            <!-- Service Selector Modal -->
-            <div id="svcSelectorModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,5,10,.82);align-items:center;justify-content:center;padding:16px;">
-              <div style="background:#0d1825;border:1.5px solid rgba(0,200,255,.25);border-radius:20px;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.6);">
-                <!-- Modal header -->
-                <div style="padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;">
-                  <span style="font-weight:900;color:#e8edf5;font-size:1rem;flex:1;">Select Services</span>
-                  <button type="button" onclick="closeSvcSelector()" style="background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#7a8ca8;cursor:pointer;padding:5px 11px;font-size:.82rem;">Close</button>
-                </div>
-                <!-- Search -->
-                <div style="padding:12px 18px 8px;">
-                  <input type="text" id="svcSelectorSearch" placeholder="Search service..."
-                    oninput="svcSelectorSearch(this.value)"
-                    style="width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(0,200,255,.22);border-radius:999px;padding:10px 16px;color:#e8edf5;font-size:.88rem;font-family:inherit;outline:none;box-sizing:border-box;" />
-                </div>
-                <!-- Select all / clear -->
-                <div style="padding:0 18px 8px;display:flex;gap:8px;">
-                  <button type="button" onclick="svcSelectorSelectAll()" style="flex:1;background:rgba(0,200,255,.10);border:1px solid rgba(0,200,255,.25);border-radius:8px;color:#9ee8ff;font-size:.78rem;font-weight:700;cursor:pointer;padding:6px;font-family:inherit;">Select All</button>
-                  <button type="button" onclick="svcSelectorClearAll()" style="flex:1;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.22);border-radius:8px;color:#ffb0b0;font-size:.78rem;font-weight:700;cursor:pointer;padding:6px;font-family:inherit;">Clear All</button>
-                </div>
-                <!-- List -->
-                <div id="svcSelectorList" style="overflow-y:auto;padding:4px 18px 12px;flex:1;display:flex;flex-direction:column;gap:4px;"></div>
-                <!-- Done button -->
-                <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);">
-                  <button type="button" onclick="svcSelectorDone()" style="width:100%;background:linear-gradient(135deg,#00c8ff,#00ff88);border:0;border-radius:999px;padding:12px;font-weight:900;color:#02050a;font-size:.92rem;cursor:pointer;font-family:inherit;">Done</button>
-                </div>
-              </div>
-            </div>
-            <style>
-              .svc-sel-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.12);cursor:pointer;font-size:.82rem;color:#a0c4d8;transition:.15s;}
-              .svc-sel-item:hover{background:rgba(0,200,255,.10);border-color:rgba(0,200,255,.28);}
-              .svc-sel-item input{accent-color:#00c8ff;flex-shrink:0;}
-            </style>
             <button type="button" class="btn-confirm" style="width:100%;margin-top:4px;" onclick="adminCreateCoupon()">
               Create Coupon
             </button>
@@ -366,53 +287,54 @@
       <!-- Panel: History -->
       <div class="admin-panel" id="panelHistory">
         <div class="admin-card-shell">
-          <div class="hist-page">
-
-            <!-- Header -->
-            <div class="hist-header">
-              <h1>History</h1>
-            </div>
-
-            <!-- Search -->
-            <div class="hist-search-wrap">
-              <input type="text" class="hist-search-input" id="historySearchInput"
-                placeholder="Search by ID, name, email, method..."
-                oninput="historySearch(this.value)" />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-            </div>
-
-            <!-- Tabs -->
-            <div class="hist-tabs">
-              <button class="hist-tab-btn active" type="button" onclick="historyShowSub('Services')" id="histSubBtnServices">Services</button>
-              <button class="hist-tab-btn" type="button" onclick="historyShowSub('Transaction')" id="histSubBtnTransaction">Transactions</button>
-              <button class="hist-tab-btn" type="button" onclick="historyShowSub('Support')" id="histSubBtnSupport">Support</button>
-            </div>
-
-            <!-- Services History -->
-            <div class="hist-sub-panel active" id="histPanelServices">
-              <div class="hist-section-label">Selected (Services) Lists</div>
-              <div class="hist-list" id="adminOrderHistoryList">
-                <div class="hist-empty">Loading...</div>
-              </div>
-            </div>
-
-            <!-- Transaction History -->
-            <div class="hist-sub-panel" id="histPanelTransaction">
-              <div class="hist-section-label">Transaction Lists</div>
-              <div class="hist-list" id="adminTopupHistoryList">
-                <div class="hist-empty">Loading...</div>
-              </div>
-            </div>
-
-            <!-- Support History -->
-            <div class="hist-sub-panel" id="histPanelSupport">
-              <div class="hist-section-label">Solved Support Tickets</div>
-              <div class="hist-list" id="adminSupportHistoryList">
-                <div class="hist-empty">Loading...</div>
-              </div>
-            </div>
-
+          <div class="admin-panel-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h2>History</h2>
           </div>
+
+          <!-- Sub-nav: Transaction / Services / Support -->
+          <div class="history-sub-nav">
+            <button class="history-sub-btn active" type="button" onclick="historyShowSub('Transaction')" id="histSubBtnTransaction">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5"/></svg>
+              Transaction
+            </button>
+            <button class="history-sub-btn" type="button" onclick="historyShowSub('Services')" id="histSubBtnServices">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
+              Services
+            </button>
+            <button class="history-sub-btn" type="button" onclick="historyShowSub('Support')" id="histSubBtnSupport">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              Support
+            </button>
+          </div>
+
+          <!-- Search box -->
+          <div class="history-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" class="history-search-input" id="historySearchInput" placeholder="Search by Transaction ID, Support ID, name, email..." oninput="historySearch(this.value)" />
+          </div>
+
+          <!-- Transaction History -->
+          <div class="history-sub-panel active" id="histPanelTransaction">
+            <div id="adminTopupHistoryList" class="admin-list">
+              <div class="empty-state">Loading transaction history...</div>
+            </div>
+          </div>
+
+          <!-- Services History -->
+          <div class="history-sub-panel" id="histPanelServices">
+            <div id="adminOrderHistoryList" class="admin-list">
+              <div class="empty-state">Loading service history...</div>
+            </div>
+          </div>
+
+          <!-- Support History -->
+          <div class="history-sub-panel" id="histPanelSupport">
+            <div id="adminSupportHistoryList" class="admin-list">
+              <div class="empty-state">Loading support history...</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -430,11 +352,10 @@
       if (panel) panel.classList.toggle('active', p === name);
       if (btn)   btn.classList.toggle('active', p === name);
     });
-    // reset search when switching to History (no scroll)
+    // reset search when switching to History
     if (name === 'History') {
       const inp = document.getElementById('historySearchInput');
-      if (inp) { inp.value = ''; }
-      window.historySearch('');
+      if (inp) { inp.value = ''; historySearch(''); }
     }
   }
 
@@ -448,118 +369,23 @@
     });
     // re-apply search filter for new sub-panel
     const inp = document.getElementById('historySearchInput');
-    if (inp) window.historySearch(inp.value);
+    if (inp) historySearch(inp.value);
   };
 
-  // ── History search (global, called by wallet.js after render too) ──
+  // ── History search ──
   window.historySearch = function(query) {
-    const q = (query || '').trim().toLowerCase();
+    const q = query.trim().toLowerCase();
+    // Find which sub-panel is active
     ['histPanelTransaction','histPanelServices','histPanelSupport'].forEach(panelId => {
       const panel = document.getElementById(panelId);
       if (!panel) return;
-      const items = panel.querySelectorAll('.hist-item');
-      items.forEach(item => {
-        const text = (item.dataset.search || item.textContent).toLowerCase();
-        item.style.display = (!q || text.includes(q)) ? '' : 'none';
+      const cards = panel.querySelectorAll('.history-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = (!q || text.includes(q)) ? '' : 'none';
       });
     });
   };
-
-  // ── Coupon service selector modal ──
-  const ALL_SERVICES = [
-    { value: 'ff',        label: 'Free Fire Diamond Top-up' },
-    { value: 'ffDrip',    label: 'Free Fire Android Panel (Drip)' },
-    { value: 'ffFf4x',    label: 'Free Fire Android Panel (FF4X)' },
-    { value: 'ffIos',     label: 'Free Fire iPhone Panel (iOS)' },
-    { value: 'ffPc',      label: 'Free Fire PC Panel' },
-    { value: 'card',      label: 'Visa / Mastercard' },
-    { value: 'meta',      label: 'Facebook Meta Verified' },
-    { value: 'pubg',      label: 'PUBG' },
-    { value: 'mlbb',      label: 'Mobile Legends (MLBB)' },
-    { value: 'proapp',    label: 'Premium App & Subscription' },
-    { value: 'security',  label: 'Ethical Hacking / Security Audit' },
-    { value: 'android',   label: 'Android App Development' },
-    { value: 'webDev',    label: 'Website Development' },
-  ];
-
-  let _couponSelected = [];
-
-  window.openServiceSelector = function() {
-    _couponSelected = Array.from(
-      document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]:checked')
-    ).map(c => c.value);
-
-    const modal = document.getElementById('svcSelectorModal');
-    if (!modal) return;
-    renderSvcList('');
-    modal.style.display = 'flex';
-    const si = document.getElementById('svcSelectorSearch');
-    if (si) { si.value = ''; si.focus(); }
-  };
-
-  window.closeSvcSelector = function() {
-    document.getElementById('svcSelectorModal').style.display = 'none';
-  };
-
-  window.svcSelectorSearch = function(q) {
-    renderSvcList(q);
-  };
-
-  function renderSvcList(q) {
-    const filtered = ALL_SERVICES.filter(s =>
-      !q || s.label.toLowerCase().includes(q.toLowerCase()) || s.value.toLowerCase().includes(q.toLowerCase())
-    );
-    const list = document.getElementById('svcSelectorList');
-    if (!list) return;
-    list.innerHTML = filtered.map(s => `
-      <label class="svc-sel-item">
-        <input type="checkbox" value="${s.value}" ${_couponSelected.includes(s.value) ? 'checked' : ''}
-          onchange="svcToggle('${s.value}', this.checked)" />
-        <span>${s.label}</span>
-      </label>
-    `).join('');
-  }
-
-  window.svcToggle = function(val, checked) {
-    if (checked) { if (!_couponSelected.includes(val)) _couponSelected.push(val); }
-    else { _couponSelected = _couponSelected.filter(v => v !== val); }
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorSelectAll = function() {
-    _couponSelected = ALL_SERVICES.map(s => s.value);
-    renderSvcList(document.getElementById('svcSelectorSearch')?.value || '');
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorClearAll = function() {
-    _couponSelected = [];
-    renderSvcList(document.getElementById('svcSelectorSearch')?.value || '');
-    updateSvcSelectorDisplay();
-  };
-
-  window.svcSelectorDone = function() {
-    // sync back to hidden checkboxes
-    document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]').forEach(cb => {
-      cb.checked = _couponSelected.includes(cb.value);
-    });
-    // update display button label
-    updateSvcSelectorDisplay();
-    closeSvcSelector();
-  };
-
-  function updateSvcSelectorDisplay() {
-    const btn = document.getElementById('svcSelectorBtn');
-    if (!btn) return;
-    if (_couponSelected.length === 0) {
-      btn.textContent = 'Select Services (All if empty) ▾';
-    } else if (_couponSelected.length === ALL_SERVICES.length) {
-      btn.textContent = 'All Services selected ▾';
-    } else {
-      const names = _couponSelected.map(v => ALL_SERVICES.find(s=>s.value===v)?.label || v);
-      btn.textContent = names.slice(0,2).join(', ') + (_couponSelected.length > 2 ? ` +${_couponSelected.length-2} more ▾` : ' ▾');
-    }
-  }
   </script>
 
   <script src="js/main.js"></script>
@@ -603,12 +429,10 @@
         const active = d.active !== false;
         const exp = d.expiresAt ? (d.expiresAt.toDate ? d.expiresAt.toDate().toLocaleDateString() : d.expiresAt) : 'No expiry';
         const usageInfo = d.maxUses ? `${d.usedCount||0}/${d.maxUses} used` : `${d.usedCount||0} used (unlimited)`;
-        const validForStr = (d.validFor && d.validFor.length > 0) ? d.validFor.join(', ') : 'All Services';
         list.innerHTML += `<div class="admin-card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <div style="flex:1;">
             <h3 style="font-family:monospace;letter-spacing:.06em;">${escHtml(code)}</h3>
             <p>${d.discountPercent}% discount &mdash; Expires: ${escHtml(String(exp))} &mdash; <strong>${escHtml(usageInfo)}</strong></p>
-            <p style="font-size:.75rem;color:#4a8090;">🎯 Valid for: ${escHtml(validForStr)}</p>
           </div>
           <span class="status ${active ? 'approved' : 'declined'}">${active ? 'Active' : 'Inactive'}</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -625,25 +449,18 @@
     const pct     = Number(document.getElementById('newCouponDiscount')?.value);
     const expVal  = document.getElementById('newCouponExpiry')?.value;
     const maxUses = Number(document.getElementById('newCouponMaxUses')?.value) || null;
-
-    // Collect selected services
-    const checked = document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]:checked');
-    const validFor = checked.length > 0 ? Array.from(checked).map(c => c.value) : [];
-
     if (!code) { showCouponMsg('Enter a coupon code.', 'error'); return; }
     if (!pct || pct <= 0 || pct > 100) { showCouponMsg('Enter a valid discount % (1-100).', 'error'); return; }
     try {
       const data = { discountPercent: pct, active: true, usedCount: 0, createdAt: serverTimestamp() };
-      if (expVal)         data.expiresAt = Timestamp.fromDate(new Date(expVal));
-      if (maxUses)        data.maxUses   = maxUses;
-      if (validFor.length > 0) data.validFor = validFor; // empty = all services
+      if (expVal)   data.expiresAt = Timestamp.fromDate(new Date(expVal));
+      if (maxUses)  data.maxUses   = maxUses;
       await setDoc(doc(db, 'coupons', code), data);
       showCouponMsg('Coupon created: ' + code, 'success');
       document.getElementById('newCouponCode').value     = '';
       document.getElementById('newCouponDiscount').value = '';
       document.getElementById('newCouponExpiry').value   = '';
       document.getElementById('newCouponMaxUses').value  = '';
-      document.querySelectorAll('#couponServiceCheckboxes input[type=checkbox]').forEach(c => c.checked = false);
     } catch(e) { showCouponMsg('Error: ' + e.message, 'error'); }
   };
 
