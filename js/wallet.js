@@ -417,71 +417,58 @@ window.copyTextValue = async function (targetId, label = "Text") {
   }
 };
 
+// wallet.js submitTopup — delegates to _submitTopupInternal (new add-credit.html flow)
 window.submitTopup = async function () {
+  const method = document.getElementById('paymentMethod')?.value;
+  const transactionId = document.getElementById('transactionId')?.value.trim();
+  if (window._submitTopupInternal) {
+    window._submitTopupInternal({
+      method: method || '',
+      transactionId: transactionId || '',
+      msgEl: 'walletMessage',
+      btnEl: 'submitTopupBtn',
+      onSuccess: typeof window.showVerifyingOverlay === 'function' ? window.showVerifyingOverlay : () => {}
+    });
+  }
+};
+
+// ── Shared submit helper — used by add-credit.html for Binance & Coin ──
+window._submitTopupInternal = async function({ method, transactionId, msgEl, btnEl, onSuccess }) {
   const user = await waitForActiveUser();
   if (!user) {
-    showMessage("আগে Login করো, তারপর payment request submit হবে।", "error");
+    const el = document.getElementById(msgEl);
+    if (el) { el.textContent = 'আগে Login করো।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
     openLoginOrHome();
     return;
   }
   currentUser = user;
 
-  const method = document.getElementById("paymentMethod")?.value;
-  const transactionId = document.getElementById("transactionId")?.value.trim();
-  const amountUsd = normalizeUsd(getSelectedUsdAmount());
+  const amountUsd = normalizeUsd(window._currentSelectedUsd ? window._currentSelectedUsd() : 0);
   const amountBdt = toBdt(amountUsd);
 
-  if (!method) {
-    showMessage("Payment method select করো।", "error");
-    return;
-  }
-
   if (!amountUsd || amountUsd < 1) {
-    showMessage("Minimum $1 amount দিতে হবে।", "error");
+    const el = document.getElementById(msgEl);
+    if (el) { el.textContent = 'Minimum $1 amount দিতে হবে।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
     return;
   }
-
   if (!transactionId || transactionId.length < 5) {
-    showMessage("Valid Transaction ID দাও।", "error");
+    const el = document.getElementById(msgEl);
+    if (el) { el.textContent = 'Valid Transaction ID / Hash দাও।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
     return;
   }
 
-  const submitBtn = document.getElementById("submitTopupBtn");
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-  }
+  const btn = document.getElementById(btnEl);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Submitting…'; }
 
   try {
     await ensureUserDoc(user);
 
-    if (pageMode === "service") {
-      const details = servicePaymentInfo?.details || {};
-      await apiPost("/api/instant-pay", {
-        serviceName: servicePaymentInfo?.serviceName || "Service",
-        serviceId: servicePaymentInfo?.fieldsType || servicePaymentInfo?.serviceId || "service",
-        amountUsd,
-        method,
-        transactionId,
-        serviceDetails: details
-      });
-
-      sessionStorage.removeItem("pendingServicePayment");
-      showMessage("Service payment request submitted. Admin review pending.", "success");
-      const tx = document.getElementById("transactionId");
-      if (tx) tx.value = "";
-      setTimeout(() => {
-        window.location.href = "dashboard.html?tab=orders";
-      }, 900);
-      return;
-    }
-
     const payload = {
       userId: user.uid,
-      userName: user.displayName || "User",
-      userEmail: user.email || "",
-      purpose: "credit",
-      serviceName: "",
+      userName: user.displayName || 'User',
+      userEmail: user.email || '',
+      purpose: 'credit',
+      serviceName: '',
       serviceDetails: {},
       amountUsd,
       amountUSD: amountUsd,
@@ -490,38 +477,27 @@ window.submitTopup = async function () {
       rate: USD_TO_BDT,
       rateBDT: USD_TO_BDT,
       method,
-      paymentNumber: PAYMENT_NUMBERS[method] || '',
       transactionId,
       status: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
 
-    // Normalize method for Firestore rules — Binance stored as 'Binance'
-    if (!['bKash', 'Nagad', 'Rocket', 'Binance'].includes(payload.method)) {
-      payload.method = 'bKash'; // fallback
-    }
-
-    await addDoc(collection(db, "topups"), payload);
-    showMessage("Credit request submitted. Admin approval pending.", "success");
-
-    const tx = document.getElementById("transactionId");
-    if (tx) tx.value = "";
-  } catch (error) {
-    console.error("submitTopup failed:", error);
-    if (error.code === "NOT_LOGGED_IN") {
-      showMessage("Please login first.", "error");
-      openLoginOrHome();
-    } else {
-      showMessage(error.message || "Payment request failed.", "error");
-    }
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = pageMode === "service" ? "Verify Service Payment" : "Verify Payment";
-    }
+    const ref = await addDoc(collection(db, 'topups'), payload);
+    if (typeof onSuccess === 'function') onSuccess(ref.id);
+  } catch (err) {
+    console.error('[submitTopupInternal] failed:', err);
+    const el = document.getElementById(msgEl);
+    if (el) { el.textContent = err.message || 'Payment submit failed. আবার চেষ্টা করো।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Verify Payment'; }
   }
 };
+
+// Expose Firestore primitives so add-credit.html verifying overlay can listen
+window._db = db;
+window._onSnapshot = onSnapshot;
+window._doc = doc;
+window._collection = collection;
 
 window.loadMyTopups = function () {
   if (!currentUser) return;
@@ -1193,34 +1169,6 @@ function loadDashboardOrders(user) {
         const svgTag = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
         return `<span style="color:#a7ffcf;">${svgTag} ${escapeHtml(data.couponCode)}${data.discountPercent ? ` (${data.discountPercent}% off)` : ''}</span>`;
       })() : '';
-      const isIosOrder = String(data.serviceName || '').toLowerCase().includes('iphone') || String(data.serviceId || '').toLowerCase().includes('ffios') || String(data.serviceDetails?.fieldsType || data.details?.fieldsType || '').toLowerCase().includes('ffios');
-      const deliveredKey = data.deliveredKey || data.serviceDetails?.deliveredKey || data.details?.deliveredKey || '';
-      const iosKeyBlock = (isIosOrder && deliveredKey) ? `
-        <div style="background:rgba(0,0,0,.32);border:1px solid rgba(0,191,255,.25);border-radius:12px;padding:14px;margin:10px 0 0;text-align:left;">
-          <div style="color:#8faec9;font-size:.75rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="17" r="3"/><path d="M10.5 13.5 21 3"/><path d="M18 5l1 1M15 8l1 1"/></svg>
-            Delivered Key
-          </div>
-          <div style="font-family:monospace;font-size:.92rem;color:#00d4ff;letter-spacing:.06em;word-break:break-all;line-height:1.5;user-select:all;" id="iosKey_${docSnap.id}">${escapeHtml(deliveredKey)}</div>
-          <button type="button" onclick="(function(){
-            navigator.clipboard.writeText('${deliveredKey.replace(/'/g,"\\'")}').then(()=>{
-              const b=document.getElementById('iosCopy_${docSnap.id}');
-              const orig=b.innerHTML;
-              b.innerHTML='<svg width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2.5\\' stroke-linecap=\\'round\\'><path d=\\'M20 6 9 17l-5-5\\'/></svg> Copied!';
-              b.style.background='rgba(0,255,136,.15)';b.style.borderColor='rgba(0,255,136,.4)';b.style.color='#a7ffcf';
-              setTimeout(()=>{b.innerHTML=orig;b.style.background='';b.style.borderColor='';b.style.color='';},2000);
-            });
-          })()"
-            id="iosCopy_${docSnap.id}"
-            style="margin-top:10px;border:1px solid rgba(0,191,255,.30);border-radius:10px;padding:8px 14px;
-            background:rgba(0,191,255,.08);color:#7ee8ff;font-weight:800;font-size:.8rem;cursor:pointer;
-            display:flex;align-items:center;gap:6px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy Key
-          </button>
-        </div>
-      ` : '';
-
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1238,7 +1186,6 @@ function loadDashboardOrders(user) {
             ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>
           </div>
-          ${iosKeyBlock}
           ${pendingNote}
           ${failReason}
         </div>
