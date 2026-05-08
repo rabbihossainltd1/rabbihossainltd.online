@@ -593,20 +593,12 @@ window.showAdminHistoryPanel = function (panel) {
 };
 
 window.loadAdminPanel = function () {
-  onAuthStateChanged(auth, async (user) => {
-    const topupList = document.getElementById("adminTopupList");
-    const orderList = document.getElementById("adminOrderList");
-    const topupHistoryList = document.getElementById("adminTopupHistoryList");
-    const orderHistoryList = document.getElementById("adminOrderHistoryList");
-    const adminInfo = document.getElementById("adminInfo");
+  const HUKAR = `<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;"><img src="images/hukar.gif" alt="" style="max-width:100%;max-height:100vh;display:block;" /></main>`;
 
+  onAuthStateChanged(auth, async (user) => {
+    // Guest user — hukar immediately
     if (!user) {
-      if (topupList) topupList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (orderList) orderList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (topupHistoryList) topupHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      if (orderHistoryList) orderHistoryList.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
-      const shl = document.getElementById("adminSupportHistoryList");
-      if (shl) shl.innerHTML = `<div class="empty-state">Please login with admin account first.</div>`;
+      document.body.innerHTML = HUKAR;
       return;
     }
 
@@ -614,14 +606,17 @@ window.loadAdminPanel = function () {
     const adminSnap = await getDoc(adminRef);
     const emailIsAdmin = ADMIN_EMAILS.includes(String(user.email || "").toLowerCase());
 
+    // Logged-in but not admin — hukar
     if (!adminSnap.exists() && !emailIsAdmin) {
-      document.body.innerHTML = `
-        <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;">
-          <img src="images/hukar.gif" alt="" style="max-width:100%;max-height:100vh;display:block;" />
-        </main>
-      `;
+      document.body.innerHTML = HUKAR;
       return;
     }
+
+    const topupList = document.getElementById("adminTopupList");
+    const orderList = document.getElementById("adminOrderList");
+    const topupHistoryList = document.getElementById("adminTopupHistoryList");
+    const orderHistoryList = document.getElementById("adminOrderHistoryList");
+    const adminInfo = document.getElementById("adminInfo");
 
     if (adminInfo) adminInfo.textContent = `Logged in as ${user.email || "Admin"}`;
 
