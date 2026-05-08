@@ -13,6 +13,7 @@ import {
   onSnapshot,
   query,
   where,
+  orderBy,
   runTransaction,
   increment
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
@@ -624,7 +625,11 @@ window.loadAdminPanel = function () {
 
     if (adminInfo) adminInfo.textContent = `Logged in as ${user.email || "Admin"}`;
 
-    const topupQuery = query(collection(db, "topups"), where("status", "==", "pending"));
+    const topupQuery = query(
+      collection(db, "topups"),
+      where("status", "==", "pending"),
+      orderBy("createdAt", "desc")
+    );
     onSnapshot(topupQuery, (snapshot) => {
       if (!topupList) return;
       topupList.innerHTML = "";
@@ -670,22 +675,23 @@ window.loadAdminPanel = function () {
       });
     });
 
-    const orderQuery = query(collection(db, "serviceOrders"));
+    const orderQuery = query(
+      collection(db, "serviceOrders"),
+      where("status", "in", ["pending", "processing"]),
+      orderBy("createdAt", "desc")
+    );
     onSnapshot(orderQuery, (snapshot) => {
       if (!orderList) return;
       orderList.innerHTML = "";
 
-      const pendingDocs = [];
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() || {};
-        if (isActionableOrder(data.status)) pendingDocs.push(docSnap);
-      });
-      pendingDocs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
-
-      if (!pendingDocs.length) {
+      if (snapshot.empty) {
         orderList.innerHTML = `<div class="empty-state">No pending service order.</div>`;
         return;
       }
+
+      const pendingDocs = [];
+      snapshot.forEach((docSnap) => pendingDocs.push(docSnap));
+      // Already ordered by Firestore, no client sort needed
 
       pendingDocs.forEach((docSnap) => {
         const data = docSnap.data() || {};
@@ -717,7 +723,7 @@ window.loadAdminPanel = function () {
       });
     });
 
-    const topupHistoryQuery = query(collection(db, "topups"));
+    const topupHistoryQuery = query(collection(db, "topups"), orderBy("createdAt", "desc"));
     onSnapshot(topupHistoryQuery, (snapshot) => {
       if (!topupHistoryList) return;
       const docs = [];
@@ -747,7 +753,7 @@ window.loadAdminPanel = function () {
       });
     });
 
-    const orderHistoryQuery = query(collection(db, "serviceOrders"));
+    const orderHistoryQuery = query(collection(db, "serviceOrders"), orderBy("createdAt", "desc"));
     onSnapshot(orderHistoryQuery, (snapshot) => {
       if (!orderHistoryList) return;
       const docs = [];
@@ -813,49 +819,77 @@ window.loadAdminPanel = function () {
 
 window.approveTopup = async function (topupId) {
   if (!confirm("Confirm this payment?")) return;
-
   try {
-    await apiPost("/api/confirm-topup", { topupId });
-    alert("Payment confirmed successfully.");
+    // 1. Get topup doc
+    const topupRef = doc(db, "topups", topupId);
+    const topupSnap = await getDoc(topupRef);
+    if (!topupSnap.exists()) { alert("Topup not found."); return; }
+    const data = topupSnap.data();
+
+    // 2. Add credit to user
+    const amountUsd = data.amountUsd || data.amountUSD || data.amount || 0;
+    const userRef = doc(db, "users", data.userId);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const currentCredit = userSnap.data().credit || 0;
+      await updateDoc(userRef, { credit: Math.round((currentCredit + amountUsd) * 100) / 100 });
+    }
+
+    // 3. Mark topup approved
+    await updateDoc(topupRef, {
+      status: "approved",
+      approvedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    alert("Payment approved. Credit added.");
   } catch (error) {
-    console.error("confirm topup failed:", error);
-    alert(error.message || "Payment confirm failed.");
+    console.error("approveTopup failed:", error);
+    alert(error.message || "Approval failed.");
   }
 };
 
 window.declineTopup = async function (topupId) {
   if (!confirm("Decline this payment request?")) return;
-
   try {
-    await apiPost("/api/decline-topup", { topupId });
+    await updateDoc(doc(db, "topups", topupId), {
+      status: "declined",
+      declinedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
     alert("Payment request declined.");
   } catch (error) {
-    console.error("decline topup failed:", error);
-    alert(error.message || "Payment decline failed.");
+    console.error("declineTopup failed:", error);
+    alert(error.message || "Decline failed.");
   }
 };
 
 window.approveServiceOrder = async function (orderId) {
   if (!confirm("Accept this service order?")) return;
-
   try {
-    await apiPost("/api/confirm-order", { orderId });
-    alert("Service order accepted. It has been moved to history.");
+    await updateDoc(doc(db, "serviceOrders", orderId), {
+      status: "accepted",
+      acceptedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    alert("Service order accepted.");
   } catch (error) {
-    console.error("confirm order failed:", error);
-    alert(error.message || "Service order confirm failed.");
+    console.error("approveServiceOrder failed:", error);
+    alert(error.message || "Accept failed.");
   }
 };
 
 window.declineServiceOrder = async function (orderId) {
   if (!confirm("Decline this service order?")) return;
-
   try {
-    await apiPost("/api/decline-order", { orderId });
-    alert("Service order declined. It has been moved to history.");
+    await updateDoc(doc(db, "serviceOrders", orderId), {
+      status: "declined",
+      declinedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    alert("Service order declined.");
   } catch (error) {
-    console.error("decline order failed:", error);
-    alert(error.message || "Service order decline failed.");
+    console.error("declineServiceOrder failed:", error);
+    alert(error.message || "Decline failed.");
   }
 };
 
@@ -1169,6 +1203,27 @@ function loadDashboardOrders(user) {
         const svgTag = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
         return `<span style="color:#a7ffcf;">${svgTag} ${escapeHtml(data.couponCode)}${data.discountPercent ? ` (${data.discountPercent}% off)` : ''}</span>`;
       })() : '';
+      const isIosOrder = String(data.serviceName || '').toLowerCase().includes('iphone') ||
+        String(data.serviceId || '').toLowerCase().includes('ffios') ||
+        String(data.serviceDetails?.fieldsType || data.details?.fieldsType || '').toLowerCase().includes('ffios');
+      const deliveredKey = data.deliveredKey || data.serviceDetails?.deliveredKey || data.details?.deliveredKey || '';
+      const safeKey = deliveredKey.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+      const iosKeyBlock = (isIosOrder && deliveredKey) ? `
+        <div style="background:rgba(0,0,0,.32);border:1px solid rgba(0,191,255,.22);border-radius:12px;padding:14px;margin:10px 0 0;">
+          <div style="color:#8faec9;font-size:.75rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="17" r="3"/><path d="M10.5 13.5 21 3"/><path d="M18 5l1 1M15 8l1 1"/></svg>
+            Delivered Key
+          </div>
+          <div style="font-family:monospace;font-size:.9rem;color:#00d4ff;letter-spacing:.05em;word-break:break-all;line-height:1.5;user-select:all;">${escapeHtml(deliveredKey)}</div>
+          <button type="button"
+            onclick="(function(b,k){navigator.clipboard.writeText(k).then(function(){var o=b.innerHTML;b.innerHTML='<svg width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2.5\\' stroke-linecap=\\'round\\'><path d=\\'M20 6 9 17l-5-5\\'/></svg> Copied!';b.style.color='#a7ffcf';setTimeout(function(){b.innerHTML=o;b.style.color='';},2000);});})(this,\`${safeKey}\`)"
+            style="margin-top:10px;border:1px solid rgba(0,191,255,.28);border-radius:10px;padding:8px 14px;
+            background:rgba(0,191,255,.08);color:#7ee8ff;font-weight:800;font-size:.8rem;cursor:pointer;
+            display:flex;align-items:center;gap:6px;font-family:inherit;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Key
+          </button>
+        </div>` : '';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1186,6 +1241,7 @@ function loadDashboardOrders(user) {
             ${data.providerOrderId ? `<span>${svgID} Auto ID: ${escapeHtml(data.providerOrderId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>
           </div>
+          ${iosKeyBlock}
           ${pendingNote}
           ${failReason}
         </div>
