@@ -5,34 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel | Rabbi Hossain LTD</title>
   <meta name="description" content="Admin panel for manual credit and service payment approval." />
-
-  <!-- ── Instant admin gate — blocks guests before any content loads ── -->
-  <script>
-    (function () {
-      function showHukar() {
-        document.documentElement.style.cssText = 'background:#02050a;';
-        document.addEventListener('DOMContentLoaded', function () {
-          document.body.innerHTML = '<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;"><img src="images/hukar.gif" alt="" style="max-width:100%;max-height:100vh;display:block;" /></main>';
-        });
-      }
-
-      // Check if any Firebase auth session exists in localStorage
-      var hasSession = false;
-      try {
-        for (var i = 0; i < localStorage.length; i++) {
-          var k = localStorage.key(i);
-          if (k && k.indexOf('firebase:authUser') !== -1) {
-            var val = JSON.parse(localStorage.getItem(k) || 'null');
-            if (val && val.uid) { hasSession = true; break; }
-          }
-        }
-      } catch (e) {}
-
-      // Guest (not logged in at all) → hukar instantly
-      // Logged-in users pass through — loadAdminPanel() does the real Firestore check
-      if (!hasSession) { showHukar(); }
-    })();
-  </script>
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .admin-page { min-height:100vh; padding:110px 16px 60px; background:radial-gradient(circle at top,rgba(0,255,136,.08),transparent 30%),#02050a; }
