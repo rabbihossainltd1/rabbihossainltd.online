@@ -15,7 +15,7 @@
           var av=document.getElementById('dashboardAvatar');
           if(n) n.textContent=u.displayName||u.email||'User';
           if(e) e.textContent=u.email||'';
-          if(b) b.textContent=u.balance||'$0.00';
+          var cacheAge=(Date.now()-(u.cache_ts||0));if(b&&cacheAge<1800000) b.textContent=u.balance||'$0.00';
           if(av&&u.photoURL) av.innerHTML='<img src="'+u.photoURL+'" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
         });
       }catch(e){}
@@ -463,5 +463,12 @@ body.has-bottom-nav #floatChatWidget { bottom:100px; right:16px; z-index:2500; }
       if(isOrders){ if(o) o.className='active'; }
       else { if(p) p.className='active'; }
     })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
   </script>
 </body>
