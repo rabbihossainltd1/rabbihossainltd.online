@@ -622,8 +622,7 @@ window.loadAdminPanel = function () {
 
     const topupQuery = query(
       collection(db, "topups"),
-      where("status", "==", "pending"),
-      orderBy("createdAt", "desc")
+      where("status", "==", "pending")
     );
     onSnapshot(topupQuery, (snapshot) => {
       if (!topupList) return;
@@ -672,8 +671,7 @@ window.loadAdminPanel = function () {
 
     const orderQuery = query(
       collection(db, "serviceOrders"),
-      where("status", "in", ["pending", "processing"]),
-      orderBy("createdAt", "desc")
+      where("status", "in", ["pending", "processing"])
     );
     onSnapshot(orderQuery, (snapshot) => {
       if (!orderList) return;
@@ -686,7 +684,7 @@ window.loadAdminPanel = function () {
 
       const pendingDocs = [];
       snapshot.forEach((docSnap) => pendingDocs.push(docSnap));
-      // Already ordered by Firestore, no client sort needed
+      pendingDocs.sort((a, b) => createdMillis(b.data()) - createdMillis(a.data()));
 
       pendingDocs.forEach((docSnap) => {
         const data = docSnap.data() || {};
@@ -718,7 +716,7 @@ window.loadAdminPanel = function () {
       });
     });
 
-    const topupHistoryQuery = query(collection(db, "topups"), orderBy("createdAt", "desc"));
+    const topupHistoryQuery = query(collection(db, "topups"));
     onSnapshot(topupHistoryQuery, (snapshot) => {
       if (!topupHistoryList) return;
       const docs = [];
@@ -748,7 +746,7 @@ window.loadAdminPanel = function () {
       });
     });
 
-    const orderHistoryQuery = query(collection(db, "serviceOrders"), orderBy("createdAt", "desc"));
+    const orderHistoryQuery = query(collection(db, "serviceOrders"));
     onSnapshot(orderHistoryQuery, (snapshot) => {
       if (!orderHistoryList) return;
       const docs = [];
@@ -781,9 +779,15 @@ window.loadAdminPanel = function () {
     // ── Support History (Solved only) ──
     const supportHistoryList = document.getElementById("adminSupportHistoryList");
     if (supportHistoryList) {
-      onSnapshot(query(collection(db, "supportRooms"), orderBy("lastAt", "desc")), (snapshot) => {
+      onSnapshot(collection(db, "supportRooms"), (snapshot) => {
         supportHistoryList.innerHTML = "";
-        const solvedDocs = snapshot.docs.filter(d => d.data().status === "solved");
+        const solvedDocs = snapshot.docs
+          .filter(d => d.data().status === "solved")
+          .sort((a, b) => {
+            const ta = a.data().lastAt?.toMillis ? a.data().lastAt.toMillis() : 0;
+            const tb = b.data().lastAt?.toMillis ? b.data().lastAt.toMillis() : 0;
+            return tb - ta;
+          });
         if (solvedDocs.length === 0) {
           supportHistoryList.innerHTML = `<div class="empty-state">কোনো solved support ticket নেই।</div>`;
           return;
