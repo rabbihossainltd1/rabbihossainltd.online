@@ -960,7 +960,7 @@
         </div>
 
         <h2 style="font-size:1.45rem;color:#f0f8ff;margin:0 0 8px;font-weight:800;">
-          ${errorMsg ? 'সমস্যা হয়েছে' : 'আপনার Key এসে গেছে! 🎉'}
+          ${errorMsg ? 'সমস্যা হয়েছে' : 'Order Successful ! 🎉'}
         </h2>
 
         ${errorMsg ? `
