@@ -1,6 +1,6 @@
 /* ============================================================
    Rabbi.dev — Service Info Modal  v1.0
-   "কাজ কি?" button → shows full Bangla+English service details
+   "এইটার কাজ কি?" button → shows full Bangla+English service details
    ============================================================ */
 
 (function () {
