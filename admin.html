@@ -5,6 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel | Rabbi Hossain LTD</title>
   <meta name="description" content="Admin panel for manual credit and service payment approval." />
+
+  <!-- ── Instant admin gate — runs before any CSS/JS loads ── -->
+  <script>
+    (function () {
+      // Show hukar immediately so non-admins see nothing else
+      function showHukar() {
+        document.documentElement.style.cssText = 'background:#02050a;';
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.innerHTML = '<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#02050a;"><img src="images/hukar.gif" alt="" style="max-width:100%;max-height:100vh;display:block;" /></main>';
+        });
+      }
+
+      // Check Firebase auth via the persisted IndexedDB session key
+      // Firebase stores the current user in localStorage under this key pattern
+      var uid = null;
+      try {
+        // Firebase v9+ stores auth state in indexedDB but also reflects
+        // the current user email/uid in a known localStorage key
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && k.indexOf('firebase:authUser') !== -1) {
+            var val = JSON.parse(localStorage.getItem(k) || 'null');
+            if (val && val.uid) { uid = val.uid; break; }
+          }
+        }
+      } catch (e) {}
+
+      // Admin UIDs whitelist (must match Firestore admins collection docs)
+      var ADMIN_UIDS = []; // Leave empty — Firestore check in loadAdminPanel handles real gate
+      // Admin emails whitelist (fast client-side pre-check)
+      var ADMIN_EMAILS = ['rabbihossainltd@gmail.com'];
+
+      var email = null;
+      try {
+        for (var j = 0; j < localStorage.length; j++) {
+          var kk = localStorage.key(j);
+          if (kk && kk.indexOf('firebase:authUser') !== -1) {
+            var vv = JSON.parse(localStorage.getItem(kk) || 'null');
+            if (vv && vv.email) { email = vv.email.toLowerCase(); break; }
+          }
+        }
+      } catch (e) {}
+
+      // Not logged in at all → hukar instantly
+      if (!uid) { showHukar(); return; }
+
+      // Logged in but email not in admin list → hukar instantly
+      if (email && ADMIN_EMAILS.indexOf(email) === -1) { showHukar(); return; }
+
+      // Looks like admin — let loadAdminPanel() do the real Firestore check
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .admin-page { min-height:100vh; padding:110px 16px 60px; background:radial-gradient(circle at top,rgba(0,255,136,.08),transparent 30%),#02050a; }
