@@ -382,7 +382,9 @@
           ...cached,
           displayName: currentUserData.name || user.displayName || '',
           photoURL: currentUserData.photoURL || user.photoURL || '',
-          balance: dollar(currentUserData.credit || 0)
+          balance: dollar(currentUserData.credit || 0),
+          credit_raw: currentUserData.credit || 0,
+          cache_ts: Date.now()
         }));
       } catch(e) {}
       window.dispatchEvent(new CustomEvent('rabbi:userData', { detail: currentUserData }));

@@ -103,7 +103,7 @@ text:problem,role:'user',userId,userEmail,userName:name,userPhone:phone,ticketId
 setDoc(doc(db,'supportTickets',ticketId),{
 ticketId,userId,userName:name,userEmail,userPhone:phone,
 problemDescription:problem,status:'open',createdAt:serverTimestamp(),updatedAt:serverTimestamp()
-}).catch(e=>console.warn('supportTickets write skipped:',e));
+
 document.getElementById('floatAgentForm')?.remove();
 botState='agent_waiting';
 await botSay('কিছুক্ষণ অপেক্ষা করুন আপনার সমস্যাটি একজন এজেন্ট এর কাছে ট্রান্সফার করা হচ্ছে',false,600);
@@ -111,7 +111,7 @@ showWaitingAnimation();
 setInputLocked(true,'এজেন্টের জন্য অপেক্ষা করুন...');
 subscribeToAdminReplies(userId);
 } catch(err){
-console.error('Ticket error:',err);
+
 if(submitEl){ submitEl.disabled=false; submitEl.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> আবার চেষ্টা করুন`; }
 }
 }

@@ -295,6 +295,14 @@ function listenUserCredit(user) {
     currentUserData = data;
     setText("userCredit", moneyPair(data.credit));
     setText("miniCredit", moneyPair(data.credit));
+    // Keep balance cache fresh so next page load shows correct balance instantly
+    try {
+      const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+      cached.balance = moneyPair(data.credit);
+      cached.credit_raw = data.credit || 0;
+      cached.cache_ts = Date.now();
+      localStorage.setItem('rh_user_cache', JSON.stringify(cached));
+    } catch(e) {}
   });
 }
 
@@ -487,7 +495,7 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl, btn
     const ref = await addDoc(collection(db, 'topups'), payload);
     if (typeof onSuccess === 'function') onSuccess(ref.id);
   } catch (err) {
-    console.error('[submitTopupInternal] failed:', err);
+
     const el = document.getElementById(msgEl);
     if (el) { el.textContent = err.message || 'Payment submit failed. আবার চেষ্টা করো।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
     if (btn) { btn.disabled = false; btn.textContent = 'Verify Payment'; }
@@ -553,7 +561,6 @@ window.buyServiceWithCredit = async function (servicePayload) {
       serviceDetails: servicePayload.details || {}
     });
 
-    console.log("[buyServiceWithCredit] Backend order complete:", result);
     return {
       ok: true,
       orderId: result.orderId,
@@ -562,7 +569,6 @@ window.buyServiceWithCredit = async function (servicePayload) {
       newCredit: result.newCredit
     };
   } catch (error) {
-    console.error("[buyServiceWithCredit] Backend failed:", error);
     if (error.code === "NOT_LOGGED_IN") {
       return { ok: false, reason: "login", message: "Please login first." };
     }
@@ -842,7 +848,7 @@ window.approveTopup = async function (topupId) {
     });
     alert("Payment approved. Credit added.");
   } catch (error) {
-    console.error("approveTopup failed:", error);
+
     alert(error.message || "Approval failed.");
   }
 };
@@ -857,7 +863,7 @@ window.declineTopup = async function (topupId) {
     });
     alert("Payment request declined.");
   } catch (error) {
-    console.error("declineTopup failed:", error);
+
     alert(error.message || "Decline failed.");
   }
 };
@@ -872,7 +878,7 @@ window.approveServiceOrder = async function (orderId) {
     });
     alert("Service order accepted.");
   } catch (error) {
-    console.error("approveServiceOrder failed:", error);
+
     alert(error.message || "Accept failed.");
   }
 };
@@ -887,7 +893,7 @@ window.declineServiceOrder = async function (orderId) {
     });
     alert("Service order declined.");
   } catch (error) {
-    console.error("declineServiceOrder failed:", error);
+
     alert(error.message || "Decline failed.");
   }
 };
@@ -899,9 +905,9 @@ window.processFreeFireAutoTopup = async function (orderId) {
   try {
     const result = await apiPost("/api/process-ff-topup", { orderId });
     alert("Auto top-up request sent. Provider order created.");
-    console.log("FazerCards top-up result:", result);
+
   } catch (error) {
-    console.error("process auto topup failed:", error);
+
     alert(error.message || "Auto top-up failed.");
   }
 };
@@ -914,7 +920,7 @@ window.checkFreeFireAutoOrder = async function (orderId, providerOrderId = "") {
     const result = await apiPost(route, {});
     alert("Order status: " + (result.status || "updated"));
   } catch (error) {
-    console.error("check auto topup failed:", error);
+
     alert(error.message || "Order status check failed.");
   }
 };
@@ -992,7 +998,7 @@ window.loadUserDashboard = function () {
       else quickAvatar.textContent = String(cachedName).charAt(0).toUpperCase();
     }
 
-    ensureUserDoc(user).catch((err) => console.warn("ensureUserDoc failed", err));
+    ensureUserDoc(user).catch(() => {});
     listenUserCredit(user);
 
     const userRef = doc(db, "users", user.uid);
@@ -1009,6 +1015,17 @@ window.loadUserDashboard = function () {
           avatar.textContent = String(data.name || user.displayName || user.email || "U").charAt(0).toUpperCase();
         }
       }
+      // Keep cache fresh
+      try {
+        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+        cached.balance = moneyPair(data.credit || 0);
+        cached.credit_raw = data.credit || 0;
+        cached.displayName = data.name || user.displayName || '';
+        cached.email = data.email || user.email || '';
+        cached.photoURL = data.photoURL || user.photoURL || '';
+        cached.cache_ts = Date.now();
+        localStorage.setItem('rh_user_cache', JSON.stringify(cached));
+      } catch(e) {}
     });
 
     // Profile page must stay clean; histories are available only from My Orders.

@@ -34,7 +34,7 @@
     }
 
     const token = await user.getIdToken(true);
-    console.log('[ServiceModal] Calling backend:', path, payload);
+
 
     const response = await fetch(BACKEND_API_BASE + backendRoute(path), {
       method: 'POST',
@@ -86,7 +86,7 @@
         newCredit: data.newCredit
       };
     } catch (error) {
-      console.error('[ServiceModal] Direct backend buy failed:', error);
+
       if (error.message === 'NOT_LOGGED_IN' || error.code === 'NOT_LOGGED_IN') return { ok: false, reason: 'login', message: 'Please login first.' };
       if (error.code === 'INSUFFICIENT_BALANCE' || /insufficient/i.test(error.message || '')) return { ok: false, reason: 'insufficient', message: 'Insufficient balance. Please add credit.' };
       if (error.code === 'INVALID_PRICE') return { ok: false, reason: 'amount', message: 'Invalid service price.' };
@@ -828,7 +828,7 @@
         updatedAt: fsST()
       });
     } catch (e) {
-      console.warn('[iOS] Could not mark order completed:', e);
+
     }
   }
 

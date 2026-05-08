@@ -435,7 +435,7 @@
     try {
       products = await fetchItem4GamerProducts();
     } catch (err) {
-      console.error('[Item4Gamer] Failed to load products:', err);
+
       showProductsError(diamondListContainer);
       return;
     }
