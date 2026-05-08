@@ -485,7 +485,7 @@
   function loadSupportRooms() {
     const roomsEl = document.getElementById('adminChatRooms');
     if (!roomsEl) return;
-    onSnapshot(query(collection(db, 'supportRooms'), orderBy('lastAt', 'desc')), (snap) => {
+    onSnapshot(collection(db, 'supportRooms'), (snap) => {
       roomsEl.innerHTML = '';
       const badge = document.getElementById('badgeSupport');
       const openCount = snap.docs.filter(d => d.data().status !== 'solved').length;
@@ -494,8 +494,13 @@
         roomsEl.innerHTML = '<div style="padding:18px;color:#4a6070;font-size:.84rem;text-align:center;">কোনো support ticket নেই।</div>';
         return;
       }
-      snap.forEach(docSnap => {
-        const d = docSnap.data();
+      // Sort client-side by lastAt desc
+      const sorted = [...snap.docs].sort((a, b) => {
+        const ta = a.data().lastAt?.toMillis ? a.data().lastAt.toMillis() : 0;
+        const tb = b.data().lastAt?.toMillis ? b.data().lastAt.toMillis() : 0;
+        return tb - ta;
+      });
+      sorted.forEach(docSnap => {
         const uid = docSnap.id;
         const isSolved = d.status === 'solved';
         const el = document.createElement('div');
@@ -546,7 +551,7 @@
     updateDoc(doc(db, 'supportRooms', uid), { unreadAdmin: 0 }).catch(() => {});
 
     if (unsubChatMsgs) unsubChatMsgs();
-    const q = query(collection(db, 'supportChats', uid, 'messages'), orderBy('createdAt', 'asc'));
+    const q = query(collection(db, 'supportChats', uid, 'messages'));
     unsubChatMsgs = onSnapshot(q, snap => {
       snap.docChanges().forEach(change => {
         if (change.type !== 'added') return;
