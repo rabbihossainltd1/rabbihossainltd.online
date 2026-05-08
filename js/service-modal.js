@@ -768,7 +768,27 @@
   }
 
   /* ── iOS Panel Key Delivery ── */
+  function _injectIosAnimStyles() {
+    if (document.getElementById('iosAnimStyle')) return;
+    const s = document.createElement('style');
+    s.id = 'iosAnimStyle';
+    s.textContent = `
+      @keyframes iosPopIn{from{opacity:0;transform:scale(.85) translateY(28px)}to{opacity:1;transform:none}}
+      @keyframes iosReveal{from{opacity:0;transform:scale(.90) translateY(20px)}to{opacity:1;transform:none}}
+      @keyframes iosSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+      @keyframes iosPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+      @keyframes iosDot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+      @keyframes iosSuccessPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+      @keyframes iosCheckDraw{to{stroke-dashoffset:0}}
+      @keyframes iosKeySlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    `;
+    document.head.appendChild(s);
+  }
+
   async function deliverIosKey(amountUsd, result) {
+    // Show processing animation immediately
+    showIosProcessingModal();
+
     // Determine variant by amount
     let keyFile = '1d';
     if (amountUsd >= 25) keyFile = '31d';
@@ -832,109 +852,198 @@
     }
   }
 
-  function showIosKeyModal(key, amountUsd, errorMsg) {
+  function showIosProcessingModal() {
     const overlay = document.getElementById('serviceModal');
     if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+    _injectIosAnimStyles();
 
     let ov = document.getElementById('orderPlacedOverlay');
     if (!ov) {
       ov = document.createElement('div');
       ov.id = 'orderPlacedOverlay';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);padding:20px;';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.88);backdrop-filter:blur(16px);padding:20px;';
+      document.body.appendChild(ov);
+    }
+
+    ov.innerHTML = `
+      <div style="width:min(420px,100%);border-radius:28px;padding:44px 28px 36px;text-align:center;
+        background:linear-gradient(180deg,rgba(0,191,255,.10) 0%,rgba(0,10,30,.95) 100%);
+        border:1px solid rgba(0,191,255,.25);
+        box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 80px rgba(0,191,255,.08);
+        animation:iosPopIn .45s cubic-bezier(.2,1,.2,1) both;">
+
+        <div style="position:relative;width:90px;height:90px;margin:0 auto 24px;">
+          <svg style="position:absolute;inset:0;animation:iosSpin 1.4s linear infinite;" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="40" fill="none" stroke="rgba(0,191,255,.15)" stroke-width="4"/>
+            <circle cx="45" cy="45" r="40" fill="none" stroke="url(#iosSpinGrad)" stroke-width="4"
+              stroke-linecap="round" stroke-dasharray="80 172" stroke-dashoffset="0"/>
+            <defs>
+              <linearGradient id="iosSpinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#00c8ff"/>
+                <stop offset="100%" stop-color="#00ff88"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>
+            </svg>
+          </div>
+        </div>
+
+        <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:999px;
+          background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);
+          color:#7ee8ff;font-size:.7rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;margin-bottom:16px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#00ff88;animation:iosPulse 1s ease-in-out infinite;display:inline-block;"></span>
+          Processing
+        </div>
+
+        <h2 style="font-size:1.4rem;color:#f0f8ff;margin:0 0 10px;font-weight:800;">আপনার Key তৈরি হচ্ছে…</h2>
+        <p style="color:#5a8099;font-size:.88rem;margin:0 0 28px;line-height:1.6;">অনুগ্রহ করে একটু অপেক্ষা করুন।<br>এই পেজ বন্ধ করবেন না।</p>
+
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#00c8ff;animation:iosDot 1.2s ease-in-out infinite;"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:#00c8ff;animation:iosDot 1.2s ease-in-out infinite .2s;"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:#00c8ff;animation:iosDot 1.2s ease-in-out infinite .4s;"></span>
+        </div>
+      </div>
+    `;
+  }
+
+  function showIosKeyModal(key, amountUsd, errorMsg) {
+    _injectIosAnimStyles();
+
+    let ov = document.getElementById('orderPlacedOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'orderPlacedOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.88);backdrop-filter:blur(16px);padding:20px;';
       document.body.appendChild(ov);
     }
 
     const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
+    const safeKey = (key || '').replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$').replace(/'/g,"\\'");
 
     ov.innerHTML = `
       <div style="width:min(440px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
-        background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,200,255,.06) 100%);
+        background:linear-gradient(180deg,rgba(0,191,255,.12) 0%,rgba(0,10,30,.97) 100%);
         border:1px solid rgba(0,191,255,.35);
-        box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 60px rgba(0,191,255,.10);
-        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
+        box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 80px rgba(0,191,255,.12);
+        animation:iosReveal .55s cubic-bezier(.2,1,.2,1) both;">
 
-        <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
-          background:rgba(0,191,255,.14);border:2px solid rgba(0,191,255,.40);
-          display:flex;align-items:center;justify-content:center;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>
-          </svg>
-        </div>
+        ${!errorMsg ? `
+          <div style="position:relative;width:80px;height:80px;margin:0 auto 18px;">
+            <div style="width:80px;height:80px;border-radius:50%;
+              background:linear-gradient(135deg,rgba(0,191,255,.18),rgba(0,255,136,.12));
+              border:1.5px solid rgba(0,255,136,.4);
+              display:flex;align-items:center;justify-content:center;
+              animation:iosSuccessPop .6s cubic-bezier(.2,1.4,.3,1) both .1s;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:iosCheckDraw .5s ease both .3s;stroke-dasharray:30;stroke-dashoffset:30;">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </div>
+          </div>
+        ` : `
+          <div style="width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
+            background:rgba(255,80,80,.10);border:1.5px solid rgba(255,80,80,.35);
+            display:flex;align-items:center;justify-content:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="1.8" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          </div>
+        `}
 
         <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
-          background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.28);
-          color:#7ee8ff;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
-          iOS Panel — Order Complete
+          background:${errorMsg ? 'rgba(255,80,80,.10)' : 'rgba(0,255,136,.10)'};
+          border:1px solid ${errorMsg ? 'rgba(255,80,80,.28)' : 'rgba(0,255,136,.28)'};
+          color:${errorMsg ? '#ffb0b0' : '#a7ffcf'};
+          font-size:.7rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px;">
+          ${errorMsg ? 'Order Failed' : 'iOS Panel — Key Delivered ✓'}
         </div>
 
-        <h2 style="font-size:1.5rem;color:#f0f8ff;margin:0 0 8px;">আপনার Key এসে গেছে!</h2>
+        <h2 style="font-size:1.45rem;color:#f0f8ff;margin:0 0 8px;font-weight:800;">
+          ${errorMsg ? 'সমস্যা হয়েছে' : 'আপনার Key এসে গেছে! 🎉'}
+        </h2>
 
         ${errorMsg ? `
-          <div style="background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.25);border-radius:14px;
-            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;
-            display:flex;align-items:center;gap:10px;justify-content:center;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <div style="background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.20);border-radius:14px;
+            padding:14px;color:#ffb0b0;font-size:.88rem;margin:14px 0 22px;line-height:1.6;">
             ${errorMsg}
           </div>
         ` : `
-          <p style="color:#8faec9;font-size:.88rem;margin:0 0 18px;">নিচের Key টি কপি করুন এবং সংরক্ষণ করুন।</p>
+          <p style="color:#5a8099;font-size:.86rem;margin:0 0 20px;">নিচের Key টি কপি করে সংরক্ষণ করুন।</p>
 
-          <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,191,255,.25);border-radius:16px;
-            padding:18px;margin:0 0 18px;position:relative;">
-            <div style="font-family:monospace;font-size:1.05rem;color:#00d4ff;letter-spacing:.08em;
-              word-break:break-all;line-height:1.6;user-select:all;" id="iosDeliveredKey">
+          <div style="background:rgba(0,0,0,.45);border:1px solid rgba(0,191,255,.22);border-radius:18px;
+            padding:20px 18px 14px;margin:0 0 14px;position:relative;text-align:left;
+            animation:iosKeySlide .5s cubic-bezier(.2,1,.2,1) both .2s;">
+            <div style="font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+              color:#2a5a7a;margin-bottom:10px;">YOUR KEY</div>
+            <div id="iosDeliveredKey" style="font-family:'Courier New',monospace;font-size:1rem;
+              color:#00e5ff;letter-spacing:.06em;word-break:break-all;line-height:1.7;
+              user-select:all;padding-right:4px;">
               ${key}
             </div>
           </div>
 
-          <button id="iosCopyBtn" type="button" onclick="(function(){
-            navigator.clipboard.writeText('${key}').then(()=>{
-              const b=document.getElementById('iosCopyBtn');
-              const orig=b.innerHTML;
-              b.innerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2.5\\' stroke-linecap=\\'round\\'><path d=\\'M20 6 9 17l-5-5\\'/></svg> Copied!';
-              b.style.background='rgba(0,255,136,.15)';
-              b.style.borderColor='rgba(0,255,136,.4)';
-              b.style.color='#a7ffcf';
-              setTimeout(()=>{b.innerHTML=orig;b.style.background='';b.style.borderColor='';b.style.color='';},2000);
-            });
-          })()" style="width:100%;border:1px solid rgba(0,191,255,.35);border-radius:14px;padding:13px;
-            background:rgba(0,191,255,.10);color:#7ee8ff;font-weight:900;font-size:.95rem;cursor:pointer;
-            margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <button id="iosCopyBtn" type="button"
+            style="width:100%;border:none;border-radius:16px;padding:15px;cursor:pointer;
+            background:linear-gradient(135deg,#00c8ff 0%,#00ff88 100%);
+            color:#02050a;font-weight:900;font-size:1rem;
+            margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:9px;
+            box-shadow:0 8px 32px rgba(0,200,255,.25);
+            transition:transform .15s,box-shadow .15s;
+            animation:iosKeySlide .5s cubic-bezier(.2,1,.2,1) both .3s;"
+            onmousedown="this.style.transform='scale(.97)'"
+            onmouseup="this.style.transform=''"
+            onmouseleave="this.style.transform=''">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Key Copy করুন
           </button>
 
-          <div style="background:rgba(255,166,0,.08);border:1px solid rgba(255,166,0,.20);border-radius:12px;
-            padding:11px 14px;color:#ffd580;font-size:.8rem;margin-bottom:18px;text-align:left;
-            display:flex;align-items:flex-start;gap:8px;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-            এই key টি সংরক্ষণ করুন। এই পেজ বন্ধ হলে আর দেখা যাবে না।
+          <div style="background:rgba(255,166,0,.07);border:1px solid rgba(255,166,0,.18);border-radius:12px;
+            padding:10px 14px;color:#c8a04a;font-size:.78rem;margin-bottom:18px;text-align:left;
+            display:flex;align-items:flex-start;gap:8px;line-height:1.5;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            এই key টি এখনই সংরক্ষণ করুন। পেজ বন্ধ হলে My Orders থেকে দেখতে পাবেন।
           </div>
         `}
 
-        ${usdStr ? `<div style="margin-bottom:14px;"><span style="padding:8px 16px;border-radius:999px;background:rgba(0,191,255,.10);border:1px solid rgba(0,191,255,.22);color:#7ee8ff;font-weight:900;font-size:.88rem;">${usdStr}</span></div>` : ''}
+        ${usdStr ? `<div style="margin-bottom:14px;"><span style="padding:7px 16px;border-radius:999px;background:rgba(0,191,255,.08);border:1px solid rgba(0,191,255,.18);color:#5a9ab5;font-weight:800;font-size:.84rem;">${usdStr}</span></div>` : ''}
 
         <button type="button" onclick="window.location.href='dashboard.html?tab=orders'"
           style="width:100%;border:none;border-radius:14px;padding:14px;
-          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;margin-bottom:10px;">
+          background:linear-gradient(135deg,#00c8ff,#00ff88);color:#02050a;font-weight:900;font-size:.95rem;cursor:pointer;margin-bottom:10px;
+          box-shadow:0 6px 24px rgba(0,200,255,.20);">
           My Orders দেখুন
         </button>
+
         ${!errorMsg ? `
         <button id="iosRateBtn" type="button"
-          style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:14px;padding:12px;
-          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
+          style="width:100%;border:1px solid rgba(255,165,0,.25);border-radius:14px;padding:12px;
+          background:rgba(255,165,0,.07);color:#c8922a;font-weight:800;font-size:.88rem;cursor:pointer;
           display:flex;align-items:center;justify-content:center;gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#f5a623" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           Rate Your Experience
         </button>` : ''}
       </div>
     `;
 
-    if (!document.getElementById('opAnimStyle')) {
-      const s = document.createElement('style');
-      s.id = 'opAnimStyle';
-      s.textContent = `@keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}`;
-      document.head.appendChild(s);
+    // Copy button logic
+    const copyBtn = document.getElementById('iosCopyBtn');
+    if (copyBtn && key) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(key).then(() => {
+          copyBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg> Copied!`;
+          copyBtn.style.background = 'linear-gradient(135deg,#00ff88,#00c8ff)';
+          copyBtn.style.boxShadow = '0 8px 32px rgba(0,255,136,.3)';
+          setTimeout(() => {
+            copyBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Key Copy করুন`;
+            copyBtn.style.background = 'linear-gradient(135deg,#00c8ff 0%,#00ff88 100%)';
+            copyBtn.style.boxShadow = '0 8px 32px rgba(0,200,255,.25)';
+          }, 2200);
+        }).catch(() => {
+          const el = document.getElementById('iosDeliveredKey');
+          if (el) { const r = document.createRange(); r.selectNode(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }
+        });
+      });
     }
 
     // Rate button — open review modal
