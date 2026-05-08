@@ -103,7 +103,7 @@ text:problem,role:'user',userId,userEmail,userName:name,userPhone:phone,ticketId
 setDoc(doc(db,'supportTickets',ticketId),{
 ticketId,userId,userName:name,userEmail,userPhone:phone,
 problemDescription:problem,status:'open',createdAt:serverTimestamp(),updatedAt:serverTimestamp()
-
+});
 document.getElementById('floatAgentForm')?.remove();
 botState='agent_waiting';
 await botSay('কিছুক্ষণ অপেক্ষা করুন আপনার সমস্যাটি একজন এজেন্ট এর কাছে ট্রান্সফার করা হচ্ছে',false,600);
