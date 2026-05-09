@@ -720,6 +720,11 @@
             .ff-type-btn.active, .ff-type-btn:hover { background:rgba(255,140,0,0.2); border-color:rgba(255,166,0,0.55); }
             .ff-diamond-options, .ff-weekly-options { display:none; }
             .ff-diamond-options.show, .ff-weekly-options.show { display:block; }
+            .i4g-loading-state { display:flex; align-items:center; gap:10px; padding:14px; color:#7a8ca8; font-size:.88rem; font-weight:700; }
+            .i4g-spinner { width:18px; height:18px; border:2px solid rgba(0,200,255,.18); border-top-color:#00c8ff; border-radius:50%; display:inline-block; animation:i4gSpin .7s linear infinite; flex-shrink:0; }
+            @keyframes i4gSpin { to { transform:rotate(360deg); } }
+            .i4g-load-error { padding:12px 14px; border-radius:12px; background:rgba(255,80,80,.08); border:1px solid rgba(255,80,80,.18); color:#ffb0b0; font-size:.84rem; font-weight:700; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+            .ff-option-unavailable { opacity:.55; cursor:not-allowed; }
             .ff-option-list { display:grid; gap:8px; }
             .ff-option-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:13px; border:1.5px solid rgba(255,166,0,0.18); background:rgba(255,140,0,0.05); cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
             .ff-option-item:hover { border-color:rgba(255,166,0,0.45); background:rgba(255,140,0,0.10); }
@@ -746,30 +751,31 @@
           </div>
 
           <!-- Diamond options -->
+          <!-- Diamond options — populated live by js/item4gamer.js -->
           <div class="ff-diamond-options" id="ffDiamondOptions">
             <div class="form-group">
               <label class="form-label">Diamond Package বেছে নিন</label>
-              <div class="ff-option-list">
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="25 Diamonds — $0.163 / ৳21" data-product-id="25_diamonds_5052" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="25 Diamonds" onchange="ffUpdateAmount(0.163)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>25 Diamonds</span><span class="ff-option-price"><strong>$0.163</strong><small>৳21</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="50 Diamonds — $0.2843 / ৳36" data-product-id="50_diamonds_5053" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="50 Diamonds" onchange="ffUpdateAmount(0.2843)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>50 Diamonds</span><span class="ff-option-price"><strong>$0.2843</strong><small>৳36</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="115 Diamonds — $0.623 / ৳78" data-product-id="115_diamonds_5054" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="115 Diamonds" onchange="ffUpdateAmount(0.623)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>115 Diamonds</span><span class="ff-option-price"><strong>$0.623</strong><small>৳78</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="240 Diamonds — $1.228 / ৳154" data-product-id="240_diamonds_5055" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="240 Diamonds" onchange="ffUpdateAmount(1.228)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>240 Diamonds</span><span class="ff-option-price"><strong>$1.228</strong><small>৳154</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="610 Diamonds — $3.0914 / ৳387" data-product-id="610_diamonds_5056" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="610 Diamonds" onchange="ffUpdateAmount(3.0914)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>610 Diamonds</span><span class="ff-option-price"><strong>$3.0914</strong><small>৳387</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="1240 Diamonds — $6.18 / ৳773" data-product-id="1240_diamonds_5057" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="1240 Diamonds" onchange="ffUpdateAmount(6.18)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>1240 Diamonds</span><span class="ff-option-price"><strong>$6.18</strong><small>৳773</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="2530 Diamonds — $12.392 / ৳1,549" data-product-id="2530_diamonds_5058" data-game-id="free_fire_direct_topup_bangladesh_499" data-package-name="2530 Diamonds" onchange="ffUpdateAmount(12.392)" /><span class="ff-option-label"><span class="ff-pack-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/><path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>2530 Diamonds</span><span class="ff-option-price"><strong>$12.392</strong><small>৳1,549</small></span></label>
+              <!-- Live prices load here from backend API (category_id=19) -->
+              <div id="ffDiamondOptionsList">
+                <div class="i4g-loading-state">
+                  <span class="i4g-spinner" aria-hidden="true"></span>
+                  Loading live prices…
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Weekly/Monthly options -->
+          <!-- Weekly / Monthly Membership options — populated live by js/item4gamer.js -->
+          <!-- Weekly Lite is NOT shown unless live API returns it -->
           <div class="ff-weekly-options" id="ffWeeklyOptions">
             <div class="form-group">
-              <label class="form-label">Plan বেছে নিন</label>
-              <div class="ff-option-list">
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="Weekly Lite — $0.34 / ৳42" onchange="ffUpdateAmount(0.34)" /><span class="ff-option-label"><span class="ff-pack-icon ff-card-lite" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.7"/></svg></span>Weekly Lite</span><span class="ff-option-price"><strong>$0.34</strong><small>৳42</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="Weekly — $1.26 / ৳157" onchange="ffUpdateAmount(1.26)" /><span class="ff-option-label"><span class="ff-pack-icon ff-card-pro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="currentColor" opacity=".16" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17 14l1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L14 16.3l2-.3 1-2Z" fill="currentColor"/></svg></span>Weekly</span><span class="ff-option-price"><strong>$1.26</strong><small>৳157</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="Monthly — $6.24 / ৳780" onchange="ffUpdateAmount(6.24)" /><span class="ff-option-label"><span class="ff-pack-icon ff-card-super" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="currentColor" opacity=".18" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.7"/><path d="M12 13.2l1 2 2.2.3-1.6 1.6.4 2.2-2-1.1-2 1.1.4-2.2-1.6-1.6 2.2-.3 1-2Z" fill="currentColor"/><path d="M7 15h1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>Monthly</span><span class="ff-option-price"><strong>$6.24</strong><small>৳780</small></span></label>
-                <label class="ff-option-item"><input type="radio" name="ff_package" value="Weekly + Monthly — $7.64 / ৳955" onchange="ffUpdateAmount(7.64)" /><span class="ff-option-label"><span class="ff-pack-icon ff-card-pro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="currentColor" opacity=".16" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17 14l1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L14 16.3l2-.3 1-2Z" fill="currentColor"/></svg></span>Weekly + Monthly</span><span class="ff-option-price"><strong>$7.64</strong><small>৳955</small></span></label>
+              <label class="form-label">Membership Plan বেছে নিন</label>
+              <!-- Loads: Free Fire Weekly Membership (155344), Monthly Membership (155345) -->
+              <div id="ffMembershipOptionsList">
+                <div class="i4g-loading-state">
+                  <span class="i4g-spinner" aria-hidden="true"></span>
+                  Loading membership prices…
+                </div>
               </div>
             </div>
           </div>
