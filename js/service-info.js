@@ -123,6 +123,25 @@
       note_en: 'PC panel works with emulators only. Use iOS or Android Panel if you play on phone.',
     },
 
+    'ffBrMods': {
+      name: 'BR Mods',
+      emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffb347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      color: '#ffb347',
+      tagline: 'Root ছাড়াই Free Fire-এ BR Mods — সহজ ও দ্রুত',
+      what_en: 'BR Mods gives you powerful in-game enhancements for Free Fire without requiring a rooted phone. Simple setup, fast activation, and affordable daily to monthly plans.',
+      what_bn: 'BR Mods দিয়ে Free Fire-এ root ছাড়াই in-game সুবিধা পান। সহজ setup, দ্রুত activation, এবং সাশ্রয়ী 1 Day থেকে 31 Day পর্যন্ত plan।',
+      features: [
+        { en: 'No root required — works on any Android', bn: 'Root লাগবে না — যেকোনো Android-এ চলে' },
+        { en: 'Fast and easy activation after order', bn: 'Order-এর পরে দ্রুত ও সহজ activation' },
+        { en: '1 Day, 7 Day, 15 Day and 31 Day plans', bn: '1 Day, 7 Day, 15 Day ও 31 Day plan' },
+        { en: 'Enhanced in-game visibility and features', bn: 'In-game visibility ও features উন্নত হয়' },
+        { en: 'Secure delivery via email', bn: 'Email-এর মাধ্যমে secure delivery' },
+        { en: 'Affordable pricing for all budgets', bn: 'সব বাজেটের জন্য সাশ্রয়ী মূল্য' },
+      ],
+      note_bn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffa500" stroke-width="2.2" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> এই service-টি শুধু Android-এ কাজ করে। iPhone ব্যবহারকারীরা iOS Panel দেখুন।',
+      note_en: 'This service works on Android only. iPhone users should check the iOS Panel.',
+    },
+
     'chatgpt': {
       name: 'ChatGPT Subscription',
       emoji: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',

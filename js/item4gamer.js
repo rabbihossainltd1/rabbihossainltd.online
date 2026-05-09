@@ -408,20 +408,38 @@
 
     window._i4gRetry = loadAndRender;
 
-    let products;
-    try {
-      products = await fetchProducts();
-    } catch (err) {
-      console.error('[Item4Gamer] Load failed:', err.message);
-      if (diamondEl)    showError(diamondEl);
-      if (membershipEl) showError(membershipEl);
-      return;
-    }
+    // Auto-retry up to 4 times (handles Render cold start / empty cache)
+    let products = [];
+    const MAX_ATTEMPTS = 4;
+    const RETRY_DELAY_MS = 4000;
 
-    if (!products.length) {
-      if (diamondEl)    showError(diamondEl);
-      if (membershipEl) showError(membershipEl);
-      return;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        products = await fetchProducts();
+      } catch (err) {
+        console.error(`[Item4Gamer] Load attempt ${attempt} failed:`, err.message);
+        if (attempt === MAX_ATTEMPTS) {
+          if (diamondEl)    showError(diamondEl);
+          if (membershipEl) showError(membershipEl);
+          return;
+        }
+        if (diamondEl)    showLoading(diamondEl);
+        if (membershipEl) showLoading(membershipEl);
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
+
+      if (products.length > 0) break;
+
+      console.warn(`[Item4Gamer] Empty product list on attempt ${attempt}`);
+      if (attempt === MAX_ATTEMPTS) {
+        if (diamondEl)    showError(diamondEl);
+        if (membershipEl) showError(membershipEl);
+        return;
+      }
+      if (diamondEl)    showLoading(diamondEl);
+      if (membershipEl) showLoading(membershipEl);
+      await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
     }
 
     window._i4gProducts = products;
