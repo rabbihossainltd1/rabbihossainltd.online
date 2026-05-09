@@ -113,7 +113,7 @@
   };
 
   // Services that hide name/email/phone contact fields — they have their own email
-  const NO_CONTACT_FIELDS = ['ff','ffDrip','ffFf4x','ffIos','ffPc'];
+  const NO_CONTACT_FIELDS = ['ff','ffDrip','ffFf4x','ffIos','ffPc','ffBrMods'];
 
   const overlay = document.getElementById('serviceModal');
   const modalClose = document.getElementById('modalClose');
@@ -135,7 +135,8 @@
     ffDrip: 'ffDripFields',
     ffFf4x: 'ffFf4xFields',
     ffIos: 'ffIosFields',
-    ffPc: 'ffPcFields'
+    ffPc: 'ffPcFields',
+    ffBrMods: 'ffBrModsFields'
   };
 
   // Visa / Mastercard fixed price options — no custom price allowed
@@ -768,6 +769,7 @@
     serviceInput.value = serviceName;
     showFields(fieldsType || '');
     if (fieldsType === 'card') resetCardPricing();
+    if (fieldsType === 'ff' && typeof window.ffSelectType === 'function') window.ffSelectType('diamond');
     showStatus('', '');
 
     form.style.display = 'block';
