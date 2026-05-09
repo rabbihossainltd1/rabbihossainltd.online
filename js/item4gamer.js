@@ -1,546 +1,384 @@
 /* ============================================================
-   Item4Gamer Integration — v2.0
-   - Loads diamond products + Weekly/Monthly Membership from backend
-   - Membership products: Weekly (155344), Monthly (155345)
-   - All calls go to backend only — NO direct Item4Gamer API key exposed
-   - Order payload includes: provider, item4gamerProductId, productId,
-     variationId, productName, freeFireUid, uid, autoTopupReady,
-     amountUsd, amountBDT
+   Item4Gamer Integration — v3.0
+   - Products load instantly from backend cache (no wait)
+   - Player ID verification required before submit
+   - Membership: Weekly (155344), Monthly (155345)
+   - All calls → backend only, no direct Item4Gamer API
    ============================================================ */
 
 (function () {
   'use strict';
 
-  const BACKEND_BASE          = 'https://rabbi-backend-vlr7.onrender.com';
-  const ITEM4GAMER_CATEGORY_ID = 19;
-  const BDT_RATE              = 125; // fallback if backend doesn't return amountBDT
+  const BACKEND_BASE           = 'https://rabbi-backend-vlr7.onrender.com';
+  const FF_CATEGORY_ID         = 19;
+  const BDT_FALLBACK_RATE      = 125;
+  const MEMBERSHIP_IDS         = new Set(['155344', '155345']);
 
-  // Known membership variation IDs — used for type detection
-  const MEMBERSHIP_IDS = new Set(['155344', '155345']);
+  // Global player verify state — checked by service-modal before submit
+  window._i4gPlayerVerified    = false;
+  window._i4gVerifiedUid       = null;
+  window._i4gVerifiedName      = null;
 
-  /* ── Utility: safe deep-get ────────────────────────────────── */
-  function safeGet(obj, ...keys) {
-    return keys.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : null), obj);
+  /* ── Safe price extraction ─────────────────────────────── */
+  const PRICE_FIELDS = [
+    'amountUsd','amountUSD','providerPriceUsd',
+    'price','sale_price','selling_price','regular_price',
+    'final_price','amount','amount_usd','usd','usd_price',
+    'cost','price_usd','priceUsd','unit_price','reseller_price','rate'
+  ];
+
+  function extractPrice(obj) {
+    if (!obj) return null;
+    for (const f of PRICE_FIELDS) {
+      const raw = obj[f];
+      if (raw === undefined || raw === null || raw === '') continue;
+      const n = parseFloat(String(raw).replace(/[^0-9.]/g, ''));
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+    return null;
   }
 
-  /* ── Normalize product list from any response shape ─────────── */
-  function normalizeProductList(raw) {
+  function extractId(p) {
+    return String(p.variationId ?? p.variation_id ?? p.id ?? p.productId ?? p.product_id ?? '').trim();
+  }
+
+  /* ── Unwrap products from any response envelope ────────── */
+  function unwrapProducts(raw) {
     if (!raw) return [];
-    const candidates = [
-      safeGet(raw, 'data', 'data', 'products'),
-      safeGet(raw, 'data', 'products'),
-      safeGet(raw, 'data', 'data'),
-      safeGet(raw, 'data'),
-      safeGet(raw, 'products'),
-      raw
+    const cands = [
+      raw?.data?.data?.products, raw?.data?.products,
+      raw?.data?.data, raw?.data, raw?.products, raw
     ];
-    for (const candidate of candidates) {
-      if (Array.isArray(candidate) && candidate.length > 0) return candidate;
+    for (const c of cands) {
+      if (Array.isArray(c) && c.length > 0) return c;
     }
     return [];
   }
 
-  /* ── Normalize price from any product field ──────────────────── */
-  function normalizePrice(product) {
-    if (!product) return null;
-    const raw =
-      product.amountUsd    ??
-      product.amountUSD    ??
-      product.providerPriceUsd ??
-      product.price        ??
-      product.usdPrice     ??
-      product.amount       ??
-      null;
-    if (raw === null || raw === undefined) return null;
-    const n = Number(raw);
-    return Number.isFinite(n) && n > 0 ? Math.round(n * 10000) / 10000 : null;
-  }
+  /* ── Normalize a product from backend response ─────────── */
+  function normalizeProduct(p) {
+    const productId    = extractId(p);
+    const amountUsd    = extractPrice(p);
+    const amountBDT    = p.amountBDT ?? p.amountBdt ??
+                         (amountUsd !== null ? Math.round(amountUsd * BDT_FALLBACK_RATE) : null);
+    const isMembership = MEMBERSHIP_IDS.has(productId) ||
+                         String(p.type || '').toLowerCase() === 'membership';
+    const name         = String(p.productName ?? p.product_name ?? p.name ?? p.title ?? 'Unknown Package').trim();
+    const hasPrice     = amountUsd !== null && amountUsd > 0;
 
-  /* ── Normalize BDT from any product field ────────────────────── */
-  function normalizeBDT(product, usd) {
-    if (!product) return null;
-    const raw = product.amountBDT ?? product.amountBdt ?? null;
-    if (raw !== null && raw !== undefined) {
-      const n = Number(raw);
-      if (Number.isFinite(n) && n > 0) return n;
+    if (!hasPrice) {
+      console.warn(`[Item4Gamer] No price for "${name}" (id:${productId}) — skipped`);
     }
-    // Fall back to local conversion
-    if (usd !== null && usd > 0) return Math.round(usd * BDT_RATE);
-    return null;
+
+    return {
+      item4gamerProductId: productId,
+      productId,
+      variationId:    productId,
+      productName:    name,
+      amountUsd,
+      amountBDT,
+      provider:       'item4gamer',
+      autoTopupReady: !!productId,
+      type:           p.type || (isMembership ? 'membership' : 'diamonds'),
+      isMembership,
+      membershipType: p.membershipType || null,
+      region:         p.region || null,
+      diamonds:       p.diamonds || null,
+      hasPrice,
+      _raw: p
+    };
   }
 
-  /* ── Normalize product ID ────────────────────────────────────── */
-  function normalizeProductId(product) {
-    if (!product) return '';
-    return String(
-      product.variationId  ??
-      product.variation_id ??
-      product.productId    ??
-      product.product_id   ??
-      product.id           ??
-      product.itemId       ??
-      ''
-    );
-  }
-
-  /* ── Normalize product name ──────────────────────────────────── */
-  function normalizeProductName(product) {
-    if (!product) return 'Unknown Package';
-    return String(
-      product.productName  ??
-      product.product_name ??
-      product.name         ??
-      product.title        ??
-      'Unknown Package'
-    );
-  }
-
-  /* ── Detect product type ─────────────────────────────────────── */
-  function detectProductType(product) {
-    const id = normalizeProductId(product);
-    if (MEMBERSHIP_IDS.has(id)) return 'membership';
-    if (product.type) return String(product.type).toLowerCase();
-    const name = normalizeProductName(product).toLowerCase();
-    if (name.includes('membership') || name.includes('weekly') || name.includes('monthly')) return 'membership';
-    return 'diamonds';
-  }
-
-  /* ── Fetch products from backend ─────────────────────────────── */
-  async function fetchItem4GamerProducts() {
-    const url = `${BACKEND_BASE}/api/item4gamer/products?category_id=${ITEM4GAMER_CATEGORY_ID}`;
+  /* ── Fetch products from backend cache (instant) ───────── */
+  async function fetchProducts() {
+    const url = `${BACKEND_BASE}/api/item4gamer/products?category_id=${FF_CATEGORY_ID}`;
     let res;
     try {
-      res = await fetch(url, {
-        method:  'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } catch (networkErr) {
+      res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    } catch (e) {
       throw new Error('Network error loading products. Please try again.');
     }
-    if (!res.ok) {
-      throw new Error(`Backend returned HTTP ${res.status} fetching products.`);
-    }
+    if (!res.ok) throw new Error(`Backend HTTP ${res.status} fetching products.`);
+
     let raw;
-    try {
-      raw = await res.json();
-    } catch (e) {
-      throw new Error('Invalid JSON from backend while fetching products.');
-    }
+    try { raw = await res.json(); } catch (e) { throw new Error('Invalid JSON from backend.'); }
 
-    const rawList = normalizeProductList(raw);
-
-    // Map into normalized shape
-    const products = rawList.map((p) => {
-      const productId    = normalizeProductId(p);
-      const amountUsd    = normalizePrice(p);
-      const amountBDT    = normalizeBDT(p, amountUsd);
-      const type         = detectProductType(p);
-      const isMembership = type === 'membership';
-
-      return {
-        item4gamerProductId: productId,
-        productId,
-        variationId:    productId,
-        productName:    normalizeProductName(p),
-        amountUsd,
-        amountBDT,
-        provider:       'item4gamer',
-        autoTopupReady: !!productId,
-        type,
-        isMembership,
-        membershipType: p.membershipType || null,
-        region:         p.region || null,
-        diamonds:       p.diamonds || null,
-        priceAvailable: amountUsd !== null && amountUsd > 0,
-        _raw: p
-      };
-    });
-
-    return products;
+    const list = unwrapProducts(raw);
+    return list
+      .map(p => normalizeProduct(p))
+      .filter(p => {
+        if (!p.hasPrice) return false;
+        return true;
+      });
   }
 
-  /* ── Check player via backend ────────────────────────────────── */
-  async function checkFreefirePlayer(uid) {
-    if (!uid || !String(uid).trim()) {
-      return { ok: false, error: 'UID is empty.' };
-    }
+  /* ── Check player via backend ──────────────────────────── */
+  async function checkPlayer(uid) {
+    if (!String(uid).trim()) return { ok: false, error: 'UID is empty.' };
 
-    // Try GET first (backend supports both)
-    const urlGet = `${BACKEND_BASE}/api/item4gamer/check-player?uid=${encodeURIComponent(String(uid).trim())}&game=freefire`;
+    // Try GET first, fall back to POST on 405
     let res;
+    const uidEnc = encodeURIComponent(String(uid).trim());
     try {
-      res = await fetch(urlGet, {
-        method:  'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } catch (networkErr) {
-      return { ok: false, error: 'Network error checking player. Please try again.' };
+      res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire`);
+    } catch (e) {
+      return { ok: false, error: 'Network error. You can still continue manually.', soft: true };
     }
 
-    // If GET fails with 405, fall back to POST
     if (res.status === 405) {
       try {
         res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player`, {
-          method:  'POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ uid: String(uid).trim(), game: 'freefire' })
+          body: JSON.stringify({ uid: String(uid).trim(), game: 'freefire' })
         });
-      } catch (networkErr) {
-        return { ok: false, error: 'Network error checking player. Please try again.' };
+      } catch (e) {
+        return { ok: false, error: 'Network error. You can still continue manually.', soft: true };
       }
     }
 
     let data;
-    try {
-      data = await res.json();
-    } catch (e) {
-      return {
-        ok:            false,
-        error:         'Could not verify player at this time. You may still place the order manually.',
-        providerError: true
-      };
+    try { data = await res.json(); } catch (e) {
+      return { ok: false, error: 'Could not verify player. You can still continue manually.', soft: true };
     }
 
     if (!res.ok || data.ok === false || data.success === false) {
-      const msg =
-        data.message ||
-        data.error   ||
-        data.msg     ||
-        'Player check unavailable. You can still continue manually.';
-      return { ok: false, error: msg, providerError: true };
+      const msg = data.message || data.error || data.msg || 'Player not found. Check your UID.';
+      // soft = API issue (not wrong UID), hard = wrong UID
+      const soft = res.status >= 500 || !!data.providerError;
+      return { ok: false, error: msg, soft };
     }
 
-    const playerInfo = data.data || data.player || data.result || data;
+    const info = data.data || data.player || data.result || data;
     return {
       ok:         true,
-      playerName: playerInfo.playerName || playerInfo.name || playerInfo.username || playerInfo.nickname || '',
-      server:     playerInfo.server     || playerInfo.region || playerInfo.zone || '',
-      extra:      playerInfo
+      playerName: info.playerName || info.name || info.username || info.nickname || '',
+      server:     info.server || info.region || info.zone || '',
+      extra:      info
     };
   }
 
-  /* ── Build Diamond SVG icon ──────────────────────────────────── */
-  function diamondSVG(color) {
-    const c = color || 'currentColor';
-    return `<svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;display:block;">
-      <path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="${c}" opacity=".22"/>
-      <path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="${c}" stroke-width="1.5" stroke-linejoin="round"/>
+  /* ── SVG icons ──────────────────────────────────────────── */
+  function diamondSVG() {
+    return `<svg viewBox="0 0 24 24" fill="none" style="width:17px;height:17px;display:block">
+      <path d="M6 4h12l4 6-10 10L2 10l4-6Z" fill="currentColor" opacity=".22"/>
+      <path d="M2 10h20M6 4l3 6 3-6 3 6 3-6M9 10l3 10 3-10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>`;
+  }
+  function membershipSVG() {
+    return `<svg viewBox="0 0 24 24" fill="none" style="width:17px;height:17px;display:block">
+      <rect x="3" y="5" width="18" height="14" rx="3" fill="currentColor" opacity=".16" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M17 14l1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L14 16.3l2-.3 1-2Z" fill="currentColor"/>
     </svg>`;
   }
 
-  /* ── Build Membership/Calendar SVG icon ──────────────────────── */
-  function membershipSVG(color) {
-    const c = color || 'currentColor';
-    return `<svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px;display:block;">
-      <rect x="3" y="5" width="18" height="14" rx="3" fill="${c}" opacity=".16" stroke="${c}" stroke-width="1.7"/>
-      <path d="M3 10h18M7 15h4" stroke="${c}" stroke-width="1.7" stroke-linecap="round"/>
-      <path d="M17 14l1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L14 16.3l2-.3 1-2Z" fill="${c}"/>
-    </svg>`;
-  }
+  /* ── Build a single radio option ───────────────────────── */
+  function buildOption(p) {
+    const usdStr = `$${p.amountUsd.toFixed(p.amountUsd < 1 ? 3 : 2)}`;
+    const bdtStr = p.amountBDT ? `৳${p.amountBDT.toLocaleString('en-BD')}` : '';
+    const icon   = p.isMembership ? membershipSVG() : diamondSVG();
 
-  /* ── Render a single option item ─────────────────────────────── */
-  function buildOptionItem(product) {
-    const usdStr  = product.priceAvailable
-      ? `$${product.amountUsd.toFixed(product.amountUsd < 1 ? 3 : 2)}`
-      : 'Price N/A';
-    const bdtStr  = product.amountBDT
-      ? `৳${product.amountBDT.toLocaleString('en-BD')}`
-      : '';
-    const name    = product.productName;
-    const isMem   = product.isMembership;
-    const iconHtml = isMem
-      ? membershipSVG(isMem ? '#79d7ff' : '#66e6ff')
-      : diamondSVG('#66e6ff');
-
-    const disabled = !product.priceAvailable ? 'disabled' : '';
-
-    const label = document.createElement('label');
-    label.className = `ff-option-item${!product.priceAvailable ? ' ff-option-unavailable' : ''}`;
+    const label  = document.createElement('label');
+    label.className = 'ff-option-item';
     label.innerHTML = `
-      <input
-        type="radio"
-        name="ff_package"
-        value="${name} — ${usdStr}${bdtStr ? ' / ' + bdtStr : ''}"
-        data-product-id="${product.productId}"
-        data-item4gamer-product-id="${product.item4gamerProductId}"
-        data-variation-id="${product.variationId}"
+      <input type="radio" name="ff_package"
+        value="${p.productName} — ${usdStr}${bdtStr ? ' / ' + bdtStr : ''}"
+        data-product-id="${p.productId}"
+        data-item4gamer-product-id="${p.item4gamerProductId}"
+        data-variation-id="${p.variationId}"
         data-game-id="freefire"
-        data-package-name="${name}"
-        data-amount-usd="${product.amountUsd ?? ''}"
-        data-amount-bdt="${product.amountBDT ?? ''}"
+        data-package-name="${p.productName}"
+        data-amount-usd="${p.amountUsd}"
+        data-amount-bdt="${p.amountBDT ?? ''}"
         data-provider="item4gamer"
-        data-is-membership="${isMem ? '1' : '0'}"
-        ${disabled}
+        data-is-membership="${p.isMembership ? '1' : '0'}"
       />
       <span class="ff-option-label">
-        <span class="ff-pack-icon${isMem ? ' ff-card-pro' : ''}" aria-hidden="true">${iconHtml}</span>
-        ${name}
-        ${!product.priceAvailable ? '<small style="color:#ff8a8a;font-size:.72rem;margin-left:6px;">(price unavailable)</small>' : ''}
+        <span class="ff-pack-icon${p.isMembership ? ' ff-card-pro' : ''}" aria-hidden="true">${icon}</span>
+        ${p.productName}
       </span>
       <span class="ff-option-price">
         <strong>${usdStr}</strong>
         ${bdtStr ? `<small>${bdtStr}</small>` : ''}
-      </span>
-    `;
+      </span>`;
 
-    const radio = label.querySelector('input[type=radio]');
-    if (radio && product.priceAvailable) {
-      radio.addEventListener('change', function () {
-        if (this.checked) {
-          const usd = parseFloat(this.dataset.amountUsd || 0);
-          if (typeof window.ffUpdateAmount === 'function') {
-            window.ffUpdateAmount(usd);
-          } else if (typeof window.setServiceAmountUsd === 'function') {
-            window.setServiceAmountUsd(usd);
-          }
-        }
-      });
-    }
-
+    label.querySelector('input').addEventListener('change', function () {
+      if (this.checked) {
+        const usd = parseFloat(this.dataset.amountUsd || 0);
+        if (typeof window.ffUpdateAmount === 'function') window.ffUpdateAmount(usd);
+        else if (typeof window.setServiceAmountUsd === 'function') window.setServiceAmountUsd(usd);
+      }
+    });
     return label;
   }
 
-  /* ── Render diamond products into container ──────────────────── */
-  function renderDiamondProducts(products, container) {
+  /* ── Render product list into a container ──────────────── */
+  function renderList(products, container, emptyMsg) {
     if (!container) return;
     container.innerHTML = '';
-
-    const diamonds = products.filter(p => !p.isMembership);
-
-    if (!diamonds || diamonds.length === 0) {
-      container.innerHTML = `<div class="i4g-load-error">No diamond packages available right now.</div>`;
+    if (!products.length) {
+      container.innerHTML = `<div class="i4g-load-error">${emptyMsg || 'No products available.'}</div>`;
       return;
     }
-
     const list = document.createElement('div');
     list.className = 'ff-option-list';
-    diamonds.forEach(p => list.appendChild(buildOptionItem(p)));
+    products.forEach(p => list.appendChild(buildOption(p)));
     container.appendChild(list);
   }
 
-  /* ── Render membership products into container ───────────────── */
-  function renderMembershipProducts(products, container) {
-    if (!container) return;
-    container.innerHTML = '';
-
-    // Only Weekly (155344) and Monthly (155345) — no Weekly Lite unless it appears in live data
-    const memberships = products.filter(p => p.isMembership);
-
-    if (!memberships || memberships.length === 0) {
-      container.innerHTML = `<div class="i4g-load-error">No membership plans available right now.</div>`;
-      return;
-    }
-
-    const list = document.createElement('div');
-    list.className = 'ff-option-list';
-    memberships.forEach(p => list.appendChild(buildOptionItem(p)));
-    container.appendChild(list);
+  /* ── Loading / error state helpers ─────────────────────── */
+  function showLoading(el) {
+    if (el) el.innerHTML = `<div class="i4g-loading-state"><span class="i4g-spinner"></span>Loading live prices…</div>`;
+  }
+  function showError(el) {
+    if (el) el.innerHTML = `<div class="i4g-load-error">Failed to load prices. <button type="button" class="i4g-retry-btn" onclick="window._i4gRetry&&window._i4gRetry()">Retry</button></div>`;
   }
 
-  /* ── Loading / Error state helpers ──────────────────────────── */
-  function showProductsLoading(container) {
-    if (!container) return;
-    container.innerHTML = `<div class="i4g-loading-state">
-      <span class="i4g-spinner" aria-hidden="true"></span>
-      Loading prices…
-    </div>`;
+  /* ── Inject CSS once ────────────────────────────────────── */
+  function injectCSS() {
+    if (document.getElementById('i4g-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'i4g-styles';
+    s.textContent = `
+      .i4g-loading-state{display:flex;align-items:center;gap:10px;padding:14px;color:#7a8ca8;font-size:.88rem;font-weight:700}
+      .i4g-spinner{width:18px;height:18px;border:2px solid rgba(0,200,255,.18);border-top-color:#00c8ff;border-radius:50%;display:inline-block;animation:i4gSpin .7s linear infinite;flex-shrink:0}
+      @keyframes i4gSpin{to{transform:rotate(360deg)}}
+      .i4g-load-error{padding:12px 14px;border-radius:12px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.18);color:#ffb0b0;font-size:.84rem;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+      .i4g-retry-btn{border:1px solid rgba(255,80,80,.35);background:rgba(255,80,80,.12);color:#ffb0b0;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:800;cursor:pointer;margin-left:auto}
+      .i4g-retry-btn:hover{background:rgba(255,80,80,.22)}
+      /* Check Player button */
+      #i4g-check-player-btn{border:1px solid rgba(0,200,255,.35);background:rgba(0,200,255,.10);color:#9ee8ff;border-radius:10px;padding:8px 16px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;white-space:nowrap}
+      #i4g-check-player-btn:hover{background:rgba(0,200,255,.22)!important;border-color:rgba(0,200,255,.60)!important}
+      #i4g-check-player-btn:disabled{opacity:.55;cursor:default!important}
+      #i4g-player-status{font-size:.82rem;font-weight:700;display:none;padding:7px 12px;border-radius:10px;flex:1;min-width:0}
+      #i4g-player-status.success{background:rgba(0,255,136,.10);border:1px solid rgba(0,255,136,.25);color:#a7ffcf}
+      #i4g-player-status.error{background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.22);color:#ffb0b0}
+      #i4g-player-status.info{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.18);color:#9ee8ff}
+      #i4g-check-player-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+      /* Verify badge on UID input */
+      .i4g-uid-verified::after{content:'✓ Verified';font-size:.72rem;color:#a7ffcf;font-weight:800;margin-left:8px}
+    `;
+    document.head.appendChild(s);
   }
 
-  function showProductsError(container) {
-    if (!container) return;
-    container.innerHTML = `<div class="i4g-load-error">
-      Failed to load live prices. Please try again.
-      <button type="button" class="i4g-retry-btn" onclick="window._i4gRetryLoad && window._i4gRetryLoad()">Retry</button>
-    </div>`;
-  }
-
-  /* ── Inject Check Player UI near UID input ───────────────────── */
+  /* ── Inject "Check Player" button below UID input ───────── */
   function injectCheckPlayerUI() {
     const uidInput = document.getElementById('mo_ff_uid');
-    if (!uidInput) return;
-    if (document.getElementById('i4g-check-player-btn')) return;
+    if (!uidInput || document.getElementById('i4g-check-player-btn')) return;
 
-    const formGroup = uidInput.closest('.form-group') || uidInput.parentElement;
-    if (!formGroup) return;
+    const parent = uidInput.closest('.form-group') || uidInput.parentElement;
+    if (!parent) return;
 
-    const checkRow = document.createElement('div');
-    checkRow.id = 'i4g-check-player-row';
-    checkRow.style.cssText = 'display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;';
-    checkRow.innerHTML = `
-      <button type="button" id="i4g-check-player-btn"
-        style="border:1px solid rgba(0,200,255,.35);background:rgba(0,200,255,.10);color:#9ee8ff;
-        border-radius:10px;padding:8px 16px;font-weight:800;font-size:.82rem;cursor:pointer;
-        display:flex;align-items:center;gap:7px;transition:.2s;white-space:nowrap;"
-        aria-label="Check Free Fire Player">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        Check Player
+    const row = document.createElement('div');
+    row.id = 'i4g-check-player-row';
+    row.innerHTML = `
+      <button type="button" id="i4g-check-player-btn" aria-label="Check Free Fire Player ID">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Check Player ID
       </button>
-      <div id="i4g-player-status" style="font-size:.82rem;font-weight:700;display:none;padding:7px 12px;border-radius:10px;flex:1;min-width:0;"></div>
-    `;
-    formGroup.appendChild(checkRow);
+      <div id="i4g-player-status"></div>`;
+    parent.appendChild(row);
 
-    if (!document.getElementById('i4g-check-player-style')) {
-      const style = document.createElement('style');
-      style.id = 'i4g-check-player-style';
-      style.textContent = `
-        #i4g-check-player-btn:hover { background:rgba(0,200,255,.22)!important; border-color:rgba(0,200,255,.60)!important; }
-        #i4g-check-player-btn:disabled { opacity:.6; cursor:default!important; }
-        #i4g-player-status.success { background:rgba(0,255,136,.10); border:1px solid rgba(0,255,136,.25); color:#a7ffcf; }
-        #i4g-player-status.error   { background:rgba(255,80,80,.10);  border:1px solid rgba(255,80,80,.22);  color:#ffb0b0; }
-        #i4g-player-status.checking{ background:rgba(0,200,255,.08);  border:1px solid rgba(0,200,255,.18);  color:#9ee8ff; }
-        .i4g-loading-state { display:flex; align-items:center; gap:10px; padding:14px; color:#7a8ca8; font-size:.88rem; font-weight:700; }
-        .i4g-spinner { width:18px; height:18px; border:2px solid rgba(0,200,255,.18); border-top-color:#00c8ff; border-radius:50%; display:inline-block; animation:i4gSpin .7s linear infinite; flex-shrink:0; }
-        @keyframes i4gSpin { to { transform:rotate(360deg); } }
-        .i4g-load-error { padding:12px 14px; border-radius:12px; background:rgba(255,80,80,.08); border:1px solid rgba(255,80,80,.18); color:#ffb0b0; font-size:.84rem; font-weight:700; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-        .i4g-retry-btn { border:1px solid rgba(255,80,80,.35); background:rgba(255,80,80,.12); color:#ffb0b0; border-radius:8px; padding:5px 12px; font-size:.78rem; font-weight:800; cursor:pointer; margin-left:auto; }
-        .i4g-retry-btn:hover { background:rgba(255,80,80,.22); }
-        .ff-option-unavailable { opacity:.55; cursor:not-allowed; }
-        .ff-option-unavailable input[type=radio] { pointer-events:none; }
-      `;
-      document.head.appendChild(style);
-    }
+    document.getElementById('i4g-check-player-btn').addEventListener('click', runPlayerCheck);
 
-    const btn = document.getElementById('i4g-check-player-btn');
-    if (btn) {
-      btn.addEventListener('click', async function () {
-        const uid      = (document.getElementById('mo_ff_uid')?.value || '').trim();
-        const statusEl = document.getElementById('i4g-player-status');
-
-        if (!uid) {
-          if (statusEl) {
-            statusEl.className   = 'error';
-            statusEl.textContent = 'Please enter your Free Fire UID first.';
-            statusEl.style.display = 'block';
-          }
-          return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = `<span class="i4g-spinner" style="width:13px;height:13px;border-width:2px;"></span> Checking…`;
-        if (statusEl) {
-          statusEl.className   = 'checking';
-          statusEl.textContent = 'Checking player…';
-          statusEl.style.display = 'block';
-        }
-
-        try {
-          const result = await checkFreefirePlayer(uid);
-          if (result.ok) {
-            const parts = [];
-            if (result.playerName) parts.push(`✓ ${result.playerName}`);
-            if (result.server)     parts.push(`Server: ${result.server}`);
-            if (!parts.length)     parts.push('✓ Player verified');
-            if (statusEl) {
-              statusEl.className   = 'success';
-              statusEl.textContent = parts.join(' · ');
-              statusEl.style.display = 'block';
-            }
-            window._i4gVerifiedUid = uid;
-          } else {
-            if (statusEl) {
-              statusEl.className   = result.providerError ? 'checking' : 'error';
-              statusEl.textContent = result.error || 'Player check failed.';
-              statusEl.style.display = 'block';
-            }
-            // providerError = API issue, not wrong UID — still allow order
-            window._i4gVerifiedUid = result.providerError ? uid : null;
-          }
-        } catch (err) {
-          if (statusEl) {
-            statusEl.className   = 'checking';
-            statusEl.textContent = 'Player check unavailable. You can still continue manually.';
-            statusEl.style.display = 'block';
-          }
-          window._i4gVerifiedUid = uid;
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg> Check Player`;
-        }
-      });
-    }
+    // Re-verify if UID changes after a successful verify
+    uidInput.addEventListener('input', function () {
+      if (window._i4gVerifiedUid && this.value.trim() !== window._i4gVerifiedUid) {
+        window._i4gPlayerVerified = false;
+        window._i4gVerifiedUid    = null;
+        window._i4gVerifiedName   = null;
+        const st = document.getElementById('i4g-player-status');
+        if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
+      }
+    });
   }
 
-  /* ── Main: load products, hydrate diamond + membership sections ─ */
-  async function loadAndRenderProducts() {
-    // Diamond container (injected dynamically by item4gamer.js itself)
-    const diamondContainer    = document.getElementById('ffDiamondOptionsList');
-    // Membership container (injected dynamically)
-    const membershipContainer = document.getElementById('ffMembershipOptionsList');
+  async function runPlayerCheck() {
+    const btn    = document.getElementById('i4g-check-player-btn');
+    const st     = document.getElementById('i4g-player-status');
+    const uid    = (document.getElementById('mo_ff_uid')?.value || '').trim();
 
-    // If neither container exists, nothing to do
-    if (!diamondContainer && !membershipContainer) return;
+    if (!uid) {
+      if (st) { st.className = 'error'; st.textContent = 'আপনার Free Fire UID লিখুন।'; st.style.display = 'block'; }
+      return;
+    }
 
-    if (diamondContainer)    showProductsLoading(diamondContainer);
-    if (membershipContainer) showProductsLoading(membershipContainer);
+    btn.disabled = true;
+    btn.innerHTML = `<span class="i4g-spinner" style="width:13px;height:13px;border-width:2px"></span> Checking…`;
+    if (st) { st.className = 'info'; st.textContent = 'Verifying player…'; st.style.display = 'block'; }
 
-    window._i4gRetryLoad = loadAndRenderProducts;
-
-    let products;
     try {
-      products = await fetchItem4GamerProducts();
+      const result = await checkPlayer(uid);
+
+      if (result.ok) {
+        window._i4gPlayerVerified = true;
+        window._i4gVerifiedUid    = uid;
+        window._i4gVerifiedName   = result.playerName || '';
+
+        const parts = [];
+        if (result.playerName) parts.push(`✓ ${result.playerName}`);
+        else parts.push('✓ Player verified');
+        if (result.server) parts.push(`Server: ${result.server}`);
+
+        if (st) { st.className = 'success'; st.textContent = parts.join(' · '); st.style.display = 'block'; }
+
+      } else if (result.soft) {
+        // API issue — allow to continue but note it
+        window._i4gPlayerVerified = true; // soft-pass
+        window._i4gVerifiedUid    = uid;
+        if (st) {
+          st.className   = 'info';
+          st.textContent = result.error || 'Player check unavailable. You can still continue manually.';
+          st.style.display = 'block';
+        }
+      } else {
+        // Hard fail — wrong UID
+        window._i4gPlayerVerified = false;
+        window._i4gVerifiedUid    = null;
+        if (st) { st.className = 'error'; st.textContent = result.error || 'Invalid UID. Please check and try again.'; st.style.display = 'block'; }
+      }
     } catch (err) {
-      if (diamondContainer)    showProductsError(diamondContainer);
-      if (membershipContainer) showProductsError(membershipContainer);
-      return;
+      // Network error — soft-pass
+      window._i4gPlayerVerified = true;
+      window._i4gVerifiedUid    = uid;
+      if (st) { st.className = 'info'; st.textContent = 'Player check unavailable. You can still continue manually.'; st.style.display = 'block'; }
     }
 
-    if (!products || products.length === 0) {
-      if (diamondContainer)    showProductsError(diamondContainer);
-      if (membershipContainer) showProductsError(membershipContainer);
-      return;
-    }
-
-    window._i4gProducts = products;
-
-    if (diamondContainer)    renderDiamondProducts(products, diamondContainer);
-    if (membershipContainer) renderMembershipProducts(products, membershipContainer);
-
-    setTimeout(injectCheckPlayerUI, 100);
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Check Player ID`;
   }
 
-  /* ── Enrich order data for FF auto top-up (called by service-modal) ── */
-  // This overrides / supplements enrichFreeFireAutoTopupDetails in service-modal.js
-  // so that item4gamer-specific fields (variationId, item4gamerProductId) are set.
+  /* ── enrichI4GOrderData — called by service-modal ──────── */
   function enrichI4GOrderData(data, form) {
     if (!form) return data;
-
-    const selectedPackage = form.querySelector('input[name="ff_package"]:checked');
+    const pkg   = form.querySelector('input[name="ff_package"]:checked');
     const ffUid = (document.getElementById('mo_ff_uid')?.value || '').trim();
 
-    if (selectedPackage) {
-      const productId   = selectedPackage.dataset.productId || selectedPackage.getAttribute('data-product-id') || '';
-      const variationId = selectedPackage.dataset.variationId || selectedPackage.getAttribute('data-variation-id') || productId;
-      const isMembership = selectedPackage.dataset.isMembership === '1';
-      const amountUsd  = parseFloat(selectedPackage.dataset.amountUsd || 0) || null;
-      const amountBDT  = parseFloat(selectedPackage.dataset.amountBdt || 0) || null;
-      const name       = selectedPackage.dataset.packageName || '';
+    if (pkg) {
+      const productId   = pkg.dataset.productId   || pkg.getAttribute('data-product-id')   || '';
+      const variationId = pkg.dataset.variationId  || pkg.getAttribute('data-variation-id') || productId;
+      const i4gId       = pkg.dataset.item4gamerProductId || pkg.getAttribute('data-item4gamer-product-id') || variationId;
+      const isMem       = pkg.dataset.isMembership === '1';
+      const amountUsd   = parseFloat(pkg.dataset.amountUsd || 0) || null;
+      const amountBDT   = parseFloat(pkg.dataset.amountBdt || 0) || null;
+      const name        = pkg.dataset.packageName || '';
 
       data.provider            = 'item4gamer';
       data.productId           = productId;
       data.product_id          = productId;
       data.variationId         = variationId;
       data.variation_id        = variationId;
-      data.item4gamerProductId = variationId || productId;
-      data.fazercardsProductId = variationId || productId;
+      data.item4gamerProductId = i4gId;
+      data.fazercardsProductId = productId;
       data.gameId              = 'freefire';
       data.game_id             = 'freefire';
       data.packageName         = name;
       data.productName         = name;
-      data.isMembership        = isMembership;
+      data.isMembership        = isMem;
       data.autoTopupReady      = !!productId;
-
-      if (amountUsd !== null && amountUsd > 0) {
-        data.amountUsd = amountUsd;
-        data.amountUSD = amountUsd;
-      }
-      if (amountBDT !== null && amountBDT > 0) {
-        data.amountBDT = amountBDT;
-        data.amountBdt = amountBDT;
-      }
+      if (amountUsd !== null && amountUsd > 0) { data.amountUsd = amountUsd; data.amountUSD = amountUsd; }
+      if (amountBDT !== null && amountBDT > 0) { data.amountBDT = amountBDT; data.amountBdt = amountBDT; }
     }
 
     if (ffUid) {
@@ -551,85 +389,99 @@
       data.user_id     = ffUid;
     }
 
+    if (window._i4gVerifiedName) data.playerName = window._i4gVerifiedName;
+
+    if (typeof window._i4gCollectHook === 'function') window._i4gCollectHook(data);
     return data;
   }
 
-  /* ── Public API ──────────────────────────────────────────────── */
-  window.Item4Gamer = {
-    fetchProducts:        fetchItem4GamerProducts,
-    checkPlayer:          checkFreefirePlayer,
-    normalizeProductList,
-    normalizePrice,
-    getProducts:          () => window._i4gProducts || [],
-    injectCheckPlayerUI,
-    loadAndRenderProducts,
-    enrichI4GOrderData,
-    renderDiamondProducts,
-    renderMembershipProducts
-  };
+  /* ── Main load ──────────────────────────────────────────── */
+  async function loadAndRender() {
+    injectCSS();
 
-  /* ── Patch service-modal enrichFreeFireAutoTopupDetails ──────── */
-  // Wait for service-modal to load, then override its FF enrichment
-  // so that item4gamer fields (variationId, item4gamerProductId) are included.
-  function patchServiceModal() {
-    const form = document.getElementById('serviceOrderForm');
-    if (!form) return;
+    const diamondEl    = document.getElementById('ffDiamondOptionsList');
+    const membershipEl = document.getElementById('ffMembershipOptionsList');
+    if (!diamondEl && !membershipEl) return;
 
-    // Override enrichFreeFireAutoTopupDetails in the service-modal scope
-    // by patching collectFormData indirectly via a global hook.
-    const origCollect = window._i4gCollectHook;
-    window._i4gCollectHook = function (data) {
-      return enrichI4GOrderData(data, form);
-    };
+    if (diamondEl)    showLoading(diamondEl);
+    if (membershipEl) showLoading(membershipEl);
+
+    window._i4gRetry = loadAndRender;
+
+    let products;
+    try {
+      products = await fetchProducts();
+    } catch (err) {
+      console.error('[Item4Gamer] Load failed:', err.message);
+      if (diamondEl)    showError(diamondEl);
+      if (membershipEl) showError(membershipEl);
+      return;
+    }
+
+    if (!products.length) {
+      if (diamondEl)    showError(diamondEl);
+      if (membershipEl) showError(membershipEl);
+      return;
+    }
+
+    window._i4gProducts = products;
+    console.log(`[Item4Gamer] Loaded ${products.length} products from cache`);
+
+    const diamonds    = products.filter(p => !p.isMembership);
+    const memberships = products.filter(p => p.isMembership);
+
+    renderList(diamonds,    diamondEl,    'No diamond packages available.');
+    renderList(memberships, membershipEl, 'No membership plans available.');
+
+    setTimeout(injectCheckPlayerUI, 80);
   }
 
-  /* ── Auto-init: observe ffFields for visibility changes ──────── */
-  function observeFFFields() {
-    // Look for both diamond and membership containers
-    // They may already exist in the DOM (services.html static) or be injected
+  /* ── Public API ─────────────────────────────────────────── */
+  window.Item4Gamer = {
+    fetchProducts, checkPlayer, loadAndRender,
+    enrichI4GOrderData, injectCheckPlayerUI,
+    getProducts: () => window._i4gProducts || []
+  };
+
+  /* ── Patch openServiceModal to trigger load on FF open ─── */
+  function init() {
+    injectCSS();
+
     const ffFields = document.getElementById('ffFields');
     if (!ffFields) return;
 
     let loaded = false;
 
-    const tryLoad = function () {
+    const tryLoad = () => {
       if (loaded) return;
       if (ffFields.style.display !== 'none' && ffFields.offsetParent !== null) {
         loaded = true;
-        loadAndRenderProducts();
-        injectCheckPlayerUI();
+        loadAndRender();
       }
     };
 
-    const observer = new MutationObserver(tryLoad);
-    observer.observe(ffFields, { attributes: true, attributeFilter: ['style', 'class'] });
+    new MutationObserver(tryLoad).observe(ffFields, { attributes: true, attributeFilter: ['style', 'class'] });
     tryLoad();
 
-    // Patch openServiceModal so products load when FF modal opens
-    const originalOpen = window.openServiceModal;
-    window.openServiceModal = function (serviceName, fieldsType) {
-      if (typeof originalOpen === 'function') {
-        originalOpen(serviceName, fieldsType);
-      }
-      if (fieldsType === 'ff' && !loaded) {
-        setTimeout(() => {
+    const origOpen = window.openServiceModal;
+    window.openServiceModal = function (name, type) {
+      if (typeof origOpen === 'function') origOpen(name, type);
+      if (type === 'ff') {
+        if (!loaded) {
           loaded = true;
-          loadAndRenderProducts();
-          setTimeout(injectCheckPlayerUI, 100);
-        }, 80);
-      } else if (fieldsType === 'ff') {
-        setTimeout(injectCheckPlayerUI, 100);
+          setTimeout(loadAndRender, 60);
+        } else {
+          setTimeout(injectCheckPlayerUI, 80);
+        }
+        // Reset verify state when modal opens fresh
+        window._i4gPlayerVerified = false;
+        window._i4gVerifiedUid    = null;
+        window._i4gVerifiedName   = null;
       }
     };
-
-    patchServiceModal();
   }
 
-  /* ── Bootstrap ───────────────────────────────────────────────── */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', observeFFFields);
-  } else {
-    observeFFFields();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 
 })();

@@ -614,18 +614,16 @@
     const ffUid = document.getElementById('mo_ff_uid')?.value.trim() || '';
 
     if (selectedPackage) {
-      const productId    = selectedPackage.dataset.productId    || selectedPackage.getAttribute('data-product-id')    || '';
-      const variationId  = selectedPackage.dataset.variationId  || selectedPackage.getAttribute('data-variation-id')  || productId;
-      const i4gId        = selectedPackage.dataset.item4gamerProductId || selectedPackage.getAttribute('data-item4gamer-product-id') || variationId || productId;
+      const productId   = selectedPackage.dataset.productId   || selectedPackage.getAttribute('data-product-id')   || '';
+      const variationId = selectedPackage.dataset.variationId || selectedPackage.getAttribute('data-variation-id') || productId;
+      const i4gId       = selectedPackage.dataset.item4gamerProductId || selectedPackage.getAttribute('data-item4gamer-product-id') || variationId || productId;
       const isMembership = selectedPackage.dataset.isMembership === '1';
-      const amountUsd    = parseFloat(selectedPackage.dataset.amountUsd || 0) || null;
-      const amountBDT    = parseFloat(selectedPackage.dataset.amountBdt || 0) || null;
-      const name         = selectedPackage.dataset.packageName || selectedPackage.value || '';
+      const amountUsd   = parseFloat(selectedPackage.dataset.amountUsd || 0) || null;
+      const amountBDT   = parseFloat(selectedPackage.dataset.amountBdt || 0) || null;
+      const name        = selectedPackage.dataset.packageName || selectedPackage.value || '';
+      const isItem4     = !!i4gId && (selectedPackage.dataset.provider === 'item4gamer' || !!variationId);
 
-      // Determine provider: if item4gamer product ID present, use item4gamer
-      const isItem4Gamer = !!i4gId && (selectedPackage.dataset.provider === 'item4gamer' || !!variationId);
-
-      data.provider            = isItem4Gamer ? 'item4gamer' : 'fazercards';
+      data.provider            = isItem4 ? 'item4gamer' : 'fazercards';
       data.productId           = productId;
       data.product_id          = productId;
       data.variationId         = variationId;
@@ -639,14 +637,8 @@
       data.isMembership        = isMembership;
       data.autoTopupReady      = !!productId;
 
-      if (amountUsd !== null && amountUsd > 0) {
-        data.amountUsd = amountUsd;
-        data.amountUSD = amountUsd;
-      }
-      if (amountBDT !== null && amountBDT > 0) {
-        data.amountBDT = amountBDT;
-        data.amountBdt = amountBDT;
-      }
+      if (amountUsd !== null && amountUsd > 0) { data.amountUsd = amountUsd; data.amountUSD = amountUsd; }
+      if (amountBDT !== null && amountBDT > 0) { data.amountBDT = amountBDT; data.amountBdt = amountBDT; }
     }
 
     if (ffUid) {
@@ -657,11 +649,9 @@
       data.user_id     = ffUid;
     }
 
-    // Allow item4gamer.js to further enrich if loaded
-    if (typeof window._i4gCollectHook === 'function') {
-      window._i4gCollectHook(data);
-    }
+    if (window._i4gVerifiedName) data.playerName = window._i4gVerifiedName;
 
+    if (typeof window._i4gCollectHook === 'function') window._i4gCollectHook(data);
     return data;
   }
 
@@ -717,8 +707,16 @@
         showStatus('Free Fire UID লিখে দিন।', 'error');
         return false;
       }
-      if (!selectedPackage.dataset.productId) {
-        showStatus('এই package-এর auto top-up product ID missing. System automatically process করবে।', 'error');
+      // Player ID must be verified before submit
+      if (!window._i4gPlayerVerified) {
+        showStatus('আগে "Check Player ID" button দিয়ে UID verify করো।', 'error');
+        const checkBtn = document.getElementById('i4g-check-player-btn');
+        if (checkBtn) { checkBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); checkBtn.focus(); }
+        return false;
+      }
+      if (window._i4gVerifiedUid && ffUid !== window._i4gVerifiedUid) {
+        showStatus('UID পরিবর্তন হয়েছে। আবার "Check Player ID" করো।', 'error');
+        window._i4gPlayerVerified = false;
         return false;
       }
     }
