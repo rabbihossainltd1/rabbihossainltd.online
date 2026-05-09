@@ -614,22 +614,53 @@
     const ffUid = document.getElementById('mo_ff_uid')?.value.trim() || '';
 
     if (selectedPackage) {
-      const productId = selectedPackage.dataset.productId || selectedPackage.getAttribute('data-product-id') || '';
-      const gameId = selectedPackage.dataset.gameId || selectedPackage.getAttribute('data-game-id') || 'free_fire_direct_topup_bangladesh_499';
+      const productId    = selectedPackage.dataset.productId    || selectedPackage.getAttribute('data-product-id')    || '';
+      const variationId  = selectedPackage.dataset.variationId  || selectedPackage.getAttribute('data-variation-id')  || productId;
+      const i4gId        = selectedPackage.dataset.item4gamerProductId || selectedPackage.getAttribute('data-item4gamer-product-id') || variationId || productId;
+      const isMembership = selectedPackage.dataset.isMembership === '1';
+      const amountUsd    = parseFloat(selectedPackage.dataset.amountUsd || 0) || null;
+      const amountBDT    = parseFloat(selectedPackage.dataset.amountBdt || 0) || null;
+      const name         = selectedPackage.dataset.packageName || selectedPackage.value || '';
 
-      data.productId = productId;
-      data.product_id = productId;
+      // Determine provider: if item4gamer product ID present, use item4gamer
+      const isItem4Gamer = !!i4gId && (selectedPackage.dataset.provider === 'item4gamer' || !!variationId);
+
+      data.provider            = isItem4Gamer ? 'item4gamer' : 'fazercards';
+      data.productId           = productId;
+      data.product_id          = productId;
+      data.variationId         = variationId;
+      data.variation_id        = variationId;
+      data.item4gamerProductId = i4gId;
       data.fazercardsProductId = productId;
-      data.gameId = gameId;
-      data.game_id = gameId;
-      data.packageName = selectedPackage.dataset.packageName || selectedPackage.value || '';
-      data.provider = 'fazercards';
-      data.autoTopupReady = !!productId;
+      data.gameId              = 'freefire';
+      data.game_id             = 'freefire';
+      data.packageName         = name;
+      data.productName         = name;
+      data.isMembership        = isMembership;
+      data.autoTopupReady      = !!productId;
+
+      if (amountUsd !== null && amountUsd > 0) {
+        data.amountUsd = amountUsd;
+        data.amountUSD = amountUsd;
+      }
+      if (amountBDT !== null && amountBDT > 0) {
+        data.amountBDT = amountBDT;
+        data.amountBdt = amountBDT;
+      }
     }
 
-    data.freeFireUid = ffUid;
-    data.playerId = ffUid;
-    data.user_id = ffUid;
+    if (ffUid) {
+      data.freeFireUid = ffUid;
+      data.uid         = ffUid;
+      data.playerId    = ffUid;
+      data.player_id   = ffUid;
+      data.user_id     = ffUid;
+    }
+
+    // Allow item4gamer.js to further enrich if loaded
+    if (typeof window._i4gCollectHook === 'function') {
+      window._i4gCollectHook(data);
+    }
 
     return data;
   }
