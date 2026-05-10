@@ -757,16 +757,147 @@
     } catch (err) { /* non-blocking */ }
   }
 
-  function openModal(serviceName, fieldsType) {    if (!overlay || !form) return;
+  /* ── Full-page overlay injection ── */
+  function injectFullPageStyles() {
+    if (document.getElementById('rhFullPageModalStyle')) return;
+    const s = document.createElement('style');
+    s.id = 'rhFullPageModalStyle';
+    s.textContent = `
+      .service-modal-overlay.open {
+        display: flex !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 3000 !important;
+        background: var(--bg, #020a10) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        animation: rhFpIn 0.28s cubic-bezier(0.4,0,0.2,1) both !important;
+      }
+      @keyframes rhFpIn {
+        from { opacity: 0; transform: translateY(22px); }
+        to   { opacity: 1; transform: none; }
+      }
+      .service-modal {
+        width: 100% !important;
+        max-width: 680px !important;
+        max-height: none !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important;
+        padding: 0 0 120px !important;
+        box-shadow: none !important;
+        background: var(--bg, #020a10) !important;
+        animation: none !important;
+      }
+      #rhModalTopBar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(2,10,16,0.96);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(0,200,255,0.12);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+      }
+      #rhModalBackBtn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 12px;
+        color: #8aaac8;
+        font-size: 0.82rem;
+        font-weight: 800;
+        cursor: pointer;
+        padding: 8px 14px;
+        transition: background 0.18s, color 0.18s;
+        flex-shrink: 0;
+      }
+      #rhModalBackBtn:hover { background: rgba(0,200,255,0.10); color: #00c8ff; border-color: rgba(0,200,255,0.25); }
+      #rhModalTopTitle {
+        flex: 1;
+        font-size: 0.92rem;
+        font-weight: 900;
+        color: #d0eaff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #rhModalContentWrap {
+        padding: 28px 20px 0;
+        max-width: 640px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      /* hide original close button */
+      .service-modal-close { display: none !important; }
+      /* hide original title/subtitle inside modal — shown in top bar */
+      #modalTitle, #modalSubtitle { display: none !important; }
 
+      @media(min-width: 700px) {
+        .service-modal {
+          border-radius: 0 !important;
+          min-height: 100vh !important;
+        }
+        #rhModalContentWrap { padding: 36px 40px 0; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function ensureTopBar(serviceName) {
+    const modal = document.querySelector('.service-modal');
+    if (!modal) return;
+
+    let bar = document.getElementById('rhModalTopBar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'rhModalTopBar';
+      bar.innerHTML = `
+        <button id="rhModalBackBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <div id="rhModalTopTitle"></div>
+      `;
+      modal.insertBefore(bar, modal.firstChild);
+      document.getElementById('rhModalBackBtn').addEventListener('click', closeModal);
+    }
+
+    const titleEl = document.getElementById('rhModalTopTitle');
+    if (titleEl) titleEl.textContent = serviceName;
+
+    // Wrap form content in padding container if not already
+    let wrap = document.getElementById('rhModalContentWrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'rhModalContentWrap';
+      // Move all children except the top bar into wrap
+      const children = Array.from(modal.childNodes).filter(n => n.id !== 'rhModalTopBar');
+      children.forEach(c => wrap.appendChild(c));
+      modal.appendChild(wrap);
+    }
+  }
+
+  function openModal(serviceName, fieldsType) {
+    if (!overlay || !form) return;
+
+    injectFullPageStyles();
     injectCheckoutPanel();
 
     activeServiceName = serviceName;
     activeFieldsType = fieldsType || '';
 
-    modalTitle.textContent = 'Apply for: ' + serviceName;
-    modalSub.textContent = 'Package select করো তারপর Place Order করুন।';
-    serviceInput.value = serviceName;
     showFields(fieldsType || '');
     if (fieldsType === 'card') resetCardPricing();
     if (fieldsType === 'ff' && typeof window.ffSelectType === 'function') window.ffSelectType('diamond');
@@ -790,13 +921,33 @@
 
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
+    overlay.scrollTop = 0;
+
+    // Inject top bar after overlay is visible
+    requestAnimationFrame(() => ensureTopBar('Order: ' + serviceName));
+
+    // Push history state so browser back button closes modal
+    if (!window._rhModalHistoryPushed) {
+      window._rhModalHistoryPushed = true;
+      history.pushState({ rhModal: true }, '');
+    }
   }
 
   function closeModal() {
     if (!overlay) return;
     overlay.classList.remove('open');
     document.body.style.overflow = '';
+    window._rhModalHistoryPushed = false;
   }
+
+  // Browser back button support
+  window.addEventListener('popstate', function(e) {
+    if (overlay && overlay.classList.contains('open')) {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      window._rhModalHistoryPushed = false;
+    }
+  });
 
   /* ── iOS Panel Key Delivery ── */
   function _injectIosAnimStyles() {
