@@ -1118,7 +1118,13 @@
       await new Promise(r => setTimeout(r, 100));
     }
 
-    if (currentCredit !== null && currentCredit < amountUsd) {
+    if (currentCredit === null) {
+      // Balance still loading — do NOT redirect, just show error
+      showStatus('Balance load হয়নি। একটু অপেক্ষা করে আবার চেষ্টা করো।', 'error');
+      return;
+    }
+
+    if (currentCredit < amountUsd) {
       // Insufficient balance — redirect to add-credit
       showStatus(`Insufficient balance ($${currentCredit.toFixed(2)} / $${amountUsd.toFixed(2)}). Redirecting to Add Credit…`, 'error');
       setTimeout(() => {
@@ -1192,6 +1198,27 @@
     const url = `add-credit.html?mode=service&service=${encodeURIComponent(activeServiceName)}&usd=${encodeURIComponent(amountUsd)}`;
     window.location.href = url;
   }
+
+  // ── Info button ("এইটার কাজ কি?") click handler for services.html ──────────
+  document.querySelectorAll('.svc-info-btn[data-info-key]').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const key = this.dataset.infoKey;
+      const applyField = this.dataset.applyField || '';
+      const applyProapp = this.dataset.applyProapp || '';
+      if (!key || typeof window.openServiceInfo !== 'function') return;
+      window.openServiceInfo(key, function () {
+        if (applyProapp) {
+          const trigger = document.querySelector('[data-service][data-proapp="' + applyProapp + '"]');
+          if (trigger) { trigger.click(); return; }
+        }
+        const trigger = document.querySelector('[data-fields="' + applyField + '"]:not(.svc-info-btn)');
+        if (trigger) trigger.click();
+      });
+    });
+  });
+  // ────────────────────────────────────────────────────────────────────────────
 
   document.querySelectorAll('.service-apply-btn').forEach(btn => {
     btn.addEventListener('click', function (e) {
