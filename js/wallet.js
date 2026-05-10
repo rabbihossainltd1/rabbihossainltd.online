@@ -222,11 +222,87 @@ function adminOrderDetailsHtml(data) {
   const ffUid = getFreeFireUid(data);
   const productId = getFreeFireProductId(data);
   const providerOrderId = data?.providerOrderId || data?.fazercardsOrderId || "";
+  const serviceName = String(data?.serviceName || '').toLowerCase();
+  const fieldsType = String(details?.fieldsType || data?.serviceId || '').toLowerCase();
+
+  // iOS panel — don't touch, show minimal
+  if (fieldsType.includes('ffios') || serviceName.includes('iphone') || serviceName.includes('ios panel')) {
+    return `
+      ${ffUid ? `<p><b>Free Fire UID:</b> ${escapeHtml(ffUid)}</p>` : ""}
+      ${productId ? `<p><b>Product ID:</b> ${escapeHtml(productId)}</p>` : ""}
+      ${providerOrderId ? `<p><b>Provider Order ID:</b> ${escapeHtml(providerOrderId)}</p>` : ""}
+    `;
+  }
+
+  // Build formatted service detail cards
+  const rows = [];
+  const skip = new Set(['name','email','phone','service_type','source_page','fieldsType','_amount_usd','_user_uid','_user_email','_payment_method','_payment_status','_amount_bdt','couponCode','discountPercent','originalAmountUsd']);
+
+  // Priority fields shown first with nice labels
+  const labelMap = {
+    app_name: 'App / Service',
+    appName: 'App / Service',
+    plan_type: 'Plan',
+    planType: 'Plan',
+    plan_usd: 'Plan Price (USD)',
+    proapp_email: 'Account Email',
+    ff_uid: 'Free Fire UID',
+    freeFireUid: 'Free Fire UID',
+    playerId: 'Player ID',
+    packageName: 'Package',
+    productName: 'Package',
+    ff_drip_variant: 'Drip Variant',
+    ff_ff4x_variant: 'FF4X Variant',
+    ff_ios_variant: 'iOS Variant',
+    ff_pc_variant: 'PC Variant',
+    ff_brmods_variant: 'BR Mods Variant',
+    drip_email: 'Email',
+    ff4x_email: 'Email',
+    ios_email: 'Email',
+    pc_email: 'Email',
+    brmods_email: 'Email',
+    website_type: 'Website Type',
+    pages: 'Pages',
+    features: 'Features',
+    existing_url: 'Existing URL',
+    app_type: 'App Category',
+    target_type: 'Target Type',
+    fb_url: 'Facebook URL',
+    meta_type: 'Verification Type',
+    card_type: 'Card Type',
+    card_name: 'Name on Card',
+    card_address: 'Delivery Address',
+    card_price_package: 'Card Price',
+    autoTopupReady: 'Auto Topup',
+    provider: 'Provider',
+    isMembership: 'Membership',
+  };
+
+  const orderedKeys = Object.keys(labelMap).filter(k => details[k] !== undefined && details[k] !== '' && details[k] !== null);
+  const extraKeys   = Object.keys(details).filter(k => !skip.has(k) && !labelMap[k] && details[k] !== undefined && details[k] !== '' && details[k] !== null && typeof details[k] !== 'object');
+
+  const allKeys = [...orderedKeys, ...extraKeys];
+
+  allKeys.forEach(k => {
+    const label = labelMap[k] || k.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    let val = details[k];
+    if (typeof val === 'boolean') val = val ? 'Yes' : 'No';
+    rows.push(`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span style="min-width:130px;color:#5a7090;font-size:.78rem;font-weight:700;flex-shrink:0;">${escapeHtml(label)}</span>
+      <span style="color:#c8daf0;font-size:.82rem;word-break:break-all;">${escapeHtml(String(val))}</span>
+    </div>`);
+  });
+
+  if (!rows.length && !ffUid && !productId) return '';
+
   return `
-    ${ffUid ? `<p><b>Free Fire UID:</b> ${escapeHtml(ffUid)}</p>` : ""}
-    ${productId ? `<p><b>FazerCards Product ID:</b> ${escapeHtml(productId)}</p>` : ""}
-    ${providerOrderId ? `<p><b>Provider Order ID:</b> ${escapeHtml(providerOrderId)}</p>` : ""}
-    <div class="admin-details"><b>Order Details:</b><pre>${escapeHtml(JSON.stringify(details, null, 2))}</pre></div>
+    ${ffUid ? `<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="min-width:130px;color:#5a7090;font-size:.78rem;font-weight:700;flex-shrink:0;">Free Fire UID</span><span style="color:#00ff88;font-size:.88rem;font-weight:900;">${escapeHtml(ffUid)}</span></div>` : ""}
+    ${productId ? `<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="min-width:130px;color:#5a7090;font-size:.78rem;font-weight:700;flex-shrink:0;">Product ID</span><span style="color:#c8daf0;font-size:.82rem;">${escapeHtml(productId)}</span></div>` : ""}
+    ${providerOrderId ? `<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="min-width:130px;color:#5a7090;font-size:.78rem;font-weight:700;flex-shrink:0;">Provider Order ID</span><span style="color:#c8daf0;font-size:.82rem;">${escapeHtml(providerOrderId)}</span></div>` : ""}
+    ${rows.length ? `<div style="margin-top:10px;background:rgba(0,10,20,.35);border:1px solid rgba(0,200,255,.10);border-radius:12px;padding:4px 12px 2px;">
+      <div style="font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#2a5a7a;padding:8px 0 4px;">Order Details</div>
+      ${rows.join('')}
+    </div>` : ''}
   `;
 }
 
@@ -492,8 +568,21 @@ window._submitTopupInternal = async function({ method, transactionId, msgEl, btn
       updatedAt: serverTimestamp()
     };
 
+    // ── Duplicate transaction ID guard ──
+    const { doc: fsDoc2, setDoc: fsSetDoc2, getDoc: fsGetDoc2 } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+    const lockRef = fsDoc2(db, 'txnLocks', transactionId);
+    const lockSnap = await fsGetDoc2(lockRef);
+    if (lockSnap.exists()) {
+      const el = document.getElementById(msgEl);
+      if (el) { el.textContent = 'এই Transaction ID আগে ব্যবহার হয়েছে। একটি নতুন Transaction ID দিন।'; el.className = 'wallet-message error'; el.style.display = 'block'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Verify Payment'; }
+      return;
+    }
+    // Claim the txnId atomically
+    await fsSetDoc2(lockRef, { userId: user.uid, txnId: transactionId, createdAt: serverTimestamp() });
+
     const ref = await addDoc(collection(db, 'topups'), payload);
-    if (typeof onSuccess === 'function') onSuccess(ref.id);
+    if (typeof onSuccess === 'function') onSuccess(ref.id, { method, amountUsd, amountBdt, transactionId, userName: user.displayName || 'User', userEmail: user.email || '' });
   } catch (err) {
 
     const el = document.getElementById(msgEl);
@@ -863,9 +952,140 @@ window.declineTopup = async function (topupId) {
     });
     alert("Payment request declined.");
   } catch (error) {
-
     alert(error.message || "Decline failed.");
   }
+};
+
+// ── Payment Declined full-screen animation ──
+window.showPaymentDeclinedOverlay = function(reason) {
+  const old = document.getElementById('verifyOverlay');
+  if (old) old.remove();
+  if (!document.getElementById('rhDeclinedAnimStyle')) {
+    const s = document.createElement('style');
+    s.id = 'rhDeclinedAnimStyle';
+    s.textContent = `
+      @keyframes rhDecIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}
+      @keyframes rhDecRing{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+      @keyframes rhDecX{from{stroke-dashoffset:36}to{stroke-dashoffset:0}}
+      @keyframes rhDecShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+    `;
+    document.head.appendChild(s);
+  }
+  const ov = document.createElement('div');
+  ov.id = 'verifyOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(4,6,8,.97);backdrop-filter:blur(14px);padding:20px;';
+  ov.innerHTML = `
+    <div style="width:min(420px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
+      background:linear-gradient(180deg,rgba(255,60,60,.10) 0%,rgba(4,6,8,.97) 100%);
+      border:1px solid rgba(255,60,60,.32);
+      box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 60px rgba(255,60,60,.08);
+      animation:rhDecIn .5s cubic-bezier(.2,1,.2,1) both;">
+      <div style="position:relative;width:88px;height:88px;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;width:88px;height:88px;border-radius:50%;border:2px solid rgba(255,60,60,.28);animation:rhDecRing 1.8s ease-out infinite;"></div>
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,60,60,.12);border:2px solid rgba(255,60,60,.45);display:flex;align-items:center;justify-content:center;animation:rhDecShake .5s ease .2s both;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ff5050" stroke-width="2.5" stroke-linecap="round" style="stroke-dasharray:36;stroke-dashoffset:36;animation:rhDecX .45s ease .3s forwards;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </div>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:999px;background:rgba(255,60,60,.10);border:1px solid rgba(255,60,60,.28);color:#ffb0b0;font-size:.7rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#ff5050;display:inline-block;"></span>Payment Declined
+      </div>
+      <h2 style="font-size:1.55rem;color:#f0f0ff;margin:0 0 10px;font-weight:800;">Payment Declined</h2>
+      <p style="color:#8a9ab5;line-height:1.72;margin:0 0 16px;font-size:.93rem;">আপনার payment request decline করা হয়েছে।</p>
+      ${reason ? `<p style="color:#ff8080;font-size:.84rem;margin:0 0 20px;background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.18);border-radius:12px;padding:10px 14px;">${reason}</p>` : '<p style="color:#6a8090;font-size:.84rem;margin:0 0 20px;">সমস্যা হলে support এ যোগাযোগ করুন।</p>'}
+      <button type="button" onclick="window.location.href='add-credit.html'"
+        style="width:100%;border:none;border-radius:16px;padding:15px;background:linear-gradient(135deg,#ff5050,#ff8050);color:#fff;font-weight:900;font-size:.96rem;cursor:pointer;box-shadow:0 12px 32px rgba(255,60,60,.25);margin-bottom:10px;">
+        Try Again
+      </button>
+      <button type="button" onclick="window.location.href='dashboard.html'"
+        style="width:100%;border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px;background:rgba(255,255,255,.05);color:#8a9ab5;font-weight:800;font-size:.88rem;cursor:pointer;">
+        Go to Dashboard
+      </button>
+    </div>`;
+  document.body.appendChild(ov);
+};
+
+// ── Invoice PDF Generator ──
+window.downloadInvoice = function(data, docId) {
+  const d = data || {};
+  const amountUsd = Number(d.amountUsd || d.amountUSD || d.amount || 0);
+  const amountBdt = Number(d.amountBdt || d.amountBDT || Math.round(amountUsd * 125));
+  const method    = d.method || d.paymentMethod || 'N/A';
+  const txnId     = d.transactionId || d.orderId || docId || 'N/A';
+  const dateTs    = d.createdAt?.toMillis ? d.createdAt.toMillis() : (d.createdAt?.seconds||0)*1000;
+  const dateStr   = dateTs ? new Date(dateTs).toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : new Date().toLocaleString();
+  const userName  = d.userName || d.name || 'Customer';
+  const userEmail = d.userEmail || d.email || '';
+  const rate      = d.rate || d.rateBDT || 125;
+  const purpose   = d.purpose === 'service' ? (d.serviceName || 'Service Payment') : 'Wallet Credit Top-up';
+  const status    = (d.status || 'pending').toUpperCase();
+  const invNum    = 'INV-' + (docId || Date.now()).toString().slice(-8).toUpperCase();
+  const website   = 'rabbihossainltd.online';
+
+  // Build SVG invoice
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="595" height="842" viewBox="0 0 595 842" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="595" height="842" fill="#02050a"/>
+  <!-- Header band -->
+  <rect width="595" height="120" fill="#050d1a"/>
+  <rect width="595" height="3" y="120" fill="#00c8ff" opacity="0.5"/>
+  <!-- Company name -->
+  <text x="40" y="52" font-size="26" font-weight="bold" fill="#00c8ff" letter-spacing="1">RH Store</text>
+  <text x="40" y="74" font-size="11" fill="#7a8ca8">Operated by Md Rabbi Hossain</text>
+  <text x="40" y="92" font-size="10" fill="#4a6070">${website}</text>
+  <!-- INVOICE label -->
+  <text x="555" y="52" font-size="28" font-weight="bold" fill="#00ff88" text-anchor="end" letter-spacing="2">INVOICE</text>
+  <text x="555" y="72" font-size="11" fill="#7a8ca8" text-anchor="end">${invNum}</text>
+  <text x="555" y="90" font-size="10" fill="#4a6070" text-anchor="end">${dateStr}</text>
+  <!-- Status badge -->
+  <rect x="430" y="100" width="125" height="24" rx="12" fill="${status === 'APPROVED' || status === 'COMPLETED' ? '#003322' : status === 'DECLINED' ? '#220000' : '#1a1200'}" stroke="${status === 'APPROVED' || status === 'COMPLETED' ? '#00ff88' : status === 'DECLINED' ? '#ff5050' : '#ffa500'}" stroke-width="1"/>
+  <text x="492" y="116" font-size="10" font-weight="bold" fill="${status === 'APPROVED' || status === 'COMPLETED' ? '#00ff88' : status === 'DECLINED' ? '#ff5050' : '#ffa500'}" text-anchor="middle">${status}</text>
+  <!-- Billed To -->
+  <text x="40" y="160" font-size="10" font-weight="bold" fill="#4a6070" letter-spacing="1.5">BILLED TO</text>
+  <text x="40" y="180" font-size="14" font-weight="bold" fill="#d0eaff">${userName}</text>
+  <text x="40" y="198" font-size="11" fill="#7a8ca8">${userEmail}</text>
+  <!-- Divider -->
+  <line x1="40" y1="230" x2="555" y2="230" stroke="#0a1a2a" stroke-width="1"/>
+  <!-- Table header -->
+  <rect x="40" y="240" width="515" height="34" rx="6" fill="#050d1a"/>
+  <text x="56" y="262" font-size="10" font-weight="bold" fill="#7a8ca8" letter-spacing="1">DESCRIPTION</text>
+  <text x="360" y="262" font-size="10" font-weight="bold" fill="#7a8ca8" letter-spacing="1">METHOD</text>
+  <text x="490" y="262" font-size="10" font-weight="bold" fill="#7a8ca8" letter-spacing="1" text-anchor="end">AMOUNT</text>
+  <!-- Row -->
+  <rect x="40" y="282" width="515" height="50" rx="6" fill="#040b16"/>
+  <text x="56" y="304" font-size="12" font-weight="bold" fill="#e8edf5">${purpose}</text>
+  <text x="56" y="320" font-size="10" fill="#4a6070">Transaction: ${txnId}</text>
+  <text x="360" y="311" font-size="12" fill="#9ee8ff">${method}</text>
+  <text x="490" y="311" font-size="14" font-weight="bold" fill="#00ff88" text-anchor="end">$${amountUsd.toFixed(2)}</text>
+  <!-- Divider -->
+  <line x1="40" y1="342" x2="555" y2="342" stroke="#0a1a2a" stroke-width="1"/>
+  <!-- Rate info -->
+  <text x="40" y="368" font-size="10" fill="#4a6070">Exchange Rate: $1 = ৳${rate}</text>
+  <!-- Totals -->
+  <text x="390" y="368" font-size="11" fill="#7a8ca8">Subtotal (USD)</text>
+  <text x="555" y="368" font-size="13" font-weight="bold" fill="#e8edf5" text-anchor="end">$${amountUsd.toFixed(2)}</text>
+  <text x="390" y="392" font-size="11" fill="#7a8ca8">Amount (BDT)</text>
+  <text x="555" y="392" font-size="13" font-weight="bold" fill="#9ee8ff" text-anchor="end">৳${amountBdt.toLocaleString()}</text>
+  <line x1="380" y1="402" x2="555" y2="402" stroke="#0a2a3a" stroke-width="1"/>
+  <!-- Total -->
+  <rect x="370" y="410" width="185" height="38" rx="8" fill="#002a3a"/>
+  <text x="386" y="434" font-size="12" font-weight="bold" fill="#00c8ff">TOTAL PAID</text>
+  <text x="549" y="434" font-size="16" font-weight="bold" fill="#00ff88" text-anchor="end">$${amountUsd.toFixed(2)}</text>
+  <!-- Footer -->
+  <line x1="40" y1="790" x2="555" y2="790" stroke="#0a1a2a" stroke-width="1"/>
+  <text x="297" y="810" font-size="10" fill="#2a4a5a" text-anchor="middle">RH Store · ${website} · info@rabbihossainltd.online</text>
+  <text x="297" y="826" font-size="9" fill="#1a3040" text-anchor="middle">This is a computer-generated invoice. No signature required.</text>
+</svg>`;
+
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `RH-Store-Invoice-${invNum}.svg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 window.approveServiceOrder = async function (orderId) {
@@ -1091,6 +1311,9 @@ function loadDashboardTopups(user) {
       const svgCard = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>`;
       const svgKey  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="17" r="3"/><path d="M10.5 13.5 21 3"/><path d="M18 5l1 1"/><path d="M15 8l1 1"/></svg>`;
       const svgCal  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+      const svgInvoice = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>`;
+      const isApproved = ['approved','completed','accepted','confirmed'].includes(data.status || '');
+      const invoiceBtn = isApproved ? `<button type="button" onclick='window.downloadInvoice(${JSON.stringify({...data, createdAt: null, updatedAt: null}).replace(/'/g,"&#39;")}, "${docSnap.id}")' style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,200,255,.25);border-radius:10px;padding:7px 13px;background:rgba(0,200,255,.07);color:#9ee8ff;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;">${svgInvoice} Download Invoice</button>` : '';
       list.innerHTML += `
         <div class="dashboard-history-card premium-order-card">
           <div class="dashboard-history-head">
@@ -1105,6 +1328,7 @@ function loadDashboardTopups(user) {
             ${data.transactionId ? `<span>${svgKey} TX: ${escapeHtml(data.transactionId)}</span>` : ""}
             <span>${svgCal} ${dateStr}</span>
           </div>
+          ${invoiceBtn}
         </div>
       `;
     });
