@@ -751,6 +751,13 @@
                 clearTimeout(timeout);
                 if (unsub) try { unsub(); } catch(e){}
                 showApprovedTick(ov);
+              } else if (data && (data.status === 'declined' || data.status === 'cancelled' || data.status === 'rejected')) {
+                approved = true;
+                clearTimeout(timeout);
+                if (unsub) try { unsub(); } catch(e){}
+                if (typeof window.showPaymentDeclinedOverlay === 'function') {
+                  window.showPaymentDeclinedOverlay(data.declineReason || '');
+                }
               }
             });
           } catch(e) {
