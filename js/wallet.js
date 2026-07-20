@@ -1520,3 +1520,182 @@ window.cancelServiceOrderRequest = async function (orderId) {
   }
 };
 
+/* ==========================================================================
+ *  SPV AUTO-PAYMENT (frontend) — https://spv-services.web.app
+ *  The SPV API key lives on YOUR Render backend; the browser only ever talks
+ *  to your own backend, which talks to SPV. See spv-integration/backend/.
+ * ========================================================================== */
+
+const SPV_PENDING_KEY = "spvPendingIntent";
+const SPV_POLL_INTERVAL_MS = 4000;   // poll backend every 4s
+const SPV_POLL_MAX_MS = 6 * 60 * 1000; // give up to 6 min of active polling
+
+// Direct fetch to your own backend (bypasses backendRoute's path-encoding so it
+// matches the standard Express mount: app.use('/api/payment/spv', spvRoutes)).
+async function spvApiFetch(path, { method = "GET", body } = {}) {
+  const user = await waitForActiveUser(8000);
+  if (!user) {
+    const err = new Error("NOT_LOGGED_IN");
+    err.code = "NOT_LOGGED_IN";
+    throw err;
+  }
+  const token = await user.getIdToken(true);
+  const res = await fetch(BACKEND_API_BASE + path, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  let data = null;
+  try { data = await res.json(); }
+  catch (e) { data = { ok: false, message: "Invalid backend response." }; }
+  if (!res.ok || !data.ok) {
+    const err = new Error(data?.message || data?.error || ("Request failed (" + res.status + ")"));
+    err.code = data?.error || "BACKEND_ERROR";
+    err.response = data;
+    throw err;
+  }
+  return data;
+}
+
+function spvMsg(text, type = "info") {
+  const el = document.getElementById("spvAutoMsg");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "spv-auto-msg " + type;
+  el.style.display = "block";
+}
+function spvMsgClear() {
+  const el = document.getElementById("spvAutoMsg");
+  if (el) { el.textContent = ""; el.className = "spv-auto-msg"; el.style.display = "none"; }
+}
+
+function saveSpvPending(intent) {
+  try { sessionStorage.setItem(SPV_PENDING_KEY, JSON.stringify({ ...intent, ts: Date.now() })); } catch (e) {}
+}
+function loadSpvPending() {
+  try {
+    const raw = sessionStorage.getItem(SPV_PENDING_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    // Expire after 35 min (SPV checkout window is 30 min).
+    if (!data || !data.topupId || Date.now() - (data.ts || 0) > 35 * 60 * 1000) {
+      sessionStorage.removeItem(SPV_PENDING_KEY);
+      return null;
+    }
+    return data;
+  } catch (e) { return null; }
+}
+function clearSpvPending() {
+  try { sessionStorage.removeItem(SPV_PENDING_KEY); } catch (e) {}
+}
+
+let _spvPollTimer = null;
+function spvStopPolling() {
+  if (_spvPollTimer) { clearInterval(_spvPollTimer); _spvPollTimer = null; }
+}
+
+// Drives the backend to poll SPV. When SPV verifies, the backend credits the
+// user + flips the topup doc to 'approved'; the verifying overlay's Firestore
+// listener then shows the green tick. We also handle late approvals here.
+function spvStartPolling(topupId) {
+  spvStopPolling();
+  const started = Date.now();
+
+  _spvPollTimer = setInterval(async () => {
+    if (Date.now() - started > SPV_POLL_MAX_MS) { spvStopPolling(); return; }
+    try {
+      const data = await spvApiFetch("/api/payment/spv/status?topupId=" + encodeURIComponent(topupId));
+      const status = String(data.topupStatus || "").toLowerCase();
+
+      if (status === "approved" || status === "completed") {
+        spvStopPolling();
+        clearSpvPending();
+        // The overlay's Firestore listener will show the approved tick if it's
+        // still active; if the user already moved on, send them to their orders.
+        setTimeout(() => {
+          if (!document.getElementById("verifyOverlay")) {
+            location.href = "dashboard.html?tab=payments&spv=approved";
+          }
+        }, 1500);
+      } else if (["declined", "rejected", "cancelled", "expired"].includes(status)) {
+        spvStopPolling();
+        clearSpvPending();
+        if (typeof window.showPaymentDeclinedOverlay === "function") {
+          window.showPaymentDeclinedOverlay("SPV payment could not be verified.");
+        }
+      }
+    } catch (e) {
+      // Transient errors are fine; keep polling until timeout.
+    }
+  }, SPV_POLL_INTERVAL_MS);
+}
+
+// Main entry — wired to the "Auto Payment" button in add-credit.html.
+window.startSpvAutoPayment = async function () {
+  spvMsgClear();
+
+  const amountUsd = Number(window._currentSelectedUsd ? window._currentSelectedUsd() : 0) || 0;
+  if (!amountUsd || amountUsd < 1) {
+    spvMsg("Minimum $1 amount দিন, তারপর Auto Payment চাপুন।", "error");
+    showStep && showStep(1);
+    return;
+  }
+
+  // Login check.
+  const user = await waitForActiveUser(8000);
+  if (!user) {
+    spvMsg("আগে Login করুন, তারপর Auto Payment ব্যবহার করুন।", "error");
+    if (typeof openLoginOrHome === "function") openLoginOrHome();
+    return;
+  }
+
+  spvMsg("Secure SPV checkout খোলা হচ্ছে… (একটি নতুন ট্যাবে payment page আসবে)", "info");
+
+  try {
+    const data = await spvApiFetch("/api/payment/spv/create-intent", {
+      method: "POST",
+      body: { amountUsd }
+    });
+
+    if (!data.checkoutUrl) throw new Error("Checkout link পাওয়া যায়নি।");
+
+    saveSpvPending({ topupId: data.topupId, paymentId: data.paymentId, amountUsd });
+
+    // Open the SPV hosted checkout in a new tab; this page shows the verifying
+    // overlay and keeps polling until the payment auto-verifies.
+    window.open(data.checkoutUrl, "_blank", "noopener");
+
+    if (typeof window.showVerifyingOverlay === "function") {
+      window.showVerifyingOverlay(data.topupId);
+    }
+    spvStartPolling(data.topupId);
+    spvMsgClear();
+  } catch (err) {
+    if (err.code === "NOT_LOGGED_IN") {
+      spvMsg("আগে Login করুন।", "error");
+      if (typeof openLoginOrHome === "function") openLoginOrHome();
+    } else if (err.code === "SPV_NOT_CONFIGURED") {
+      spvMsg("Auto Payment এখনো চালু হয়নি (server এ SPV_API_KEY সেট করা হয়নি)। আপাতত নিচের Manual Mobile Banking ব্যবহার করুন।", "error");
+    } else {
+      spvMsg(err.message || "Auto Payment শুরু করা যায়নি। আবার চেষ্টা করুন।", "error");
+    }
+  }
+};
+
+// Resume an in-flight SPV payment if the user returns to this page.
+function spvResumeIfPending() {
+  const isAddCreditPage = !!document.getElementById("walletContent");
+  if (!isAddCreditPage) return;
+  const pending = loadSpvPending();
+  if (!pending) return;
+  if (typeof window.showVerifyingOverlay === "function") {
+    window.showVerifyingOverlay(pending.topupId);
+  }
+  spvStartPolling(pending.topupId);
+}
+// Run after the verifying overlay globals are defined by the page's inline script.
+setTimeout(spvResumeIfPending, 1200);
+

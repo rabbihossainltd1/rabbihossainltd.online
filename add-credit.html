@@ -237,6 +237,48 @@
     .safe-note{display:flex;align-items:center;justify-content:center;gap:7px;color:rgba(122,143,181,.5);font-size:.72rem;margin-top:16px;letter-spacing:.04em;}
     .safe-note svg{width:12px;height:12px;}
   </style>
+<style id="spv-auto-style">
+  /* ── SPV Auto Payment button ── */
+  .category-btn.auto.spv-auto{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg, rgba(0,232,122,.14), rgba(0,180,255,.10));
+    border:1px solid rgba(0,232,122,.35);
+    box-shadow:0 0 30px rgba(0,232,122,.12), 0 0 0 1px rgba(0,232,122,.06) inset;
+    position:relative;
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .category-btn.auto.spv-auto:hover{
+    border-color:rgba(0,232,122,.65);
+    box-shadow:0 0 42px rgba(0,232,122,.24);
+    transform:translateY(-2px);
+  }
+  .category-btn.auto.spv-auto .category-icon{
+    width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#00e87a,#00b4ff);border-radius:14px;color:#04121a;
+    box-shadow:0 8px 24px rgba(0,232,122,.3);
+  }
+  .category-btn.auto.spv-auto .category-icon svg{width:26px;height:26px;}
+  .category-btn.auto.spv-auto .category-label{
+    color:#eafff3;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .category-btn.auto.spv-auto .category-sub{color:rgba(160,240,190,.72);}
+  .spv-badge{
+    font-size:.58rem;font-weight:900;letter-spacing:.6px;padding:2px 8px;border-radius:999px;
+    background:rgba(0,232,122,.18);color:#00e87a;border:1px solid rgba(0,232,122,.4);
+  }
+  .spv-live-dot{
+    width:8px;height:8px;border-radius:50%;background:#00e87a;display:inline-block;
+    animation:spvPulse 1.6s infinite;
+  }
+  @keyframes spvPulse{
+    0%{box-shadow:0 0 0 0 rgba(0,232,122,.55);}
+    70%{box-shadow:0 0 0 9px rgba(0,232,122,0);}
+    100%{box-shadow:0 0 0 0 rgba(0,232,122,0);}
+  }
+  .spv-auto-msg{margin-top:14px;padding:12px 14px;border-radius:14px;font-size:.85rem;display:none;line-height:1.5;}
+  .spv-auto-msg.error{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.32);color:#ff9b9b;display:block;}
+  .spv-auto-msg.info{background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.32);color:#9bd6ff;display:block;}
+</style>
 <script src="js/no-inspect.js"></script>
 </head>
 
@@ -306,10 +348,20 @@
             </button>
             <div class="section-label"></div>
             <div class="category-grid">
+              <!-- SPV Auto Payment (instant auto-verify via SMS matching) -->
+              <button class="category-btn auto spv-auto" onclick="startSpvAutoPayment()">
+                <div class="category-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13l0-8Z"/></svg>
+                </div>
+                <div class="category-label">Auto Payment <span class="spv-badge">INSTANT</span> <span class="spv-live-dot"></span></div>
+                <div class="category-sub">bKash · Nagad · Rocket — auto-verified, no manual approval</div>
+              </button>
+              <div id="spvAutoMsg" class="spv-auto-msg"></div>
+
               <button class="category-btn mobile" onclick="showStep('3mobile')">
                 <div class="category-icon"><img src="images/mobile-bank.png" alt="Mobile Banking" /></div>
                 <div class="category-label">Mobile Banking</div>
-                <div class="category-sub">bKash · Nagad · Rocket</div>
+                <div class="category-sub">bKash · Nagad · Rocket (manual)</div>
               </button>
               <button class="category-btn crypto" onclick="showStep('3crypto')">
                 <div class="category-icon"><img src="images/crypto.png" alt="Crypto" /></div>
