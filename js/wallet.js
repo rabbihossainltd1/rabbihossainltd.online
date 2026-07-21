@@ -1610,45 +1610,52 @@ function spvToast(msg) {
   setTimeout(() => { t.style.transition = "opacity .4s"; t.style.opacity = "0"; setTimeout(() => t.remove(), 450); }, 3500);
 }
 
-function spvStartPolling(topupId, opts = {}) {
-  const silent = !!(opts && opts.silent);
-  spvStopPolling();
-  const started = Date.now();
+// Success screen + redirect — used when the customer returns to our site after
+// SPV has verified the payment. Reuses the green-tick screen from add-credit.html
+// (showApprovedTick), which then redirects to dashboard.html.
+function spvApprovedReturn() {
+  const old = document.getElementById("verifyOverlay");
+  if (old) old.remove();
+  if (typeof window.showApprovedTick === "function") {
+    const ov = document.createElement("div");
+    ov.className = "verify-overlay";
+    ov.id = "verifyOverlay";
+    document.body.appendChild(ov);
+    window.showApprovedTick(ov); // shows tick, then redirects to dashboard.html
+  } else {
+    location.href = "dashboard.html?tab=payments&spv=approved";
+  }
+}
 
-  _spvPollTimer = setInterval(async () => {
-    if (Date.now() - started > SPV_POLL_MAX_MS) { spvStopPolling(); return; }
+// Return-poller: checks the top-up once immediately (the common case — the
+// customer comes back after it's already verified), then keeps polling for the
+// fast-return case where verification is still in progress. Never blocks the UI.
+function spvStartPolling(topupId) {
+  spvStopPolling();
+
+  const check = async () => {
     try {
       const data = await spvApiFetch("/api/payment/spv/status?topupId=" + encodeURIComponent(topupId));
       const status = String(data.topupStatus || "").toLowerCase();
-
       if (status === "approved" || status === "completed") {
         spvStopPolling();
         clearSpvPending();
-        if (silent) {
-          // Background resume: don't block/redirect — just inform + let the
-          // live credit listener refresh the balance.
-          spvToast("Payment approved! Credit যোগ হয়েছে।");
-        } else {
-          // The overlay's Firestore listener shows the approved tick if it's
-          // still active; if the user already moved on, send them to orders.
-          setTimeout(() => {
-            if (!document.getElementById("verifyOverlay")) {
-              location.href = "dashboard.html?tab=payments&spv=approved";
-            }
-          }, 1500);
-        }
+        spvApprovedReturn();
       } else if (["declined", "rejected", "cancelled", "expired"].includes(status)) {
         spvStopPolling();
         clearSpvPending();
-        if (silent) {
-          spvToast("আগের একটি payment verify হয়নি।");
-        } else if (typeof window.showPaymentDeclinedOverlay === "function") {
-          window.showPaymentDeclinedOverlay("SPV payment could not be verified.");
-        }
+        spvToast("Payment verify হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।");
       }
     } catch (e) {
-      // Transient errors are fine; keep polling until timeout.
+      // transient — keep polling
     }
+  };
+
+  check();
+  const started = Date.now();
+  _spvPollTimer = setInterval(() => {
+    if (Date.now() - started > SPV_POLL_MAX_MS) { spvStopPolling(); return; }
+    check();
   }, SPV_POLL_INTERVAL_MS);
 }
 
@@ -1683,15 +1690,12 @@ window.startSpvAutoPayment = async function () {
 
     saveSpvPending({ topupId: data.topupId, paymentId: data.paymentId, amountUsd });
 
-    // Open the SPV hosted checkout in a new tab; this page shows the verifying
-    // overlay and keeps polling until the payment auto-verifies.
-    window.open(data.checkoutUrl, "_blank", "noopener");
-
-    if (typeof window.showVerifyingOverlay === "function") {
-      window.showVerifyingOverlay(data.topupId);
-    }
-    spvStartPolling(data.topupId);
+    // Follow SPV's intended pattern: send the customer to SPV's hosted checkout
+    // in the SAME tab (SPV shows its own payment + verification UI + receipt).
+    // When the customer returns to our site, spvResumeIfPending() detects the
+    // verified intent and redirects them to the dashboard (success).
     spvMsgClear();
+    window.location.href = data.checkoutUrl;
   } catch (err) {
     if (err.code === "NOT_LOGGED_IN" || err.code === "AUTH_REFRESH_FAILED") {
       spvMsg("Login session expire হয়েছে — অনুগ্রহ করে আবার login করুন।", "error");
@@ -1713,11 +1717,12 @@ function spvResumeIfPending() {
   if (!isAddCreditPage) return;
   const pending = loadSpvPending();
   if (!pending) return;
-  // Revisit after paying in another tab: poll SILENTLY in the background.
-  // Do NOT pop the blocking verifying overlay on page load (that's what made
-  // the "verifying" animation stick on the Add Credit page).
-  spvStartPolling(pending.topupId, { silent: true });
+  // Customer returned from SPV checkout (same-tab flow). If the intent is now
+  // verified, show the success screen + redirect to dashboard; if it's still
+  // pending, poll quietly (no blocking overlay) until it resolves.
+  spvStartPolling(pending.topupId);
 }
-// Run after the verifying overlay globals are defined by the page's inline script.
-setTimeout(spvResumeIfPending, 1200);
+// showApprovedTick (used on approved return) is defined by the page's inline
+// script, which runs before this module — a short delay is just a safety margin.
+setTimeout(spvResumeIfPending, 500);
 
