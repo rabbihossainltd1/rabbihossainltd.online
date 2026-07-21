@@ -1539,7 +1539,9 @@ async function spvApiFetch(path, { method = "GET", body } = {}) {
     err.code = "NOT_LOGGED_IN";
     throw err;
   }
-  const token = await user.getIdToken(true);
+  let token;
+  try { token = await user.getIdToken(true); }
+  catch (e) { const err = new Error("SESSION_EXPIRED"); err.code = "AUTH_REFRESH_FAILED"; throw err; }
   const res = await fetch(BACKEND_API_BASE + path, {
     method,
     headers: {
@@ -1674,13 +1676,16 @@ window.startSpvAutoPayment = async function () {
     spvStartPolling(data.topupId);
     spvMsgClear();
   } catch (err) {
-    if (err.code === "NOT_LOGGED_IN") {
-      spvMsg("আগে Login করুন।", "error");
+    if (err.code === "NOT_LOGGED_IN" || err.code === "AUTH_REFRESH_FAILED") {
+      spvMsg("Login session expire হয়েছে — অনুগ্রহ করে আবার login করুন।", "error");
       if (typeof openLoginOrHome === "function") openLoginOrHome();
     } else if (err.code === "SPV_NOT_CONFIGURED") {
-      spvMsg("Auto Payment এখনো চালু হয়নি (server এ SPV_API_KEY সেট করা হয়নি)। আপাতত নিচের Manual Mobile Banking ব্যবহার করুন।", "error");
+      spvMsg("Auto Payment এখনো চালু হয়নি। একটু পর চেষ্টা করুন।", "error");
     } else {
-      spvMsg(err.message || "Auto Payment শুরু করা যায়নি। আবার চেষ্টা করুন।", "error");
+      // Friendly message in UI (raw server errors like Firestore UNAUTHENTICATED
+      // are logged to console for debugging, not shown to the user).
+      spvMsg("Payment শুরু করা যায়নি। অনুগ্রহ করে একটু পর আবার চেষ্টা করুন।", "error");
+      console.error("[SPV] start error:", err && err.message ? err.message : err);
     }
   }
 };
