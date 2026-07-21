@@ -9,7 +9,7 @@
  *  - UI / design / pricing untouched
  */
 
-const IOS_PANEL_API = "https://rabbi-backend-vlr7.onrender.com/api/ios-panel-order";
+const IOS_PANEL_API = "https://rabbi-backend-production.up.railway.app/api/ios-panel-order";
 
 /**
  * Get a fresh Firebase ID token for the current user.

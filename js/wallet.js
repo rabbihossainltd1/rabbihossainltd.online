@@ -28,7 +28,7 @@ const PAYMENT_NUMBERS = {
 };
 
 const ADMIN_EMAILS = ["rabbihossainltd@gmail.com"];
-const BACKEND_API_BASE = "https://rabbi-backend-vlr7.onrender.com";
+const BACKEND_API_BASE = "https://rabbi-backend-production.up.railway.app";
 
 function backendRoute(path) {
   if (!path) return "/api/health";

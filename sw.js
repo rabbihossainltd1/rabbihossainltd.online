@@ -76,7 +76,7 @@ self.addEventListener('fetch', (event) => {
   if (url.hostname.includes('firebase')) return;
   if (url.hostname.includes('googleapis.com')) return;
   if (url.hostname.includes('gstatic.com')) return;
-  if (url.hostname.includes('onrender.com')) return;
+  if (url.hostname.includes('up.railway.app')) return;
   if (url.hostname.includes('formspree.io')) return;
 
   // For same-origin CSS, JS, images: cache-first

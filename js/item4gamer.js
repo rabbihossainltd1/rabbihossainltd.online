@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  const BACKEND_BASE           = 'https://rabbi-backend-vlr7.onrender.com';
+  const BACKEND_BASE           = 'https://rabbi-backend-production.up.railway.app';
   const FF_CATEGORY_ID         = 19;
   const BDT_FALLBACK_RATE      = 125;
   const MEMBERSHIP_IDS         = new Set(['155344', '155345']);
