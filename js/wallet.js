@@ -1712,15 +1712,41 @@ window.startSpvAutoPayment = async function () {
 };
 
 // Resume an in-flight SPV payment if the user returns to this page.
+// Read our embedded top-up id from the URL hash when SPV redirects the customer
+// back via returnUrl. Tolerates any query/params SPV may append, e.g.
+// "...add-credit.html#t=ID?status=verified" or "...?status=verified#t=ID".
+function getReturnTopupId() {
+  const fromHash = (() => {
+    const h = (location.hash || "").replace(/^#/, "");
+    const seg = (h.split(/[?&]/)[0] || "").trim();
+    const m = seg.match(/^t=(.+)$/);
+    return m ? decodeURIComponent(m[1]) : "";
+  })();
+  if (fromHash) return fromHash;
+  try {
+    const q = new URLSearchParams(location.search);
+    return q.get("t") || q.get("topup") || q.get("topupId") || "";
+  } catch (e) { return ""; }
+}
+
 function spvResumeIfPending() {
-  const isAddCreditPage = !!document.getElementById("walletContent");
-  if (!isAddCreditPage) return;
-  const pending = loadSpvPending();
-  if (!pending) return;
-  // Customer returned from SPV checkout (same-tab flow). If the intent is now
-  // verified, show the success screen + redirect to dashboard; if it's still
-  // pending, poll quietly (no blocking overlay) until it resolves.
-  spvStartPolling(pending.topupId);
+  if (!document.getElementById("walletContent")) return;
+
+  // 1) Returned via SPV returnUrl (hash carries the top-up id)?
+  let topupId = getReturnTopupId();
+  if (topupId) {
+    saveSpvPending({ topupId }); // keep the poller/consistency happy
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} // clean URL
+  } else {
+    // 2) Otherwise fall back to the intent saved before we left for SPV.
+    const pending = loadSpvPending();
+    topupId = pending ? pending.topupId : "";
+  }
+  if (!topupId) return;
+
+  // If verified -> success screen + redirect to dashboard; if still pending ->
+  // poll quietly (no blocking overlay) until it resolves.
+  spvStartPolling(topupId);
 }
 // showApprovedTick (used on approved return) is defined by the page's inline
 // script, which runs before this module — a short delay is just a safety margin.
