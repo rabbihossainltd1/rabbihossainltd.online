@@ -1602,7 +1602,16 @@ function spvStopPolling() {
 // Drives the backend to poll SPV. When SPV verifies, the backend credits the
 // user + flips the topup doc to 'approved'; the verifying overlay's Firestore
 // listener then shows the green tick. We also handle late approvals here.
-function spvStartPolling(topupId) {
+function spvToast(msg) {
+  const t = document.createElement("div");
+  t.textContent = msg;
+  t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(0,232,122,.95);color:#04121a;font-weight:800;font-size:.9rem;padding:12px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:99999;animation:fadeUp .3s ease both;max-width:90vw;text-align:center;";
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.transition = "opacity .4s"; t.style.opacity = "0"; setTimeout(() => t.remove(), 450); }, 3500);
+}
+
+function spvStartPolling(topupId, opts = {}) {
+  const silent = !!(opts && opts.silent);
   spvStopPolling();
   const started = Date.now();
 
@@ -1615,17 +1624,25 @@ function spvStartPolling(topupId) {
       if (status === "approved" || status === "completed") {
         spvStopPolling();
         clearSpvPending();
-        // The overlay's Firestore listener will show the approved tick if it's
-        // still active; if the user already moved on, send them to their orders.
-        setTimeout(() => {
-          if (!document.getElementById("verifyOverlay")) {
-            location.href = "dashboard.html?tab=payments&spv=approved";
-          }
-        }, 1500);
+        if (silent) {
+          // Background resume: don't block/redirect — just inform + let the
+          // live credit listener refresh the balance.
+          spvToast("Payment approved! Credit যোগ হয়েছে।");
+        } else {
+          // The overlay's Firestore listener shows the approved tick if it's
+          // still active; if the user already moved on, send them to orders.
+          setTimeout(() => {
+            if (!document.getElementById("verifyOverlay")) {
+              location.href = "dashboard.html?tab=payments&spv=approved";
+            }
+          }, 1500);
+        }
       } else if (["declined", "rejected", "cancelled", "expired"].includes(status)) {
         spvStopPolling();
         clearSpvPending();
-        if (typeof window.showPaymentDeclinedOverlay === "function") {
+        if (silent) {
+          spvToast("আগের একটি payment verify হয়নি।");
+        } else if (typeof window.showPaymentDeclinedOverlay === "function") {
           window.showPaymentDeclinedOverlay("SPV payment could not be verified.");
         }
       }
@@ -1696,10 +1713,10 @@ function spvResumeIfPending() {
   if (!isAddCreditPage) return;
   const pending = loadSpvPending();
   if (!pending) return;
-  if (typeof window.showVerifyingOverlay === "function") {
-    window.showVerifyingOverlay(pending.topupId);
-  }
-  spvStartPolling(pending.topupId);
+  // Revisit after paying in another tab: poll SILENTLY in the background.
+  // Do NOT pop the blocking verifying overlay on page load (that's what made
+  // the "verifying" animation stick on the Add Credit page).
+  spvStartPolling(pending.topupId, { silent: true });
 }
 // Run after the verifying overlay globals are defined by the page's inline script.
 setTimeout(spvResumeIfPending, 1200);

@@ -527,16 +527,32 @@
       const ov = document.createElement('div');
       ov.className = 'verify-overlay';
       ov.id = 'verifyOverlay';
-      ov.innerHTML = `
+
+      let unsub = null;
+      let approved = false;
+      let timeout = null;
+
+      // Global cleanup so the close (×) button can dismiss a stuck overlay.
+      window.__verifyCleanup = function(){
+        approved = true;
+        if (timeout) clearTimeout(timeout);
+        if (unsub) try { unsub(); } catch(e){}
+        const el = document.getElementById('verifyOverlay');
+        if (el) el.remove();
+      };
+
+      const closeBtn = `<button type="button" class="verify-close" aria-label="Close" onclick="window.__verifyCleanup&&window.__verifyCleanup()" style="position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">&times;</button>`;
+
+      ov.innerHTML = closeBtn + `
         <div class="verify-spinner-wrap">
           <div class="verify-pulse-ring"></div>
           <div class="verify-spinner"></div>
         </div>
         <div class="verify-title">Verifying Payment…</div>
-        <div class="verify-sub">আপনার payment request সফলভাবে submit হয়েছে।<br>সাধারণত <strong style="color:var(--pay-text);">1 minute</strong> এর মধ্যে verify হবে।</div>
+        <div class="verify-sub">Auto-verification চলছে — সাধারণত কয়েক সেকেন্ডের মধ্যে হয়ে যায়।</div>
         <div class="verify-eta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          Max wait time: 1 minute
+          SPV auto-verification in progress
         </div>
         <a href="dashboard.html?tab=payments" class="verify-orders-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
@@ -547,21 +563,19 @@
       if (!topupDocId) return;
 
       // Wait for wallet.js to expose _db/_onSnapshot (they load async as module)
-      let unsub = null;
-      let approved = false;
       const MAX_WAIT_MS = 60000; // 1 minute
       const started = Date.now();
 
-      // Auto-timeout after 1 min — show a friendly message
-      const timeout = setTimeout(() => {
+      // Auto-timeout after 1 min — show a friendly (non-admin) message
+      timeout = setTimeout(() => {
         if (approved) return;
         if (unsub) try { unsub(); } catch(e){}
-        ov.innerHTML = `
+        ov.innerHTML = closeBtn + `
           <div class="verify-spinner-wrap" style="opacity:.35;">
             <div class="verify-spinner"></div>
           </div>
           <div class="verify-title" style="color:var(--pay-muted);">Still Verifying…</div>
-          <div class="verify-sub">Admin এখনো verify করেননি। একটু পরে My Orders চেক করুন।</div>
+          <div class="verify-sub">Verification এখনো complete হয়নি। Payment সম্পন্ন হয়ে থাকলে একটু পরে My Orders চেক করুন।</div>
           <a href="dashboard.html?tab=payments" class="verify-orders-btn" style="margin-top:8px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5"/></svg>
             Go to My Orders
@@ -581,12 +595,12 @@
               const data = snap.data();
               if (data && (data.status === 'approved' || data.status === 'completed')) {
                 approved = true;
-                clearTimeout(timeout);
+                if (timeout) clearTimeout(timeout);
                 if (unsub) try { unsub(); } catch(e){}
                 showApprovedTick(ov);
               } else if (data && (data.status === 'declined' || data.status === 'cancelled' || data.status === 'rejected')) {
                 approved = true;
-                clearTimeout(timeout);
+                if (timeout) clearTimeout(timeout);
                 if (unsub) try { unsub(); } catch(e){}
                 if (typeof window.showPaymentDeclinedOverlay === 'function') {
                   window.showPaymentDeclinedOverlay(data.declineReason || '');
