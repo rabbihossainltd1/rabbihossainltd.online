@@ -946,3 +946,20 @@ html[data-theme="light"] .profile-control-btn {
   border: 1px solid rgba(0,0,0,.14) !important;
   color: #161616 !important;
 }
+
+/* Hamburger selected item — light, never a black pill */
+html[data-theme="light"] .nav-links.open a.active,
+html[data-theme="light"] .nav-links.open li a.active,
+html[data-theme="light"] .nav-links.open .customer-service-nav a.active {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1.5px solid #111111 !important;
+}
+html[data-theme="light"] .nav-links.open a.active .nav-icon,
+html[data-theme="light"] .nav-links.open a.active .nav-icon svg,
+html[data-theme="light"] .nav-links.open a.active svg,
+html[data-theme="light"] .nav-links.open a.active span {
+  background: #f0f0ee !important;
+  color: #111111 !important;
+  stroke: currentColor !important;
+}

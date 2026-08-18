@@ -155,3 +155,15 @@ html[data-theme="dark"] .nav-user-menu .profile-balance-info strong,
 html[data-theme="dark"] .nav-user-menu #profileMenuBalance {
   color: #ffffff !important;
 }
+
+html[data-theme="light"] .nav-links.open a.active {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1.5px solid #111111 !important;
+}
+html[data-theme="light"] .nav-links.open a.active .nav-icon,
+html[data-theme="light"] .nav-links.open a.active .nav-icon svg,
+html[data-theme="light"] .nav-links.open a.active span {
+  background: #f0f0ee !important;
+  color: #111111 !important;
+}
