@@ -37,7 +37,7 @@
   <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
   <style>
     .dashboard-page { min-height:100vh; padding:0; background:var(--bg-primary); }
-    .dashboard-wrap { max-width:100%; min-height:100vh; padding:120px 20px 80px; background:radial-gradient(circle at top right,rgba(255, 255, 255,.10),transparent 32%),radial-gradient(circle at bottom left,rgba(255, 255, 255,.07),transparent 28%),var(--bg-primary); }
+    .dashboard-wrap { max-width:100%; min-height:100vh; padding:calc(var(--nav-h) + 8px) 12px 110px; background:var(--bg-primary); }
     .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(255, 255, 255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); max-width:780px; margin:0 auto; }
     .dashboard-profile { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:18px; }
     .dashboard-avatar { width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#ffffff; color:#080808; font-family:var(--font-display); font-size:1.6rem; font-weight:900; overflow:hidden; border:2px solid rgba(255, 255, 255,.35); }
@@ -99,6 +99,30 @@
     .compact-balance .balance-plus-btn { justify-self:end; flex:0 0 auto; }
     @media(max-width:520px){ .dashboard-balance { padding:14px; } .dashboard-balance strong{font-size:1.15rem;} .compact-balance .balance-plus-btn{width:38px;height:38px;border-radius:12px;} }
 
+    /* Compact profile redesign — wins over v3 2-col leftovers */
+    .dashboard-wrap{width:100%!important;max-width:560px!important;margin:0 auto!important;padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+    #dashboardContent[style*="display: block"],
+    #dashboardContent:not([style*="display:none"]){display:flex!important;flex-direction:column!important;gap:10px!important}
+    .dashboard-card{max-width:560px!important;margin:0 auto!important;background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important}
+    .dashboard-profile{display:flex!important;grid-template-columns:none!important;align-items:center!important;gap:12px!important;text-align:left!important;padding:14px!important;margin:0!important;border-radius:16px!important}
+    .dashboard-avatar{width:52px!important;height:52px!important;flex:none;margin:0!important;font-size:1.15rem!important}
+    .dashboard-id{flex:1;min-width:0}
+    .dashboard-profile h2{font-size:1.05rem!important;margin:0 0 2px!important;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .dashboard-profile p{margin:0!important;font-size:.8rem!important}
+    .dash-icon-btn{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eee;display:grid;place-items:center;cursor:pointer}
+    .dashboard-balance{margin:0!important;padding:14px 16px!important;border-radius:16px!important}
+    .dashboard-balance strong{font-size:1.2rem!important}
+    .profile-control-panel{padding:10px!important;margin:0!important;border-radius:16px!important}
+    .profile-control-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;flex-direction:unset!important}
+    .profile-control-grid .profile-control-btn:last-child{grid-column:1/-1}
+    .profile-control-btn{display:flex!important;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 12px!important;border-radius:12px!important;font-size:.82rem!important;margin:0!important;flex-direction:row!important}
+    .profile-control-btn svg{flex:none;margin:0!important}
+    #supportTicketsPanel{margin-top:0!important;padding:12px!important;border-radius:16px!important}
+    html.orders-only-mode .dash-icon-btn{display:none}
+    @media(max-width:720px){
+      .dashboard-profile{grid-template-columns:none!important;text-align:left!important}
+      .dashboard-avatar{margin:0!important}
+    }
   </style>
   <style id="rh-bottom-nav-css">
     .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
@@ -146,15 +170,18 @@
       <div id="dashboardContent" class="dashboard-card" style="display:none;">
         <div class="dashboard-profile">
           <div class="dashboard-avatar" id="dashboardAvatar">U</div>
-          <div>
+          <div class="dashboard-id">
             <h2 id="dashboardName">User <span class="user-verify-badge" title="Verified Member" aria-label="Verified">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
     <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
     <path d="M7 12.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 </span></h2>
             <p id="dashboardEmail">Loading...</p>
           </div>
+          <button class="dash-icon-btn" type="button" aria-label="Settings" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
         </div>
 
         <div class="dashboard-balance compact-balance">
@@ -247,6 +274,10 @@
   import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
   import { collection, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 
+  window.openCustomerService = function() {
+    var toggle = document.getElementById('floatChatToggle');
+    if (toggle) toggle.click();
+  };
   window.toggleSupportTickets = function() {
     const panel = document.getElementById('supportTicketsPanel');
     const btn = document.getElementById('supportTicketsBtn');

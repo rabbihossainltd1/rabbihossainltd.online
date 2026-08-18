@@ -929,3 +929,13 @@ html[data-theme="light"] .nav-cta {
 @media (max-width: 899px) {
   .nav-cta { display: none !important; }
 }
+html[data-theme="light"] .dash-icon-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .profile-control-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+  color: #161616 !important;
+}
