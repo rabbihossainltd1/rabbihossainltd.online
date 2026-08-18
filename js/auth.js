@@ -636,7 +636,10 @@
     if (signOutBtn) signOutBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       localStorage.removeItem('rabbiLandingPopupSeen');
+      localStorage.removeItem('rh_user_cache');
       sessionStorage.setItem('rabbiShowLandingPopup', '1');
+      document.documentElement.classList.remove('rh-authed');
+      document.documentElement.classList.add('rh-guest');
       await authApi.signOut(auth);
       window.location.href = '/';
     });
@@ -752,9 +755,9 @@
     cm.innerHTML = `
       <div style="background:rgba(6,12,22,1);border:1px solid rgba(255, 255, 255,.2);border-radius:22px;padding:24px;width:min(400px,100%);display:flex;flex-direction:column;gap:16px;">
         <div style="font-weight:800;font-size:1rem;color:#f7f7f4;font-family:var(--font-display,'DM Sans',sans-serif);">Crop Profile Photo</div>
-        <div id="cropContainer" style="position:relative;width:100%;aspect-ratio:1/1;background:#0a0a09;border-radius:14px;overflow:hidden;">
-          <img id="cropImg" src="${src}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;cursor:move;user-select:none;transform-origin:center center;" draggable="false"/>
-          <div style="position:absolute;inset:12%;border:2.5px solid rgba(255, 255, 255,.75);border-radius:50%;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.58);"></div>
+        <div id="cropContainer" style="position:relative;width:100%;aspect-ratio:1/1;background:#0a0a09;border-radius:14px;overflow:hidden;touch-action:none;">
+          <img id="cropImg" src="${src}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;cursor:move;user-select:none;transform-origin:center center;will-change:transform;" draggable="false"/>
+          <div id="cropMask" style="position:absolute;inset:12%;border:2.5px solid rgba(255, 255, 255,.75);border-radius:50%;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.58);"></div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b8b87" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
@@ -767,48 +770,80 @@
       </div>`;
     document.body.appendChild(cm);
 
+    const box = cm.querySelector('#cropContainer');
     const img = cm.querySelector('#cropImg');
+    const mask = cm.querySelector('#cropMask');
     const zoomInput = cm.querySelector('#cropZoom');
-    let tx=0,ty=0,startX=0,startY=0,dragging=false,scale=1;
+    let tx = 0, ty = 0, startX = 0, startY = 0, dragging = false, scale = 1;
 
-    function updateTransform() {
-      img.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+    function applyTransform() {
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
     }
 
-    zoomInput.addEventListener('input', () => { scale = zoomInput.value/100; updateTransform(); });
+    zoomInput.addEventListener('input', () => {
+      scale = Number(zoomInput.value) / 100;
+      applyTransform();
+    });
 
-    img.addEventListener('pointerdown', e => {
-      dragging=true; startX=e.clientX-tx; startY=e.clientY-ty;
-      img.setPointerCapture(e.pointerId);
-    });
-    img.addEventListener('pointermove', e => {
+    function onDown(e) {
+      dragging = true;
+      startX = e.clientX - tx;
+      startY = e.clientY - ty;
+      try { box.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    function onMove(e) {
       if (!dragging) return;
-      tx=e.clientX-startX; ty=e.clientY-startY; updateTransform();
-    });
-    img.addEventListener('pointerup', () => { dragging=false; });
+      tx = e.clientX - startX;
+      ty = e.clientY - startY;
+      applyTransform();
+    }
+    function onUp() { dragging = false; }
+    box.addEventListener('pointerdown', onDown);
+    box.addEventListener('pointermove', onMove);
+    box.addEventListener('pointerup', onUp);
+    box.addEventListener('pointercancel', onUp);
 
     cm.querySelector('#cropCancel').addEventListener('click', () => cm.remove());
 
     cm.querySelector('#cropApply').addEventListener('click', () => {
+      const nw = img.naturalWidth || 1;
+      const nh = img.naturalHeight || 1;
+      const boxRect = box.getBoundingClientRect();
+      const maskRect = mask.getBoundingClientRect();
+      const bw = boxRect.width;
+      const bh = boxRect.height;
+      const contain = Math.min(bw / nw, bh / nh);
+      const baseW = nw * contain;
+      const baseH = nh * contain;
+      const originX = boxRect.left + bw / 2;
+      const originY = boxRect.top + bh / 2;
+      const baseLeft = boxRect.left + (bw - baseW) / 2;
+      const baseTop = boxRect.top + (bh - baseH) / 2;
+
+      function toNatural(sx, sy) {
+        const ux = originX + (sx - originX - tx) / scale;
+        const uy = originY + (sy - originY - ty) / scale;
+        return { x: (ux - baseLeft) / contain, y: (uy - baseTop) / contain };
+      }
+
+      const p0 = toNatural(maskRect.left, maskRect.top);
+      const p1 = toNatural(maskRect.right, maskRect.bottom);
+      let sx = p0.x, sy = p0.y, sw = p1.x - p0.x, sh = p1.y - p0.y;
+      if (sx < 0) { sw += sx; sx = 0; }
+      if (sy < 0) { sh += sy; sy = 0; }
+      if (sx + sw > nw) sw = nw - sx;
+      if (sy + sh > nh) sh = nh - sy;
+      if (sw < 1 || sh < 1) { sx = 0; sy = 0; sw = nw; sh = nh; }
+
       const size = 300;
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = size;
       const ctx = canvas.getContext('2d');
-      ctx.beginPath(); ctx.arc(size/2,size/2,size/2,0,Math.PI*2); ctx.clip();
-
-      const container = cm.querySelector('#cropContainer');
-      const circleEl = container.children[1];
-      const imgRect = img.getBoundingClientRect();
-      const circRect = circleEl.getBoundingClientRect();
-
-      const ratioX = img.naturalWidth / imgRect.width * (1/scale) * scale;
-      const ratioY = img.naturalHeight / imgRect.height * (1/scale) * scale;
-      const sx = (circRect.left - imgRect.left) / scale * (img.naturalWidth / imgRect.width);
-      const sy = (circRect.top  - imgRect.top)  / scale * (img.naturalHeight / imgRect.height);
-      const sw = circRect.width  / scale * (img.naturalWidth / imgRect.width);
-      const sh = circRect.height / scale * (img.naturalHeight / imgRect.height);
-
-      ctx.drawImage(img, Math.max(0,sx), Math.max(0,sy), Math.max(1,sw), Math.max(1,sh), 0, 0, size, size);
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
       const cropped = canvas.toDataURL('image/jpeg', 0.9);
 
       const preview = document.getElementById('settingsAvatarPreview');
@@ -1303,7 +1338,9 @@
             else await new Promise(function (r) { setTimeout(r, 1200); });
           } catch (e) {}
           if (auth.currentUser) return;
-          try { localStorage.removeItem('rh_user_cache'); } catch (e) {}
+          await new Promise(function (r) { setTimeout(r, 800); });
+          if (auth.currentUser) return;
+          // Keep cache — a false-null must not wipe instant-login on the next tap.
         }
         currentUserData = null;
         currentIsAdmin = false;
@@ -1396,10 +1433,17 @@
     if (navUserAvatar) {
       navUserAvatar.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!currentUser) { openLoginModal(); return; }
+        const cache = cachedAuth();
+        const optimistic = currentUser || (cache && cache.uid ? {
+          uid: cache.uid,
+          displayName: cache.displayName || '',
+          email: cache.email || '',
+          photoURL: cache.photoURL || ''
+        } : null);
+        if (!optimistic) { openLoginModal(); return; }
         const menu = createProfileMenu(auth);
         if (!menu) return;
-        updateProfileMenu(currentUser, currentUserData || {});
+        updateProfileMenu(currentUser || optimistic, currentUserData || {});
         menu.classList.toggle('open');
         document.addEventListener('click', () => menu.classList.remove('open'), { once: true });
       });

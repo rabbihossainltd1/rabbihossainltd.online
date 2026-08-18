@@ -147,7 +147,7 @@ function statusClass(status) {
   const value = String(status || "pending").toLowerCase();
   if (["approved", "accepted", "confirmed", "completed", "delivered"].includes(value)) return "approved";
   if (["processing", "paid_credit_pending_review", "paid_instant_pending_review"].includes(value)) return "processing";
-  if (["declined", "cancelled", "rejected", "failed"].includes(value)) return value;
+  if (["declined", "cancelled", "rejected", "failed", "expired"].includes(value)) return value === "expired" ? "declined" : value;
   return "pending";
 }
 
@@ -160,6 +160,7 @@ function statusLabel(status) {
   if (value === "declined" || value === "rejected") return "Declined";
   if (value === "failed") return "Failed";
   if (value === "cancelled") return "Cancelled";
+  if (value === "expired") return "Expired";
   return "Pending";
 }
 
@@ -1191,6 +1192,59 @@ function trackOrderNotification(orderId, data) {
   }
 }
 
+const TOPUP_EXPIRE_MS = 30 * 60 * 1000;
+const ORDER_EXPIRE_MS = 10 * 60 * 1000;
+const _expireTried = {};
+
+function isPendingStatus(status) {
+  const v = String(status || '').toLowerCase();
+  return v === 'pending' || v === 'paid_credit_pending_review' || v === 'paid_instant_pending_review';
+}
+
+function applyTimeoutStatus(item) {
+  if (!item || !item.ts || !isPendingStatus(item.status)) return item;
+  const age = Date.now() - item.ts;
+  if (item.kind === 'topup' && String(item.data && item.data.purpose || '') !== 'service') {
+    if (age >= TOPUP_EXPIRE_MS) item.status = 'expired';
+  } else if (age >= ORDER_EXPIRE_MS) {
+    item.status = 'expired';
+  }
+  return item;
+}
+
+async function expireStaleItems(list) {
+  for (const item of list) {
+    if (!item || !item.ts) continue;
+    const original = String((item.data && item.data.status) || item.status || '').toLowerCase();
+    if (!isPendingStatus(original)) continue;
+    const age = Date.now() - item.ts;
+    const key = item.kind + ':' + item.id;
+    if (_expireTried[key]) continue;
+    if (item.kind === 'topup' && String(item.data && item.data.purpose || '') !== 'service') {
+      if (age < TOPUP_EXPIRE_MS) continue;
+      _expireTried[key] = 1;
+      try {
+        await updateDoc(doc(db, 'topups', item.id), {
+          status: 'expired',
+          expiredAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          failReason: 'Expired after 30 minutes'
+        });
+      } catch (e) {
+        try { await apiPost('/api/decline-topup', { topupId: item.id, reason: 'Expired after 30 minutes' }); } catch (e2) {}
+      }
+    } else {
+      if (age < ORDER_EXPIRE_MS) continue;
+      _expireTried[key] = 1;
+      try {
+        await apiPost('/api/decline-order', { orderId: item.id, reason: 'Auto-cancelled after 10 minutes' });
+      } catch (e) {
+        try { await apiPost('/api/expire-pending', { orderId: item.id }); } catch (e2) {}
+      }
+    }
+  }
+}
+
 function loadOrdersUnified(user) {
   const root = document.getElementById("ordersRoot");
   if (!root) return;
@@ -1217,7 +1271,7 @@ function loadOrdersUnified(user) {
 
   function statusKey(status) {
     const sc = statusClass(status);
-    if (["declined", "cancelled", "failed", "rejected"].includes(sc)) return "declined";
+    if (["declined", "cancelled", "failed", "rejected", "expired"].includes(sc)) return "declined";
     return sc;
   }
 
@@ -1342,7 +1396,7 @@ function loadOrdersUnified(user) {
   }
 
   function render() {
-    const all = serviceOrders.concat(topups);
+    const all = serviceOrders.concat(topups).map((i) => applyTimeoutStatus(i));
     let items = all.filter(i => activeFilter === "all" ? true : statusKey(i.status) === activeFilter);
     if (activeQuery) {
       const q = activeQuery.toLowerCase();
@@ -1397,8 +1451,9 @@ function loadOrdersUnified(user) {
         (snap) => {
           const arr = [];
           snap.forEach(d => arr.push(normalizeOrder(d.id, d.data() || {})));
-          arr.forEach(o => trackOrderNotification(o.id, o.data));
+          arr.forEach(o => { applyTimeoutStatus(o); trackOrderNotification(o.id, o.data); });
           serviceOrders = arr;
+          expireStaleItems(arr);
           render();
         },
         (err) => {
@@ -1416,8 +1471,9 @@ function loadOrdersUnified(user) {
         query(collection(db, "topups"), where("userId", "==", user.uid), limit(100)),
         (snap) => {
           const arr = [];
-          snap.forEach(d => arr.push(normalizeTopup(d.id, d.data() || {})));
+          snap.forEach(d => arr.push(applyTimeoutStatus(normalizeTopup(d.id, d.data() || {}))));
           topups = arr;
+          expireStaleItems(arr);
           render();
         },
         (err) => {
@@ -1592,14 +1648,10 @@ window.cancelTopupRequest = async function (topupId) {
 
 window.cancelServiceOrderRequest = async function (orderId) {
   if (!currentUser) return;
-  if (!confirm("Cancel this pending service order?")) return;
+  if (!confirm("Cancel this pending service order? Wallet credit will be refunded.")) return;
 
   try {
-    await updateDoc(doc(db, "serviceOrders", orderId), {
-      status: "cancelled",
-      cancelledAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+    await apiPost("/api/decline-order", { orderId, reason: "Cancelled by user" });
   } catch (error) {
     alert(error.message || "Unable to cancel order.");
   }
@@ -1847,4 +1899,5 @@ function spvResumeIfPending() {
 // showApprovedTick (used on approved return) is defined by the page's inline
 // script, which runs before this module — a short delay is just a safety margin.
 setTimeout(spvResumeIfPending, 500);
+
 

@@ -270,7 +270,55 @@
     if (t) t.textContent = window.RhCart.formatUsd(total) + ' / ' + window.RhCart.formatBdt(total);
   }
 
-  // ── Open checkout (new tab) ───────────────────────────────
+  var payMethod = 'balance';
+  var payItems = [];
+
+  function setPayMsg(text, cls) {
+    var m = document.getElementById('cartPayMsg');
+    if (!m) return;
+    m.textContent = text || '';
+    m.className = 'cart-msg' + (cls ? ' ' + cls : '');
+  }
+
+  function showPayView(on) {
+    var shop = document.getElementById('cartShopView');
+    var pay = document.getElementById('cartPayView');
+    if (shop) shop.hidden = !!on;
+    if (pay) pay.hidden = !on;
+  }
+
+  function renderPayView(chosen) {
+    payItems = chosen.slice();
+    var list = document.getElementById('cartPayItems');
+    var sub = 0;
+    if (list) {
+      list.innerHTML = chosen.map(function (it) {
+        var qty = Number(it.qty) || 1;
+        var line = (Number(it.amountUsd) || 0) * qty;
+        sub += line;
+        return '<div class="checkout-item">' +
+          (it.image ? '<img src="' + esc(it.image) + '" alt="">' : '') +
+          '<div class="ci-body"><div class="ci-title">' + esc(it.title) + '</div>' +
+          '<div class="ci-meta">' + (qty > 1 ? esc(qty) + ' × ' : '') + esc(window.RhCart.formatUsd(it.amountUsd)) + '</div></div>' +
+          '<div class="ci-price">' + esc(window.RhCart.formatUsd(line)) + ' / ' + esc(window.RhCart.formatBdt(line)) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+    var st = document.getElementById('cartPaySubtotal');
+    if (st) st.textContent = window.RhCart.formatUsd(sub) + ' / ' + window.RhCart.formatBdt(sub);
+    var lbl = document.getElementById('cartPayNowLabel');
+    if (lbl) lbl.textContent = 'Pay Now (' + window.RhCart.formatBdt(sub) + ')';
+    setPayMsg('', '');
+  }
+
+  function selectPay(m) {
+    payMethod = m;
+    var b = document.getElementById('cartPayBalance');
+    var i = document.getElementById('cartPayInstant');
+    if (b) b.classList.toggle('sel', m === 'balance');
+    if (i) i.classList.toggle('sel', m === 'instant');
+  }
+
   function openCheckout() {
     var items = window.RhCart ? window.RhCart.get() : [];
     var ids = selectedIds();
@@ -281,23 +329,85 @@
       if (dm) { dm.textContent = '"' + draft.title + '" select a plan first.'; dm.className = 'cart-msg error'; }
       return;
     }
-
     if (!chosen.length) {
       var msg = document.getElementById('cartCheckoutMsg');
       if (msg) { msg.textContent = 'Select at least one product.'; msg.className = 'cart-msg error'; }
       return;
     }
-    if (!loggedIn()) {
+    if (!loggedIn() && !hasCached()) {
       window.rabbiAuth && window.rabbiAuth.openLogin && window.rabbiAuth.openLogin('cart');
       var m2 = document.getElementById('cartCheckoutMsg');
       if (m2) { m2.textContent = 'Login to checkout.'; m2.className = 'cart-msg error'; }
       return;
     }
+    renderPayView(chosen);
+    showPayView(true);
+  }
 
-    try { localStorage.setItem('rh_cart_checkout', JSON.stringify(chosen)); } catch (e) {}
+  async function placeAll() {
+    var btn = document.getElementById('cartPayNowBtn');
+    var done = [], failed = [];
+    for (var i = 0; i < payItems.length; i++) {
+      var it = payItems[i];
+      setPayMsg('Placing order: ' + it.title + ' (' + (i + 1) + '/' + payItems.length + ')…', 'info');
+      try {
+        var res = await window.buyServiceWithCredit({
+          serviceName: it.serviceName || 'Service',
+          serviceId: it.serviceId || 'service',
+          amountUsd: (Number(it.amountUsd) || 0) * (Number(it.qty) || 1),
+          details: it.details || {}
+        });
+        if (res && res.ok) done.push(it.id);
+        else failed.push(it.title);
+      } catch (e) {
+        failed.push(it.title);
+      }
+    }
+    if (failed.length) setPayMsg(failed.length + ' order(s) failed: ' + failed.join(', '), 'error');
+    else setPayMsg('All orders placed successfully.', 'success');
+    if (done.length && window.RhCart) window.RhCart.removeMany(done);
+    if (btn) btn.disabled = false;
+    if (!failed.length) setTimeout(function () { window.location.href = '/dashboard/?tab=orders'; }, 1200);
+  }
 
-    var win = window.open('/cart/checkout/', '_blank', 'noopener');
-    if (!win) window.location.href = '/cart/checkout/';
+  async function payNow() {
+    if (!payItems.length) { setPayMsg('Checkout list is empty.', 'error'); return; }
+    if (!window.buyServiceWithCredit) { setPayMsg('Payment engine not loaded — please refresh.', 'error'); return; }
+    if (!loggedIn()) {
+      window.rabbiAuth && window.rabbiAuth.openLogin && window.rabbiAuth.openLogin('cart');
+      setPayMsg('Login to checkout.', 'error');
+      return;
+    }
+    var btn = document.getElementById('cartPayNowBtn');
+    if (btn) btn.disabled = true;
+    if (payMethod === 'balance') {
+      await placeAll();
+      return;
+    }
+    var subtotalUsd = payItems.reduce(function (s, i) { return s + (Number(i.amountUsd) || 0) * (Number(i.qty) || 1); }, 0);
+    setPayMsg('Preparing payment link…', 'info');
+    try {
+      var user = window.rabbiAuth && window.rabbiAuth.getUser && window.rabbiAuth.getUser();
+      if (!user || typeof user.getIdToken !== 'function') throw new Error('NOT_LOGGED_IN');
+      var token = await user.getIdToken(true);
+      var res = await fetch('https://rabbi-backend-production.up.railway.app/api/payment/spv/create-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ amountUsd: subtotalUsd })
+      });
+      var data = null;
+      try { data = await res.json(); } catch (e) { data = {}; }
+      if (!res.ok || !data.ok || !data.checkoutUrl) throw new Error(data.message || 'NO_CHECKOUT_URL');
+      try {
+        sessionStorage.setItem('rhCartPendingPayment', JSON.stringify({
+          items: payItems, amountUsd: subtotalUsd, topupId: data.topupId, paymentId: data.paymentId
+        }));
+      } catch (e) {}
+      window.location.href = data.checkoutUrl;
+    } catch (err) {
+      if (btn) btn.disabled = false;
+      setPayMsg('Could not start Instant Pay. Use Balance Pay.', 'error');
+    }
   }
 
   // wire
@@ -307,6 +417,17 @@
   });
   var checkoutBtn = document.getElementById('cartCheckoutBtn');
   if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckout);
+  var backBtn = document.getElementById('cartPayBack');
+  if (backBtn) backBtn.addEventListener('click', function () { showPayView(false); render(); });
+  var bBtn = document.getElementById('cartPayBalance');
+  var iBtn = document.getElementById('cartPayInstant');
+  if (bBtn) bBtn.addEventListener('click', function () { selectPay('balance'); });
+  if (iBtn) iBtn.addEventListener('click', function () { selectPay('instant'); });
+  var payNowBtn = document.getElementById('cartPayNowBtn');
+  if (payNowBtn) payNowBtn.addEventListener('click', payNow);
+  if (new URLSearchParams(location.search).get('pay') === '1') {
+    setTimeout(openCheckout, 80);
+  }
 
   window.addEventListener('rh:cart', render);
   // Cross-tab sync: if the checkout page (in another tab) configures an item.
