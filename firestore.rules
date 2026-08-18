@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function own(uid) { return signedIn() && request.auth.uid == uid; }
+    function adminClaim() {
+      return signedIn() && (request.auth.token.admin == true || request.auth.token.role == 'admin');
+    }
+    function adminDocument() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active != false;
+    }
+    function isAdmin() { return adminClaim() || adminDocument(); }
+
+    match /users/{uid} {
+      allow get: if own(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if own(uid)
+        && request.resource.data.credit == 0
+        && request.resource.data.creditUSD == 0
+        && request.resource.data.creditBDT == 0;
+      allow update: if own(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['name', 'photoURL', 'email', 'updatedAt']);
+      allow update, delete: if isAdmin();
+    }
+
+    match /admins/{uid} {
+      allow get: if own(uid) || isAdmin();
+      allow list, create, update, delete: if isAdmin();
+    }
+
+    match /topups/{topupId} {
+      allow get: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if signedIn() && (isAdmin() || request.query.limit <= 100);
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.amountUsd is number
+        && request.resource.data.amountUsd >= 1
+        && request.resource.data.amountUsd <= 1000;
+      allow update, delete: if false;
+    }
+
+    match /serviceOrders/{orderId} {
+      allow get: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if signedIn() && (isAdmin() || request.query.limit <= 100);
+      allow create, update, delete: if false;
+    }
+
+    match /orders/{orderId} {
+      allow get: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if signedIn() && (isAdmin() || request.query.limit <= 100);
+      allow create, update, delete: if false;
+    }
+
+    match /walletLedger/{entryId} {
+      allow get: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if signedIn() && (isAdmin() || request.query.limit <= 100);
+      allow create, update, delete: if false;
+    }
+
+    match /iosKeyPool/{variant}/keys/{keyId} {
+      allow read, write: if false;
+    }
+    match /iosOrders/{orderId} {
+      allow get: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if signedIn() && (isAdmin() || request.query.limit <= 100);
+      allow create, update, delete: if false;
+    }
+    match /iosKeyCounters/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /txnLocks/{lockId} {
+      allow get: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && !exists(/databases/$(database)/documents/txnLocks/$(lockId));
+      allow update, delete, list: if false;
+    }
+
+    match /coupons/{code} {
+      allow get: if signedIn();
+      allow list, create, update, delete: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 1200;
+      allow update, delete: if signedIn() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /supportRooms/{uid} {
+      allow read: if own(uid) || isAdmin();
+      allow create: if own(uid) && request.resource.data.userId == uid;
+      allow update: if own(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /supportChats/{uid}/messages/{messageId} {
+      allow read: if own(uid) || isAdmin();
+      allow create: if (own(uid) && request.resource.data.role == 'user')
+        || (isAdmin() && request.resource.data.role == 'admin');
+      allow update, delete: if false;
+    }
+    match /supportTickets/{ticketId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /ffProducts/{productId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

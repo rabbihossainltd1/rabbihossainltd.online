@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /dashboard
+Disallow: /dashboard.html
+Disallow: /add-credit
+Disallow: /add-credit.html
+Disallow: /checkout
+Disallow: /checkout.html
+Disallow: /keys/
+
+Sitemap: https://rabbihossainltd.online/sitemap.xml

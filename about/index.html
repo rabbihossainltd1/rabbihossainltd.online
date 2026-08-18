@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About MD Rabbi Hossain | RabbiHossainLTD</title>
+  <meta name="description" content="Learn about MD Rabbi Hossain, the operator of RabbiHossainLTD and its web development and digital service work." />
+  <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+
+
+  <meta name="theme-color" content="#090909">
+  <link rel="canonical" href="https://rabbihossainltd.online/about/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RabbiHossainLTD">
+  <meta property="og:locale" content="bn_BD">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:title" content="About MD Rabbi Hossain | RabbiHossainLTD">
+  <meta property="og:description" content="Learn about MD Rabbi Hossain, the operator of RabbiHossainLTD and its web development and digital service work.">
+  <meta property="og:url" content="https://rabbihossainltd.online/about/">
+  <meta property="og:image" content="https://rabbihossainltd.online/images/og/about.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="About MD Rabbi Hossain | RabbiHossainLTD">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About MD Rabbi Hossain | RabbiHossainLTD">
+  <meta name="twitter:description" content="Learn about MD Rabbi Hossain, the operator of RabbiHossainLTD and its web development and digital service work.">
+  <meta name="twitter:image" content="https://rabbihossainltd.online/images/og/about.png">
+  <script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://rabbihossainltd.online/"}, {"@type": "ListItem", "position": 2, "name": "About", "item": "https://rabbihossainltd.online/about/"}]}
+  </script>
+  <link rel="alternate" hreflang="bn-BD" href="https://rabbihossainltd.online/about/">
+  <link rel="alternate" hreflang="en" href="https://rabbihossainltd.online/about/">
+  <link rel="alternate" hreflang="x-default" href="https://rabbihossainltd.online/about/">
+</head>
+<body class="has-bottom-nav">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" role="navigation" aria-label="Main navigation" style="position:relative;z-index:100;">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">RabbiHossainLTD</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks" role="list">
+      <li><a href="/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg></span>Home</a></li>
+      <li><a href="/services/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg></span>Services</a></li>
+      <li><a href="/portfolio/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg></span>Portfolio</a></li>
+      <li><a href="/about/" class="active"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>About</a></li>
+    </ul>
+    <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<main id="main-content" class="about-page-v3">
+  <section class="about-intro">
+    <div class="about-intro-copy">
+      <p class="eyebrow">Founder &amp; operator</p>
+      <h1>MD Rabbi<br>Hossain</h1>
+      <p class="about-lead">I work on web development, digital services and technical support from Bangladesh. The goal is simple — the work should look clean, be easy to use, and deliver real results.</p>
+      <div class="about-actions">
+        <a class="btn btn-primary" href="/services/">My services</a>
+        <a class="btn btn-secondary" href="mailto:info@rabbihossainltd.online">Get in touch</a>
+      </div>
+    </div>
+    <figure class="about-portrait-wrap">
+      <img src="/images/rabbihossainltd.png" alt="MD Rabbi Hossain" class="about-portrait">
+      <figcaption><span>Based in Bangladesh</span><span>Available for selected projects</span></figcaption>
+    </figure>
+  </section>
+
+  <section class="about-story page-width">
+    <div class="about-section-heading">
+      <p class="eyebrow">About the work</p>
+      <h2>Technology, design and support — three parts of the same work.</h2>
+    </div>
+    <div class="about-story-copy">
+      <p>Through RabbiHossainLTD I bring website, digital product, account service and customer support into one flow. Not just a clean interface — making order, payment, delivery and support clear to the user is what matters most.</p>
+      <p>In every project I follow this process — understand the need, define the right scope, and provide support after delivery.</p>
+    </div>
+  </section>
+
+  <section class="capability-section page-width">
+    <div class="about-section-heading">
+      <p class="eyebrow">Capabilities</p>
+      <h2>What I work on</h2>
+    </div>
+    <div class="capability-list">
+      <article><span>01</span><div><h3>Web Development</h3><p>Portfolio, business websites, landing pages and custom web applications.</p></div></article>
+      <article><span>02</span><div><h3>Security Review</h3><p>Website hardening, vulnerability review and practical security recommendations.</p></div></article>
+      <article><span>03</span><div><h3>Android &amp; Digital Products</h3><p>Application planning, interface implementation and digital delivery flow.</p></div></article>
+      <article><span>04</span><div><h3>Brand &amp; Support</h3><p>Digital identity, product presentation and ongoing customer support.</p></div></article>
+    </div>
+  </section>
+
+  <section class="tools-section page-width">
+    <div class="about-section-heading compact">
+      <p class="eyebrow">Working stack</p>
+      <h2>Tools &amp; technologies</h2>
+    </div>
+    <div class="tools-cloud" aria-label="Skills">
+      <span>HTML / CSS</span><span>JavaScript</span><span>Node.js</span><span>Firebase</span><span>PHP</span><span>MySQL</span><span>WordPress</span><span>Android</span><span>Git / GitHub</span><span>Figma</span><span>Security Testing</span><span>SEO</span>
+    </div>
+  </section>
+
+  <section class="about-contact-band">
+    <div><p class="eyebrow">Start a conversation</p><h2>Want to talk about a project or service?</h2></div>
+    <a class="btn btn-primary" href="mailto:info@rabbihossainltd.online">Email me</a>
+  </section>
+</main>
+
+<footer class="footer" style="position:relative;z-index:2;">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="nav-logo">RabbiHossainLTD</a>
+        <p>Premium digital solutions by MD Rabbi Hossain — Web Developer, Ethical Hacker &amp; Digital Branding specialist.</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-heading">Navigation</p>
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/services/">Services</a>
+        <a href="/portfolio/">Portfolio</a>
+        <a href="/#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <p class="footer-heading">Contact</p>
+        <a href="mailto:info@rabbihossainltd.online">info@rabbihossainltd.online</a>
+        <a href="https://wa.me/8801731410341" target="_blank" rel="noopener">+880 1731-410341</a>
+        <a href="https://facebook.com/rabbihossainltd" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://instagram.com/rabbihossainltd1" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 MD Rabbi Hossain. All rights reserved.</p>
+      <div class="social-links">
+        <a href="https://facebook.com/rabbihossainltd" class="social-link fb" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://instagram.com/rabbihossainltd1" class="social-link ig" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        <a href="https://wa.me/8801731410341" class="social-link wa" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+        <a href="https://t.me/Rabbihossainltd" class="social-link tg" target="_blank" rel="noopener" aria-label="Telegram" style="background:rgba(255, 255, 255,.12);border-color:rgba(255, 255, 255,.2);"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#0088cc"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.54c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.374 14.51l-2.95-.924c-.64-.203-.654-.64.136-.948l11.52-4.44c.532-.194.998.13.482.95z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ── Float Widget ── -->
+<div id="floatChatWidget">
+  <div id="floatChatWindow" style="display:none;" role="dialog" aria-label="Customer Support Chat">
+    <div id="floatChatHeader">
+      <div id="floatChatHeaderInfo">
+        <div id="floatChatAvatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+        <div>
+          <div id="floatChatTitle">RH Support</div>
+          <div id="floatChatStatus"><span id="floatStatusDot"></span> Online</div>
+        </div>
+      </div>
+      <button type="button" id="floatChatClose" aria-label="Close chat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div id="floatChatMessages"></div>
+    <div id="floatChatInputArea">
+      <input type="text" id="floatChatInput" placeholder="বার্তা লিখুন..." autocomplete="off" maxlength="500" />
+      <button type="button" id="floatChatSend" aria-label="Send message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg></button>
+    </div>
+  </div>
+  <button type="button" id="floatChatToggle" aria-label="Open customer support">
+    <span id="floatChatBadge" style="display:none;"></span>
+    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+<style>
+#floatChatWidget{position:fixed;bottom:24px;right:24px;z-index:2300;display:flex;flex-direction:column;align-items:flex-end;gap:12px;transition:bottom .25s ease;}
+body.has-bottom-nav #floatChatWidget{bottom:100px;right:16px;z-index:2500;}
+#floatChatToggle{width:50px;height:50px;border-radius:50%;border:2px solid rgba(255, 255, 255,.35);background:rgba(8,16,28,.92);backdrop-filter:blur(10px);color:#ffffff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255, 255, 255,.22);transition:transform .2s,box-shadow .2s;position:relative;}
+#floatChatToggle:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(255, 255, 255,.38);}
+#floatChatBadge{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:999px;background:#ff5050;color:#fff;font-size:.68rem;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #080808;}
+#floatChatWindow{width:340px;max-height:560px;background:rgba(10,18,30,.97);border:1px solid rgba(255, 255, 255,.18);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;animation:floatSlideIn .22s ease;}
+@keyframes floatSlideIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+#floatChatHeader{background:rgba(255, 255, 255,.07);border-bottom:1px solid rgba(255, 255, 255,.14);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;}
+#floatChatHeaderInfo{display:flex;align-items:center;gap:10px;}
+#floatChatAvatar{width:38px;height:38px;border-radius:50%;background:rgba(255, 255, 255,.12);border:1px solid rgba(255, 255, 255,.28);display:flex;align-items:center;justify-content:center;color:#ffffff;flex-shrink:0;}
+#floatChatTitle{color:#ededec;font-weight:900;font-size:.92rem;}
+#floatChatStatus{color:#aaaaaa;font-size:.75rem;display:flex;align-items:center;gap:5px;margin-top:2px;}
+#floatStatusDot{width:7px;height:7px;border-radius:50%;background:#ffffff;animation:statusPulse 2s ease-in-out infinite;display:inline-block;}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.4}}
+#floatChatClose{background:none;border:none;color:#aaaaaa;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;transition:color .15s;}
+#floatChatClose:hover{color:#f7f7f4;}
+#floatChatMessages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:180px;max-height:360px;scroll-behavior:smooth;}
+#floatChatMessages::-webkit-scrollbar{width:4px;}
+#floatChatMessages::-webkit-scrollbar-track{background:transparent;}
+#floatChatMessages::-webkit-scrollbar-thumb{background:rgba(255, 255, 255,.2);border-radius:2px;}
+.float-msg{display:flex;flex-direction:column;max-width:88%;}
+.float-msg-admin{align-self:flex-start;}
+.float-msg-user{align-self:flex-end;}
+.float-msg-bubble{padding:10px 14px;border-radius:16px;font-size:.86rem;line-height:1.55;word-break:break-word;}
+.float-msg-admin .float-msg-bubble{background:rgba(255, 255, 255,.10);border:1px solid rgba(255, 255, 255,.18);color:#dcdcd8;border-bottom-left-radius:4px;}
+.float-msg-user .float-msg-bubble{background:linear-gradient(135deg,rgba(255, 255, 255,.18),rgba(255, 255, 255,.14));border:1px solid rgba(255, 255, 255,.22);color:#f1f1f0;border-bottom-right-radius:4px;}
+.float-msg-time{font-size:.7rem;color:#70706d;margin-top:4px;}
+.float-msg-admin .float-msg-time{text-align:left;}
+.float-msg-user .float-msg-time{text-align:right;}
+.float-typing-bubble{display:flex;align-items:center;gap:4px;padding:12px 14px;min-width:54px;}
+.float-typing-dot{width:7px;height:7px;border-radius:50%;background:rgba(255, 255, 255,.5);animation:floatDotBounce 1.2s ease-in-out infinite;}
+.float-typing-dot:nth-child(2){animation-delay:.2s;}
+.float-typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes floatDotBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.float-quick-btns{display:flex;flex-direction:column;gap:7px;align-self:stretch;margin-top:4px;}
+.float-quick-btn{background:rgba(255, 255, 255,.07);border:1px solid rgba(255, 255, 255,.22);border-radius:12px;color:#dcdcd8;font-size:.84rem;padding:10px 14px;cursor:pointer;text-align:left;transition:background .17s,border-color .17s,color .17s;font-family:inherit;line-height:1.4;}
+.float-quick-btn:hover{background:rgba(255, 255, 255,.16);border-color:rgba(255, 255, 255,.45);color:#ededec;}
+.float-answer-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.float-answer-item{display:flex;align-items:flex-start;gap:7px;font-size:.84rem;line-height:1.5;}
+.float-answer-item svg{flex-shrink:0;margin-top:3px;}
+.float-agent-form-wrap{background:rgba(255, 255, 255,.06);border:1px solid rgba(255, 255, 255,.18);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:9px;align-self:stretch;}
+.float-form-title{display:flex;align-items:center;gap:8px;color:#ffffff;font-weight:900;font-size:.88rem;}
+.float-form-ticket-id{font-size:.76rem;color:#aaaaaa;display:flex;align-items:center;gap:5px;}
+.float-form-ticket-id strong{color:#c4c4c0;}
+.float-form-input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:9px 12px;color:#f7f7f4;font-size:.84rem;font-family:inherit;outline:none;transition:border-color .15s;width:100%;box-sizing:border-box;}
+.float-form-input:focus{border-color:rgba(255, 255, 255,.4);}
+.float-form-textarea{resize:none;min-height:70px;}
+.float-form-ticket-note{font-size:.72rem;color:#70706d;text-align:center;}
+.float-form-ticket-note code{color:#9b9b96;font-family:monospace;font-size:.76rem;}
+.float-form-submit{background:linear-gradient(135deg,rgba(255, 255, 255,.2),rgba(255, 255, 255,.15));border:1px solid rgba(255, 255, 255,.35);border-radius:11px;color:#e4e4e0;font-size:.86rem;font-weight:900;padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.18s;font-family:inherit;}
+.float-form-submit:hover:not(:disabled){background:linear-gradient(135deg,rgba(255, 255, 255,.3),rgba(255, 255, 255,.22));border-color:rgba(255, 255, 255,.55);color:#ededec;}
+.float-form-submit:disabled{opacity:.5;cursor:not-allowed;}
+.float-waiting-bubble{padding:12px 14px;}
+.float-waiting-inner{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.float-wait-ring{flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.float-wait-arc{transform-origin:center;animation:floatSpin 1.1s linear infinite;}
+@keyframes floatSpin{to{transform:rotate(360deg)}}
+.float-waiting-text{color:#9b9b96;font-size:.84rem;}
+.float-wait-dots{display:flex;gap:5px;padding-left:2px;}
+#floatChatInputArea{border-top:1px solid rgba(255,255,255,.07);padding:11px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0;}
+#floatChatInput{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px 12px;color:#f7f7f4;font-size:.88rem;font-family:inherit;outline:none;transition:border-color .15s;}
+#floatChatInput:focus{border-color:rgba(255, 255, 255,.3);}
+#floatChatInput::placeholder{color:#70706d;}
+#floatChatInput:disabled{opacity:.45;cursor:not-allowed;}
+#floatChatSend{width:38px;height:38px;border-radius:10px;border:none;background:#ffffff;color:#080808;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.18s;}
+#floatChatSend:hover:not(:disabled){transform:scale(1.08);}
+#floatChatSend:disabled{opacity:.4;cursor:not-allowed;}
+@media(max-width:480px){#floatChatWindow{width:calc(100vw - 28px);}body.has-bottom-nav #floatChatWidget{right:12px;bottom:100px;z-index:2500;}}
+</style>
+<script type="module" src="/js/support-chat.js"></script>
+
+<nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+  <a href="/"><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+  <a href="/add-credit/"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+  <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+
+  <a href="/dashboard/?tab=orders"><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+  <a href="/dashboard/"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+</nav>
+
+<script src="/js/lang.js" defer></script>
+<script src="/js/main.js" defer></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+  const { firebaseConfig } = await import("/js/firebase-config.js");
+  const app = initializeApp(firebaseConfig);
+  getAnalytics(app);
+</script>
+<script src="/js/auth.js" defer></script>
+<script src="/js/typing.js" defer></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    });
+  }
+
+</script>
+</body>
+</html>

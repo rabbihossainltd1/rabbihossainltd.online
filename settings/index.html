@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — RabbiHossainLTD</title>
+  <meta name="description" content="Manage your RabbiHossainLTD profile, language and password." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://rabbihossainltd.online/settings/" />
+  <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    .settings-page{min-height:100vh;padding:calc(var(--nav-h) + 30px) 20px 120px;background:var(--bg)}
+    .settings-page-inner{max-width:620px;margin:0 auto}
+    .settings-page-head{margin-bottom:22px}
+    .settings-page-head .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:800}
+    .settings-page-head h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:6px 0 4px}
+    .settings-page-head p{color:var(--text-secondary);font-size:.9rem}
+    .settings-card{background:#101010;border:1px solid var(--border);border-radius:22px;padding:26px}
+    .settings-divider{height:1px;background:var(--border);margin:22px 0}
+    .settings-block-title{font-size:.78rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#7a7a75;margin:0 0 14px}
+    .settings-field{display:flex;flex-direction:column}
+    .settings-field label{display:block;color:#b0b0ad;font-weight:900;font-size:.78rem;margin-bottom:6px}
+    .settings-field input{width:100%;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.22);border-radius:13px;padding:11px 12px;color:#f8f8f7;outline:none;font-family:inherit;font-size:.9rem}
+    .settings-field input:focus{border-color:rgba(255,255,255,.48)}
+    .settings-field input:disabled{opacity:.55}
+    .settings-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+    .settings-btn{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:#ffffff;color:#080808;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-size:.88rem}
+    .settings-btn svg{width:16px;height:16px;flex:none}
+    .settings-photo-btn svg{width:17px;height:17px;flex:none}
+    .settings-btn:hover{opacity:.92}
+    .settings-btn.secondary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#e4e4e0}
+    .settings-btn.secondary:hover{background:rgba(255,255,255,.12)}
+    .settings-btn:disabled{opacity:.6;cursor:not-allowed}
+    .settings-message{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;font-size:.82rem;line-height:1.5}
+    .settings-message.success{display:block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#e0e0df}
+    .settings-message.error{display:block;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.24);color:#ffb2b2}
+    .settings-gate{text-align:center;padding:40px 24px}
+    .settings-gate .mark{width:52px;height:52px;margin:0 auto 18px;border-radius:50%;background:#fff;color:#080808;display:grid;place-items:center;font-weight:900;font-size:1.3rem}
+    .settings-gate h2{font-size:1.4rem;margin-bottom:8px}
+    .settings-gate p{color:var(--text-secondary);margin-bottom:20px}
+    @media(max-width:560px){.settings-card{padding:20px}.settings-grid{grid-template-columns:1fr}}
+  </style>
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  
+    .theme-swatch{width:22px;height:22px;border-radius:50%;flex:none}
+    .settings-lang-btn.theme-btn{flex-direction:row;justify-content:flex-start;gap:10px}
+    .settings-lang-btn.theme-btn.sel-theme{border-color:#111;background:rgba(0,0,0,.05)}
+    [data-theme="dark"] .settings-lang-btn.theme-btn.sel-theme{border-color:#fff;background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body class="has-bottom-nav">
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">RabbiHossainLTD</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg></span>Home</a></li>
+        <li><a href="/services/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg></span>Services</a></li>
+        <li><a href="/portfolio/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z"/></svg></span>Portfolio</a></li>
+        <li><a href="/about/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main class="settings-page">
+    <div class="settings-page-inner">
+      <div class="settings-page-head">
+        <div class="kicker">Account</div>
+        <h1>Settings</h1>
+        
+      </div>
+
+      <!-- Login gate -->
+      <div class="settings-card settings-gate" id="settingsLoginGate" style="display:none;">
+        <div class="mark">→</div>
+        <h2>Login required</h2>
+        <p>Login to view and edit settings.</p>
+        <button class="settings-btn" id="settingsLoginBtn" type="button">Login</button>
+      </div>
+
+      <!-- Settings content -->
+      <div class="settings-card" id="settingsContent" style="display:none;">
+        <!-- Profile -->
+        <div class="settings-block-title">Profile</div>
+        <div class="settings-avatar-row">
+          <div class="settings-avatar-preview" id="settingsAvatarPreview">U</div>
+          <label class="settings-photo-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>
+            <span>Change Picture</span>
+            <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
+          </label>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label for="settingsName">Name</label>
+            <input type="text" id="settingsName" placeholder="Your name" />
+          </div>
+          <div class="settings-field">
+            <label for="settingsEmail">Email</label>
+            <input type="email" id="settingsEmail" disabled />
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="settings-btn" id="settingsSaveProfileBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Save Changes</span>
+          </button>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Password -->
+        <div class="settings-block-title">Password</div>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label for="settingsCurrentPassword">Current Password</label>
+            <input type="password" id="settingsCurrentPassword" placeholder="Current password" autocomplete="current-password" />
+          </div>
+          <div class="settings-field">
+            <label for="settingsNewPassword">New Password</label>
+            <input type="password" id="settingsNewPassword" placeholder="New password" autocomplete="new-password" />
+          </div>
+          <div class="settings-field">
+            <label for="settingsConfirmPassword">Confirm Password</label>
+            <input type="password" id="settingsConfirmPassword" placeholder="Confirm new password" autocomplete="new-password" />
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="settings-btn" id="settingsChangePasswordBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Change Password</span>
+          </button>
+          <button class="settings-btn secondary" id="settingsResetPasswordBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L4 10"/></svg>
+            <span>Forgot password? Reset via email</span>
+          </button>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Language -->
+        <div class="settings-block-title">Language</div>
+        <div class="settings-lang-row">
+          <label class="settings-lang-btn" id="settingsLangEnLabel">
+            <input type="radio" name="siteLanguage" id="langEn" value="en" />
+            <span class="lang-flag"><svg width="20" height="14" viewBox="0 0 60 42"><rect width="60" height="42" fill="#012169"/><path d="M0 0L60 42M60 0L0 42" stroke="#fff" stroke-width="7"/><path d="M0 0L60 42M60 0L0 42" stroke="#C8102E" stroke-width="4.5"/><path d="M30 0V42M0 21H60" stroke="#fff" stroke-width="12"/><path d="M30 0V42M0 21H60" stroke="#C8102E" stroke-width="7"/></svg></span>
+            <span class="lang-name">English</span>
+          </label>
+          <label class="settings-lang-btn" id="settingsLangBnLabel">
+            <input type="radio" name="siteLanguage" id="langBn" value="bn" />
+            <span class="lang-flag"><svg width="20" height="14" viewBox="0 0 60 42"><rect width="60" height="42" fill="#006a4e"/><circle cx="27" cy="21" r="12" fill="#f42a41"/></svg></span>
+            <span class="lang-name">বাংলা</span>
+          </label>
+        </div>
+        <button class="settings-lang-save-btn" id="saveLangBtn" type="button" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          Save Language
+        </button>
+
+        <div class="settings-divider"></div>
+
+        <!-- Theme -->
+        <div class="settings-block-title">Theme</div>
+        <div class="settings-lang-row" id="themeRow">
+          <button type="button" class="settings-lang-btn theme-btn" data-theme="light" id="themeLightBtn">
+            <span class="theme-swatch" style="background:#fff;border:1px solid rgba(0,0,0,.15);"></span>
+            <span class="lang-name">Light</span>
+          </button>
+          <button type="button" class="settings-lang-btn theme-btn" data-theme="dark" id="themeDarkBtn">
+            <span class="theme-swatch" style="background:#0a0a0a;border:1px solid rgba(255,255,255,.2);"></span>
+            <span class="lang-name">Dark</span>
+          </button>
+        </div>
+
+        <div id="profileSettingsMessage" class="settings-message" style="display:none;"></div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+    <a href="/" ><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+    <a href="/add-credit/" ><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+    <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+
+    <a href="/dashboard/?tab=orders" ><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+    <a href="/dashboard/" ><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+  </nav>
+
+  <script src="/js/lang.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js').catch(function() {}); });
+    }
+    // Bootstrap the settings page once auth.js exposes the entry point.
+    (function boot() {
+      if (window.rabbiAuth && typeof window.rabbiAuth.initSettingsPage === 'function') {
+        window.rabbiAuth.initSettingsPage();
+      } else {
+        setTimeout(boot, 120);
+      }
+    })();
+  </script>
+  <script src="/js/theme-ui.js" defer></script>
+</body>
+</html>

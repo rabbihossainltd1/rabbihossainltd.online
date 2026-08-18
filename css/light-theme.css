@@ -1,0 +1,929 @@
+/* ============================================================
+   Light theme — final coverage pass
+   Loaded last (and re-appended at end of <body>) so it wins
+   over page-inline dark leftovers and JS-injected chrome.
+   ============================================================ */
+
+html[data-theme="light"] {
+  color-scheme: light;
+  background: #f5f5f2 !important;
+  --bg: #f5f5f2;
+  --bg-primary: #f5f5f2;
+  --surface: #ffffff;
+  --surface-2: #f4f4f1;
+  --surface-3: #ececea;
+  --border: rgba(0,0,0,.10);
+  --border-hover: rgba(0,0,0,.28);
+  --text-primary: #161616;
+  --text-secondary: #4a4a48;
+  --text-muted: #6f6f6c;
+  --accent: #111111;
+  --accent-dim: rgba(0,0,0,.06);
+  --accent-glow: rgba(0,0,0,.14);
+  --accent-hover: #2a2a2a;
+  --pay-bg: #f5f5f2;
+  --pay-text: #161616;
+  --pay-muted: #6f6f6c;
+  --pay-success: #0a7a40;
+  --pay-accent: #111111;
+  --pay-accent-2: #2a2a2a;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-primary: #080808;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f5f2 !important;
+  color: #161616 !important;
+}
+
+html[data-theme="light"] * { scrollbar-color: #c4c4c0 #f0f0ee; }
+html[data-theme="light"] ::-webkit-scrollbar-track { background: #f0f0ee; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.22); }
+html[data-theme="light"] ::selection { background: #111; color: #fff; }
+html[data-theme="light"] img { background: #ececea; }
+
+/* ── page shells ── */
+html[data-theme="light"] .store-hero,
+html[data-theme="light"] .home-hero,
+html[data-theme="light"] .home-hero-text,
+html[data-theme="light"] .home-hero-slider,
+html[data-theme="light"] .home-service-cards,
+html[data-theme="light"] .contact-section,
+html[data-theme="light"] .about-page-v3,
+html[data-theme="light"] .payment-page,
+html[data-theme="light"] .dashboard-page,
+html[data-theme="light"] .dashboard-wrap,
+html[data-theme="light"] .admin-page,
+html[data-theme="light"] .admin-denied,
+html[data-theme="light"] .checkout-shell,
+html[data-theme="light"] .checkout-page,
+html[data-theme="light"] .wallet-page,
+html[data-theme="light"] .settings-page,
+html[data-theme="light"] .cart-page,
+html[data-theme="light"] .faq-body,
+html[data-theme="light"] .policy-body {
+  background: #f5f5f2 !important;
+  color: #161616 !important;
+}
+
+html[data-theme="light"] body::before,
+html[data-theme="light"] body::after { opacity: .18 !important; }
+
+/* ── readable text (kills leftover #fff / #f7f7f4 on light cards) ── */
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] h5,
+html[data-theme="light"] .section-title-main,
+html[data-theme="light"] .display-1,
+html[data-theme="light"] .display-2,
+html[data-theme="light"] .display-3,
+html[data-theme="light"] .nav-logo,
+html[data-theme="light"] .store-hero h1,
+html[data-theme="light"] .home-svc-card h3,
+html[data-theme="light"] .compact-service-card h3,
+html[data-theme="light"] .service-card h3,
+html[data-theme="light"] .faq-question,
+html[data-theme="light"] .faq-category-title,
+html[data-theme="light"] .checkout-head h1,
+html[data-theme="light"] .checkout-state h1,
+html[data-theme="light"] .checkout-state-title,
+html[data-theme="light"] .checkout-view-title,
+html[data-theme="light"] .cart-item-title,
+html[data-theme="light"] .ci-title,
+html[data-theme="light"] .oc-name,
+html[data-theme="light"] .lang-name {
+  color: #161616 !important;
+}
+
+html[data-theme="light"] p,
+html[data-theme="light"] li,
+html[data-theme="light"] label,
+html[data-theme="light"] .about-lead,
+html[data-theme="light"] .about-story-copy,
+html[data-theme="light"] .capability-list p,
+html[data-theme="light"] .store-hero-copy > p,
+html[data-theme="light"] .home-svc-card p,
+html[data-theme="light"] .compact-service-card p,
+html[data-theme="light"] .faq-answer-inner,
+html[data-theme="light"] .policy-body p,
+html[data-theme="light"] .policy-body li,
+html[data-theme="light"] .payment-guide li,
+html[data-theme="light"] .payment-auth-copy p,
+html[data-theme="light"] .v2-page-intro > p,
+html[data-theme="light"] .page-hero p,
+html[data-theme="light"] .policy-hero p {
+  color: #4a4a48 !important;
+}
+
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .section-label,
+html[data-theme="light"] .hero-kicker,
+html[data-theme="light"] .kicker,
+html[data-theme="light"] .text-muted,
+html[data-theme="light"] .updated-tag,
+html[data-theme="light"] .home-svc-price,
+html[data-theme="light"] .compact-service-card .service-num,
+html[data-theme="light"] .svc-category-head span {
+  color: #6f6f6c !important;
+}
+
+html[data-theme="light"] .svc-category-head span {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+}
+
+html[data-theme="light"] .home-svc-price {
+  background: #f0f0ee !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+  color: #161616 !important;
+}
+
+/* ── cards / surfaces still painted dark ── */
+html[data-theme="light"] .home-svc-card,
+html[data-theme="light"] .compact-service-card,
+html[data-theme="light"] .glass-card,
+html[data-theme="light"] .service-card,
+html[data-theme="light"] .cart-card,
+html[data-theme="light"] .cart-item,
+html[data-theme="light"] .checkout-item,
+html[data-theme="light"] .checkout-card,
+html[data-theme="light"] .checkout-summary,
+html[data-theme="light"] .checkout-state,
+html[data-theme="light"] .settings-card,
+html[data-theme="light"] .dashboard-card,
+html[data-theme="light"] .dashboard-profile,
+html[data-theme="light"] .dashboard-login,
+html[data-theme="light"] .dashboard-history-card,
+html[data-theme="light"] .history-card,
+html[data-theme="light"] .order-card,
+html[data-theme="light"] .order-mini-panel,
+html[data-theme="light"] .support-ticket-item,
+html[data-theme="light"] .admin-card,
+html[data-theme="light"] .admin-card-shell,
+html[data-theme="light"] .admin-denied div,
+html[data-theme="light"] .faq-item,
+html[data-theme="light"] .policy-card,
+html[data-theme="light"] .delivery-card,
+html[data-theme="light"] .info-box,
+html[data-theme="light"] .policy-highlight,
+html[data-theme="light"] .contact-cta,
+html[data-theme="light"] .tools-cloud span,
+html[data-theme="light"] .skill-tag,
+html[data-theme="light"] .nav-card {
+  background: #ffffff !important;
+  color: #161616 !important;
+  border-color: rgba(0,0,0,.10) !important;
+}
+
+html[data-theme="light"] .home-svc-card:hover,
+html[data-theme="light"] .compact-service-card:hover {
+  border-color: rgba(0,0,0,.22) !important;
+  box-shadow: 0 18px 40px rgba(0,0,0,.08) !important;
+}
+
+html[data-theme="light"] .home-svc-icon,
+html[data-theme="light"] .home-svc-png-icon {
+  background: #f4f4f1 !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+/* ── navbar / footer / bottom nav ── */
+html[data-theme="light"] .navbar,
+html[data-theme="light"] .navbar.scrolled,
+html[data-theme="light"] .footer {
+  background: rgba(255,255,255,.92) !important;
+  border-color: rgba(0,0,0,.08) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .nav-links a,
+html[data-theme="light"] .footer-col a,
+html[data-theme="light"] .footer-brand p,
+html[data-theme="light"] .footer-bottom p,
+html[data-theme="light"] .footer-heading,
+html[data-theme="light"] .footer-col h4 { color: #4a4a48 !important; }
+html[data-theme="light"] .nav-links a:hover,
+html[data-theme="light"] .nav-links a.active,
+html[data-theme="light"] .footer-col a:hover { color: #161616 !important; }
+html[data-theme="light"] .nav-search-btn { color: #2a2a2a !important; }
+html[data-theme="light"] .nav-search-btn:hover,
+html[data-theme="light"] .nav-search.is-open .nav-search-btn { color: #111 !important; background: rgba(0,0,0,.06) !important; }
+html[data-theme="light"] .nav-hamburger span { background: #161616 !important; }
+html[data-theme="light"] .nav-hamburger:hover { background: rgba(0,0,0,.06) !important; }
+html[data-theme="light"] .customer-service-nav a {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.14) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .customer-service-nav a:hover { color: #111 !important; border-color: rgba(0,0,0,.3) !important; }
+
+html[data-theme="light"] .rabbi-bottom-nav {
+  background: rgba(255,255,255,.94) !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .rabbi-bottom-nav a { color: #6f6f6c !important; }
+html[data-theme="light"] .rabbi-bottom-nav a.active,
+html[data-theme="light"] .rabbi-bottom-nav a:hover {
+  background: #111 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] .nav-links.open {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(0,0,0,.10) !important;
+  box-shadow: 18px 0 40px rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .nav-links.open::before {
+  background: #ffffff !important;
+  color: #161616 !important;
+  border-bottom-color: rgba(0,0,0,.08) !important;
+}
+html[data-theme="light"] .nav-links.open a { color: #3a3a38 !important; }
+html[data-theme="light"] .nav-links.open a .nav-icon {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .nav-links.open a .nav-icon svg { color: #2a2a2a !important; }
+html[data-theme="light"] .nav-links.open a.active {
+  background: #111 !important;
+  color: #fff !important;
+}
+html[data-theme="light"] .nav-links.open a.active .nav-icon,
+html[data-theme="light"] .nav-links.open a.active .nav-icon svg { color: #fff !important; }
+
+html[data-theme="light"] .social-link {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+
+/* ── buttons ── */
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .service-apply-btn,
+html[data-theme="light"] .home-svc-action,
+html[data-theme="light"] .submit-btn,
+html[data-theme="light"] .btn-confirm,
+html[data-theme="light"] .service-modal-submit,
+html[data-theme="light"] .cart-checkout-btn,
+html[data-theme="light"] .cart-login-btn,
+html[data-theme="light"] .hero-all-services,
+html[data-theme="light"] .checkout-cta,
+html[data-theme="light"] .settings-btn,
+html[data-theme="light"] .settings-save-btn,
+html[data-theme="light"] .settings-lang-save-btn,
+html[data-theme="light"] .btn-accent,
+html[data-theme="light"] .dashboard-action.primary,
+html[data-theme="light"] .svc-hub-btn,
+html[data-theme="light"] .auth-submit-btn,
+html[data-theme="light"] .rh-cx-spay {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+}
+html[data-theme="light"] .btn-primary:hover,
+html[data-theme="light"] .service-apply-btn:hover,
+html[data-theme="light"] .home-svc-action:hover,
+html[data-theme="light"] .submit-btn:hover,
+html[data-theme="light"] .hero-all-services:hover,
+html[data-theme="light"] .cart-checkout-btn:hover,
+html[data-theme="light"] .checkout-cta:hover,
+html[data-theme="light"] .rh-cx-spay:hover {
+  background: #f0f0ee !important;
+  color: #111111 !important;
+  border-color: #111111 !important;
+}
+html[data-theme="light"] .btn-outline,
+html[data-theme="light"] .btn-secondary,
+html[data-theme="light"] .profile-control-btn,
+html[data-theme="light"] .settings-btn.secondary,
+html[data-theme="light"] .cart-back-btn,
+html[data-theme="light"] .cart-remove,
+html[data-theme="light"] .oc-btn,
+html[data-theme="light"] .dashboard-action,
+html[data-theme="light"] .dashboard-tab,
+html[data-theme="light"] .filter-btn {
+  background: #ffffff !important;
+  color: #2a2a2a !important;
+  border: 1px solid rgba(0,0,0,.16) !important;
+}
+html[data-theme="light"] .dashboard-tab.active,
+html[data-theme="light"] .orders-segment-btn.active,
+html[data-theme="light"] .filter-btn.active,
+html[data-theme="light"] .admin-nav-btn.active {
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #111 !important;
+}
+html[data-theme="light"] .svc-info-btn { color: #6f6f6c !important; }
+html[data-theme="light"] .svc-info-btn:hover,
+html[data-theme="light"] .svc-info-btn:focus-visible { color: #111 !important; }
+
+/* ── inputs ── */
+html[data-theme="light"] .form-input,
+html[data-theme="light"] .form-textarea,
+html[data-theme="light"] .form-select,
+html[data-theme="light"] .auth-input,
+html[data-theme="light"] .settings-input,
+html[data-theme="light"] .settings-field input,
+html[data-theme="light"] .pay-field input,
+html[data-theme="light"] .amount-input-row,
+html[data-theme="light"] .amount-input-row input,
+html[data-theme="light"] #heroSearchInput,
+html[data-theme="light"] #couponInput,
+html[data-theme="light"] .orders-search-wrap input,
+html[data-theme="light"] .nav-search-input {
+  background: #ffffff !important;
+  color: #161616 !important;
+  border-color: rgba(0,0,0,.14) !important;
+}
+html[data-theme="light"] .form-label,
+html[data-theme="light"] .settings-field label,
+html[data-theme="light"] .settings-label,
+html[data-theme="light"] .settings-block-title,
+html[data-theme="light"] .settings-section-label { color: #4a4a48 !important; }
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder { color: #8a8a87 !important; }
+html[data-theme="light"] .hero-search-box,
+html[data-theme="light"] .nav-search.is-open,
+html[data-theme="light"] .coupon-input-wrap {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.14) !important;
+}
+
+html[data-theme="light"] .hero-cat-btn,
+html[data-theme="light"] .hero-quick-links a {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+  color: #4a4a48 !important;
+}
+html[data-theme="light"] .hero-cat-btn.is-active {
+  background: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+}
+
+/* ── auth modal + profile dropdown (JS-injected) ── */
+html[data-theme="light"] .auth-modal-box,
+html[data-theme="light"] .auth-modal,
+html[data-theme="light"] .profile-settings-box,
+html[data-theme="light"] .nav-user-menu,
+html[data-theme="light"] #serviceSearchBox,
+html[data-theme="light"] .service-modal,
+html[data-theme="light"] #svcInfoModalBox,
+html[data-theme="light"] .rv-modal,
+html[data-theme="light"] #proappPickerBox {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.16) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .auth-title,
+html[data-theme="light"] .settings-head h3,
+html[data-theme="light"] .settings-section-title,
+html[data-theme="light"] .profile-settings-title,
+html[data-theme="light"] .profile-name,
+html[data-theme="light"] .settings-history-title { color: #161616 !important; }
+html[data-theme="light"] .auth-sub,
+html[data-theme="light"] .settings-head p,
+html[data-theme="light"] .profile-settings-sub,
+html[data-theme="light"] .profile-email,
+html[data-theme="light"] .profile-mini-note,
+html[data-theme="light"] .auth-note,
+html[data-theme="light"] .auth-toggle-btn { color: #6f6f6c !important; }
+html[data-theme="light"] .auth-toggle-btn strong { color: #111 !important; }
+html[data-theme="light"] .auth-icon {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #111 !important;
+}
+html[data-theme="light"] .auth-modal-close,
+html[data-theme="light"] .settings-close,
+html[data-theme="light"] .profile-settings-close {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #4a4a48 !important;
+}
+html[data-theme="light"] .auth-google-btn {
+  background: #ffffff !important;
+  color: #161616 !important;
+  border: 1px solid rgba(0,0,0,.16) !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] .auth-submit-btn {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+}
+html[data-theme="light"] .auth-divider::before,
+html[data-theme="light"] .auth-divider::after { background: rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .nav-user-menu-btn { color: #161616 !important; }
+html[data-theme="light"] .nav-user-menu-btn:hover { background: rgba(0,0,0,.05) !important; }
+html[data-theme="light"] .nav-user-menu-btn.primary {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+}
+html[data-theme="light"] .profile-btn-icon { color: #2a2a2a !important; }
+html[data-theme="light"] .nav-user-menu-btn.primary .profile-btn-icon { color: #fff !important; }
+html[data-theme="light"] .profile-balance,
+html[data-theme="light"] .nav-user-menu .compact-menu-balance {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .nav-user-menu .profile-balance-info span { color: #6f6f6c !important; }
+html[data-theme="light"] .nav-user-menu .profile-balance-info strong,
+html[data-theme="light"] .nav-user-menu #profileMenuBalance,
+html[data-theme="light"] .profile-balance strong { color: #161616 !important; }
+html[data-theme="light"] .settings-section,
+html[data-theme="light"] .settings-history-item {
+  background: #fafafa !important;
+  border-color: rgba(0,0,0,.10) !important;
+}
+html[data-theme="light"] .settings-history-amount { color: #161616 !important; }
+html[data-theme="light"] .settings-message.success {
+  background: rgba(0,0,0,.04) !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+
+/* ── cart leftovers (plan modal, empty link, totals) ── */
+html[data-theme="light"] .rh-plan-modal-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+}
+html[data-theme="light"] .rh-plan-modal-head { border-bottom-color: rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .rh-plan-modal-title,
+html[data-theme="light"] .rh-plan-opt .lbl,
+html[data-theme="light"] .rh-plan-opt .p,
+html[data-theme="light"] .cart-total-row .val,
+html[data-theme="light"] .checkout-subtotal-row .val,
+html[data-theme="light"] .ci-price { color: #161616 !important; }
+html[data-theme="light"] .rh-plan-modal-close {
+  border-color: rgba(0,0,0,.16) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .rh-plan-opt {
+  background: #fafafa !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .rh-plan-opt.sel {
+  background: #111 !important;
+  border-color: #111 !important;
+}
+html[data-theme="light"] .rh-plan-opt.sel .lbl,
+html[data-theme="light"] .rh-plan-opt.sel .p { color: #fff !important; }
+html[data-theme="light"] .cart-empty a,
+html[data-theme="light"] .cart-item-meta,
+html[data-theme="light"] .cart-selectall,
+html[data-theme="light"] .cart-total-row .lbl,
+html[data-theme="light"] .checkout-subtotal-row .lbl,
+html[data-theme="light"] .ci-meta { color: #4a4a48 !important; }
+html[data-theme="light"] .cart-empty a { text-decoration: underline; }
+html[data-theme="light"] .cart-footer,
+html[data-theme="light"] .checkout-subtotal-row { border-top-color: rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .cart-item-check,
+html[data-theme="light"] .cart-selectall input { accent-color: #111; }
+html[data-theme="light"] .cart-msg.info {
+  background: rgba(0,0,0,.04) !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+
+/* ── checkout compact form (page-inline !important) ── */
+html[data-theme="light"] .rh-cx-shell,
+html[data-theme="light"] .rh-cx-card,
+html[data-theme="light"] .rh-cx-body { background: #ffffff !important; color: #161616 !important; }
+html[data-theme="light"] .rh-cx-card { border: 1px solid rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .rh-cx-brandname,
+html[data-theme="light"] .rh-cx-title,
+html[data-theme="light"] .rh-cx-usd,
+html[data-theme="light"] .rh-cx-infotext b,
+html[data-theme="light"] .rh-cx-sv { color: #161616 !important; }
+html[data-theme="light"] .rh-cx-brandsub,
+html[data-theme="light"] .rh-cx-sub,
+html[data-theme="light"] .rh-cx-bdt,
+html[data-theme="light"] .rh-cx-infotext,
+html[data-theme="light"] .rh-cx-body .form-label,
+html[data-theme="light"] .rh-cx-sl { color: #6f6f6c !important; }
+html[data-theme="light"] .rh-cx-close { color: #4a4a48 !important; border-color: rgba(0,0,0,.14) !important; }
+html[data-theme="light"] .rh-cx-close:hover { color: #111 !important; }
+html[data-theme="light"] .rh-cx-hr { border-top-color: rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .rh-cx-body .form-input,
+html[data-theme="light"] .rh-cx-body .form-select,
+html[data-theme="light"] .rh-cx-body .form-textarea {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .rh-cx-body .radio-option,
+html[data-theme="light"] .rh-cx-body .pkg-toggle,
+html[data-theme="light"] .rh-cx-body .opt,
+html[data-theme="light"] .rh-cx-body .tgl,
+html[data-theme="light"] .rh-cx-body .opts {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .rh-cx-body .radio-option:has(input:checked),
+html[data-theme="light"] .rh-cx-body .tgl button.active {
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #111 !important;
+}
+html[data-theme="light"] .rh-cx-body .service-notice {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .rh-cx-sticky {
+  background: rgba(255,255,255,.96) !important;
+  border-top: 1px solid rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .rh-cx-spay { background: #ffffff !important; color: #111111 !important; border: 1px solid #111111 !important; }
+html[data-theme="light"] .rh-cx-cart {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.16) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .rh-cx-body #serviceCheckoutPanel .service-checkout-box {
+  background: #fafafa !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .plan-picker,
+html[data-theme="light"] .plan-picker-summary {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .plan-picker-value { color: #161616 !important; }
+html[data-theme="light"] .plan-picker-label { color: #6f6f6c !important; }
+
+/* ── dashboard leftovers ── */
+html[data-theme="light"] .dashboard-balance {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.10) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .dashboard-balance span,
+html[data-theme="light"] .dashboard-balance .balance-text span { color: #6f6f6c !important; }
+html[data-theme="light"] .dashboard-balance strong { color: #161616 !important; }
+html[data-theme="light"] .dashboard-history-head span:not(.status),
+html[data-theme="light"] .dashboard-history-head strong { color: #161616 !important; }
+html[data-theme="light"] .dashboard-history-card p,
+html[data-theme="light"] .support-ticket-problem,
+html[data-theme="light"] .support-ticket-id,
+html[data-theme="light"] .support-ticket-date { color: #4a4a48 !important; }
+html[data-theme="light"] .orders-segment {
+  background: #f4f4f1 !important;
+  border-color: rgba(0,0,0,.10) !important;
+}
+html[data-theme="light"] .orders-segment-btn { color: #6f6f6c !important; }
+html[data-theme="light"] .support-ticket-status.open {
+  background: rgba(0,0,0,.06) !important;
+  color: #161616 !important;
+  border-color: rgba(0,0,0,.16) !important;
+}
+html[data-theme="light"] .empty-state { color: #6f6f6c !important; }
+
+/* ── add-credit / wallet ── */
+html[data-theme="light"] #authRequired,
+html[data-theme="light"] .payment-card,
+html[data-theme="light"] .payment-guide,
+html[data-theme="light"] .payment-auth-copy,
+html[data-theme="light"] .payment-auth-notes,
+html[data-theme="light"] .category-btn,
+html[data-theme="light"] .suboption-btn,
+html[data-theme="light"] .coin-btn,
+html[data-theme="light"] .pay-panel,
+html[data-theme="light"] .crypto-pay-box,
+html[data-theme="light"] .binance-qr-box {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .category-btn:hover,
+html[data-theme="light"] .suboption-btn:hover,
+html[data-theme="light"] .coin-btn:hover {
+  background: #f5f5f2 !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08) !important;
+}
+html[data-theme="light"] .pay-field label,
+html[data-theme="light"] .amount-input-box label,
+html[data-theme="light"] .pay-step-row,
+html[data-theme="light"] .category-sub,
+html[data-theme="light"] .suboption-tag,
+html[data-theme="light"] .safe-note { color: #4a4a48 !important; }
+html[data-theme="light"] .pay-field input {
+  background: #fafafa !important;
+  color: #161616 !important;
+  border-color: rgba(0,0,0,.14) !important;
+}
+html[data-theme="light"] .amount-input-row {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+}
+html[data-theme="light"] .amount-prefix,
+html[data-theme="light"] .amount-bdt-hint,
+html[data-theme="light"] .amount-bdt-badge { color: #6f6f6c !important; }
+html[data-theme="light"] .wallet-id-row,
+html[data-theme="light"] .address-row {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.10) !important;
+}
+html[data-theme="light"] .verify-overlay,
+html[data-theme="light"] .step-loading-overlay {
+  background: rgba(245,245,242,.92) !important;
+}
+html[data-theme="light"] .verify-title,
+html[data-theme="light"] .verify-approved-title { color: #161616 !important; }
+html[data-theme="light"] .verify-sub,
+html[data-theme="light"] .verify-approved-sub { color: #4a4a48 !important; }
+html[data-theme="light"] .spv-auto-msg.info {
+  background: rgba(0,0,0,.04) !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+
+/* ── admin ── */
+html[data-theme="light"] .admin-nav,
+html[data-theme="light"] .admin-nav-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #4a4a48 !important;
+}
+html[data-theme="light"] .admin-nav-btn svg { color: #2a2a2a !important; }
+html[data-theme="light"] .admin-nav-btn.active svg { color: #ffffff !important; }
+html[data-theme="light"] .admin-nav-btn:hover { color: #161616 !important; background: #f5f5f2 !important; }
+html[data-theme="light"] .admin-denied a { color: #111 !important; }
+
+/* ── about leftover chips / contact band ── */
+html[data-theme="light"] .tools-cloud span {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .capability-list,
+html[data-theme="light"] .capability-list article,
+html[data-theme="light"] .about-story,
+html[data-theme="light"] .capability-section,
+html[data-theme="light"] .tools-section {
+  border-color: rgba(0,0,0,.10) !important;
+}
+html[data-theme="light"] .about-contact-band {
+  background: #111 !important;
+  color: #fff !important;
+}
+html[data-theme="light"] .about-contact-band h2,
+html[data-theme="light"] .about-contact-band .eyebrow { color: #fff !important; }
+html[data-theme="light"] .about-contact-band .btn-primary {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #fff !important;
+}
+
+/* ── contact form ── */
+html[data-theme="light"] .contact-icon {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #111 !important;
+}
+html[data-theme="light"] .contact-social-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] #formStatus.status-success {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] #formStatus.status-success .fs-title { color: #161616 !important; }
+html[data-theme="light"] #formStatus.status-success .fs-body { color: #4a4a48 !important; }
+
+/* ── chat widget (duplicated inline on many pages) ── */
+html[data-theme="light"] #floatChatToggle {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.16) !important;
+  color: #111111 !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] #floatChatToggle svg {
+  color: #111111 !important;
+  stroke: currentColor !important;
+}
+html[data-theme="light"] #floatChatWindow {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.18) !important;
+}
+html[data-theme="light"] #floatChatHeader {
+  background: #f5f5f2 !important;
+  border-bottom-color: rgba(0,0,0,.10) !important;
+}
+html[data-theme="light"] #floatChatTitle { color: #161616 !important; }
+html[data-theme="light"] #floatChatStatus,
+html[data-theme="light"] #floatChatClose { color: #6f6f6c !important; }
+html[data-theme="light"] #floatChatClose:hover { color: #111 !important; }
+html[data-theme="light"] #floatChatAvatar {
+  background: #ececea !important;
+  border-color: rgba(0,0,0,.14) !important;
+  color: #111 !important;
+}
+html[data-theme="light"] #floatStatusDot { background: #111 !important; }
+html[data-theme="light"] #floatChatInputArea { border-top-color: rgba(0,0,0,.08) !important; }
+html[data-theme="light"] #floatChatInput,
+html[data-theme="light"] .float-form-input {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] #floatChatSend { background: #ffffff !important; color: #111111 !important; border: 1px solid #111111 !important; }
+html[data-theme="light"] .float-msg-admin .float-msg-bubble {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.10) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .float-msg-user .float-msg-bubble {
+  background: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+}
+html[data-theme="light"] .float-quick-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.14) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .float-quick-btn:hover {
+  background: #f0f0ee !important;
+  color: #111 !important;
+}
+html[data-theme="light"] .float-agent-form-wrap {
+  background: #fafafa !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .float-form-title,
+html[data-theme="light"] .float-form-ticket-id strong { color: #161616 !important; }
+html[data-theme="light"] .float-form-ticket-id,
+html[data-theme="light"] .float-waiting-text,
+html[data-theme="light"] .float-form-ticket-note { color: #6f6f6c !important; }
+html[data-theme="light"] .float-form-submit {
+  background: #ffffff !important;
+  border: 1px solid #111111 !important;
+  color: #111111 !important;
+}
+html[data-theme="light"] .float-typing-dot { background: rgba(0,0,0,.35) !important; }
+
+/* ── services FF / i4g leftovers ── */
+html[data-theme="light"] #ffFields .ff-type-btn,
+html[data-theme="light"] .ff-type-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.14) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] #ffFields .ff-type-btn.active,
+html[data-theme="light"] .ff-type-btn.active {
+  background: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+}
+html[data-theme="light"] #ffFields .ff-option-item,
+html[data-theme="light"] .ff-option-item,
+html[data-theme="light"] .proapp-plan-item,
+html[data-theme="light"] .proapp-select-trigger,
+html[data-theme="light"] .proapp-selected-row,
+html[data-theme="light"] .proapp-app-card {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #161616 !important;
+}
+html[data-theme="light"] .ff-option-label,
+html[data-theme="light"] .ff-card-lite,
+html[data-theme="light"] .proapp-plan-label,
+html[data-theme="light"] .proapp-plan-price,
+html[data-theme="light"] .proapp-selected-row strong { color: #161616 !important; }
+html[data-theme="light"] #ffFields .ff-option-price,
+html[data-theme="light"] .ff-option-price { color: #2a2a2a !important; }
+html[data-theme="light"] .service-notice {
+  background: #f5f5f2 !important;
+  border-color: rgba(0,0,0,.12) !important;
+  color: #2a2a2a !important;
+}
+html[data-theme="light"] .i4g-loading-state { color: #6f6f6c !important; }
+html[data-theme="light"] #i4g-check-player-btn {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.16) !important;
+  color: #161616 !important;
+}
+
+/* ── reviews / landing popup / order result ── */
+html[data-theme="light"] .landing-popup-card,
+html[data-theme="light"] .order-result-card,
+html[data-theme="light"] .rv-modal {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .landing-popup-card h3,
+html[data-theme="light"] .order-result-card h3,
+html[data-theme="light"] .rvv-title { color: #161616 !important; }
+html[data-theme="light"] .landing-popup-card p,
+html[data-theme="light"] .order-result-card p { color: #4a4a48 !important; }
+
+/* ── 404 ── */
+html[data-theme="light"] .code { color: #161616 !important; }
+
+/* ── misc ── */
+html[data-theme="light"] .hero-search-item,
+html[data-theme="light"] .svc-search-item,
+html[data-theme="light"] .search-result-item,
+html[data-theme="light"] .hero-search-empty,
+html[data-theme="light"] .svc-search-empty {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .hero-search-item-name,
+html[data-theme="light"] .svc-search-item-name { color: #161616 !important; }
+html[data-theme="light"] .divider { background: rgba(0,0,0,.08) !important; }
+html[data-theme="light"] .rh-skel {
+  background: linear-gradient(90deg,#ececea 25%,#f5f5f2 37%,#ececea 63%) !important;
+}
+html[data-theme="light"] .profile-control-btn { color: #161616 !important; }
+html[data-theme="light"] .settings-photo-btn {
+  background: #f0f0ee !important;
+  color: #2a2a2a !important;
+  border: 1px solid rgba(0,0,0,.14) !important;
+}
+html[data-theme="light"] #navLoginBtn { color: #111 !important; border-color: rgba(0,0,0,.22) !important; }
+html[data-theme="light"] #navUserAvatar { border-color: rgba(0,0,0,.16) !important; box-shadow: none !important; }
+
+/* service checkout injected panel */
+html[data-theme="light"] .service-checkout-box {
+  background: #fafafa !important;
+  border: 1px solid rgba(0,0,0,.12) !important;
+}
+html[data-theme="light"] .service-checkout-head strong,
+html[data-theme="light"] .service-price-pill small,
+html[data-theme="light"] .service-pay-note strong { color: #161616 !important; }
+html[data-theme="light"] .service-checkout-head span,
+html[data-theme="light"] .service-pay-note { color: #4a4a48 !important; }
+
+/* proapp / radio selected stay inverted for affordance */
+html[data-theme="light"] .radio-option:has(input:checked),
+html[data-theme="light"] .proapp-plan-item:has(input:checked),
+html[data-theme="light"] .ff-option-item:has(input:checked) {
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #111 !important;
+}
+html[data-theme="light"] .radio-option:has(input:checked) .ff-option-label,
+html[data-theme="light"] .proapp-plan-item:has(input:checked) .proapp-plan-label,
+html[data-theme="light"] .proapp-plan-item:has(input:checked) .proapp-plan-price { color: #fff !important; }
+
+/* Login = outline (Hire Me stays solid black) */
+html[data-theme="light"] #navLoginBtn {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid rgba(0,0,0,.22) !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] #navLoginBtn:hover,
+html[data-theme="light"] .nav-cta:hover {
+  background: #f0f0ee !important;
+  color: #111111 !important;
+  border-color: #111111 !important;
+}
+
+/* All remaining CTAs: white fill + dark text + dark ring so they stay visible */
+html[data-theme="light"] .btn,
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .service-apply-btn,
+html[data-theme="light"] .home-svc-action,
+html[data-theme="light"] .svc-hub-btn,
+html[data-theme="light"] .submit-btn,
+html[data-theme="light"] .hero-all-services,
+html[data-theme="light"] .checkout-cta,
+html[data-theme="light"] .cart-checkout-btn,
+html[data-theme="light"] .cart-login-btn,
+html[data-theme="light"] .settings-btn,
+html[data-theme="light"] .settings-save-btn,
+html[data-theme="light"] .settings-lang-save-btn,
+html[data-theme="light"] .btn-accent,
+html[data-theme="light"] .auth-submit-btn,
+html[data-theme="light"] .rh-cx-spay,
+html[data-theme="light"] .cx-pay-now,
+html[data-theme="light"] .cc-pay-now,
+html[data-theme="light"] .nav-cta {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+}
+@media (max-width: 899px) {
+  .nav-cta { display: none !important; }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "rabbihossainltd-online",
+  "private": true,
+  "version": "2.0.0",
+  "scripts": {
+    "build:css": "cleancss -O2 -o css/style.min.css css/style.css css/v3-overrides.css css/light-theme.css",
+    "validate": "node scripts/validate-site.mjs",
+    "ci": "npm run build:css && npm run validate"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3"
+  }
+}

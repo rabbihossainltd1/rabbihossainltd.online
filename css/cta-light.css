@@ -1,0 +1,49 @@
+/* Forced light CTAs — white fill, dark text, dark ring. Must stay visible. */
+html[data-theme="light"] .nav-cta,
+html[data-theme="light"] #navLoginBtn,
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .btn,
+html[data-theme="light"] .service-apply-btn,
+html[data-theme="light"] .home-svc-action,
+html[data-theme="light"] .home-svc-action-row .home-svc-action,
+html[data-theme="light"] .svc-hub-btn,
+html[data-theme="light"] .submit-btn,
+html[data-theme="light"] .hero-all-services,
+html[data-theme="light"] .checkout-cta,
+html[data-theme="light"] .cart-checkout-btn,
+html[data-theme="light"] .cart-login-btn,
+html[data-theme="light"] .settings-btn,
+html[data-theme="light"] .settings-save-btn,
+html[data-theme="light"] .settings-lang-save-btn,
+html[data-theme="light"] .btn-accent,
+html[data-theme="light"] .auth-submit-btn,
+html[data-theme="light"] .rh-cx-spay,
+html[data-theme="light"] .cx-pay-now,
+html[data-theme="light"] .cc-pay-now,
+html[data-theme="light"] #floatChatToggle,
+html[data-theme="light"] #floatChatSend,
+html[data-theme="light"] .float-form-submit {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
+}
+html[data-theme="light"] #floatChatToggle svg,
+html[data-theme="light"] .nav-cta,
+html[data-theme="light"] .home-svc-action {
+  color: #111111 !important;
+  stroke: currentColor !important;
+}
+@media (max-width: 899px) {
+  .nav-cta { display: none !important; }
+}
+html[data-theme="light"] .nav-cta:hover,
+html[data-theme="light"] .home-svc-action:hover,
+html[data-theme="light"] .service-apply-btn:hover,
+html[data-theme="light"] .btn-primary:hover,
+html[data-theme="light"] .hero-all-services:hover,
+html[data-theme="light"] .submit-btn:hover {
+  background: #f3f3f0 !important;
+  color: #111111 !important;
+  border-color: #111111 !important;
+}

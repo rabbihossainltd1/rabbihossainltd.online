@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    // Instant dashboard restore from cache
+    (function(){
+      try{
+        var u=JSON.parse(localStorage.getItem('rh_user_cache')||'null');
+        if(!u||!u.uid) return;
+        document.addEventListener('DOMContentLoaded',function(){
+          var n=document.getElementById('dashboardName');
+          var e=document.getElementById('dashboardEmail');
+          var b=document.getElementById('dashboardBalance');
+          var av=document.getElementById('dashboardAvatar');
+          if(n) n.textContent=u.displayName||u.email||'User';
+          if(e) e.textContent=u.email||'';
+          // Always paint the cached balance. Firestore overwrites it moments
+          // later; showing a slightly stale number beats showing "$0 / ৳0",
+          // and the 30-min cutoff meant a daily visitor always saw zero first.
+          if(b&&u.balance){ b.textContent=u.balance; b.dataset.rhStale='1'; }
+          if(av&&u.photoURL) av.innerHTML='<img src="'+u.photoURL+'" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        });
+      }catch(e){}
+    })();
+  </script>
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | RabbiHossainLTD</title>
+  <meta name="description" content="User dashboard for wallet balance, payment history, service orders and profile overview." />
+    <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
+  <style>
+    .dashboard-page { min-height:100vh; padding:0; background:var(--bg-primary); }
+    .dashboard-wrap { max-width:100%; min-height:100vh; padding:120px 20px 80px; background:radial-gradient(circle at top right,rgba(255, 255, 255,.10),transparent 32%),radial-gradient(circle at bottom left,rgba(255, 255, 255,.07),transparent 28%),var(--bg-primary); }
+    .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(255, 255, 255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); max-width:780px; margin:0 auto; }
+    .dashboard-profile { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:18px; }
+    .dashboard-avatar { width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#ffffff; color:#080808; font-family:var(--font-display); font-size:1.6rem; font-weight:900; overflow:hidden; border:2px solid rgba(255, 255, 255,.35); }
+    .dashboard-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+    .dashboard-profile h1 { color:var(--text-primary); font-size:clamp(1.7rem,4vw,2.5rem); margin-bottom:6px; font-family:var(--font-display); }
+    .dashboard-profile p { color:var(--text-secondary); word-break:break-word; }
+    .dashboard-balance { margin-top:16px; padding:16px 16px; border-radius:20px; background:rgba(255, 255, 255,.075); border:1px solid rgba(255, 255, 255,.20); display:grid; grid-template-columns:1fr auto; gap:14px; align-items:center; }
+    .dashboard-balance span { color:#b0b0ad; font-weight:800; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; }
+    .dashboard-balance strong { color:#ffffff; font-size:1.35rem; font-family:var(--font-display); display:block; line-height:1.15; }
+    .dashboard-actions { display:flex; justify-content:center; gap:10px; margin:18px 0; flex-wrap:wrap; }
+    .dashboard-action { text-decoration:none; text-align:center; padding:10px 14px; min-width:126px; font-size:.86rem; border-radius:16px; background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.10); color:var(--text-primary); font-weight:900; transition:.2s ease; }
+    .dashboard-action.primary { background:#ffffff; color:#080808; border:0; }
+    .dashboard-action:hover { transform:translateY(-2px); }
+    .dashboard-tabs { display:flex; gap:10px; flex-wrap:wrap; margin:22px 0 16px; }
+    .dashboard-tab { border:1px solid rgba(255, 255, 255,.16); background:rgba(255, 255, 255,.06); color:#c3c3c1; padding:11px 15px; border-radius:999px; font-weight:900; cursor:pointer; }
+    .dashboard-tab.active { background:#ffffff; color:#080808; border:0; }
+    .dashboard-history-list { display:grid; gap:12px; }
+    .dashboard-history-card { background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.085); border-radius:18px; padding:16px; }
+    .dashboard-history-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:8px; }
+    .dashboard-history-head strong { display:block; color:var(--text-primary); font-size:.98rem; margin-bottom:4px; }
+    .dashboard-history-head span:not(.status) { color:#ffffff; font-size:.86rem; font-weight:900; }
+    .dashboard-history-card p { color:#aaaaaa; font-size:.84rem; line-height:1.55; }
+    .status { display:inline-flex; padding:5px 9px; border-radius:999px; background:rgba(255, 255, 255,.10); border:1px solid rgba(255, 255, 255,.16); color:#d4d4d2; font-size:.68rem; font-weight:900; text-transform:uppercase; white-space:nowrap; }
+    .status.approved,.status.accepted { background:rgba(255, 255, 255,.10); border-color:rgba(255, 255, 255,.20); color:#d9d9d7; }
+    .status.declined,.status.cancelled { background:rgba(255,80,80,.10); border-color:rgba(255,80,80,.22); color:#ffb1b1; }
+    .dashboard-cancel-btn { margin-top:12px; border:1px solid rgba(255,80,80,.26); background:rgba(255,80,80,.08); color:#ffb1b1; border-radius:12px; padding:10px 12px; font-weight:900; cursor:pointer; }
+    .dashboard-login { display:none; text-align:center; padding:42px 22px; }
+    .dashboard-login h1 { color:var(--text-primary); margin-bottom:12px; font-family:var(--font-display); }
+    .dashboard-login p { color:var(--text-secondary); margin-bottom:20px; }
+    .orders-only-title { display:none; color:var(--text-primary); font-family:var(--font-display); font-size:clamp(1.9rem,5vw,3rem); margin-bottom:16px; }
+    .orders-only-subtitle { display:none; color:var(--text-secondary); margin-bottom:18px; line-height:1.6; }
+    html.orders-only-mode .dashboard-profile,
+    html.orders-only-mode .dashboard-balance,
+    html.orders-only-mode .dashboard-actions,
+    html.orders-only-mode .dashboard-tabs,
+    html.orders-only-mode [data-dashboard-panel="payments"] { display:none !important; }
+    html.orders-only-mode .orders-only-title,
+    html.orders-only-mode .orders-only-subtitle { display:block; }
+    html.orders-only-mode [data-dashboard-panel="orders"] { display:block !important; }
+    @media(max-width:720px){ .dashboard-actions{display:flex;} .dashboard-profile{grid-template-columns:1fr;text-align:center;} .dashboard-avatar{margin:0 auto;} .dashboard-history-head{display:grid;grid-template-columns:1fr;} }
+  
+    .orders-segment { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:6px; border:1px solid rgba(255, 255, 255,.14); background:rgba(255,255,255,.035); border-radius:18px; margin:20px 0 16px; }
+    .orders-segment-btn { border:0; border-radius:14px; padding:11px 12px; background:transparent; color:#aeaeaa; font-weight:950; cursor:pointer; font-size:.88rem; }
+    .orders-segment-btn.active { background:#ffffff; color:#080808; box-shadow:0 10px 24px rgba(255, 255, 255,.16); }
+    .order-mini-panel { display:none; }
+    .order-mini-panel.active { display:block; }
+    .orders-only-mode .dashboard-card { padding:18px; border-radius:24px; }
+    .orders-only-mode .dashboard-history-list { gap:8px; }
+    .orders-only-mode .dashboard-history-card { padding:12px 13px; border-radius:15px; background:rgba(255,255,255,.04); }
+    .orders-only-mode .dashboard-history-head { margin-bottom:4px; align-items:center; }
+    .orders-only-mode .dashboard-history-head strong { font-size:.88rem; margin-bottom:2px; }
+    .orders-only-mode .dashboard-history-head span:not(.status) { font-size:.78rem; }
+    .orders-only-mode .dashboard-history-card p { font-size:.76rem; margin-top:4px; }
+    .orders-only-mode .status { font-size:.62rem; padding:4px 8px; }
+    .orders-section-title { color:var(--text-primary); font-family:var(--font-display); font-size:1rem; margin:14px 0 12px; }
+
+  
+    .compact-balance .balance-text { min-width:0; }
+    .compact-balance .balance-plus-btn { justify-self:end; flex:0 0 auto; }
+    @media(max-width:520px){ .dashboard-balance { padding:14px; } .dashboard-balance strong{font-size:1.15rem;} .compact-balance .balance-plus-btn{width:38px;height:38px;border-radius:12px;} }
+
+  </style>
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+
+  <meta name="theme-color" content="#090909">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+</head>
+<body class="has-bottom-nav" onload="loadUserDashboard()">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">RabbiHossainLTD</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg></span>Home</a></li>
+        <li><a href="/services/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766"/></svg></span>Services</a></li>
+        <li><a href="/portfolio/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25A2.25 2.25 0 018.25 10.5H6A2.25 2.25 0 013.75 8.25V6zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6z"/></svg></span>Portfolio</a></li>
+        <li><a href="/about/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg></span>About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main class="dashboard-page" id="main-content">
+    <div class="dashboard-wrap">
+      <h1 class="sr-only">Your dashboard</h1>
+
+      <div id="dashboardLoginRequired" class="dashboard-card dashboard-login">
+        <div class="dashboard-login-mark">→</div>
+        <h2>Login required</h2>
+        <p>Login to view your order and payment history.</p>
+        <button type="button" class="btn btn-primary" onclick="window.rabbiAuth&&window.rabbiAuth.openLogin('dashboard')">Login</button>
+      </div>
+
+      <div id="dashboardContent" class="dashboard-card" style="display:none;">
+        <div class="dashboard-profile">
+          <div class="dashboard-avatar" id="dashboardAvatar">U</div>
+          <div>
+            <h2 id="dashboardName">User <span class="user-verify-badge" title="Verified Member" aria-label="Verified">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="12" fill="#1da1f2"/>
+    <path d="M7 12.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</span></h2>
+            <p id="dashboardEmail">Loading...</p>
+          </div>
+        </div>
+
+        <div class="dashboard-balance compact-balance">
+          <div class="balance-text">
+            <span>Current Balance</span>
+            <strong id="dashboardBalance">$0 / ৳0</strong>
+            <script>
+              /* Paint the cached balance on the very same parse step the
+                 element is created, before the browser can show a frame.
+                 Doing it on DOMContentLoaded left a ~80ms "$0 / ৳0" flash. */
+              (function(){try{
+                var u=JSON.parse(localStorage.getItem('rh_user_cache')||'null');
+                if(!u||!u.uid||!u.balance)return;
+                var b=document.getElementById('dashboardBalance');
+                if(b&&!b.dataset.rhLive)b.textContent=u.balance;
+              }catch(e){}})();
+            </script>
+          </div>
+          <a class="balance-plus-btn" href="/add-credit/" aria-label="Add Credit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </a>
+        </div>
+
+        <section class="profile-control-panel" id="profileControlPanel">
+          <div class="profile-control-grid" id="profileControlGrid">
+            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</button>
+            <button class="profile-control-btn" type="button" id="supportTicketsBtn" onclick="toggleSupportTickets()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Support Tickets</button>
+
+          </div>
+        </section>
+        <script>
+          // In orders-only mode, hide profile control panel entirely (already no useful buttons there)
+          (function(){
+            if(document.documentElement.classList.contains('orders-only-mode')){
+              var panel = document.getElementById('profileControlPanel');
+              if(panel) panel.style.display='none';
+            }
+          })();
+        </script>
+
+        <section data-dashboard-panel="orders" style="display:none;">
+          <div class="orders-page-head">
+            <h1>My Orders</h1>
+            
+          </div>
+          <div class="orders-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="ordersSearchInput" placeholder="Search by order or transaction ID" autocomplete="off" />
+          </div>
+          <div class="orders-filters" id="ordersFilters">
+            <button class="orders-filter-chip active" data-filter="all" type="button">All <span class="count">(0)</span></button>
+            <button class="orders-filter-chip" data-filter="pending" type="button"><span class="dot"></span>Pending <span class="count">(0)</span></button>
+            <button class="orders-filter-chip" data-filter="processing" type="button"><span class="dot"></span>Processing <span class="count">(0)</span></button>
+            <button class="orders-filter-chip" data-filter="approved" type="button"><span class="dot"></span>Approved <span class="count">(0)</span></button>
+            <button class="orders-filter-chip" data-filter="declined" type="button"><span class="dot bad"></span>Declined <span class="count">(0)</span></button>
+          </div>
+          <div id="ordersRoot">
+            <div class="empty-state">Loading orders...</div>
+          </div>
+        </section>
+
+        <!-- Support Tickets Panel -->
+        <section id="supportTicketsPanel" style="display:none;margin-top:20px;">
+          <h2 class="orders-section-title" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            My Support Tickets
+          </h2>
+          <div id="supportTicketsList">
+            <div class="empty-state">Loading...</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <style>
+  .support-ticket-item { background:rgba(255, 255, 255,.05); border:1px solid rgba(255, 255, 255,.14); border-radius:14px; padding:14px 16px; margin-bottom:10px; }
+  .support-ticket-header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .support-ticket-id { font-family:monospace; font-size:.82rem; color:#9b9b96; font-weight:700; }
+  .support-ticket-status { font-size:.74rem; font-weight:900; padding:3px 10px; border-radius:99px; }
+  .support-ticket-status.open { background:rgba(255, 255, 255,.15); color:#ffffff; border:1px solid rgba(255, 255, 255,.3); }
+  .support-ticket-status.solved { background:rgba(255, 255, 255,.12); color:#787873; border:1px solid rgba(255, 255, 255,.28); }
+  .support-ticket-status.closed { background:rgba(255,255,255,.06); color:#aaaaaa; border:1px solid rgba(255,255,255,.1); }
+  .support-ticket-problem { font-size:.85rem; color:#b6b6b3; line-height:1.5; margin-bottom:4px; }
+  .support-ticket-date { font-size:.74rem; color:#70706d; }
+  </style>
+
+  <script type="module">
+  import { auth, db } from '/js/firebase-core.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+  import { collection, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+  window.toggleSupportTickets = function() {
+    const panel = document.getElementById('supportTicketsPanel');
+    const btn = document.getElementById('supportTicketsBtn');
+    if (!panel) return;
+    const isVisible = panel.style.display !== 'none';
+    panel.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) loadUserTickets();
+  };
+
+  function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function loadUserTickets() {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      const list = document.getElementById('supportTicketsList');
+      if (!list) return;
+      // orderBy removed — composite index not required, sort client-side instead
+      const q = query(
+        collection(db, 'supportTickets'),
+        where('userId', '==', user.uid)
+      );
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          list.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:#70706d;font-size:.88rem;">No support tickets yet.</div>';
+          return;
+        }
+        // Sort client-side by createdAt desc
+        const docs = [];
+        snap.forEach(docSnap => docs.push(docSnap.data()));
+        docs.sort((a, b) => {
+          const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return tb - ta;
+        });
+        list.innerHTML = '';
+        docs.forEach(d => {
+          const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('bn-BD') : '';
+          const statusClass = d.status === 'solved' ? 'solved' : d.status === 'closed' ? 'closed' : 'open';
+          const statusLabel = d.status === 'solved' ? 'সমাধান হয়েছে' : d.status === 'closed' ? 'বন্ধ' : 'খোলা আছে';
+          list.innerHTML += `<div class="support-ticket-item">
+            <div class="support-ticket-header">
+              <span class="support-ticket-id">${escH(d.ticketId)}</span>
+              <span class="support-ticket-status ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="support-ticket-problem">${escH(d.problemDescription || '')}</div>
+            <div class="support-ticket-date">${date}</div>
+          </div>`;
+        });
+      }, (err) => {
+        console.error('Tickets load error:', err);
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:#ff6b6b;font-size:.88rem;">টিকেট লোড করতে সমস্যা হয়েছে।</div>';
+      });
+    });
+  }
+  </script>
+
+  <script src="/js/lang.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/cart.js" defer></script>
+  <script type="module" src="/js/wallet.js"></script>
+  <script>
+    // Request browser notification permission once on dashboard load
+    if ("Notification" in window && Notification.permission === "default") {
+      setTimeout(() => {
+        Notification.requestPermission();
+      }, 3000); // wait 3 seconds so it doesn't feel abrupt
+    }
+  </script>
+
+<!-- ── Floating Customer Support Widget ── -->
+<div id="floatChatWidget">
+  <div id="floatChatWindow" style="display:none;" role="dialog" aria-label="Customer Support Chat">
+    <div id="floatChatHeader">
+      <div id="floatChatHeaderInfo">
+        <div id="floatChatAvatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+        </div>
+        <div>
+          <div id="floatChatTitle">RH Support</div>
+          <div id="floatChatStatus"><span id="floatStatusDot"></span> Online</div>
+        </div>
+      </div>
+      <button type="button" id="floatChatClose" aria-label="Close chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="floatChatMessages"></div>
+    <div id="floatChatInputArea">
+      <input type="text" id="floatChatInput" placeholder="বার্তা লিখুন..." autocomplete="off" maxlength="500" />
+      <button type="button" id="floatChatSend" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+  <button type="button" id="floatChatToggle" aria-label="Open customer support">
+    <span id="floatChatBadge" style="display:none;"></span>
+    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+
+<style>
+#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
+
+body.has-bottom-nav #floatChatWidget { bottom:100px; right:16px; z-index:2500; }
+#floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(255, 255, 255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#ffffff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(255, 255, 255,.22); transition:transform .2s,box-shadow .2s; position:relative; }
+#floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(255, 255, 255,.38); }
+#floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #080808; }
+#floatChatWindow { width:340px; max-height:560px; background:rgba(10,18,30,.97); border:1px solid rgba(255, 255, 255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
+@keyframes floatSlideIn { from{opacity:0;transform:translateY(18px) scale(.96)} to{opacity:1;transform:none} }
+#floatChatHeader { background:rgba(255, 255, 255,.07); border-bottom:1px solid rgba(255, 255, 255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0; }
+#floatChatHeaderInfo { display:flex; align-items:center; gap:10px; }
+#floatChatAvatar { width:38px; height:38px; border-radius:50%; background:rgba(255, 255, 255,.12); border:1px solid rgba(255, 255, 255,.28); display:flex; align-items:center; justify-content:center; color:#ffffff; flex-shrink:0; }
+#floatChatTitle { color:#ededec; font-weight:900; font-size:.92rem; }
+#floatChatStatus { color:#aaaaaa; font-size:.75rem; display:flex; align-items:center; gap:5px; margin-top:2px; }
+#floatStatusDot { width:7px; height:7px; border-radius:50%; background:#ffffff; animation:statusPulse 2s ease-in-out infinite; display:inline-block; }
+@keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#floatChatClose { background:none; border:none; color:#aaaaaa; cursor:pointer; padding:4px; border-radius:6px; display:flex; align-items:center; transition:color .15s; }
+#floatChatClose:hover { color:#f7f7f4; }
+#floatChatMessages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:180px; max-height:360px; scroll-behavior:smooth; }
+#floatChatMessages::-webkit-scrollbar { width:4px; }
+#floatChatMessages::-webkit-scrollbar-track { background:transparent; }
+#floatChatMessages::-webkit-scrollbar-thumb { background:rgba(255, 255, 255,.2); border-radius:2px; }
+.float-msg { display:flex; flex-direction:column; max-width:88%; }
+.float-msg-admin { align-self:flex-start; }
+.float-msg-user { align-self:flex-end; }
+.float-msg-bubble { padding:10px 14px; border-radius:16px; font-size:.86rem; line-height:1.55; word-break:break-word; }
+.float-msg-admin .float-msg-bubble { background:rgba(255, 255, 255,.10); border:1px solid rgba(255, 255, 255,.18); color:#dcdcd8; border-bottom-left-radius:4px; }
+.float-msg-user .float-msg-bubble { background:linear-gradient(135deg,rgba(255, 255, 255,.18),rgba(255, 255, 255,.14)); border:1px solid rgba(255, 255, 255,.22); color:#f1f1f0; border-bottom-right-radius:4px; }
+.float-msg-time { font-size:.7rem; color:#70706d; margin-top:4px; }
+.float-msg-admin .float-msg-time { text-align:left; }
+.float-msg-user .float-msg-time { text-align:right; }
+.float-typing-bubble { display:flex; align-items:center; gap:4px; padding:12px 14px; min-width:54px; }
+.float-typing-dot { width:7px; height:7px; border-radius:50%; background:rgba(255, 255, 255,.5); animation:floatDotBounce 1.2s ease-in-out infinite; }
+.float-typing-dot:nth-child(2) { animation-delay:.2s; }
+.float-typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes floatDotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+.float-quick-btns { display:flex; flex-direction:column; gap:7px; align-self:stretch; margin-top:4px; }
+.float-quick-btn { background:rgba(255, 255, 255,.07); border:1px solid rgba(255, 255, 255,.22); border-radius:12px; color:#dcdcd8; font-size:.84rem; padding:10px 14px; cursor:pointer; text-align:left; transition:background .17s,border-color .17s,color .17s; font-family:inherit; line-height:1.4; }
+.float-quick-btn:hover { background:rgba(255, 255, 255,.16); border-color:rgba(255, 255, 255,.45); color:#ededec; }
+.float-answer-list { display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+.float-answer-item { display:flex; align-items:flex-start; gap:7px; font-size:.84rem; line-height:1.5; }
+.float-answer-item svg { flex-shrink:0; margin-top:3px; }
+.float-agent-form-wrap { background:rgba(255, 255, 255,.06); border:1px solid rgba(255, 255, 255,.18); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:9px; align-self:stretch; }
+.float-form-title { display:flex; align-items:center; gap:8px; color:#ffffff; font-weight:900; font-size:.88rem; }
+.float-form-ticket-id { font-size:.76rem; color:#aaaaaa; display:flex; align-items:center; gap:5px; }
+.float-form-ticket-id strong { color:#c4c4c0; }
+.float-form-input { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:10px; padding:9px 12px; color:#f7f7f4; font-size:.84rem; font-family:inherit; outline:none; transition:border-color .15s; width:100%; box-sizing:border-box; }
+.float-form-input:focus { border-color:rgba(255, 255, 255,.4); }
+.float-form-textarea { resize:none; min-height:70px; }
+.float-form-ticket-note { font-size:.72rem; color:#70706d; text-align:center; }
+.float-form-ticket-note code { color:#9b9b96; font-family:monospace; font-size:.76rem; }
+.float-form-submit { background:linear-gradient(135deg,rgba(255, 255, 255,.2),rgba(255, 255, 255,.15)); border:1px solid rgba(255, 255, 255,.35); border-radius:11px; color:#e4e4e0; font-size:.86rem; font-weight:900; padding:11px 14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:.18s; font-family:inherit; }
+.float-form-submit:hover:not(:disabled) { background:linear-gradient(135deg,rgba(255, 255, 255,.3),rgba(255, 255, 255,.22)); border-color:rgba(255, 255, 255,.55); color:#ededec; }
+.float-form-submit:disabled { opacity:.5; cursor:not-allowed; }
+.float-waiting-bubble { padding:12px 14px; }
+.float-waiting-inner { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.float-wait-ring { flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.float-wait-arc { transform-origin:center; animation:floatSpin 1.1s linear infinite; }
+@keyframes floatSpin { to{transform:rotate(360deg)} }
+.float-waiting-text { color:#9b9b96; font-size:.84rem; }
+.float-wait-dots { display:flex; gap:5px; padding-left:2px; }
+#floatChatInputArea { border-top:1px solid rgba(255,255,255,.07); padding:11px 12px; display:flex; gap:8px; align-items:center; flex-shrink:0; }
+#floatChatInput { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 12px; color:#f7f7f4; font-size:.88rem; font-family:inherit; outline:none; transition:border-color .15s; }
+#floatChatInput:focus { border-color:rgba(255, 255, 255,.3); }
+#floatChatInput::placeholder { color:#70706d; }
+#floatChatInput:disabled { opacity:.45; cursor:not-allowed; }
+#floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:#ffffff; color:#080808; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
+#floatChatSend:hover:not(:disabled) { transform:scale(1.08); }
+#floatChatSend:disabled { opacity:.4; cursor:not-allowed; }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:12px; bottom:100px; z-index:2500; } }
+</style>
+
+<script type="module" src="/js/support-chat.js"></script>
+
+  <script>
+    function openSupportChatFullscreen() {
+      const widget = document.getElementById('floatChatWidget');
+      const winEl  = document.getElementById('floatChatWindow');
+      const closeBtn = document.getElementById('floatChatClose');
+
+      if (!widget || !winEl) {
+        setTimeout(openSupportChatFullscreen, 500);
+        return;
+      }
+
+      // Show chat window fullscreen
+      winEl.style.cssText = 'display:flex!important;flex-direction:column!important;width:100vw!important;height:100dvh!important;max-height:none!important;border-radius:0!important;border:none!important;position:fixed!important;inset:0!important;z-index:9998!important;';
+      widget.style.cssText = 'position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:9997!important;display:flex!important;';
+      document.body.style.overflow = 'hidden';
+
+      // Mark as fullscreen so close button knows to reset properly
+      winEl.dataset.fullscreen = '1';
+
+      // Override close button to reset fullscreen
+      if (closeBtn) {
+        closeBtn._origHandler = closeBtn._origHandler || null;
+        closeBtn.onclick = () => {
+          winEl.style.cssText = 'display:none;';
+          widget.style.cssText = '';
+          winEl.dataset.fullscreen = '';
+          document.body.style.overflow = '';
+          closeBtn.onclick = null;
+        };
+      }
+    }
+  </script>
+  <nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+    <a href="/"><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+    <a href="/add-credit/"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+    <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+
+    <a href="/dashboard/?tab=orders" id="bnOrders"><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+    <a href="/dashboard/" id="bnProfile"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+  </nav>
+  <script>
+    (function(){
+      var isOrders = new URLSearchParams(location.search).get('tab') === 'orders';
+      var o = document.getElementById('bnOrders');
+      var p = document.getElementById('bnProfile');
+      if(isOrders){ if(o) o.className='active'; }
+      else { if(p) p.className='active'; }
+    })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body>

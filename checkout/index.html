@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Checkout | RabbiHossainLTD</title>
+  <meta name="description" content="Secure checkout for RabbiHossainLTD digital services. Pay from your wallet balance or pay instantly with bKash, Nagad or Rocket." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://rabbihossainltd.online/checkout/" />
+  <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+  <meta name="theme-color" content="#080808">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Checkout | RabbiHossainLTD">
+  <meta property="og:description" content="Secure checkout — pay from wallet balance or instantly with bKash, Nagad or Rocket.">
+  <meta property="og:url" content="https://rabbihossainltd.online/checkout/">
+  <meta property="og:site_name" content="RabbiHossainLTD">
+  <meta name="twitter:card" content="summary">
+  <link rel="preload" href="/fonts/noto-serif-bengali.subset.woff2" as="font" type="font/woff2" crossorigin>
+<style id="rh-cx-css">
+/* ===== Compact buy-form redesign (checkout) ===== */
+.rh-cx-shell{max-width:520px;margin:0 auto;padding:14px 16px 96px}
+.rh-cx-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.rh-cx-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.rh-cx-mark{width:30px;height:30px;border-radius:9px;background:#fff;color:#0a0a0a;display:grid;place-items:center;font-weight:800;font-size:13px}
+.rh-cx-brandname{font-weight:800;letter-spacing:.12em;font-size:.74rem;color:#f5f5f3;line-height:1.2}
+.rh-cx-brandsub{font-size:.62rem;color:#6f6f6c}
+.rh-cx-topright{display:flex;align-items:center;gap:8px}
+.rh-cx-sec{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;color:#3ddc84;border:1px solid rgba(61,220,132,.25);border-radius:999px;padding:6px 11px;background:rgba(61,220,132,.05);white-space:nowrap}
+.rh-cx-sec svg{width:13px;height:13px;flex:none}
+.rh-cx-close{width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.1);display:grid;place-items:center;color:#a9a9a6;text-decoration:none;transition:.15s}
+.rh-cx-close:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+.rh-cx-card{background:#111;border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden}
+.rh-cx-photo{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#1a1a1a}
+.rh-cx-body{padding:13px 14px 16px}
+.rh-cx-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rh-cx-title{font-size:1.15rem;font-weight:800;margin:0;color:#f5f5f3;letter-spacing:-.01em;line-height:1.25}
+.rh-cx-sub{font-size:.8rem;color:#a9a9a6;margin-top:2px}
+.rh-cx-titlerow{display:flex;align-items:center;gap:6px;margin-top:3px}
+.rh-cx-info{width:26px;height:26px;border-radius:999px;border:none;background:transparent;color:#a9a9a6;display:grid;place-items:center;cursor:pointer;transition:transform .18s,color .15s}
+.rh-cx-info:hover{color:#f5f5f3}
+.rh-cx-info.open{transform:rotate(180deg);color:#f5f5f3}
+.rh-cx-info svg{width:19px;height:19px}
+.rh-cx-price{flex:none;text-align:right}
+.rh-cx-usd{font-size:1.1rem;font-weight:800;color:#f5f5f3}
+.rh-cx-bdt{font-size:.72rem;color:#a9a9a6}
+.rh-cx-infopanel{max-height:0;overflow:hidden;transition:max-height .22s ease}
+.rh-cx-infopanel.open{max-height:360px;overflow-y:auto}
+.rh-cx-infotext{font-size:.78rem;color:#a9a9a6;line-height:1.6;padding-top:8px}
+.rh-cx-infotext b{color:#f5f5f3;font-weight:700}
+.rh-cx-hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:11px 0}
+
+/* ===== compact form overrides ===== */
+.rh-cx-body #serviceOrderForm{display:block}
+.rh-cx-body .form-group{margin-bottom:11px}
+.rh-cx-body .form-label{display:block;font-size:.78rem;font-weight:700;color:#a9a9a6;margin-bottom:6px}
+.rh-cx-body .form-input,.rh-cx-body .form-select,.rh-cx-body .form-textarea{font-size:.88rem;padding:9px 11px;border-radius:10px;background:#0a0a0a!important;border:1px solid rgba(255,255,255,.1)!important;color:#f5f5f3!important;width:100%}
+.rh-cx-body .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.rh-cx-body .form-row{grid-template-columns:1fr}}
+.rh-cx-body .radio-group{display:grid;gap:8px}
+.rh-cx-body .radio-option{display:flex;align-items:center;gap:9px;font-size:.86rem;font-weight:700;color:#ddd;padding:11px 12px;border:1px solid rgba(255,255,255,.12);border-radius:11px;background:#141414;cursor:pointer}
+.rh-cx-body .radio-option:has(input:checked){border-color:#fff;background:#fff;color:#080808}
+.rh-cx-body .radio-option input{accent-color:#fff}
+.rh-cx-body .form-note{font-size:.72rem!important;color:#6f6f6c!important;line-height:1.6;margin-top:-2px}
+.rh-cx-body .service-notice{margin:8px 0 12px;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#c9c9c6;font-weight:700;line-height:1.5;font-size:.8rem}
+.rh-cx-body .ff-option-list{display:grid!important;gap:7px}
+.rh-cx-body .ff-option-item{padding:10px 12px;border-radius:11px}
+.rh-cx-body .ff-option-label{font-size:.84rem}
+.rh-cx-body .ff-option-price{font-size:.82rem}
+.rh-cx-body .ff-type-btn{font-size:.8rem;padding:9px 8px;border-radius:11px}
+.rh-cx-body .plan-picker{margin-top:8px;border-radius:11px}
+.rh-cx-body .plan-picker-summary{padding:11px 13px;min-height:44px}
+
+/* ===== compact payment panel (injected by service-modal.js) ===== */
+.rh-cx-body #serviceCheckoutPanel .service-checkout-box{margin:14px 0 0;padding:14px;border-radius:14px;background:#141414!important;border:1px solid rgba(255,255,255,.12)!important}
+.rh-cx-body #serviceCheckoutPanel .service-checkout-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rh-cx-body #serviceCheckoutPanel .service-checkout-head strong{font-size:.9rem}
+.rh-cx-body #serviceCheckoutPanel .service-price-pill{min-width:0;padding:7px 11px;border-radius:11px;text-align:right}
+.rh-cx-body #serviceCheckoutPanel .service-price-pill span{font-size:1rem}
+.rh-cx-body #serviceCheckoutPanel .service-price-pill small{font-size:.72rem}
+.rh-cx-body #serviceCheckoutPanel .service-pay-note{font-size:.72rem;margin-top:9px}
+.rh-cx-body #serviceCheckoutPanel .coupon-row{margin-bottom:10px}
+.rh-cx-body #serviceCheckoutPanel .coupon-input-wrap{border-radius:11px;padding:7px 10px}
+.rh-cx-body #serviceCheckoutPanel #couponInput{font-size:.84rem}
+
+/* ===== sticky mobile pay bar ===== */
+.rh-cx-sticky{position:fixed;left:0;right:0;bottom:0;z-index:2400;background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.2);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.rh-cx-sticky-in{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto}
+.rh-cx-stotal{flex:none}
+.rh-cx-sl{font-size:.64rem;color:#6f6f6c;font-weight:700}
+.rh-cx-sv{font-size:1.05rem;font-weight:800;color:#f5f5f3}
+.rh-cx-spay{flex:1;padding:13px;border:none;border-radius:12px;background:#fff;color:#0a0a0a;font-weight:800;font-size:.9rem;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.rh-cx-spay svg{width:15px;height:15px}
+.rh-cx-cart{flex:none;width:46px;height:46px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:#141414;color:#f5f5f3;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s}
+.rh-cx-cart:hover{border-color:rgba(255,255,255,.4);background:#181818}
+.rh-cx-cart svg{width:20px;height:20px}
+@media(min-width:600px){.rh-cx-sticky .rh-cx-sticky-in{max-width:520px}}
+
+.checkout-page .checkout-state{max-width:480px}
+
+/* ===== schema-driven fields (Claude dropdown/toggle) ===== */
+.rh-cx-body .req{color:#ff5c5c}
+.rh-cx-body .hint{font-size:.68rem;color:#6f6f6c;font-weight:600;margin-left:auto}
+.rh-cx-body .pkg-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:1px solid rgba(255,255,255,.1);background:#0a0a0a;border-radius:10px;padding:10px 12px;cursor:pointer;font-family:inherit;text-align:left;color:#f5f5f3}
+.rh-cx-body .pkg-toggle:hover{border-color:rgba(255,255,255,.25)}
+.rh-cx-body .pkg-toggle.open{border-color:#fff;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.rh-cx-body .pkg-toggle .pt-label{font-size:.86rem;font-weight:700;color:#f5f5f3;min-width:0}
+.rh-cx-body .pkg-toggle .pt-label small{display:block;font-size:.68rem;color:#a9a9a6;font-weight:600;margin-top:1px}
+.rh-cx-body .pkg-toggle .pt-right{display:flex;align-items:center;gap:8px;flex:none}
+.rh-cx-body .pkg-toggle .pt-price{font-size:.9rem;font-weight:800;color:#f5f5f3}
+.rh-cx-body .pkg-toggle .chev{width:16px;height:16px;flex:none;color:#a9a9a6;transition:transform .18s}
+.rh-cx-body .pkg-toggle.open .chev{transform:rotate(180deg);color:#f5f5f3}
+.rh-cx-body .opts{display:flex;flex-direction:column;gap:6px;border:1px solid #fff;border-top:none;border-radius:0 0 10px 10px;padding:8px;background:#0a0a0a}
+.rh-cx-body .opt{display:flex;align-items:center;gap:10px;width:100%;border:1px solid rgba(255,255,255,.1);background:#141414;border-radius:10px;padding:9px 11px;cursor:pointer;font-family:inherit;text-align:left;color:#f5f5f3}
+.rh-cx-body .opt:hover{border-color:rgba(255,255,255,.25)}
+.rh-cx-body .opt.sel{border-color:#fff}
+.rh-cx-body .opt .radio{width:17px;height:17px;flex:none;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);display:grid;place-items:center}
+.rh-cx-body .opt.sel .radio{border-color:#fff}
+.rh-cx-body .opt.sel .radio::after{content:"";width:9px;height:9px;border-radius:50%;background:#fff}
+.rh-cx-body .opt .lbl{font-size:.86rem;font-weight:700;color:#f5f5f3;min-width:0}
+.rh-cx-body .opt .lbl small{display:block;font-size:.7rem;color:#a9a9a6;font-weight:600}
+.rh-cx-body .opt .tag,.rh-cx-body .pt-label .tag{font-size:.62rem;font-weight:800;color:#0a0a0a;background:#ffb454;border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.rh-cx-body .opt .p{margin-left:auto;font-size:.9rem;font-weight:800;color:#f5f5f3}
+.rh-cx-body .tgl{display:flex;background:#0a0a0a;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:3px;gap:3px}
+.rh-cx-body .tgl button{flex:1;border:none;background:transparent;color:#6f6f6c;font-weight:700;font-size:.8rem;font-family:inherit;padding:9px;border-radius:8px;cursor:pointer}
+.rh-cx-body .tgl button.active{background:#fff;color:#0a0a0a}
+
+/* ===== embedded mode (cart plan picker iframe) ===== */
+body.cx-embed .rh-cx-top{display:none!important}
+body.cx-embed .rh-cx-shell{padding-top:6px!important}
+body.cx-embed .rh-cx-sticky #stickyPayBtn{display:none!important}
+body.cx-embed .rh-cx-sticky .rh-cx-sticky-in{justify-content:stretch}
+body.cx-embed .rh-cx-sticky #addToCartBtn{flex:1;width:auto;height:48px;border:none;background:#111;color:#fff;font-weight:800;font-size:.9rem;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+body.cx-embed .rh-cx-sticky #addToCartBtn:hover{background:#222}
+[data-theme="light"] body.cx-embed .rh-cx-sticky #addToCartBtn{background:#111!important;color:#fff!important}
+</style>
+</head>
+
+<body class="checkout-page checkout-standalone">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <main id="main-content">
+    <div class="rh-cx-shell">
+
+      <div class="rh-cx-top">
+        <a class="rh-cx-brand" href="/">
+          <span class="rh-cx-mark">R</span>
+          <span>
+            <div class="rh-cx-brandname">RABBIHOSSAINLTD</div>
+            <div class="rh-cx-brandsub">Secure Checkout</div>
+          </span>
+        </a>
+        <div class="rh-cx-topright">
+          <span class="rh-cx-sec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+            SSL · TLS 1.3
+          </span>
+          <a class="rh-cx-close" href="/services/" aria-label="Close checkout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div id="checkoutLoading" class="checkout-state">
+        <div class="checkout-spinner" aria-hidden="true"></div>
+        <p>Loading…</p>
+      </div>
+
+      <div id="checkoutInvalid" class="checkout-state" style="display:none;">
+        <div class="checkout-state-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+        </div>
+        <h2 class="checkout-state-title">Service not found</h2>
+        <p>The link is invalid or the service is no longer available.</p>
+        <a class="checkout-cta" href="/services/">View all services</a>
+      </div>
+
+      <div id="checkoutAuthGate" class="checkout-state" style="display:none;">
+        <div class="checkout-state-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2 class="checkout-state-title">Login required</h2>
+        <p id="checkoutAuthGateService">Login to complete your order.</p>
+        <button type="button" class="checkout-cta" id="checkoutLoginBtn">Login</button>
+        <p class="checkout-state-note"></p>
+      </div>
+
+      <div id="checkoutMain" style="display:none;">
+        <div class="rh-cx-card">
+          <img class="rh-cx-photo" id="checkoutPhoto" alt="" />
+          <div class="rh-cx-body">
+            <div class="rh-cx-head">
+              <div>
+                <h1 class="rh-cx-title" id="checkoutTitle">Service</h1>
+                <div class="rh-cx-sub" id="checkoutSubtitle"></div>
+                <div class="rh-cx-titlerow">
+                  <button class="rh-cx-info" id="infoBtn" type="button" aria-expanded="false" aria-controls="infoPanel" aria-label="Product info">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="rh-cx-price">
+                <div class="rh-cx-usd" id="headerPriceUsd">$0</div>
+                <div class="rh-cx-bdt" id="headerPriceBdt">৳0</div>
+              </div>
+            </div>
+            <div class="rh-cx-infopanel" id="infoPanel">
+              <div class="rh-cx-infotext" id="infoText"></div>
+            </div>
+            <hr class="rh-cx-hr">
+            <form id="serviceOrderForm" novalidate>
+              <input type="hidden" id="modalServiceType" name="service_type" value="" />
+              <div id="schemaRoot"></div>
+              <div class="service-modal-status" id="modalStatus"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="rh-cx-sticky" id="stickyBar">
+    <div class="rh-cx-sticky-in">
+      <button class="rh-cx-spay" id="stickyPayBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="stickyPayLabel">Pay Now</span>
+      </button>
+      <button class="rh-cx-cart" id="addToCartBtn" type="button" aria-label="Add to cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+      </button>
+    </div>
+  </div>
+
+
+  <script src="/js/lang.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/service-info.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script type="module" src="/js/wallet.js"></script>
+  <script src="/js/service-modal.js" defer></script>
+  <script src="/js/item4gamer.js" defer></script>
+  <script src="/js/cart.js" defer></script>
+  <script src="/js/plans.js" defer></script>
+  <script src="/js/checkout.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+    }
+  </script>
+</body>
+</html>

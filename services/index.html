@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Services & Pricing | RabbiHossainLTD</title>
+  <meta name="description" content="Browse RabbiHossainLTD services, plans, prices, delivery information and order requirements before placing an order." />
+    <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+
+  <meta name="theme-color" content="#090909">
+  <link rel="canonical" href="https://rabbihossainltd.online/services/">
+  <link rel="preload" href="/fonts/noto-serif-bengali.subset.woff2" as="font" type="font/woff2" crossorigin>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RabbiHossainLTD">
+  <meta property="og:locale" content="bn_BD">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:title" content="Digital Services & Pricing | RabbiHossainLTD">
+  <meta property="og:description" content="Browse RabbiHossainLTD services, plans, prices, delivery information and order requirements before placing an order.">
+  <meta property="og:url" content="https://rabbihossainltd.online/services/">
+  <meta property="og:image" content="https://rabbihossainltd.online/images/og/services.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Digital Services & Pricing | RabbiHossainLTD">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Digital Services & Pricing | RabbiHossainLTD">
+  <meta name="twitter:description" content="Browse RabbiHossainLTD services, plans, prices, delivery information and order requirements before placing an order.">
+  <meta name="twitter:image" content="https://rabbihossainltd.online/images/og/services.png">
+  <script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://rabbihossainltd.online/"}, {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://rabbihossainltd.online/services/"}]}
+  </script>
+  <link rel="alternate" hreflang="bn-BD" href="https://rabbihossainltd.online/services/">
+  <link rel="alternate" hreflang="en" href="https://rabbihossainltd.online/services/">
+  <link rel="alternate" hreflang="x-default" href="https://rabbihossainltd.online/services/">
+</head>
+<body class="has-bottom-nav">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ── NAVBAR ─────────────────────────────────────────── -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">RabbiHossainLTD</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg></span>Home</a></li>
+        <li><a href="/services/" class="active"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg></span>Services</a></li>
+        <li><a href="/portfolio/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg></span>Portfolio</a></li>
+        <li><a href="/about/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>About</a></li>
+        
+      </ul>
+      <div class="nav-search" id="svcSearchWrap">
+        <input type="search" id="svcSearchInput" class="nav-search-input" placeholder="Search services" autocomplete="off" spellcheck="false" aria-label="Search services" tabindex="-1" />
+        <button type="button" class="nav-search-clear" id="svcSearchClear" aria-label="Clear search" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <button type="button" class="nav-search-btn" id="svcSearchToggle" aria-label="Search services" aria-expanded="false" aria-controls="svcSearchWrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+      </div>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+      
+    </div>
+  </nav>
+  <!-- ── Global Service Search Overlay ── -->
+
+
+  <!-- ── SERVICE ORDER MODAL ──────────────────────────────── -->
+  <!-- ══ SERVICE ORDER MODAL ════════════════════════════════ -->
+  <div class="service-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="service-modal">
+      <button class="service-modal-close" id="modalClose" aria-label="Close">&times;</button>
+      <div class="service-modal-title" id="modalTitle">Apply for Service</div>
+      <div class="service-modal-subtitle" id="modalSubtitle">Fill in the details below to continue.</div>
+
+      <form id="serviceOrderForm" novalidate>
+        <input type="hidden" id="modalServiceType" name="service_type" value="" />
+
+        <!-- Standard contact fields (hidden for FF panels & diamond) -->
+        <div id="standardContactFields">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mo_name">Full Name *</label>
+              <input class="form-input" type="text" id="mo_name" name="name" placeholder="Your name" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mo_email">Email Address *</label>
+              <input class="form-input" type="email" id="mo_email" name="email" placeholder="your@email.com" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Web Dev specific fields -->
+        <div id="webDevFields" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mo_website_type">Website Type</label>
+              <select class="form-input form-select" id="mo_website_type" name="website_type">
+                <option value="">Select type…</option>
+                <option>Landing Page / Portfolio</option>
+                <option>Business / Corporate Website</option>
+                <option>E-commerce Store</option>
+                <option>Blog / News Site</option>
+                <option>Web Application</option>
+                <option>WordPress Website</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mo_pages">Number of Pages</label>
+              <select class="form-input form-select" id="mo_pages" name="pages">
+                <option value="">Select…</option>
+                <option>1–3 pages</option>
+                <option>4–7 pages</option>
+                <option>8–15 pages</option>
+                <option>15+ pages</option>
+                <option>Not sure yet</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mo_features">Required Features</label>
+            <input class="form-input" type="text" id="mo_features" name="features" placeholder="e.g. contact form, payment gateway, admin panel…" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mo_existing">Existing Website URL (if any)</label>
+            <input class="form-input" type="url" id="mo_existing" name="existing_url" placeholder="https://yourwebsite.com" />
+          </div>
+        </div>
+
+        <!-- Security specific fields -->
+        <div id="securityFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label" for="mo_target_type">Target / System Type</label>
+            <select class="form-input form-select" id="mo_target_type" name="target_type">
+              <option value="">Select…</option>
+              <option>Web Application</option>
+              <option>Network / Server</option>
+              <option>Mobile App</option>
+              <option>API / Backend</option>
+              <option>Full Infrastructure</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Android specific fields -->
+        <div id="androidFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label" for="mo_app_type">App Category</label>
+            <select class="form-input form-select" id="mo_app_type" name="app_type">
+              <option value="">Select…</option>
+              <option>Business / Productivity</option>
+              <option>E-commerce</option>
+              <option>Social / Community</option>
+              <option>Education</option>
+              <option>Utility / Tools</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Meta Verified fields -->
+        <div id="metaFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Verification Type</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="meta_type" value="Page" /> Facebook Page</label>
+              <label class="radio-option"><input type="radio" name="meta_type" value="Personal ID" /> Personal Profile (ID)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mo_fb_url">Facebook Page / Profile URL</label>
+            <input class="form-input" type="url" id="mo_fb_url" name="fb_url" placeholder="https://facebook.com/yourpage" />
+          </div>
+        </div>
+
+        <!-- Visa/Mastercard fields -->
+        <div id="cardFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Card Type</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="card_type" value="Physical" id="cardTypePhysical" /> Physical Card (Delivered)</label>
+              <label class="radio-option"><input type="radio" name="card_type" value="Virtual" id="cardTypeVirtual" /> Virtual Card (Instant Online)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="mo_card_name">Name for Card</label>
+            <input class="form-input" type="text" id="mo_card_name" name="card_name" placeholder="Name to print on card" />
+          </div>
+          <div class="form-group" id="cardAddressGroup" style="display:none;">
+            <label class="form-label" for="mo_card_address">Delivery Address *</label>
+            <textarea class="form-textarea" id="mo_card_address" name="card_address" placeholder="সম্পূর্ণ ডেলিভারি ঠিকানা দিন…" style="min-height:90px;"></textarea>
+          </div>
+          <div class="form-group" id="cardPriceGroup" style="display:none;">
+            <label class="form-label" for="mo_card_price">Select Card Price *</label>
+            <select class="form-input form-select" id="mo_card_price" name="card_price_package">
+              <option value="">Select card price…</option>
+            </select>
+            <input type="hidden" id="mo_card_price_usd" name="card_price_usd" value="" />
+          </div>
+          <p class="form-note" style="color:var(--text-muted);font-size:.78rem;line-height:1.65;margin-top:-6px;">
+            Virtual: $12 / ৳1,500, $55 / ৳6,875, $105 / ৳13,125. Physical: $110 / ৳13,750, $550 / ৳68,750, $1,200 / ৳150,000.
+          </p>
+        </div>
+
+        <!-- Pro App fields — App selector + Plan picker -->
+        <div id="proappFields" style="display:none;">
+
+          <!-- Step 1: Select App -->
+          <div class="form-group" id="proappStep1">
+            <label class="form-label">Select App / Subscription</label>
+            <div class="proapp-grid" id="proappGrid">
+              <!-- Cards injected by JS -->
+            </div>
+          </div>
+
+          <!-- Step 2: Select Plan (shown after app selected) -->
+          <div class="form-group" id="proappStep2" style="display:none;">
+            <details class="plan-picker" id="proappPlanPicker">
+              <summary class="plan-picker-summary">
+                <span class="plan-picker-label">Select Your Plan</span>
+                <span class="plan-picker-value" id="proappPlanValue">Choose</span>
+                <svg class="plan-picker-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </summary>
+              <div class="proapp-plan-list" id="proappPlanList"></div>
+            </details>
+            <input type="hidden" id="mo_app_name" name="app_name" />
+            <input type="hidden" id="mo_plan_type" name="plan_type" />
+            <input type="hidden" id="mo_plan_usd" name="plan_usd" />
+          </div>
+
+          <!-- Email field -->
+          <div class="form-group" id="proappEmailGroup" style="display:none;">
+            <label class="form-label" for="mo_proapp_email">Account Email (required)</label>
+            <input class="form-input" type="email" id="mo_proapp_email" name="proapp_email" placeholder="Your account email address" autocomplete="email" />
+          </div>
+
+        </div>
+
+        <script>
+        (function(){
+          const APPS = [
+            {
+              id:'chatgpt', name:'ChatGPT', img:'images/v2/chatgpt-pro.webp',
+              plans:[
+                {label:'Go · 1 Month', usd:10},
+                {label:'Plus · 1 Month', usd:20},
+                {label:'Pro · 1 Month', usd:200},
+              ]
+            },
+            {
+              id:'gemini', name:'Gemini', img:'images/v2/gemini-pro.webp',
+              plans:[
+                {label:'AI Pro · 1 Month', usd:19.99},
+                {label:'AI Ultra · 1 Month', usd:249.99},
+              ]
+            },
+            {
+              id:'grok', name:'Grok AI', img:'images/v2/grok-pro.webp',
+              plans:[
+                {label:'Grok Basic · 1 Month', usd:5},
+                {label:'Grok Plus · 1 Month', usd:15},
+                {label:'Grok Plus · 3 Months', usd:30},
+                {label:'Grok Plus · 12 Months', usd:120},
+                {label:'Grok Premium · 1 Month', usd:20},
+                {label:'Grok Premium · 3 Months', usd:50},
+                {label:'Grok Premium · 12 Months', usd:100},
+              ]
+            },
+            {
+              id:'netflix', name:'Netflix', img:'images/v2/netflix-pro.webp',
+              plans:[
+                {label:'Mobile · 1 Month', usd:2.99},
+                {label:'Basic · 1 Month', usd:4.99},
+                {label:'Standard · 1 Month', usd:6.99},
+                {label:'Premium · 1 Month', usd:9.99},
+              ]
+            },
+            {
+              id:'canva', name:'Canva', img:'images/v2/canva-pro.webp',
+              plans:[
+                {label:'Pro · 1 Month', usd:12.99},
+                {label:'Pro · 1 Year', usd:119.99},
+                {label:'Teams · 1 Month / user', usd:14.99},
+              ]
+            },
+            {
+              id:'capcut', name:'CapCut', img:'images/v2/capcut-pro.webp',
+              plans:[
+                {label:'Pro · 1 Month', usd:9.99},
+                {label:'Pro · 1 Year', usd:89.99},
+              ]
+            },
+            {
+              id:'youtube', name:'YouTube', img:'images/v2/youtube-pro.webp',
+              plans:[
+                {label:'Premium Individual · 1 Month', usd:3.99},
+                {label:'Premium Family · 1 Month', usd:6.99},
+                {label:'Premium Student · 1 Month', usd:2.49},
+              ]
+            },
+            {
+              id:'truecaller', name:'Truecaller', img:'images/v2/Truecaller-pro.webp',
+              plans:[
+                {label:'Premium · 1 Month', usd:1.99},
+                {label:'Premium · 3 Months', usd:4.99},
+                {label:'Premium · 12 Months', usd:14.99},
+                {label:'Gold · 1 Month', usd:4.99},
+              ]
+            },
+            {
+              id:'imo', name:'imo', img:'images/v2/imo-pro.webp',
+              plans:[
+                {label:'Premium · 1 Week', usd:0.29},
+                {label:'Premium · 1 Month', usd:0.82},
+                {label:'Premium · 3 Months', usd:2.07},
+                {label:'Premium · 12 Months', usd:7.49},
+              ]
+            },
+            {
+              id:'vpn', name:'Premium VPN', img:'images/v2/pro-vpn.webp',
+              plans:[
+                {label:'1 Device · 1 Year', usd:4.99},
+                {label:'3 Devices · 1 Year', usd:11.99},
+                {label:'5 Devices · 1 Year', usd:19.99},
+                {label:'10 Devices · 1 Year', usd:29.99},
+              ]
+            },
+            {
+              id:'adsremove', name:'Remove Ads', img:'images/v2/ads-remove.webp',
+              plans:[
+                {label:'Lifetime', usd:5.99},
+              ]
+            },
+            {
+              id:'antivirus', name:'Antivirus', img:'images/v2/anti-virus.webp',
+              plans:[
+                {label:'1 Device · 1 Year', usd:4.99},
+                {label:'3 Devices · 1 Year', usd:9.99},
+                {label:'5 Devices · 1 Year', usd:19.99},
+                {label:'10 Devices · 1 Year', usd:29.99},
+              ]
+            },
+            // ── PC Software ──────────────────────────────────
+            {
+              id:'premiere', name:'Adobe Premiere Pro', img:'images/v2/adobe-premier-pro.webp', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:19.99},
+                {label:'Annual Plan Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Plan Prepaid · 1 Year', usd:240.88},
+              ]
+            },
+            {
+              id:'photoshop', name:'Adobe Photoshop', img:'images/v2/adobe-photoshop.webp', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:18.99},
+                {label:'Annual Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Prepaid · 1 Year', usd:240.88},
+              ]
+            },
+            {
+              id:'illustrator', name:'Adobe Illustrator', img:'images/v2/adobe-illustrator.webp', category:'pc',
+              plans:[
+                {label:'Monthly Plan · 1 Month', usd:19.99},
+                {label:'Annual Paid Monthly · 12 Months', usd:130.88},
+                {label:'Annual Prepaid · 1 Year', usd:250.88},
+              ]
+            },
+            {
+              id:'windows', name:'Windows License', img:'images/v2/Microsoft-excel.webp', category:'pc',
+              plans:[
+                {label:'Windows 10 Home · Lifetime', usd:11.99},
+                {label:'Windows 10 Pro · Lifetime', usd:14.99},
+                {label:'Windows 11 Home · Lifetime', usd:19.99},
+                {label:'Windows 11 Pro · Lifetime', usd:16.99},
+                {label:'Windows 11 Pro 2PC · Lifetime', usd:29.99},
+              ]
+            },
+            {
+              id:'excel', name:'Microsoft Excel', img:'images/v2/Microsoft-excel.webp', category:'pc',
+              plans:[
+                {label:'Excel 2021 · Lifetime', usd:14.99},
+                {label:'Microsoft 365 Excel · 1 Year / 1 User', usd:29.99},
+                {label:'Microsoft 365 Family · 1 Year / 6 Users', usd:49.99},
+                {label:'Excel + Word + PowerPoint · Lifetime', usd:39.99},
+              ]
+            },
+          ];
+
+          const BDT_RATE = 125;
+
+          function renderApps() {
+            const grid = document.getElementById('proappGrid');
+            if (!grid) return;
+            grid.innerHTML = `
+              <button class="proapp-select-trigger" type="button" id="proappSelectTrigger" onclick="window._proappOpenPicker()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                <span id="proappSelectLabel">Select App</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-left:auto;opacity:.6;"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div id="proappPickerOverlay" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);align-items:flex-end;justify-content:center;padding:0;" onclick="if(event.target===this)window._proappClosePicker()">
+                <div id="proappPickerBox" style="width:100%;max-width:520px;background:rgba(8,15,26,.98);border:1px solid rgba(255, 255, 255,.18);border-radius:24px 24px 0 0;padding:20px 18px 32px;max-height:82vh;display:flex;flex-direction:column;gap:12px;box-shadow:0 -20px 60px rgba(0,0,0,.6);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+                    <strong style="color:#ededec;font-size:1rem;">Select App</strong>
+                    <button type="button" onclick="window._proappClosePicker()" style="background:none;border:none;color:#aaaaaa;cursor:pointer;padding:4px;display:flex;align-items:center;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaaaaa" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" id="proappSearchInput" placeholder="Search app..." autocomplete="off" style="flex:1;background:transparent;border:none;outline:none;color:#f7f7f4;font-size:.9rem;font-family:inherit;" oninput="window._proappFilterList(this.value)" />
+                  </div>
+                  <div id="proappPickerList" style="overflow-y:auto;display:grid;gap:6px;max-height:55vh;"></div>
+                </div>
+              </div>
+            `;
+            window._proappRenderPickerList('');
+          }
+
+          window._proappOpenPicker = function() {
+            const overlay = document.getElementById('proappPickerOverlay');
+            if (overlay) { overlay.style.display = 'flex'; setTimeout(() => { const inp = document.getElementById('proappSearchInput'); if (inp) inp.focus(); }, 80); }
+          };
+          window._proappClosePicker = function() {
+            const overlay = document.getElementById('proappPickerOverlay');
+            if (overlay) overlay.style.display = 'none';
+            const inp = document.getElementById('proappSearchInput');
+            if (inp) inp.value = '';
+          };
+          window._proappFilterList = function(q) {
+            window._proappRenderPickerList(q || '');
+          };
+          window._proappRenderPickerList = function(q) {
+            const list = document.getElementById('proappPickerList');
+            if (!list) return;
+            const query = (q || '').toLowerCase();
+            const filtered = APPS.filter(a => !query || a.name.toLowerCase().includes(query));
+            if (!filtered.length) { list.innerHTML = '<div style="color:#70706d;text-align:center;padding:20px;font-size:.88rem;">No results found.</div>'; return; }
+            list.innerHTML = filtered.map(app => `
+              <button type="button" class="proapp-picker-item" data-appid="${app.id}" onclick="window._proappSelectFromPicker('${app.id}')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;cursor:pointer;text-align:left;color:#ededec;font-weight:800;font-size:.9rem;transition:.15s;width:100%;" onmouseenter="this.style.background='rgba(255, 255, 255,.08)';this.style.borderColor='rgba(255, 255, 255,.25)'" onmouseleave="this.style.background='rgba(255,255,255,.04)';this.style.borderColor='rgba(255,255,255,.08)'">
+                <img src="${app.img}" alt="${app.name}" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex:none;background:#222;" loading="lazy" />
+                <span>${app.name}</span>
+                ${app.category === 'pc' ? '<span style="margin-left:auto;font-size:.7rem;color:#aaaaaa;background:rgba(255,255,255,.06);border-radius:6px;padding:2px 7px;font-weight:700;">PC</span>' : ''}
+              </button>
+            `).join('');
+          };
+          window._proappSelectFromPicker = function(appId) {
+            window._proappClosePicker();
+            window._proappSelect(appId);
+          };
+
+          window._proappSelect = function(appId) {
+            const app = APPS.find(a => a.id === appId);
+            if (!app) return;
+
+            // Update trigger button label
+            const triggerLabel = document.getElementById('proappSelectLabel');
+            if (triggerLabel) triggerLabel.textContent = app.name;
+            const trigger = document.getElementById('proappSelectTrigger');
+            if (trigger) { trigger.style.borderColor = 'rgba(255, 255, 255,.45)'; trigger.style.background = 'rgba(255, 255, 255,.08)'; trigger.style.color = '#ffffff'; }
+
+            // Fill selected row — compact, show name + Change App button
+            const row = document.getElementById('proappSelectedRow');
+            if (row) row.innerHTML = `<strong style="color:#f7f7f4;font-size:1rem;">${app.name}</strong><button class="proapp-change-btn" type="button" onclick="window._proappOpenPicker()">Change App</button>`;
+
+            // Fill plan list
+            const planList = document.getElementById('proappPlanList');
+            if (planList) {
+              planList.innerHTML = app.plans.map((p,i) => `
+                <label class="proapp-plan-item">
+                  <input type="radio" name="proappPlan" value="${i}" onchange="window._proappPickPlan('${appId}',${i})" />
+                  <div class="proapp-checkbox-box">
+                    <span class="proapp-tick"></span>
+                  </div>
+                  <div class="proapp-plan-info">
+                    <span class="proapp-plan-label">${p.label}</span>
+                    <span class="proapp-plan-price">$${p.usd.toFixed(2)} <span class="proapp-plan-bdt">/ ৳${Math.round(p.usd*BDT_RATE).toLocaleString()}</span></span>
+                  </div>
+                </label>
+              `).join('');
+            }
+
+            document.getElementById('proappStep2').style.display = '';
+            document.getElementById('proappEmailGroup').style.display = '';
+            document.getElementById('mo_app_name').value = app.name;
+            document.getElementById('mo_plan_type').value = '';
+            document.getElementById('mo_plan_usd').value = '';
+            const _pv = document.getElementById('proappPlanValue');
+            if (_pv) _pv.textContent = 'Choose';
+            const _pp = document.getElementById('proappPlanPicker');
+            if (_pp) _pp.open = false;
+          };
+
+          window._proappClear = function() {
+            document.getElementById('proappStep2').style.display = 'none';
+            document.getElementById('proappEmailGroup').style.display = 'none';
+            document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.remove('active'));
+          };
+
+          // Show app list again (inline, within modal — no redirect)
+          window._proappShowList = function() {
+            document.getElementById('proappStep1').style.display = '';
+            document.getElementById('proappStep2').style.display = 'none';
+            document.getElementById('proappEmailGroup').style.display = 'none';
+            document.querySelectorAll('.proapp-app-card').forEach(c => c.classList.remove('active'));
+          };
+
+          window._proappCollapsePlan = function(text) {
+            const d = document.getElementById('proappPlanPicker');
+            const v = document.getElementById('proappPlanValue');
+            if (v && text) v.textContent = text;
+            if (d) d.open = false;
+          };
+
+          window._proappPickPlan = function(appId, idx) {
+            const app = APPS.find(a => a.id === appId);
+            if (!app) return;
+            const p = app.plans[idx];
+            document.getElementById('mo_plan_type').value = p.label;
+            document.getElementById('mo_plan_usd').value = p.usd;
+            window._proappCollapsePlan(p.label + ' — $' + Number(p.usd).toFixed(2));
+            const usd = parseFloat(p.usd) || 0;
+            const bdt = Math.round(usd * BDT_RATE);
+            // Update visible price pill
+            const priceUsdEl = document.getElementById('servicePriceUsd');
+            const priceBdtEl = document.getElementById('servicePriceBdt');
+            if (priceUsdEl) priceUsdEl.textContent = '$' + usd.toFixed(2);
+            if (priceBdtEl) priceBdtEl.textContent = '৳' + bdt.toLocaleString();
+            // Update hidden input — service-modal reads this
+            const amountInp = document.getElementById('serviceAmountUsd');
+            if (amountInp) {
+              amountInp.value = usd;
+              // Dispatch change event so service-modal.js picks it up
+              amountInp.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            // Also set via global setter if available
+            if (typeof window.setServiceAmountUsd === 'function') window.setServiceAmountUsd(usd);
+          };
+
+          // Init on DOM ready
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderApps);
+          } else {
+            renderApps();
+          }
+        })();
+        </script>
+
+        <!-- ══ FREE FIRE DIAMOND TOP-UP fields ══ -->
+        <div id="ffFields" style="display:none;">
+          
+          <style id="ffBlueThemeV22">
+            #ffFields .ff-type-btn { border-color:rgba(255, 255, 255,0.30)!important; background:rgba(255, 255, 255,0.08)!important; color:#e4e4e0!important; }
+            #ffFields .ff-type-btn.active, #ffFields .ff-type-btn:hover { background:rgba(255, 255, 255,0.18)!important; border-color:rgba(255, 255, 255,0.62)!important; box-shadow:0 0 26px rgba(255, 255, 255,.12); }
+            #ffFields .ff-option-item { border-color:rgba(255, 255, 255,0.22)!important; background:rgba(255, 255, 255,0.16)!important; }
+            #ffFields .ff-option-item:hover { border-color:rgba(255, 255, 255,0.52)!important; }
+            #ffFields .ff-option-price { color:#bcbcb9!important; }
+            .ff-pack-icon { width:18px; height:18px; display:inline-grid; place-items:center; margin-right:7px; color:#b8b8b5; vertical-align:-3px; }
+            .ff-pack-icon svg { width:18px; height:18px; display:block; }
+            .ff-card-lite { color:#e1e1df; }
+            .ff-card-pro { color:#c1c1be; }
+            .ff-card-super { color:#858580; filter:drop-shadow(0 0 8px rgba(255, 255, 255,.35)); }
+            .service-notice { margin:12px 0 14px; padding:12px 14px; border-radius:14px; background:rgba(255, 255, 255,.08); border:1px solid rgba(255, 255, 255,.18); color:#c9c9c6; font-weight:800; line-height:1.55; font-size:.86rem; }
+          </style>
+
+          <style>
+            .ff-topup-type-btns { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+            .ff-type-btn { flex:1; min-width:110px; padding:10px 8px; border-radius:14px; border:1.5px solid rgba(255,166,0,0.25); background:rgba(255,140,0,0.07); color:#ffa500; font-weight:700; font-size:0.84rem; cursor:pointer; transition:all 0.2s; text-align:center; }
+            .ff-type-btn.active, .ff-type-btn:hover { background:rgba(255,140,0,0.2); border-color:rgba(255,166,0,0.55); }
+            .ff-diamond-options, .ff-weekly-options { display:none; }
+            .ff-diamond-options.show, .ff-weekly-options.show { display:block; }
+            .i4g-loading-state { display:flex; align-items:center; gap:10px; padding:14px; color:#aaaaaa; font-size:.88rem; font-weight:700; }
+            .i4g-spinner { width:18px; height:18px; border:2px solid rgba(255, 255, 255,.18); border-top-color:#ffffff; border-radius:50%; display:inline-block; animation:i4gSpin .7s linear infinite; flex-shrink:0; }
+            @keyframes i4gSpin { to { transform:rotate(360deg); } }
+            .i4g-load-error { padding:12px 14px; border-radius:12px; background:rgba(255,80,80,.08); border:1px solid rgba(255,80,80,.18); color:#ffb0b0; font-size:.84rem; font-weight:700; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+            .ff-option-unavailable { opacity:.55; cursor:not-allowed; }
+            .ff-option-list { display:grid; gap:8px; }
+            .ff-option-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:13px; border:1.5px solid rgba(255,166,0,0.18); background:rgba(255,140,0,0.05); cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
+            .ff-option-item:hover { border-color:rgba(255,166,0,0.45); background:rgba(255,140,0,0.10); }
+            .ff-option-item:has(input:checked) { border-color:rgba(255,166,0,0.6); background:rgba(255,140,0,0.14); }
+            /* hide native radio */
+            .ff-option-item input[type=radio] { display:none; }
+            /* custom tick circle */
+            .ff-option-item::before { content:''; width:20px; height:20px; border-radius:50%; border:2px solid rgba(255,255,255,.22); background:rgba(255,255,255,.04); flex-shrink:0; transition:border-color .2s,background .2s,box-shadow .2s; display:block; order:-1; }
+            .ff-option-item:has(input:checked)::before { border-color:#ffa500; background:rgba(255,165,0,.18); box-shadow:0 0 0 3px rgba(255,165,0,.12); }
+            /* tick mark */
+            .ff-option-item::after { content:''; position:absolute; width:10px; height:6px; border-left:2.5px solid #ffa500; border-bottom:2.5px solid #ffa500; transform:rotate(-45deg) translateY(-1px); opacity:0; transition:opacity .15s; left:19px; top:50%; margin-top:-4px; }
+            .ff-option-item:has(input:checked)::after { opacity:1; }
+            .ff-option-label { font-weight:700; color:#f7f7f4; font-size:0.88rem; }
+            .ff-option-price { color:#ffa500; font-weight:900; font-size:0.9rem; background:rgba(255,166,0,0.12); border-radius:8px; padding:3px 9px; }
+          </style>
+
+          <!-- Type selector -->
+          <div class="form-group">
+            <label class="form-label">Choose Top-up Type</label>
+            <div class="ff-topup-type-btns">
+              <button type="button" class="ff-type-btn" onclick="ffSelectType('diamond')"><span class="inline-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6.75 4.75h10.5L21 9l-9 10.25L3 9l3.75-4.25Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3 9h18M8.5 4.75 12 9l3.5-4.25M8.5 9 12 19.25 15.5 9" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span> Diamond</button>
+              <button type="button" class="ff-type-btn" onclick="ffSelectType('weekly')"><span class="inline-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6.75 4.75v2.5M17.25 4.75v2.5M4.75 8.25h14.5M6.75 20.25h10.5A2.25 2.25 0 0 0 19.5 18V7.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 7.75V18a2.25 2.25 0 0 0 2.25 2.25Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span> Weekly / Monthly</button>
+            </div>
+          </div>
+
+          <!-- Diamond options -->
+          <!-- Diamond options — populated live by js/item4gamer.js -->
+          <div class="ff-diamond-options" id="ffDiamondOptions">
+            <div class="form-group">
+              <label class="form-label">Choose Diamond Package</label>
+              <!-- Live prices load here from backend API (category_id=19) -->
+              <div id="ffDiamondOptionsList">
+                <div class="i4g-loading-state">
+                  <span class="i4g-spinner" aria-hidden="true"></span>
+                  Loading live prices…
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly / Monthly Membership options — populated live by js/item4gamer.js -->
+          <!-- Weekly Lite is NOT shown unless live API returns it -->
+          <div class="ff-weekly-options" id="ffWeeklyOptions">
+            <div class="form-group">
+              <label class="form-label">Choose Membership Plan</label>
+              <!-- Loads: Free Fire Weekly Membership (155344), Monthly Membership (155345) -->
+              <div id="ffMembershipOptionsList">
+                <div class="i4g-loading-state">
+                  <span class="i4g-spinner" aria-hidden="true"></span>
+                  Loading membership prices…
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UID field -->
+          <div class="form-group" style="margin-top:14px;">
+            <label class="form-label" for="mo_ff_uid">Free Fire UID *</label>
+            <input class="form-input" type="text" id="mo_ff_uid" name="ff_uid" placeholder="আপনার Free Fire UID নম্বর দিন" />
+          </div>
+        </div>
+
+        <!-- ══ FF ANDROID PANEL (DRIP) fields ══ -->
+        <div id="ffDripFields" style="display:none;">
+          <div class="service-notice">Notice: Your Android phone must be rooted to use this panel.</div>
+          <div class="form-group">
+            <label class="form-label">Choose Variant</label>
+            <div class="ff-option-list" style="gap:8px;display:grid;">
+              <label class="ff-option-item" style="border-color:rgba(138,43,226,0.25);background:rgba(138,43,226,0.06);"><input type="radio" name="ff_drip_variant" value="1 DAY — $0.90 / ৳113" onchange="ffUpdateAmount(0.90)" /><span class="ff-option-label">1 DAY</span><span class="ff-option-price" style="color:#b39ddb;"><strong>$0.90</strong><small>৳113</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(138,43,226,0.25);background:rgba(138,43,226,0.06);"><input type="radio" name="ff_drip_variant" value="3 DAYS — $2.00 / ৳250" onchange="ffUpdateAmount(2.00)" /><span class="ff-option-label">3 DAYS</span><span class="ff-option-price" style="color:#b39ddb;"><strong>$2.00</strong><small>৳250</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(138,43,226,0.25);background:rgba(138,43,226,0.06);"><input type="radio" name="ff_drip_variant" value="7 DAYS — $4.00 / ৳500" onchange="ffUpdateAmount(4.00)" /><span class="ff-option-label">7 DAYS</span><span class="ff-option-price" style="color:#b39ddb;"><strong>$4.00</strong><small>৳500</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(138,43,226,0.25);background:rgba(138,43,226,0.06);"><input type="radio" name="ff_drip_variant" value="15 DAYS — $7.00 / ৳875" onchange="ffUpdateAmount(7.00)" /><span class="ff-option-label">15 DAYS</span><span class="ff-option-price" style="color:#b39ddb;"><strong>$7.00</strong><small>৳875</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(138,43,226,0.25);background:rgba(138,43,226,0.06);"><input type="radio" name="ff_drip_variant" value="30 DAYS — $10.00 / ৳1,250" onchange="ffUpdateAmount(10.00)" /><span class="ff-option-label">30 DAYS</span><span class="ff-option-price" style="color:#b39ddb;"><strong>$10.00</strong><small>৳1,250</small></span></label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" for="mo_drip_email">Email *</label>
+            <input class="form-input" type="email" id="mo_drip_email" name="drip_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <!-- ══ FF ANDROID PANEL (FF4X) fields ══ -->
+        <div id="ffFf4xFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Choose Variant</label>
+            <div class="ff-option-list" style="gap:8px;display:grid;">
+              <label class="ff-option-item" style="border-color:rgba(220,20,60,0.25);background:rgba(220,20,60,0.06);"><input type="radio" name="ff_ff4x_variant" value="1 Month — $5 / ৳625" onchange="ffUpdateAmount(5)" /><span class="ff-option-label">1 Month</span><span class="ff-option-price" style="color:#e74c3c;"><strong>$5</strong><small>৳625</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(220,20,60,0.25);background:rgba(220,20,60,0.06);"><input type="radio" name="ff_ff4x_variant" value="3 Months — $10 / ৳1,250" onchange="ffUpdateAmount(10)" /><span class="ff-option-label">3 Months</span><span class="ff-option-price" style="color:#e74c3c;"><strong>$10</strong><small>৳1,250</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(220,20,60,0.25);background:rgba(220,20,60,0.06);"><input type="radio" name="ff_ff4x_variant" value="1 Year — $30 / ৳3,750" onchange="ffUpdateAmount(30)" /><span class="ff-option-label">1 Year</span><span class="ff-option-price" style="color:#e74c3c;"><strong>$30</strong><small>৳3,750</small></span></label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" for="mo_ff4x_email">Email *</label>
+            <input class="form-input" type="email" id="mo_ff4x_email" name="ff4x_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <!-- ══ FF iPhone Panel (iOS) fields ══ -->
+        <div id="ffIosFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Choose Variant</label>
+            <div class="ff-option-list" style="gap:8px;display:grid;">
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_ios_variant" value="1 DAY — $5.00 / ৳625" onchange="ffUpdateAmount(5)" /><span class="ff-option-label">1 DAY</span><span class="ff-option-price" style="color:#ffffff;"><strong>$5.00</strong><small>৳625</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_ios_variant" value="7 DAYS — $14.00 / ৳1,750" onchange="ffUpdateAmount(14)" /><span class="ff-option-label">7 DAYS</span><span class="ff-option-price" style="color:#ffffff;"><strong>$14.00</strong><small>৳1,750</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_ios_variant" value="31 DAYS — $25.00 / ৳3,125" onchange="ffUpdateAmount(25)" /><span class="ff-option-label">31 DAYS</span><span class="ff-option-price" style="color:#ffffff;"><strong>$25.00</strong><small>৳3,125</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_ios_variant" value="Full Set-up (First Time) — $40.00 / ৳5,000" onchange="ffUpdateAmount(40)" /><span class="ff-option-label">Full Set-up <small style="color:#aaaaaa;">(First Time Only)</small></span><span class="ff-option-price" style="color:#ffffff;"><strong>$40.00</strong><small>৳5,000</small></span></label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" for="mo_ios_email">Email *</label>
+            <input class="form-input" type="email" id="mo_ios_email" name="ios_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <!-- ══ FF PC Panel fields ══ -->
+        <div id="ffPcFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Choose Variant</label>
+            <div class="ff-option-list" style="gap:8px;display:grid;">
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_pc_variant" value="1 DAY — $0.50 / ৳63" onchange="ffUpdateAmount(0.50)" /><span class="ff-option-label">1 DAY</span><span class="ff-option-price" style="color:#e4e4e0;"><strong>$0.50</strong><small>৳63</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_pc_variant" value="7 DAYS — $2.00 / ৳250" onchange="ffUpdateAmount(2)" /><span class="ff-option-label">7 DAYS</span><span class="ff-option-price" style="color:#e4e4e0;"><strong>$2.00</strong><small>৳250</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_pc_variant" value="30 DAYS — $5.00 / ৳625" onchange="ffUpdateAmount(5)" /><span class="ff-option-label">30 DAYS</span><span class="ff-option-price" style="color:#e4e4e0;"><strong>$5.00</strong><small>৳625</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255, 255, 255,0.25);background:rgba(255, 255, 255,0.06);"><input type="radio" name="ff_pc_variant" value="1 YEAR — $15.00 / ৳1,875" onchange="ffUpdateAmount(15)" /><span class="ff-option-label">1 YEAR</span><span class="ff-option-price" style="color:#e4e4e0;"><strong>$15.00</strong><small>৳1,875</small></span></label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" for="mo_pc_email">Email *</label>
+            <input class="form-input" type="email" id="mo_pc_email" name="pc_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <!-- ══ BR MODS fields ══ -->
+        <div id="ffBrModsFields" style="display:none;">
+          <div class="service-notice">Notice: No root is required for the BR Mods panel.</div>
+          <div class="form-group">
+            <label class="form-label">Choose Variant</label>
+            <div class="ff-option-list" style="gap:8px;display:grid;">
+              <label class="ff-option-item" style="border-color:rgba(255,140,0,0.25);background:rgba(255,140,0,0.06);"><input type="radio" name="ff_brmods_variant" value="1 DAY — $0.90 / ৳113" onchange="ffUpdateAmount(0.90)" /><span class="ff-option-label">1 DAY</span><span class="ff-option-price" style="color:#ffb347;"><strong>$0.90</strong><small>৳113</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255,140,0,0.25);background:rgba(255,140,0,0.06);"><input type="radio" name="ff_brmods_variant" value="7 DAYS — $3.50 / ৳438" onchange="ffUpdateAmount(3.50)" /><span class="ff-option-label">7 DAYS</span><span class="ff-option-price" style="color:#ffb347;"><strong>$3.50</strong><small>৳438</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255,140,0,0.25);background:rgba(255,140,0,0.06);"><input type="radio" name="ff_brmods_variant" value="15 DAYS — $6.00 / ৳750" onchange="ffUpdateAmount(6.00)" /><span class="ff-option-label">15 DAYS</span><span class="ff-option-price" style="color:#ffb347;"><strong>$6.00</strong><small>৳750</small></span></label>
+              <label class="ff-option-item" style="border-color:rgba(255,140,0,0.25);background:rgba(255,140,0,0.06);"><input type="radio" name="ff_brmods_variant" value="31 DAYS — $9.00 / ৳1,125" onchange="ffUpdateAmount(9.00)" /><span class="ff-option-label">31 DAYS</span><span class="ff-option-price" style="color:#ffb347;"><strong>$9.00</strong><small>৳1,125</small></span></label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" for="mo_brmods_email">Email *</label>
+            <input class="form-input" type="email" id="mo_brmods_email" name="brmods_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <div class="service-modal-status" id="modalStatus"></div>
+
+        <button type="submit" class="service-modal-submit" id="modalSubmitBtn">
+          Submit Request
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  <script>
+    // FF type selector helper
+    function ffSelectType(type) {
+      document.getElementById('ffDiamondOptions').classList.toggle('show', type === 'diamond');
+      document.getElementById('ffWeeklyOptions').classList.toggle('show', type === 'weekly');
+      document.querySelectorAll('.ff-type-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&type==='diamond')||(i===1&&type==='weekly')));
+    }
+    // Update amount in checkout panel when FF option selected
+    function ffUpdateAmount(usd) {
+      const inp = document.getElementById('serviceAmountUsd');
+      if (inp) { inp.value = Math.round(usd * 100) / 100; if (window.updateServiceAmountUI) window.updateServiceAmountUI(); }
+    }
+    // Extended showFields to handle new field groups + contact field visibility
+    const _origShowFields = window._ffShowFieldsHooked;
+    document.addEventListener('DOMContentLoaded', function() {
+      // patch allFields in service-modal.js after it loads
+      const ffNoContact = ['ff','ffDrip','ffFf4x','ffIos','ffPc','ffBrMods'];
+      window._ffFieldsMap = {
+        webDev:'webDevFields', security:'securityFields', android:'androidFields',
+        meta:'metaFields', card:'cardFields', proapp:'proappFields',
+        ff:'ffFields', ffDrip:'ffDripFields', ffFf4x:'ffFf4xFields',
+        ffIos:'ffIosFields', ffPc:'ffPcFields', ffBrMods:'ffBrModsFields'
+      };
+      window._ffNoContactTypes = ffNoContact;
+    });
+  </script>
+
+  <!-- ── SERVICES CATEGORIES ────────────────────────────────────── -->
+
+  <main id="main-content">
+    <h1 class="sr-only">All Services</h1>
+
+  <div id="svcSearchResults" class="svc-search-results" role="region" aria-live="polite" aria-label="Search results" hidden></div>
+
+  <section class="section services-category-section">
+    <div class="container">
+      <div class="svc-category-block reveal">
+        <div class="svc-category-head">
+          <span>Category 01</span>
+          <h2>Verification, Cards & Premium Apps</h2>
+        </div>
+        <div class="svc-category-grid">
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/visa-mastercard.png" alt="Visa & Mastercard" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">01</div>
+              <h3>Visa & Mastercard</h3>
+              <p>Physical or virtual card service.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Visa / Mastercard" data-fields="card">Get Card <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="card" data-apply-field="card"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/meta-verified.png" alt="Meta Verify" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">02</div>
+              <h3>Meta Verify</h3>
+              <p>Profile/Page verified support.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Facebook Meta Verified" data-fields="meta">Apply Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="meta" data-apply-field="meta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/chatgpt.png" alt="ChatGPT" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">03</div>
+              <h3>ChatGPT</h3>
+              <p>Go · Plus · Pro — from $10/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="chatgpt">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="chatgpt" data-apply-field="proapp" data-apply-proapp="chatgpt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/gemini.png" alt="Gemini AI" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">04</div>
+              <h3>Gemini AI</h3>
+              <p>AI Pro · Ultra — from $19.99/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="gemini">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="gemini" data-apply-field="proapp" data-apply-proapp="gemini"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/canva.png" alt="Canva" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">05</div>
+              <h3>Canva Pro</h3>
+              <p>Pro & Teams — from $12.99/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="canva">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="canva" data-apply-field="proapp" data-apply-proapp="canva"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/capcut.png" alt="CapCut" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">06</div>
+              <h3>CapCut Pro</h3>
+              <p>Monthly & Yearly — from $9.99/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="capcut">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="capcut" data-apply-field="proapp" data-apply-proapp="capcut"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/youtube.png" alt="YouTube Premium" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">07</div>
+              <h3>YouTube Premium</h3>
+              <p>Individual · Family · Student.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="youtube">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="youtube" data-apply-field="proapp" data-apply-proapp="youtube"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/truecaller.png" alt="Truecaller" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">08</div>
+              <h3>Truecaller Premium</h3>
+              <p>Premium & Gold — from $1.99/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="truecaller">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="truecaller" data-apply-field="proapp" data-apply-proapp="truecaller"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/imo.png" alt="imo" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">09</div>
+              <h3>imo Premium</h3>
+              <p>Weekly to yearly — from $0.29/wk.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="imo">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="imo" data-apply-field="proapp" data-apply-proapp="imo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/netflix.png" alt="Netflix" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">10</div>
+              <h3>Netflix</h3>
+              <p>Mobile · Basic · Standard · Premium.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="netflix">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="netflix" data-apply-field="proapp" data-apply-proapp="netflix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/grok.png" alt="Grok AI" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">11</div>
+              <h3>Grok AI</h3>
+              <p>Basic · Plus · Premium — from $5/mo.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="grok">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="grok" data-apply-field="proapp" data-apply-proapp="grok"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/vpn.png" alt="Premium VPN" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">12</div>
+              <h3>Premium VPN</h3>
+              <p>1–10 Devices · 1 Year — from $4.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="vpn">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="vpn" data-apply-field="proapp" data-apply-proapp="vpn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/antivirus.png" alt="Antivirus" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">13</div>
+              <h3>Antivirus</h3>
+              <p>1–10 Devices · 1 Year — from $4.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="antivirus">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="antivirus" data-apply-field="proapp" data-apply-proapp="antivirus"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/remove-ads.png" alt="Remove Ads" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">14</div>
+              <h3>Remove Ads</h3>
+              <p>Lifetime ad-free experience — $5.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="adsremove">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="adsremove" data-apply-field="proapp" data-apply-proapp="adsremove"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CATEGORY 04: PC Software ───────────────────── -->
+      <div class="svc-category-block reveal">
+        <div class="svc-category-head">
+          <span>Category 04</span>
+          <h2>PC Software & Licenses</h2>
+        </div>
+        <div class="svc-category-grid">
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/premiere-pro.png" alt="Adobe Premiere Pro" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC01</div>
+              <h3>Adobe Premiere Pro</h3>
+              <p>Monthly & Annual plans — from $19.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="premiere">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="premiere" data-apply-field="proapp" data-apply-proapp="premiere"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/photoshop.png" alt="Adobe Photoshop" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC02</div>
+              <h3>Adobe Photoshop</h3>
+              <p>Monthly & Annual plans — from $18.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="photoshop">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="photoshop" data-apply-field="proapp" data-apply-proapp="photoshop"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/illustrator.png" alt="Adobe Illustrator" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC03</div>
+              <h3>Adobe Illustrator</h3>
+              <p>Monthly & Annual plans — from $19.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="illustrator">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="illustrator" data-apply-field="proapp" data-apply-proapp="illustrator"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/windows.png" alt="Windows License" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC04</div>
+              <h3>Windows License Key</h3>
+              <p>Win 10/11 Home & Pro — from $11.99.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="windows">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="windows" data-apply-field="proapp" data-apply-proapp="windows"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+          <div class="service-card glass-card reveal compact-service-card">
+            <div class="service-card-img"><img src="/images/service-cards/excel.png" alt="Microsoft Excel" loading="lazy" decoding="async" /></div>
+            <div class="service-card-body">
+              <div class="service-num">PC05</div>
+              <h3>Microsoft Excel</h3>
+              <p>Lifetime & Microsoft 365 plans.</p>
+              <div class="svc-btn-row"><button class="service-apply-btn" data-service="Premium App & Subscription" data-fields="proapp" data-proapp="excel">Get Now <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="excel" data-apply-field="proapp" data-apply-proapp="excel"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+            </div>
+          </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="svc-category-block reveal">
+        <div class="svc-category-head">
+          <span>Category 02</span>
+          <h2>Free Fire Top-up &amp; Panels</h2>
+        </div>
+        <div class="svc-category-grid">
+          <div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/free-fire-topup.png" alt="Free Fire Top-up" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">04</div>
+        <h3>Free Fire Top-up</h3>
+        <p>Diamond, weekly, monthly package.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="Free Fire Diamond Top-up" data-fields="ff">Top-up Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ff" data-apply-field="ff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/ff-drip.png" alt="Android Panel Drip Client (Root)" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">05</div>
+        <h3>Android Panel Drip Client (Root)</h3>
+        <p>Rooted phone required for panel setup.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="Free Fire Android Panel Drip Client (Root)" data-fields="ffDrip">Get Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ffDrip" data-apply-field="ffDrip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/ff-h4x.png" alt="Android Panel FFH4X" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">06</div>
+        <h3>Android Panel FFH4X</h3>
+        <p>Rooted phone required for panel setup.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="Free Fire Android Panel (FF4X)" data-fields="ffFf4x">Get Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ffDrip" data-apply-field="ffFf4x"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/ff-ios.png" alt="FF iPhone Panel" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">07</div>
+        <h3>FF iPhone Panel</h3>
+        <p>First-time setup includes lifetime GBox service.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="Free Fire iPhone Panel (iOS)" data-fields="ffIos">Get Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ffIos" data-apply-field="ffIos"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/ff-pc.png" alt="FF PC Panel" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">08</div>
+        <h3>FF PC Panel</h3>
+        <p>PC panel setup and configuration.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="Free Fire PC Panel" data-fields="ffPc">Get Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ffPc" data-apply-field="ffPc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/br-mods.png" alt="BR Mods" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">09</div>
+        <h3>BR Mods</h3>
+        <p>No root required. Daily, weekly & monthly plans.</p>
+        <div class="svc-btn-row"><button class="service-apply-btn" data-service="BR Mods" data-fields="ffBrMods">Get Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button><button type="button" class="svc-cart-btn" aria-label="Add to cart" data-info-key="ffBrMods" data-apply-field="ffBrMods"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></button></div>
+      </div>
+    </div>
+        </div>
+      </div>
+
+      <div class="svc-category-block reveal">
+        <div class="svc-category-head">
+          <span>Category 03</span>
+          <h2>Development, Security & Branding</h2>
+        </div>
+        <div class="svc-category-grid">
+          <div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/ethical-hacking.png" alt="Ethical Hacking" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">09</div>
+        <h3>Ethical Hacking</h3>
+        <p>Security review and hardening.</p>
+        <button class="service-apply-btn" data-service="Ethical Hacking / Security Audit" data-fields="security">Apply Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/android-development.png" alt="Android Development" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">10</div>
+        <h3>Android Development</h3>
+        <p>Professional Android app development.</p>
+        <button class="service-apply-btn" data-service="Android App Development" data-fields="android">Apply Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/web-development.png" alt="Website Development" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">11</div>
+        <h3>Website Development</h3>
+        <p>Modern website design and development.</p>
+        <button class="service-apply-btn" data-service="Website Development" data-fields="webDev">Apply Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/digital-branding.png" alt="Digital Branding" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">12</div>
+        <h3>Digital Branding</h3>
+        <p>Brand identity and digital design.</p>
+        <button class="service-apply-btn" data-service="Digital Branding" data-fields="">Apply Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+<div class="service-card glass-card reveal compact-service-card">
+      <div class="service-card-img"><img src="/images/service-cards/premium-services.png" alt="Premium Digital Services" loading="lazy" decoding="async" /></div>
+      <div class="service-card-body">
+        <div class="service-num">13</div>
+        <h3>Premium Digital Services</h3>
+        <p>Custom digital service support.</p>
+        <button class="service-apply-btn" data-service="Premium Digital Services" data-fields="">Apply Now  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      </div>
+    </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+<script>
+  /* ── In-nav expanding service search (services page) ────────────────────
+     The nav search icon itself expands in place into a search field that
+     fills the empty nav space between the logo and the avatar. Results are
+     rendered in place of the catalogue below.                              */
+  (function () {
+    'use strict';
+    var wrap, toggle, input, clear, results, open = false;
+
+    function collect() {
+      return Array.prototype.map.call(
+        document.querySelectorAll('.compact-service-card'),
+        function (card) {
+          var h = card.querySelector('h3');
+          var p = card.querySelector('p');
+          var apply = card.querySelector('.service-apply-btn');
+          return {
+            name: h ? h.textContent.trim() : '',
+            desc: p ? p.textContent.trim() : '',
+            service: apply ? (apply.dataset.service || '') : '',
+            card: card
+          };
+        }
+      ).filter(function (x) { return x.name; });
+    }
+
+    var ITEMS = null;
+
+    function openBar() {
+      if (open) return;
+      open = true;
+      wrap.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      input.removeAttribute('tabindex');
+      document.body.classList.add('svc-search-open');
+      setTimeout(function () { try { input.focus(); } catch (e) {} }, 180);
+    }
+
+    function closeBar() {
+      if (!open) return;
+      open = false;
+      wrap.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      input.setAttribute('tabindex', '-1');
+      document.body.classList.remove('svc-search-open');
+      input.value = '';
+      render('');
+      try { input.blur(); } catch (e) {}
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function render(q) {
+      if (!ITEMS) ITEMS = collect();
+      q = (q || '').trim().toLowerCase();
+      if (clear) clear.hidden = !q;
+
+      if (!q) {
+        results.innerHTML = '';
+        results.hidden = true;
+        ITEMS.forEach(function (it) { it.card.style.display = ''; });
+        document.querySelectorAll('.svc-category-block').forEach(function (b) { b.style.display = ''; });
+        return;
+      }
+
+      var hits = ITEMS.filter(function (it) {
+        return it.name.toLowerCase().indexOf(q) > -1 || it.desc.toLowerCase().indexOf(q) > -1;
+      });
+
+      ITEMS.forEach(function (it) { it.card.style.display = 'none'; });
+      document.querySelectorAll('.svc-category-block').forEach(function (b) { b.style.display = 'none'; });
+
+      results.hidden = false;
+      if (!hits.length) {
+        results.innerHTML = '<div class="svc-search-empty">কোনো সার্ভিস পাওয়া যায়নি।</div>';
+        return;
+      }
+      results.innerHTML = hits.map(function (it, i) {
+        return '<button type="button" class="svc-search-item" data-i="' + i + '">' +
+                 '<span class="svc-search-item-text">' +
+                   '<span class="svc-search-item-name">' + esc(it.name) + '</span>' +
+                   '<span class="svc-search-item-desc">' + esc(it.desc) + '</span>' +
+                 '</span>' +
+                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+               '</button>';
+      }).join('');
+      Array.prototype.forEach.call(results.querySelectorAll('.svc-search-item'), function (btn) {
+        btn.addEventListener('click', function () {
+          var hit = hits[+btn.dataset.i];
+          var apply = hit.card.querySelector('.service-apply-btn');
+          if (apply) apply.click();
+        });
+      });
+    }
+
+    function init() {
+      wrap = document.getElementById('svcSearchWrap');
+      toggle = document.getElementById('svcSearchToggle');
+      input = document.getElementById('svcSearchInput');
+      clear = document.getElementById('svcSearchClear');
+      results = document.getElementById('svcSearchResults');
+      if (!wrap || !toggle || !input || !results) return;
+
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        open ? closeBar() : openBar();
+      });
+      input.addEventListener('input', function () { render(input.value); });
+      input.addEventListener('search', function () { render(input.value); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeBar();
+      });
+      if (clear) clear.addEventListener('click', function () {
+        input.value = ''; render(''); input.focus();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && open) closeBar();
+      });
+      /* click outside closes the bar only when it is empty */
+      document.addEventListener('click', function (e) {
+        if (!open) return;
+        if (wrap.contains(e.target)) return;
+        if (!input.value.trim()) closeBar();
+      });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+  <script src="/js/lang.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+    const { firebaseConfig } = await import("/js/firebase-config.js");
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  <script src="/js/service-info.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script type="module" src="/js/wallet.js"></script>
+  <script src="/js/service-modal.js" defer></script>
+  <script src="/js/plans.js" defer></script>
+  <script src="/js/cart.js" defer></script>
+  <script src="/js/plan-picker.js" defer></script>
+  <script src="/js/item4gamer.js" defer></script>
+
+
+
+  <script>
+    (function(){
+      const sliders = document.querySelectorAll('.svc-category-slider[data-auto-slide="true"]');
+      sliders.forEach((slider) => {
+        let pause = false;
+        slider.addEventListener('touchstart', () => pause = true, {passive:true});
+        slider.addEventListener('mousedown', () => pause = true);
+        slider.addEventListener('touchend', () => setTimeout(()=>pause=false, 2500), {passive:true});
+        slider.addEventListener('mouseup', () => setTimeout(()=>pause=false, 2500));
+        setInterval(() => {
+          if (pause || !slider.scrollWidth) return;
+          const max = slider.scrollWidth - slider.clientWidth - 8;
+          if (max <= 0) return;
+          if (slider.scrollLeft >= max) slider.scrollTo({left:0, behavior:'smooth'});
+          else slider.scrollBy({left: Math.min(260, slider.clientWidth * .72), behavior:'smooth'});
+        }, 3600);
+      });
+    })();
+  </script>
+
+<!-- ── Floating Customer Support Widget ── -->
+<div id="floatChatWidget">
+  <div id="floatChatWindow" style="display:none;" role="dialog" aria-label="Customer Support Chat">
+    <div id="floatChatHeader">
+      <div id="floatChatHeaderInfo">
+        <div id="floatChatAvatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+        </div>
+        <div>
+          <div id="floatChatTitle">RH Support</div>
+          <div id="floatChatStatus">
+            <span id="floatStatusDot"></span> Online
+          </div>
+        </div>
+      </div>
+      <button type="button" id="floatChatClose" aria-label="Close chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="floatChatMessages">
+      <div class="float-msg float-msg-admin">
+        <div class="float-msg-bubble">Hi! How can we help you today?</div>
+        <div class="float-msg-time">Support Team</div>
+      </div>
+    </div>
+    <div id="floatChatInputArea">
+      <input type="text" id="floatChatInput" placeholder="Type your message..." autocomplete="off" maxlength="500" />
+      <button type="button" id="floatChatSend" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+  <button type="button" id="floatChatToggle" aria-label="Open customer support">
+    <span id="floatChatBadge" style="display:none;"></span>
+    <svg id="floatIconChat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    <svg id="floatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:none;"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+</div>
+
+<style>
+#floatChatWidget { position:fixed; bottom:24px; right:24px; z-index:2300; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:bottom .25s ease; }
+body.has-bottom-nav #floatChatWidget { bottom:100px; right:16px; z-index:2500; }
+#floatChatToggle { width:50px; height:50px; border-radius:50%; border:2px solid rgba(255, 255, 255,.35); background:rgba(8,16,28,.92); backdrop-filter:blur(10px); color:#ffffff; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(255, 255, 255,.22); transition:transform .2s, box-shadow .2s; position:relative; }
+#floatChatToggle:hover { transform:scale(1.08); box-shadow:0 8px 28px rgba(255, 255, 255,.38); }
+#floatChatBadge { position:absolute; top:-2px; right:-2px; min-width:18px; height:18px; border-radius:999px; background:#ff5050; color:#fff; font-size:.68rem; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid #080808; }
+#floatChatWindow { width:340px; max-height:520px; background:rgba(10,18,30,.97); border:1px solid rgba(255, 255, 255,.18); border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; animation:floatSlideIn .22s ease; }
+@keyframes floatSlideIn { from{opacity:0;transform:translateY(18px) scale(.96)} to{opacity:1;transform:none} }
+#floatChatHeader { background:rgba(255, 255, 255,.07); border-bottom:1px solid rgba(255, 255, 255,.14); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#floatChatHeaderInfo { display:flex; align-items:center; gap:10px; }
+#floatChatAvatar { width:38px; height:38px; border-radius:50%; background:rgba(255, 255, 255,.12); border:1px solid rgba(255, 255, 255,.28); display:flex; align-items:center; justify-content:center; color:#ffffff; flex-shrink:0; }
+#floatChatTitle { color:#ededec; font-weight:900; font-size:.92rem; }
+#floatChatStatus { color:#aaaaaa; font-size:.75rem; display:flex; align-items:center; gap:5px; margin-top:2px; }
+#floatStatusDot { width:7px; height:7px; border-radius:50%; background:#ffffff; animation:statusPulse 2s ease-in-out infinite; display:inline-block; }
+@keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#floatChatClose { background:none; border:none; color:#aaaaaa; cursor:pointer; padding:4px; border-radius:6px; display:flex; align-items:center; }
+#floatChatClose:hover { color:#f7f7f4; }
+#floatChatMessages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:200px; max-height:300px; }
+.float-msg { display:flex; flex-direction:column; max-width:82%; }
+.float-msg-admin { align-self:flex-start; }
+.float-msg-user { align-self:flex-end; }
+.float-msg-bubble { padding:10px 14px; border-radius:16px; font-size:.86rem; line-height:1.52; word-break:break-word; }
+.float-msg-admin .float-msg-bubble { background:rgba(255, 255, 255,.10); border:1px solid rgba(255, 255, 255,.18); color:#dcdcd8; border-bottom-left-radius:4px; }
+.float-msg-user .float-msg-bubble { background:linear-gradient(135deg,rgba(255, 255, 255,.18),rgba(255, 255, 255,.14)); border:1px solid rgba(255, 255, 255,.22); color:#f1f1f0; border-bottom-right-radius:4px; }
+.float-msg-time { font-size:.7rem; color:#70706d; margin-top:4px; }
+.float-msg-admin .float-msg-time { text-align:left; }
+.float-msg-user .float-msg-time { text-align:right; }
+#floatChatInputArea { border-top:1px solid rgba(255,255,255,.07); padding:12px; display:flex; gap:8px; align-items:center; }
+#floatChatInput { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:10px 12px; color:#f7f7f4; font-size:.88rem; font-family:inherit; outline:none; }
+#floatChatInput::placeholder { color:#70706d; }
+#floatChatSend { width:38px; height:38px; border-radius:10px; border:none; background:#ffffff; color:#080808; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.18s; }
+#floatChatSend:hover { transform:scale(1.08); }
+@media(max-width:480px){ #floatChatWindow { width:calc(100vw - 28px); } body.has-bottom-nav #floatChatWidget { right:12px; bottom:100px; z-index:2500; } }
+</style>
+
+<script type="module">
+import { auth, db } from '/js/firebase-core.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+import {
+  collection, addDoc, onSnapshot, query, where, orderBy,
+  serverTimestamp, limit
+} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+(function() {
+  'use strict';
+
+  const toggle = document.getElementById('floatChatToggle');
+  const window_ = document.getElementById('floatChatWindow');
+  const closeBtn = document.getElementById('floatChatClose');
+  const sendBtn = document.getElementById('floatChatSend');
+  const input = document.getElementById('floatChatInput');
+  const messages = document.getElementById('floatChatMessages');
+  const badge = document.getElementById('floatChatBadge');
+  const iconChat = document.getElementById('floatIconChat');
+  const iconClose = document.getElementById('floatIconClose');
+
+  let isOpen = false;
+  let currentUser = null;
+  let unsubMessages = null;
+  let unreadCount = 0;
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts.seconds * 1000);
+    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function appendMessage(role, text, time) {
+    const wrap = document.createElement('div');
+    wrap.className = 'float-msg ' + (role === 'user' ? 'float-msg-user' : 'float-msg-admin');
+    wrap.innerHTML = `<div class="float-msg-bubble">${escHtml(text)}</div><div class="float-msg-time">${time || ''}</div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function openChat() {
+    isOpen = true;
+    window_.style.display = 'flex';
+    iconChat.style.display = 'none';
+    iconClose.style.display = '';
+    unreadCount = 0;
+    badge.style.display = 'none';
+    if (currentUser) subscribeMessages();
+    setTimeout(() => input.focus(), 60);
+  }
+
+  function closeChat() {
+    isOpen = false;
+    window_.style.display = 'none';
+    iconChat.style.display = '';
+    iconClose.style.display = 'none';
+  }
+
+  function subscribeMessages() {
+    if (unsubMessages) unsubMessages();
+    if (!currentUser) return;
+    const q = query(
+      collection(db, 'supportChats', currentUser.uid, 'messages'),
+      orderBy('createdAt', 'asc'),
+      limit(80)
+    );
+    messages.innerHTML = '';
+    unsubMessages = onSnapshot(q, (snap) => {
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const d = change.doc.data();
+          appendMessage(d.role, d.text, fmtTime(d.createdAt));
+          if (!isOpen && d.role === 'admin') {
+            unreadCount++;
+            badge.textContent = unreadCount;
+            badge.style.display = 'flex';
+          }
+        }
+      });
+    });
+  }
+
+  let _autoReplySent = false;
+  const AUTO_REPLY_TEXT = 'কিছুক্ষণ অপেক্ষা করুন খুব শীগ্রই আপনার message এর উত্তর দেওয়া হবে';
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    if (!currentUser) {
+      appendMessage('admin', 'Please login to send messages.', new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+      return;
+    }
+    try {
+      await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
+        text,
+        role: 'user',
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        createdAt: serverTimestamp(),
+      });
+      const { doc: fsDoc, setDoc: fsSetDoc, increment: fsIncrement } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const roomRef = fsDoc(db, 'supportRooms', currentUser.uid);
+      await fsSetDoc(roomRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        displayName: currentUser.displayName || currentUser.email || '',
+        lastMessage: text,
+        lastAt: serverTimestamp(),
+        unreadAdmin: fsIncrement(1)
+      }, { merge: true });
+
+      if (!_autoReplySent) {
+        _autoReplySent = true;
+        setTimeout(async () => {
+          try {
+            await addDoc(collection(db, 'supportChats', currentUser.uid, 'messages'), {
+              text: AUTO_REPLY_TEXT,
+              role: 'admin',
+              adminEmail: 'auto-reply',
+              createdAt: serverTimestamp(),
+            });
+          } catch(_) {}
+        }, 800);
+      }
+    } catch(e) {
+      appendMessage('admin', 'Failed to send message. Try again.', '');
+    }
+  }
+
+  toggle.addEventListener('click', () => { isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
+
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    _autoReplySent = false;
+    if (user && isOpen) subscribeMessages();
+  });
+})();
+</script>
+
+  <script src="/js/reviews.js" type="module"></script>
+  <nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+    <a href="/" ><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+    <a href="/add-credit/" ><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+    <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+
+    <a href="/dashboard/?tab=orders" ><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+    <a href="/dashboard/" ><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+  </nav>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body>
+</html>
