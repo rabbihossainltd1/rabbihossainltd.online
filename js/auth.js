@@ -611,7 +611,7 @@
       <div class="profile-balance compact-menu-balance">
         <div class="profile-balance-info">
           <span>Balance</span>
-          <strong id="profileMenuBalance">$0 / ৳0</strong>
+          <strong id="profileMenuBalance"></strong>
         </div>
         <a href="/add-credit/" class="menu-balance-plus" aria-label="Add Credit">${iconCredit()}</a>
       </div>
@@ -712,12 +712,13 @@
   }
 
   function fillSettingsForm() {
+    const cache = cachedAuth();
     const nameInput = document.getElementById('settingsName');
     const emailInput = document.getElementById('settingsEmail');
-    if (nameInput) nameInput.value = currentUserData?.name || currentUser?.displayName || '';
-    if (emailInput) emailInput.value = currentUser?.email || currentUserData?.email || '';
+    if (nameInput) nameInput.value = currentUserData?.name || currentUser?.displayName || cache.displayName || '';
+    if (emailInput) emailInput.value = currentUser?.email || currentUserData?.email || cache.email || '';
     const preview = document.getElementById('settingsAvatarPreview');
-    const photo = currentUserData?.photoURL || currentUser?.photoURL || '';
+    const photo = currentUserData?.photoURL || currentUser?.photoURL || cache.photoURL || '';
     if (preview) {
       if (photo) preview.innerHTML = `<img src="${escapeHtml(photo)}" alt="Profile photo">`;
       else preview.textContent = String(currentUserData?.name || currentUser?.displayName || currentUser?.email || 'U').charAt(0).toUpperCase();
@@ -943,7 +944,8 @@
       if (content) content.style.display = 'none';
     }
     function fillIfReady() {
-      if (!currentUser) { showGate(); return; }
+      const cache = cachedAuth();
+      if (!currentUser && !(cache && cache.uid)) { showGate(); return; }
       const gate = document.getElementById('settingsLoginGate');
       const content = document.getElementById('settingsContent');
       if (gate) gate.style.display = 'none';
@@ -1265,13 +1267,16 @@
       if (user) {
         if (loginBtn) loginBtn.style.display = 'none';
         if (avatar) avatar.style.display = 'flex';
-        // Cache basic user info for instant next-load restore
+        // Merge — never wipe a cached balance while Firestore is still in flight.
         try {
+          const prev = JSON.parse(localStorage.getItem('rh_user_cache') || '{}') || {};
           localStorage.setItem('rh_user_cache', JSON.stringify({
+            ...prev,
             uid: user.uid,
-            displayName: user.displayName || '',
-            email: user.email || '',
-            photoURL: user.photoURL || ''
+            displayName: user.displayName || prev.displayName || '',
+            email: user.email || prev.email || '',
+            photoURL: user.photoURL || prev.photoURL || '',
+            cache_ts: Date.now()
           }));
         } catch(e) {}
         await ensureUserDoc(user);
@@ -1288,18 +1293,27 @@
           refreshAfterLoginOnce();
         }
       } else {
+        // First callback is often null while IndexedDB restores the session.
+        // If we still have a cached user, wait until auth is actually ready
+        // before treating this as a real logout (kills the login/$0 flash).
+        const cached = cachedAuth();
+        if (cached.uid) {
+          try {
+            if (auth && typeof auth.authStateReady === 'function') await auth.authStateReady();
+            else await new Promise(function (r) { setTimeout(r, 1200); });
+          } catch (e) {}
+          if (auth.currentUser) return;
+          try { localStorage.removeItem('rh_user_cache'); } catch (e) {}
+        }
         currentUserData = null;
         currentIsAdmin = false;
         sessionStorage.removeItem('rabbiLoginRefreshDone');
-        // NOTE: keep rh_user_cache here — the auth observer fires with a null
-        // user during Firebase's slow re-validation on EVERY load; removing the
-        // cache there would drop the instant-login cache (and its cached
-        // balance) and cause a "Login" flash on the next page. It is cleared
-        // on explicit sign-out instead (see signOut above).
         if (unsubscribeUserDoc) { unsubscribeUserDoc(); unsubscribeUserDoc = null; }
         if (loginBtn) loginBtn.style.display = 'block';
         if (avatar) avatar.style.display = 'none';
         if (menu) menu.classList.remove('open');
+        document.documentElement.classList.remove('rh-authed');
+        document.documentElement.classList.add('rh-guest');
         window.dispatchEvent(new CustomEvent('rabbi:loggedout'));
       }
     });

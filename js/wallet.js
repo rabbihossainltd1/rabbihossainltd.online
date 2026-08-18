@@ -321,6 +321,14 @@ async function waitForActiveUser(timeoutMs = 8000) {
   if (window.rabbiAuth && typeof window.rabbiAuth.getUser === "function" && window.rabbiAuth.getUser()) {
     return window.rabbiAuth.getUser();
   }
+  try {
+    if (typeof auth.authStateReady === "function") await auth.authStateReady();
+  } catch (e) {}
+  if (auth.currentUser) return auth.currentUser;
+  if (window.rabbiAuth && typeof window.rabbiAuth.getUser === "function" && window.rabbiAuth.getUser()) {
+    return window.rabbiAuth.getUser();
+  }
+  if (!hasCachedUser()) return null;
 
   return await new Promise((resolve) => {
     let settled = false;
@@ -332,7 +340,9 @@ async function waitForActiveUser(timeoutMs = 8000) {
       resolve(user || null);
     };
 
-    unsubscribe = onAuthStateChanged(auth, (user) => finish(user));
+    unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) finish(user);
+    });
 
     setTimeout(() => {
       const fallback = window.rabbiAuth && typeof window.rabbiAuth.getUser === "function" ? window.rabbiAuth.getUser() : null;
@@ -434,23 +444,32 @@ function setupPageMode() {
   }
 }
 
+function hasCachedUser() {
+  try {
+    const c = JSON.parse(localStorage.getItem("rh_user_cache") || "null");
+    return !!(c && c.uid);
+  } catch (e) {
+    return false;
+  }
+}
+
 window.loadWalletPage = function () {
   setupPageMode();
   window.updatePaymentNumber();
   window.handleAmountChange();
 
-  onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
+  const applyWalletUser = async (user) => {
     const authRequired = document.getElementById("authRequired");
     const walletContent = document.getElementById("walletContent");
 
     if (!user) {
+      if (hasCachedUser()) return;
       if (authRequired) authRequired.style.display = "block";
       if (walletContent) walletContent.style.display = "none";
       return;
     }
 
+    currentUser = user;
     if (authRequired) authRequired.style.display = "none";
     if (walletContent) walletContent.style.display = "grid";
 
@@ -459,7 +478,16 @@ window.loadWalletPage = function () {
     setText("userEmail", user.email || "No email");
     setText("userName", user.displayName || user.email || "User");
     window.loadMyTopups();
-  });
+  };
+
+  (async () => {
+    try {
+      if (typeof auth.authStateReady === "function") await auth.authStateReady();
+    } catch (e) {}
+    applyWalletUser(auth.currentUser);
+  })();
+
+  onAuthStateChanged(auth, applyWalletUser);
 };
 
 window.updatePaymentNumber = function () {
@@ -1409,8 +1437,16 @@ function loadOrdersUnified(user) {
   render();
 }
 
+function setDashboardName(value) {
+  const el = document.getElementById("dashboardName");
+  if (!el) return;
+  const badge = el.querySelector(".user-verify-badge");
+  el.textContent = value;
+  if (badge) el.appendChild(badge);
+}
+
 window.loadUserDashboard = function () {
-  onAuthStateChanged(auth, async (user) => {
+  const applyDashboardUser = async (user) => {
     const loginRequired = document.getElementById("dashboardLoginRequired");
     const content = document.getElementById("dashboardContent");
     const tabParam = new URLSearchParams(window.location.search).get("tab");
@@ -1421,6 +1457,7 @@ window.loadUserDashboard = function () {
     }
 
     if (!user) {
+      if (hasCachedUser()) return;
       if (loginRequired) loginRequired.style.display = "block";
       if (content) content.style.display = "none";
       return;
@@ -1434,29 +1471,22 @@ window.loadUserDashboard = function () {
     if (ordersOnly) {
       showDashboardTab("orders");
       loadOrdersUnified(user);
-      // Notification permission is non-blocking — never gate orders loading on it.
       requestNotificationPermission().catch(() => {});
       return;
     }
 
-    // Fast first paint: show cached data instantly, then sync Firestore
     let cached = {};
     try { cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}'); } catch(e) {}
 
     const cachedName    = cached.displayName || user.displayName || user.email || "User";
     const cachedEmail   = cached.email       || user.email || "";
-    const cachedBalance = cached.balance     || "$0.00";
     const cachedPhoto   = cached.photoURL    || user.photoURL || "";
 
-    setText("dashboardName",    cachedName);
-    setText("dashboardEmail",   cachedEmail);
-    // Only paint the cached balance if Firestore has not already answered
-    // (onSnapshot can resolve from its local cache before this line runs).
+    setDashboardName(cachedName);
+    setText("dashboardEmail", cachedEmail);
     const dashBalEl = document.getElementById("dashboardBalance");
     if (dashBalEl && !dashBalEl.dataset.rhLive && cached.balance) {
       dashBalEl.textContent = cached.balance;
-    } else if (dashBalEl && !dashBalEl.dataset.rhLive) {
-      setText("dashboardBalance", cachedBalance);
     }
 
     const quickAvatar = document.getElementById("dashboardAvatar");
@@ -1471,11 +1501,14 @@ window.loadUserDashboard = function () {
     const userRef = doc(db, "users", user.uid);
     onSnapshot(userRef, (snap) => {
       const data = snap.exists() ? snap.data() : {};
-      setText("dashboardName", data.name || user.displayName || "User");
+      setDashboardName(data.name || user.displayName || "User");
       setText("dashboardEmail", data.email || user.email || "");
       const liveBal = document.getElementById("dashboardBalance");
-      if (liveBal) { liveBal.dataset.rhLive = '1'; delete liveBal.dataset.rhStale; }
-      setText("dashboardBalance", moneyPair(data.credit || 0));
+      if (liveBal && data.credit !== undefined && data.credit !== null) {
+        liveBal.dataset.rhLive = '1';
+        delete liveBal.dataset.rhStale;
+        setText("dashboardBalance", moneyPair(data.credit || 0));
+      }
       const avatar = document.getElementById("dashboardAvatar");
       if (avatar) {
         if (data.photoURL || user.photoURL) {
@@ -1484,23 +1517,33 @@ window.loadUserDashboard = function () {
           avatar.textContent = String(data.name || user.displayName || user.email || "U").charAt(0).toUpperCase();
         }
       }
-      // Keep cache fresh
       try {
-        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
-        cached.balance = moneyPair(data.credit || 0);
-        cached.credit_raw = data.credit || 0;
-        cached.displayName = data.name || user.displayName || '';
-        cached.email = data.email || user.email || '';
-        cached.photoURL = data.photoURL || user.photoURL || '';
-        cached.cache_ts = Date.now();
-        localStorage.setItem('rh_user_cache', JSON.stringify(cached));
+        const next = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+        if (data.credit !== undefined && data.credit !== null) {
+          next.balance = moneyPair(data.credit || 0);
+          next.credit_raw = data.credit || 0;
+        }
+        next.displayName = data.name || user.displayName || next.displayName || '';
+        next.email = data.email || user.email || next.email || '';
+        next.photoURL = data.photoURL || user.photoURL || next.photoURL || '';
+        next.uid = user.uid;
+        next.cache_ts = Date.now();
+        localStorage.setItem('rh_user_cache', JSON.stringify(next));
       } catch(e) {}
     });
 
-    // Profile page must stay clean; histories are available only from My Orders.
     const orderPanel2 = document.querySelector('[data-dashboard-panel="orders"]');
     if (orderPanel2) orderPanel2.style.display = "none";
-  });
+  };
+
+  (async () => {
+    try {
+      if (typeof auth.authStateReady === "function") await auth.authStateReady();
+    } catch (e) {}
+    applyDashboardUser(auth.currentUser);
+  })();
+
+  onAuthStateChanged(auth, applyDashboardUser);
 };
 
 function setupDashboardTabs() {

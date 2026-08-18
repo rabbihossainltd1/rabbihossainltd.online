@@ -231,7 +231,7 @@
   }
 
   window.addEventListener('rabbi:loggedin', function () { showGate(false); if (items.length) render(); });
-  window.addEventListener('rabbi:loggedout', function () { showGate(true); });
+  window.addEventListener('rabbi:loggedout', function () { if (!hasCached()) showGate(true); });
 
   boot();
   var tries = 30;

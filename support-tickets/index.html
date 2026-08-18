@@ -139,6 +139,7 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
+        if (hasCached()) return;
         showGate(true);
         return;
       }

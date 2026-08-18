@@ -164,9 +164,15 @@
     '.rh-authed #authRequired,' +
     '.rh-authed #checkoutAuthGate,' +
     '.rh-authed #dashboardLoginRequired,' +
-    '.rh-authed #dashAuthRequired{display:none!important}' +
+    '.rh-authed #dashAuthRequired,' +
+    '.rh-authed #cartLoginGate,' +
+    '.rh-authed #settingsLoginGate,' +
+    '.rh-authed #ticketsLoginGate{display:none!important}' +
     '.rh-authed #walletContent,' +
-    '.rh-authed #dashboardContent{display:block!important}' +
+    '.rh-authed #dashboardContent,' +
+    '.rh-authed #cartContent,' +
+    '.rh-authed #settingsContent,' +
+    '.rh-authed #ticketsContent{display:block!important}' +
     // skeleton shimmer for values that only Firestore can supply
     '.rh-authed .rh-skel{color:transparent!important;background:linear-gradient(90deg,#161616 25%,#1f1f1f 37%,#161616 63%);' +
       'background-size:400% 100%;animation:rhSkel 1.1s ease infinite;border-radius:8px}' +

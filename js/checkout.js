@@ -580,7 +580,7 @@
       }
     })();
     window.addEventListener('rabbi:loggedin', open);
-    window.addEventListener('rabbi:loggedout', () => { started = false; show('checkoutAuthGate'); });
+    window.addEventListener('rabbi:loggedout', () => { if (hasCached()) return; started = false; show('checkoutAuthGate'); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
