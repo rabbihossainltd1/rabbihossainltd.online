@@ -15,13 +15,13 @@
   <link rel="stylesheet" href="/css/style.min.css" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
-    .settings-page{min-height:100vh;padding:calc(var(--nav-h) + 8px) 12px 118px;background:var(--bg)}
-    .settings-page-inner{max-width:620px;margin:0 auto}
+    .settings-page{min-height:100vh;padding:calc(var(--nav-h) + 2px) 8px 96px;background:var(--bg)}
+    .settings-page-inner{max-width:none;width:100%;margin:0}
     .settings-page-head{margin-bottom:8px}
     .settings-page-head .kicker{display:none}
     .settings-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem);margin:2px 0 0}
     .settings-page-head p{color:var(--text-secondary);font-size:.9rem}
-    .settings-card{background:#101010;border:1px solid var(--border);border-radius:22px;padding:26px}
+    .settings-card{background:transparent;border:0;border-radius:0;padding:0}
     .settings-divider{height:1px;background:var(--border);margin:22px 0}
     .settings-block-title{font-size:.78rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#7a7a75;margin:0 0 14px}
     .settings-field{display:flex;flex-direction:column}
@@ -44,7 +44,21 @@
     .settings-gate .mark{width:52px;height:52px;margin:0 auto 18px;border-radius:50%;background:#fff;color:#080808;display:grid;place-items:center;font-weight:900;font-size:1.3rem}
     .settings-gate h2{font-size:1.4rem;margin-bottom:8px}
     .settings-gate p{color:var(--text-secondary);margin-bottom:20px}
-    @media(max-width:560px){.settings-card{padding:20px}.settings-grid{grid-template-columns:1fr}}
+    .settings-block-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
+    .settings-block-head .settings-block-title{margin:0}
+    .settings-edit-btn{width:40px;height:40px;flex:none;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#f5f5f3;display:grid;place-items:center;cursor:pointer}
+    .settings-edit-btn svg{width:18px;height:18px}
+    .settings-edit-btn[aria-pressed="true"]{background:#111;color:#fff;border-color:#111}
+    html[data-theme="light"] .settings-edit-btn{color:#161616;border-color:rgba(0,0,0,.16)}
+    .settings-photo-btn{display:none!important}
+    .settings-avatar-preview{cursor:pointer}
+    .settings-field input[readonly]{opacity:.78;cursor:default}
+    #settingsPwPanel,.settings-pw-panel{display:none!important}
+    .settings-page.is-pw-open #settingsPwPanel,
+    .settings-page.is-pw-open .settings-pw-panel{display:block!important}
+    .settings-reset-link{display:inline-block;margin-top:10px;background:none;border:0;padding:0;color:#8a8a87;font:inherit;font-size:.84rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+    html[data-theme="light"] .settings-reset-link{color:#6f6f6c}
+    @media(max-width:560px){.settings-card{padding:0}.settings-grid{grid-template-columns:1fr}}
   </style>
   <style id="rh-bottom-nav-css">
     .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
@@ -93,12 +107,14 @@
       <!-- Settings content -->
       <div class="settings-card" id="settingsContent" style="display:none;">
         <!-- Profile -->
-        <div class="settings-block-title">Profile</div>
+        <div class="settings-block-head">
+          <div class="settings-block-title">Profile</div>
+          <button class="settings-edit-btn" id="settingsEditProfileBtn" type="button" aria-label="Edit profile" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+        </div>
         <div class="settings-avatar-row">
-          <div class="settings-avatar-preview" id="settingsAvatarPreview">U</div>
-          <label class="settings-photo-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>
-            <span>Change Picture</span>
+          <label class="settings-avatar-preview" id="settingsAvatarPreview" title="Change picture">U
             <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
           </label>
         </div>
@@ -106,47 +122,40 @@
         <div class="settings-grid">
           <div class="settings-field">
             <label for="settingsName">Name</label>
-            <input type="text" id="settingsName" placeholder="Your name" />
+            <input type="text" id="settingsName" placeholder="Your name" readonly />
           </div>
           <div class="settings-field">
             <label for="settingsEmail">Email</label>
             <input type="email" id="settingsEmail" disabled />
           </div>
         </div>
-        <div class="settings-actions">
-          <button class="settings-btn" id="settingsSaveProfileBtn" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            <span>Save Changes</span>
-          </button>
-        </div>
 
         <div class="settings-divider"></div>
 
         <!-- Password -->
         <div class="settings-block-title">Password</div>
-        <div class="settings-grid">
-          <div class="settings-field">
-            <label for="settingsCurrentPassword">Current Password</label>
-            <input type="password" id="settingsCurrentPassword" placeholder="Current password" autocomplete="current-password" />
-          </div>
-          <div class="settings-field">
-            <label for="settingsNewPassword">New Password</label>
-            <input type="password" id="settingsNewPassword" placeholder="New password" autocomplete="new-password" />
-          </div>
-          <div class="settings-field">
-            <label for="settingsConfirmPassword">Confirm Password</label>
-            <input type="password" id="settingsConfirmPassword" placeholder="Confirm new password" autocomplete="new-password" />
-          </div>
-        </div>
         <div class="settings-actions">
-          <button class="settings-btn" id="settingsChangePasswordBtn" type="button">
+          <button class="settings-btn" id="settingsChangePasswordBtn" type="button" aria-expanded="false" aria-controls="settingsPwPanel">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>Change Password</span>
           </button>
-          <button class="settings-btn secondary" id="settingsResetPasswordBtn" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L4 10"/></svg>
-            <span>Forgot password? Reset via email</span>
-          </button>
+        </div>
+        <button class="settings-reset-link" id="settingsResetPasswordBtn" type="button">Forgot password</button>
+        <div class="settings-pw-panel" id="settingsPwPanel" hidden style="display:none">
+          <div class="settings-grid">
+            <div class="settings-field">
+              <label for="settingsCurrentPassword">Current Password</label>
+              <input type="password" id="settingsCurrentPassword" placeholder="Current password" autocomplete="current-password" />
+            </div>
+            <div class="settings-field">
+              <label for="settingsNewPassword">New Password</label>
+              <input type="password" id="settingsNewPassword" placeholder="New password" autocomplete="new-password" />
+            </div>
+            <div class="settings-field">
+              <label for="settingsConfirmPassword">Confirm Password</label>
+              <input type="password" id="settingsConfirmPassword" placeholder="Confirm new password" autocomplete="new-password" />
+            </div>
+          </div>
         </div>
 
         <div class="settings-divider"></div>

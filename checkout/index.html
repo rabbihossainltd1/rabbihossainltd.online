@@ -35,7 +35,7 @@
   <link rel="preload" href="/fonts/noto-serif-bengali.subset.woff2" as="font" type="font/woff2" crossorigin>
 <style id="rh-cx-css">
 /* ===== Compact buy-form redesign (checkout) ===== */
-.rh-cx-shell{max-width:520px;margin:0 auto;padding:14px 16px 96px}
+.rh-cx-shell{max-width:none;width:100%;margin:0;padding:8px 6px 88px;box-sizing:border-box}
 .rh-cx-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .rh-cx-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
 .rh-cx-mark{width:30px;height:30px;border-radius:9px;background:#fff;color:#0a0a0a;display:grid;place-items:center;font-weight:800;font-size:13px}
@@ -46,9 +46,9 @@
 .rh-cx-sec svg{width:13px;height:13px;flex:none}
 .rh-cx-close{width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.1);display:grid;place-items:center;color:#a9a9a6;text-decoration:none;transition:.15s}
 .rh-cx-close:hover{color:#fff;border-color:rgba(255,255,255,.2)}
-.rh-cx-card{background:#111;border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden}
+.rh-cx-card{background:transparent;border:0;border-radius:0;overflow:visible}
 .rh-cx-photo{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#1a1a1a}
-.rh-cx-body{padding:13px 14px 16px}
+.rh-cx-body{padding:10px 0 12px}
 .rh-cx-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .rh-cx-title{font-size:1.15rem;font-weight:800;margin:0;color:#f5f5f3;letter-spacing:-.01em;line-height:1.25}
 .rh-cx-sub{font-size:.8rem;color:#a9a9a6;margin-top:2px}
@@ -101,7 +101,7 @@
 
 /* ===== sticky mobile pay bar ===== */
 .rh-cx-sticky{position:fixed;left:0;right:0;bottom:0;z-index:2400;background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.2);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
-.rh-cx-sticky-in{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto}
+.rh-cx-sticky-in{display:flex;align-items:center;gap:12px;max-width:none;width:100%;margin:0}
 .rh-cx-stotal{flex:none}
 .rh-cx-sl{font-size:.64rem;color:#6f6f6c;font-weight:700}
 .rh-cx-sv{font-size:1.05rem;font-weight:800;color:#f5f5f3}
@@ -110,9 +110,9 @@
 .rh-cx-cart{flex:none;width:46px;height:46px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:#141414;color:#f5f5f3;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s,background .15s}
 .rh-cx-cart:hover{border-color:rgba(255,255,255,.4);background:#181818}
 .rh-cx-cart svg{width:20px;height:20px}
-@media(min-width:600px){.rh-cx-sticky .rh-cx-sticky-in{max-width:520px}}
+@media(min-width:600px){.rh-cx-sticky .rh-cx-sticky-in{max-width:none}}
 
-.checkout-page .checkout-state{max-width:480px}
+.checkout-page .checkout-state{max-width:none;width:100%;margin:8px 0}
 
 /* ===== schema-driven fields (Claude dropdown/toggle) ===== */
 .rh-cx-body .req{color:#ff5c5c}

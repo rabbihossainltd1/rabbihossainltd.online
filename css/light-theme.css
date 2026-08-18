@@ -504,9 +504,8 @@ html[data-theme="light"] .cart-msg.info {
 
 /* ── checkout compact form (page-inline !important) ── */
 html[data-theme="light"] .rh-cx-shell,
-html[data-theme="light"] .rh-cx-card,
-html[data-theme="light"] .rh-cx-body { background: #ffffff !important; color: #161616 !important; }
-html[data-theme="light"] .rh-cx-card { border: 1px solid rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .rh-cx-body { background: #f5f5f2 !important; color: #161616 !important; }
+html[data-theme="light"] .rh-cx-card { background: transparent !important; border: 0 !important; }
 html[data-theme="light"] .rh-cx-brandname,
 html[data-theme="light"] .rh-cx-title,
 html[data-theme="light"] .rh-cx-usd,

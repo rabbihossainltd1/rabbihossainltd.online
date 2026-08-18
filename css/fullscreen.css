@@ -1,0 +1,272 @@
+/* ============================================================
+   Edge-to-edge fullscreen content — no boxed column.
+   Loaded last. Layout only (does not restyle CTAs).
+   ============================================================ */
+
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip;
+}
+
+.navbar {
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+}
+.nav-inner {
+  max-width: none !important;
+  width: 100% !important;
+  padding: 0 10px !important;
+}
+
+.container,
+.page-width,
+.store-hero-inner,
+.about-intro,
+.about-story,
+.capability-section,
+.tools-section,
+.about-contact-band,
+.admin-wrap {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.v2-page-intro,
+.page-hero,
+.policy-hero {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: calc(var(--nav-h) + 4px) 10px 16px !important;
+}
+
+.store-hero {
+  width: 100% !important;
+  max-width: none !important;
+  padding: calc(var(--nav-h) + 4px) 10px 12px !important;
+  min-height: 0 !important;
+}
+
+.home-service-cards,
+.services-category-section,
+.faq-body,
+.policy-body,
+.contact-section,
+.section {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.home-svc-grid,
+.svc-category-grid,
+.nav-cards-grid {
+  width: 100% !important;
+}
+
+/* App screens: flush under nav, no side gutter, no column cap */
+.cart-page,
+.settings-page,
+.tickets-page,
+.payment-page,
+.dashboard-wrap,
+.checkout-shell,
+.wallet-page,
+.admin-page {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: var(--nav-h) 6px 80px !important;
+  box-sizing: border-box !important;
+}
+
+.dashboard-page,
+.checkout-page,
+body.checkout-standalone {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rh-cx-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 8px 6px 88px !important;
+  box-sizing: border-box !important;
+}
+html:has(#rh-preview-nav) .rh-cx-shell {
+  padding-top: 48px !important;
+}
+
+.rh-cx-card,
+.rh-cx-sticky-in {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+.rh-cx-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.rh-cx-body { padding-left: 0 !important; padding-right: 0 !important; }
+
+html.orders-only-mode [data-dashboard-panel],
+html.orders-only-mode .dashboard-card,
+[data-dashboard-panel] {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.cart-page-inner,
+.settings-page-inner,
+.tickets-page-inner,
+.payment-shell,
+.payment-auth-state,
+.checkout-layout,
+.checkout-col-main,
+.checkout-col-side {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+html.orders-only-mode .dashboard-wrap,
+.dashboard-wrap {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* Kill the outer "card in a box" chrome — content sits on the page */
+.cart-card,
+.settings-card,
+.tickets-card,
+.payment-card,
+.payment-card-inner,
+#authRequired,
+.dashboard-card,
+.checkout-card,
+.checkout-summary,
+.checkout-state {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.cart-card,
+.settings-card,
+.tickets-card,
+.payment-card-inner,
+.dashboard-card,
+.checkout-card,
+.checkout-summary {
+  padding: 0 !important;
+}
+
+html[data-theme="light"] .cart-card,
+html[data-theme="light"] .settings-card,
+html[data-theme="light"] .tickets-card,
+html[data-theme="light"] .payment-card,
+html[data-theme="light"] .payment-card-inner,
+html[data-theme="light"] #authRequired,
+html[data-theme="light"] .dashboard-card,
+html[data-theme="light"] .checkout-card,
+html[data-theme="light"] .checkout-summary,
+html[data-theme="light"] .checkout-state,
+html[data-theme="light"] .rh-cx-shell,
+html[data-theme="light"] .rh-cx-card,
+html[data-theme="light"] [data-dashboard-panel] {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] .rh-cx-shell,
+html[data-theme="light"] .rh-cx-body {
+  background: #f5f5f2 !important;
+}
+
+.cart-page-head,
+.settings-page-head,
+.tickets-page-head,
+.orders-page-head,
+.checkout-head {
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+}
+
+/* Bottom app bar: full-bleed, not a floating pill */
+@media (max-width: 899px) {
+  .rabbi-bottom-nav {
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  body.has-bottom-nav {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  body.has-bottom-nav main,
+  body.has-bottom-nav .wallet-page,
+  body.has-bottom-nav .dashboard-page,
+  body.has-bottom-nav .cart-page,
+  body.has-bottom-nav .settings-page,
+  body.has-bottom-nav .tickets-page,
+  body.has-bottom-nav .payment-page {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .cart-page,
+  .settings-page,
+  .tickets-page,
+  .payment-page,
+  .dashboard-wrap,
+  .checkout-shell {
+    padding: var(--nav-h) 10px 40px !important;
+  }
+}
+
+/* Policy / about leftover side gaps */
+.about-page-v3,
+.faq-page,
+.policy-page {
+  width: 100% !important;
+}
+
+@media (max-width: 899px) {
+  .v2-page-intro,
+  .page-hero,
+  .policy-hero {
+    width: 100% !important;
+    padding: calc(var(--nav-h) + 4px) 10px 14px !important;
+  }
+  .nav-inner {
+    padding: 0 8px !important;
+  }
+}

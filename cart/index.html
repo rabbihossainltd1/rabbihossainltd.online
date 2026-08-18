@@ -15,13 +15,13 @@
   <link rel="stylesheet" href="/css/style.min.css" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
-    .cart-page{min-height:100vh;padding:calc(var(--nav-h) + 8px) 12px 118px;background:var(--bg)}
-    .cart-page-inner{max-width:720px;margin:0 auto}
-    .cart-page-head{margin-bottom:12px}
+    .cart-page{min-height:100vh;padding:calc(var(--nav-h) + 2px) 8px 96px;background:var(--bg)}
+    .cart-page-inner{max-width:none;width:100%;margin:0}
+    .cart-page-head{margin-bottom:10px}
     .cart-page-head .kicker{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:800}
     .cart-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem);margin:2px 0 0}
     .cart-page-head p{color:var(--text-secondary);font-size:.9rem}
-    .cart-card{background:#101010;border:1px solid var(--border);border-radius:16px;padding:12px}
+    .cart-card{background:transparent;border:0;border-radius:0;padding:0}
     .cart-item{display:grid;grid-template-columns:18px 52px minmax(0,1fr);grid-template-areas:"check img body" "actions actions actions";align-items:center;column-gap:10px;row-gap:10px;background:#151515;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px;margin-bottom:10px}
     .cart-item-check,.cart-item-check-slot{grid-area:check;width:18px;height:18px;accent-color:#fff;cursor:pointer;margin:0}
     .cart-item img,.cart-item-ph{grid-area:img;width:52px;height:52px;border-radius:10px;object-fit:cover;background:#222}

@@ -70,7 +70,9 @@
           ['/cart/', 'Cart'],
           ['/add-credit/', 'Add Credit'],
           ['/dashboard/', 'Dashboard'],
+          ['/dashboard/?tab=orders', 'Orders'],
           ['/settings/', 'Settings'],
+          ['/support-tickets/', 'Tickets'],
           ['/about/', 'About'],
           ['/faq/', 'FAQ'],
           ['/portfolio/', 'Portfolio'],
@@ -101,7 +103,8 @@
           '#rh-preview-nav a{flex:none;color:#ddd;text-decoration:none;font:700 11px/1 system-ui,sans-serif;padding:7px 10px;border-radius:999px;border:1px solid #333;white-space:nowrap}' +
           '#rh-preview-nav a.on,#rh-preview-nav a:hover{background:#fff;color:#111;border-color:#fff}' +
           'html body .navbar{top:40px!important}' +
-          'html{scroll-padding-top:40px}';
+          'html{scroll-padding-top:40px;--nav-h:112px}' +
+          '@media(max-width:899px){html{--nav-h:104px}}';
         (document.head || document.documentElement).appendChild(css);
         (document.body || document.documentElement).appendChild(bar);
       }
@@ -127,6 +130,22 @@
           cta.href = '/css/cta-light.css?v=1';
         }
         if (cta.parentNode !== host) host.appendChild(cta);
+        var fs = document.getElementById('rh-fullscreen-link');
+        if (!fs) {
+          fs = document.createElement('link');
+          fs.id = 'rh-fullscreen-link';
+          fs.rel = 'stylesheet';
+          fs.href = '/css/fullscreen.css?v=3';
+        }
+        if (fs.parentNode !== host) host.appendChild(fs);
+        var cd = document.getElementById('rh-cta-dark-link');
+        if (!cd) {
+          cd = document.createElement('link');
+          cd.id = 'rh-cta-dark-link';
+          cd.rel = 'stylesheet';
+          cd.href = '/css/cta-dark.css?v=2';
+        }
+        if (cd.parentNode !== host) host.appendChild(cd);
         if (!document.getElementById('rh-cta-inline')) {
           var inline = document.createElement('style');
           inline.id = 'rh-cta-inline';

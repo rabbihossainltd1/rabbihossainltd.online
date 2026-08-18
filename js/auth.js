@@ -723,8 +723,18 @@
     const preview = document.getElementById('settingsAvatarPreview');
     const photo = currentUserData?.photoURL || currentUser?.photoURL || cache.photoURL || '';
     if (preview) {
-      if (photo) preview.innerHTML = `<img src="${escapeHtml(photo)}" alt="Profile photo">`;
-      else preview.textContent = String(currentUserData?.name || currentUser?.displayName || currentUser?.email || 'U').charAt(0).toUpperCase();
+      const fileKeep = preview.querySelector('#settingsPhotoInput');
+      preview.querySelectorAll('img').forEach(function (im) { im.remove(); });
+      Array.from(preview.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
+      if (photo) {
+        const im = document.createElement('img');
+        im.src = photo;
+        im.alt = 'Profile photo';
+        preview.insertBefore(im, preview.firstChild);
+      } else {
+        preview.insertBefore(document.createTextNode(String(currentUserData?.name || currentUser?.displayName || currentUser?.email || 'U').charAt(0).toUpperCase()), preview.firstChild);
+      }
+      if (fileKeep && fileKeep.parentNode !== preview) preview.appendChild(fileKeep);
     }
     const pass1 = document.getElementById('settingsNewPassword');
     const pass2 = document.getElementById('settingsConfirmPassword');
@@ -737,13 +747,17 @@
     const fileInput = document.getElementById('settingsPhotoInput');
     if (fileInput) {
       fileInput.value = '';
-      fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => openCropModal(e.target.result);
-        reader.readAsDataURL(file);
-      }, { once: true });
+      if (!fileInput.dataset.rhBound) {
+        fileInput.dataset.rhBound = '1';
+        fileInput.addEventListener('change', function() {
+          const file = this.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = e => openCropModal(e.target.result);
+          reader.readAsDataURL(file);
+          this.value = '';
+        });
+      }
     }
   }
 
@@ -847,9 +861,20 @@
       const cropped = canvas.toDataURL('image/jpeg', 0.9);
 
       const preview = document.getElementById('settingsAvatarPreview');
-      if (preview) preview.innerHTML = `<img src="${cropped}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      if (preview) {
+        const fileKeep = preview.querySelector('#settingsPhotoInput');
+        preview.querySelectorAll('img').forEach(function (im) { im.remove(); });
+        Array.from(preview.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
+        const im = document.createElement('img');
+        im.src = cropped;
+        im.alt = 'Preview';
+        im.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+        preview.insertBefore(im, preview.firstChild);
+        if (fileKeep && fileKeep.parentNode !== preview) preview.appendChild(fileKeep);
+      }
       window._pendingCroppedPhoto = cropped;
       cm.remove();
+      saveProfilePhoto(cropped);
     });
   }
 
@@ -994,14 +1019,68 @@
     if (_settingsPageWired) { fillIfReady(); return; }
     _settingsPageWired = true;
 
-    const saveProfileBtn = document.getElementById('settingsSaveProfileBtn');
-    if (saveProfileBtn) saveProfileBtn.addEventListener('click', saveProfileSettings);
     const changePasswordBtn = document.getElementById('settingsChangePasswordBtn');
-    if (changePasswordBtn) changePasswordBtn.addEventListener('click', changeUserPassword);
     const resetPasswordBtn = document.getElementById('settingsResetPasswordBtn');
     if (resetPasswordBtn) resetPasswordBtn.addEventListener('click', sendUserPasswordReset);
     const loginBtn = document.getElementById('settingsLoginBtn');
     if (loginBtn) loginBtn.addEventListener('click', () => window.rabbiAuth && window.rabbiAuth.openLogin && window.rabbiAuth.openLogin('settings'));
+
+    const page = document.querySelector('.settings-page');
+    const editBtn = document.getElementById('settingsEditProfileBtn');
+    const nameInput = document.getElementById('settingsName');
+    function setProfileEditing(on) {
+      if (page) page.classList.toggle('is-editing', !!on);
+      if (editBtn) editBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (nameInput) {
+        if (on) nameInput.removeAttribute('readonly');
+        else nameInput.setAttribute('readonly', '');
+      }
+    }
+    if (editBtn) {
+      editBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const next = !(page && page.classList.contains('is-editing'));
+        setProfileEditing(next);
+        if (next && nameInput) setTimeout(function () { nameInput.focus(); }, 0);
+      });
+    }
+    if (nameInput) {
+      nameInput.addEventListener('blur', function () {
+        if (page && page.classList.contains('is-editing')) saveProfileName();
+      });
+      nameInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); nameInput.blur(); }
+      });
+    }
+    document.addEventListener('pointerdown', function (e) {
+      if (!page || !page.classList.contains('is-editing')) return;
+      if (e.target.closest('#settingsName') || e.target.closest('#settingsEditProfileBtn')) return;
+      saveProfileName();
+    });
+    function setPwOpen(on) {
+      if (page) page.classList.toggle('is-pw-open', !!on);
+      const panel = document.getElementById('settingsPwPanel');
+      if (panel) {
+        if (on) {
+          panel.removeAttribute('hidden');
+          panel.style.display = 'block';
+        } else {
+          panel.setAttribute('hidden', '');
+          panel.style.display = 'none';
+        }
+      }
+      if (changePasswordBtn) changePasswordBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    }
+    if (changePasswordBtn) {
+      changePasswordBtn.addEventListener('click', function () {
+        if (!(page && page.classList.contains('is-pw-open'))) {
+          setPwOpen(true);
+          setTimeout(function () { document.getElementById('settingsCurrentPassword')?.focus(); }, 0);
+          return;
+        }
+        changeUserPassword();
+      });
+    }
 
     // Language radios + save
     const saveLangBtn = document.getElementById('saveLangBtn');
@@ -1030,8 +1109,14 @@
     // Honor ?focus=… (e.g. focus password field)
     try {
       const f = new URLSearchParams(location.search).get('focus');
-      if (f === 'name') setTimeout(() => document.getElementById('settingsName')?.focus(), 300);
-      if (f === 'password') setTimeout(() => document.getElementById('settingsCurrentPassword')?.focus(), 300);
+      if (f === 'name') {
+        setProfileEditing(true);
+        setTimeout(() => document.getElementById('settingsName')?.focus(), 300);
+      }
+      if (f === 'password') {
+        setPwOpen(true);
+        setTimeout(() => document.getElementById('settingsCurrentPassword')?.focus(), 300);
+      }
     } catch (e) {}
 
     fillIfReady();
@@ -1048,6 +1133,72 @@
     const modal = document.getElementById('profileSettingsModal');
     if (modal) modal.classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+
+  async function writeUserFields(fields) {
+    if (!currentUser) throw new Error('Not logged in. Please refresh.');
+    if (fields.name && authApi) {
+      await authApi.updateProfile(currentUser, { displayName: fields.name });
+    }
+    if (dbApi) {
+      const { db, doc, updateDoc, serverTimestamp } = dbApi;
+      await updateDoc(doc(db, 'users', currentUser.uid), { ...fields, updatedAt: serverTimestamp() });
+    } else {
+      const { getFirestore, doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const { getApp } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js');
+      const db = getFirestore(getApp());
+      await updateDoc(doc(db, 'users', currentUser.uid), { ...fields, updatedAt: serverTimestamp() });
+    }
+    currentUserData = { ...(currentUserData || {}), ...fields };
+    updateProfileMenu(currentUser, currentUserData);
+    try {
+      const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+      localStorage.setItem('rh_user_cache', JSON.stringify({
+        ...cached,
+        displayName: currentUserData.name || cached.displayName || '',
+        photoURL: currentUserData.photoURL || cached.photoURL || '',
+        cache_ts: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  async function saveProfileName() {
+    const page = document.querySelector('.settings-page');
+    const nameInput = document.getElementById('settingsName');
+    const fullName = String(nameInput?.value || '').trim();
+    const prev = String(currentUserData?.name || currentUser?.displayName || '').trim();
+    function lock() {
+      if (page) page.classList.remove('is-editing');
+      if (nameInput) nameInput.setAttribute('readonly', '');
+      const editToggle = document.getElementById('settingsEditProfileBtn');
+      if (editToggle) editToggle.setAttribute('aria-pressed', 'false');
+    }
+    if (!fullName) {
+      setSettingsMessage('error', 'Please enter your name.');
+      if (nameInput) nameInput.focus();
+      return;
+    }
+    if (fullName === prev) { lock(); return; }
+    try {
+      await writeUserFields({ name: fullName });
+      lock();
+      setSettingsMessage('success', 'Name updated.');
+    } catch (err) {
+      setSettingsMessage('error', err.message || 'Name update failed.');
+    }
+  }
+
+  async function saveProfilePhoto(dataUrl) {
+    if (!dataUrl) return;
+    try {
+      await writeUserFields({ photoURL: dataUrl });
+      updateAvatar(dataUrl, currentUser);
+      window._pendingCroppedPhoto = null;
+      setSettingsMessage('success', 'Profile picture updated.');
+    } catch (err) {
+      setSettingsMessage('error', err.message || 'Photo update failed.');
+    }
   }
 
   async function saveProfileSettings() {
@@ -1102,6 +1253,11 @@
       updateProfileMenu(currentUser, currentUserData);
       if (fileInput) fileInput.value = '';
       setSettingsMessage('success', 'Profile updated successfully.');
+      const settingsPage = document.querySelector('.settings-page');
+      if (settingsPage) settingsPage.classList.remove('is-editing');
+      if (nameInput) nameInput.setAttribute('readonly', '');
+      const editToggle = document.getElementById('settingsEditProfileBtn');
+      if (editToggle) editToggle.setAttribute('aria-pressed', 'false');
     } catch (err) {
       setSettingsMessage('error', err.message || 'Profile update failed.');
     } finally {
@@ -1113,6 +1269,7 @@
     if (!currentUser || !authApi) return;
     const currentPassword = String(document.getElementById('settingsCurrentPassword')?.value || '');
     const newPassword = String(document.getElementById('settingsNewPassword')?.value || '');
+    const confirmPassword = String(document.getElementById('settingsConfirmPassword')?.value || '');
     const btn = document.getElementById('settingsChangePasswordBtn');
     const old = btn ? btn.innerHTML : '';
 
@@ -1128,6 +1285,10 @@
       setSettingsMessage('error', 'New password must be at least 6 characters.');
       return;
     }
+    if (confirmPassword && confirmPassword !== newPassword) {
+      setSettingsMessage('error', 'New password and confirm password do not match.');
+      return;
+    }
 
     try {
       if (btn) { btn.disabled = true; btn.innerHTML = `${iconPassword()} <span>Updating...</span>`; }
@@ -1136,9 +1297,16 @@
       await authApi.updatePassword(currentUser, newPassword);
       const currentInput = document.getElementById('settingsCurrentPassword');
       const newInput = document.getElementById('settingsNewPassword');
+      const confirmInput = document.getElementById('settingsConfirmPassword');
       if (currentInput) currentInput.value = '';
       if (newInput) newInput.value = '';
+      if (confirmInput) confirmInput.value = '';
       setSettingsMessage('success', 'Password changed successfully.');
+      const settingsPage = document.querySelector('.settings-page');
+      if (settingsPage) settingsPage.classList.remove('is-pw-open');
+      const panel = document.getElementById('settingsPwPanel');
+      if (panel) panel.setAttribute('hidden', '');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
     } catch (err) {
       const msg = {
         'auth/wrong-password': 'Current password is incorrect.',
@@ -1159,15 +1327,15 @@
       return;
     }
     const btn = document.getElementById('settingsResetPasswordBtn');
-    const old = btn ? btn.innerHTML : '';
+    const old = btn ? btn.textContent : '';
     try {
-      if (btn) { btn.disabled = true; btn.innerHTML = `${iconPassword()} <span>Sending...</span>`; }
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
       await authApi.sendPasswordResetEmail(authApi.auth, currentUser.email);
       setSettingsMessage('success', 'Password reset link sent to your email.');
     } catch (err) {
       setSettingsMessage('error', err.message || 'Unable to send reset link.');
     } finally {
-      if (btn) { btn.disabled = false; btn.innerHTML = old; }
+      if (btn) { btn.disabled = false; btn.textContent = old || 'Forgot password'; }
     }
   }
 

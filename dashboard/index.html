@@ -37,8 +37,8 @@
   <script>if(new URLSearchParams(location.search).get("tab")==="orders"){document.documentElement.classList.add("orders-only-mode");}</script>
   <style>
     .dashboard-page { min-height:100vh; padding:0; background:var(--bg-primary); }
-    .dashboard-wrap { max-width:100%; min-height:100vh; padding:calc(var(--nav-h) + 8px) 12px 110px; background:var(--bg-primary); }
-    .dashboard-card { background:rgba(255,255,255,.045); border:1px solid rgba(255, 255, 255,.16); border-radius:28px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.34); max-width:780px; margin:0 auto; }
+    .dashboard-wrap { max-width:100%; min-height:100vh; padding:calc(var(--nav-h) + 2px) 8px 96px; background:var(--bg-primary); }
+    .dashboard-card { background:transparent; border:0; border-radius:0; padding:0; box-shadow:none; max-width:none; margin:0; }
     .dashboard-profile { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:18px; }
     .dashboard-avatar { width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#ffffff; color:#080808; font-family:var(--font-display); font-size:1.6rem; font-weight:900; overflow:hidden; border:2px solid rgba(255, 255, 255,.35); }
     .dashboard-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -84,7 +84,7 @@
     .orders-segment-btn.active { background:#ffffff; color:#080808; box-shadow:0 10px 24px rgba(255, 255, 255,.16); }
     .order-mini-panel { display:none; }
     .order-mini-panel.active { display:block; }
-    .orders-only-mode .dashboard-card { padding:18px; border-radius:24px; }
+    .orders-only-mode .dashboard-card { padding:0; border-radius:0; }
     .orders-only-mode .dashboard-history-list { gap:8px; }
     .orders-only-mode .dashboard-history-card { padding:12px 13px; border-radius:15px; background:rgba(255,255,255,.04); }
     .orders-only-mode .dashboard-history-head { margin-bottom:4px; align-items:center; }
@@ -100,10 +100,10 @@
     @media(max-width:520px){ .dashboard-balance { padding:14px; } .dashboard-balance strong{font-size:1.15rem;} .compact-balance .balance-plus-btn{width:38px;height:38px;border-radius:12px;} }
 
     /* Compact profile redesign — wins over v3 2-col leftovers */
-    .dashboard-wrap{width:100%!important;max-width:560px!important;margin:0 auto!important;padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+    .dashboard-wrap{width:100%!important;max-width:none!important;margin:0!important;padding:calc(var(--nav-h) + 2px) 8px 96px!important}
     #dashboardContent[style*="display: block"],
     #dashboardContent:not([style*="display:none"]){display:flex!important;flex-direction:column!important;gap:10px!important}
-    .dashboard-card{max-width:560px!important;margin:0 auto!important;background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important}
+    .dashboard-card{max-width:none!important;margin:0!important;background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important}
     .dashboard-profile{display:flex!important;grid-template-columns:none!important;align-items:center!important;gap:12px!important;text-align:left!important;padding:14px!important;margin:0!important;border-radius:16px!important}
     .dashboard-avatar{width:52px!important;height:52px!important;flex:none;margin:0!important;font-size:1.15rem!important}
     .dashboard-id{flex:1;min-width:0}
@@ -122,6 +122,11 @@
     .profile-control-btn svg{flex:none;margin:0!important}
     #supportTicketsPanel{display:none!important}
     html.orders-only-mode .dash-icon-btn{display:none}
+    html.orders-only-mode [data-dashboard-panel],
+    html.orders-only-mode .dashboard-card{
+      background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important
+    }
+    html.orders-only-mode .orders-page-head{margin:4px 0 8px!important;padding:0!important}
     @media(max-width:720px){
       .dashboard-profile{grid-template-columns:none!important;text-align:left!important}
       .dashboard-avatar{margin:0!important}
