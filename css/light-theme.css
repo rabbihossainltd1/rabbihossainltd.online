@@ -254,11 +254,18 @@ html[data-theme="light"] .nav-links.open a .nav-icon {
 }
 html[data-theme="light"] .nav-links.open a .nav-icon svg { color: #2a2a2a !important; }
 html[data-theme="light"] .nav-links.open a.active {
-  background: #111 !important;
-  color: #fff !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #111111 !important;
 }
-html[data-theme="light"] .nav-links.open a.active .nav-icon,
-html[data-theme="light"] .nav-links.open a.active .nav-icon svg { color: #fff !important; }
+html[data-theme="light"] .nav-links.open a.active .nav-icon {
+  background: #f0f0ee !important;
+  border-color: rgba(0,0,0,.16) !important;
+  color: #111111 !important;
+}
+html[data-theme="light"] .nav-links.open a.active .nav-icon svg,
+html[data-theme="light"] .nav-links.open a.active svg,
+html[data-theme="light"] .nav-links.open a.active span { color: #111111 !important; stroke: currentColor !important; }
 
 html[data-theme="light"] .social-link {
   background: #ffffff !important;
