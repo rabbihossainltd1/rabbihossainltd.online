@@ -106,6 +106,7 @@
     html[data-theme="light"] .cart-item-plan,html[data-theme="light"] .cart-item-meta,html[data-theme="light"] .checkout-item .ci-meta,html[data-theme="light"] .checkout-subtotal-row .lbl,html[data-theme="light"] .cart-total-row .lbl,html[data-theme="light"] .cart-selectall,html[data-theme="light"] .cart-pay-label,html[data-theme="light"] .cart-pay .p-desc{color:#4a4a48}
     html[data-theme="light"] .cart-pay .p-name{color:#161616}
     html[data-theme="light"] .cart-remove{color:#2a2a2a;border-color:rgba(0,0,0,.16)}
+    #cartPayView[hidden],#cartShopView[hidden]{display:none!important}
   </style>
   <style id="rh-bottom-nav-css">
     .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
@@ -148,18 +149,49 @@
 
       <!-- Cart content -->
       <div class="cart-card" id="cartContent" style="display:none;">
-        <div id="cartList"></div>
-        <div id="cartFooter" style="display:none;">
-          <label class="cart-selectall"><input type="checkbox" id="cartSelectAll" checked> Select all</label>
-          <div class="cart-total-row">
-            <span class="lbl">Total</span>
-            <span class="val" id="cartTotal">$0 / ৳0</span>
+        <div id="cartShopView">
+          <div id="cartList"></div>
+          <div id="cartFooter" style="display:none;">
+            <label class="cart-selectall"><input type="checkbox" id="cartSelectAll" checked> Select all</label>
+            <div class="cart-total-row">
+              <span class="lbl">Total</span>
+              <span class="val" id="cartTotal">$0 / ৳0</span>
+            </div>
+            <button class="cart-checkout-btn" id="cartCheckoutBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Checkout &amp; Pay
+            </button>
+            <div id="cartCheckoutMsg" class="cart-msg"></div>
           </div>
-          <button class="cart-checkout-btn" id="cartCheckoutBtn" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Checkout &amp; Pay
+        </div>
+
+        <div id="cartPayView" hidden>
+          <button type="button" class="cart-back-btn" id="cartPayBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18 9 12l6-6"/></svg>
+            Back to cart
           </button>
-          <div id="cartCheckoutMsg" class="cart-msg"></div>
+          <h2 class="checkout-view-title">Pay now</h2>
+          <div id="cartPayItems"></div>
+          <div class="checkout-subtotal-row">
+            <span class="lbl">Subtotal</span>
+            <span class="val" id="cartPaySubtotal">$0 / ৳0</span>
+          </div>
+          <span class="cart-pay-label">Payment method</span>
+          <div class="cart-pay-actions">
+            <button type="button" class="cart-pay sel" id="cartPayBalance">
+              <span class="p-name">Balance Pay</span>
+              <span class="p-desc">Pay from wallet</span>
+            </button>
+            <button type="button" class="cart-pay" id="cartPayInstant">
+              <span class="p-name">Instant Pay</span>
+              <span class="p-desc">Pay now</span>
+            </button>
+          </div>
+          <button class="cart-checkout-btn" id="cartPayNowBtn" type="button" style="margin-top:16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span id="cartPayNowLabel">Pay Now</span>
+          </button>
+          <div id="cartPayMsg" class="cart-msg"></div>
         </div>
       </div>
     </div>

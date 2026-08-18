@@ -283,8 +283,14 @@
   function showPayView(on) {
     var shop = document.getElementById('cartShopView');
     var pay = document.getElementById('cartPayView');
-    if (shop) shop.hidden = !!on;
-    if (pay) pay.hidden = !on;
+    if (shop) {
+      shop.hidden = !!on;
+      shop.style.display = on ? 'none' : '';
+    }
+    if (pay) {
+      pay.hidden = !on;
+      pay.style.display = on ? '' : 'none';
+    }
   }
 
   function renderPayView(chosen) {
@@ -322,16 +328,14 @@
   function openCheckout() {
     var items = window.RhCart ? window.RhCart.get() : [];
     var ids = selectedIds();
-    var chosen = items.filter(function (i) { return ids.indexOf(i.id) !== -1; });
-    var draft = chosen.find(function (i) { return i.needsPlan; });
-    if (draft) {
-      var dm = document.getElementById('cartCheckoutMsg');
-      if (dm) { dm.textContent = '"' + draft.title + '" select a plan first.'; dm.className = 'cart-msg error'; }
-      return;
-    }
+    var chosen = items.filter(function (i) { return !i.needsPlan && (ids.length ? ids.indexOf(i.id) !== -1 : true); });
     if (!chosen.length) {
+      var draft = items.find(function (i) { return i.needsPlan; });
       var msg = document.getElementById('cartCheckoutMsg');
-      if (msg) { msg.textContent = 'Select at least one product.'; msg.className = 'cart-msg error'; }
+      if (msg) {
+        msg.textContent = draft ? '"' + draft.title + '" select a plan first.' : 'Select at least one product.';
+        msg.className = 'cart-msg error';
+      }
       return;
     }
     if (!loggedIn() && !hasCached()) {
