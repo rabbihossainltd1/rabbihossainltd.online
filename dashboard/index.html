@@ -67,7 +67,7 @@
     .dashboard-login { display:none; text-align:center; padding:42px 22px; }
     .dashboard-login h1 { color:var(--text-primary); margin-bottom:12px; font-family:var(--font-display); }
     .dashboard-login p { color:var(--text-secondary); margin-bottom:20px; }
-    .orders-only-title { display:none; color:var(--text-primary); font-family:var(--font-display); font-size:clamp(1.9rem,5vw,3rem); margin-bottom:16px; }
+    .orders-only-title { display:none; color:var(--text-primary); font-family:var(--font-display); font-size:clamp(1.35rem,4vw,1.85rem); margin-bottom:8px; }
     .orders-only-subtitle { display:none; color:var(--text-secondary); margin-bottom:18px; line-height:1.6; }
     html.orders-only-mode .dashboard-profile,
     html.orders-only-mode .dashboard-balance,
@@ -109,7 +109,10 @@
     .dashboard-id{flex:1;min-width:0}
     .dashboard-profile h2{font-size:1.05rem!important;margin:0 0 2px!important;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .dashboard-profile p{margin:0!important;font-size:.8rem!important}
-    .dash-icon-btn{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eee;display:grid;place-items:center;cursor:pointer}
+    .dash-icon-row{display:flex;gap:8px;flex:none}
+    .dash-icon-btn{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid #111;background:#111;color:#fff;display:grid;place-items:center;text-decoration:none}
+    html[data-theme="light"] .dash-icon-btn{background:#111!important;color:#fff!important;border-color:#111!important}
+    .profile-control-panel{display:none!important}
     .dashboard-balance{margin:0!important;padding:14px 16px!important;border-radius:16px!important}
     .dashboard-balance strong{font-size:1.2rem!important}
     .profile-control-panel{padding:10px!important;margin:0!important;border-radius:16px!important}
@@ -117,7 +120,7 @@
     .profile-control-grid .profile-control-btn:last-child{grid-column:1/-1}
     .profile-control-btn{display:flex!important;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 12px!important;border-radius:12px!important;font-size:.82rem!important;margin:0!important;flex-direction:row!important}
     .profile-control-btn svg{flex:none;margin:0!important}
-    #supportTicketsPanel{margin-top:0!important;padding:12px!important;border-radius:16px!important}
+    #supportTicketsPanel{display:none!important}
     html.orders-only-mode .dash-icon-btn{display:none}
     @media(max-width:720px){
       .dashboard-profile{grid-template-columns:none!important;text-align:left!important}
@@ -179,9 +182,14 @@
 </span></h2>
             <p id="dashboardEmail">Loading...</p>
           </div>
-          <button class="dash-icon-btn" type="button" aria-label="Settings" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          </button>
+          <div class="dash-icon-row">
+            <a class="dash-icon-btn" href="/settings/" aria-label="Settings" title="Settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </a>
+            <a class="dash-icon-btn" href="/support-tickets/" aria-label="Support tickets" title="Support tickets">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </a>
+          </div>
         </div>
 
         <div class="dashboard-balance compact-balance">
@@ -205,27 +213,11 @@
           </a>
         </div>
 
-        <section class="profile-control-panel" id="profileControlPanel">
-          <div class="profile-control-grid" id="profileControlGrid">
-            <button class="profile-control-btn" type="button" onclick="window.rabbiAuth && window.rabbiAuth.openProfileSettings && window.rabbiAuth.openProfileSettings()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</button>
-            <button class="profile-control-btn" type="button" id="supportTicketsBtn" onclick="toggleSupportTickets()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="display:inline-block;vertical-align:-2px;margin-right:5px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Support Tickets</button>
-
-          </div>
-        </section>
-        <script>
-          // In orders-only mode, hide profile control panel entirely (already no useful buttons there)
-          (function(){
-            if(document.documentElement.classList.contains('orders-only-mode')){
-              var panel = document.getElementById('profileControlPanel');
-              if(panel) panel.style.display='none';
-            }
-          })();
-        </script>
+        <section class="profile-control-panel" id="profileControlPanel" hidden></section>
 
         <section data-dashboard-panel="orders" style="display:none;">
           <div class="orders-page-head">
             <h1>My Orders</h1>
-            
           </div>
           <div class="orders-search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -243,95 +235,15 @@
           </div>
         </section>
 
-        <!-- Support Tickets Panel -->
-        <section id="supportTicketsPanel" style="display:none;margin-top:20px;">
-          <h2 class="orders-section-title" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            My Support Tickets
-          </h2>
-          <div id="supportTicketsList">
-            <div class="empty-state">Loading...</div>
-          </div>
-        </section>
       </div>
     </div>
   </main>
 
-  <style>
-  .support-ticket-item { background:rgba(255, 255, 255,.05); border:1px solid rgba(255, 255, 255,.14); border-radius:14px; padding:14px 16px; margin-bottom:10px; }
-  .support-ticket-header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
-  .support-ticket-id { font-family:monospace; font-size:.82rem; color:#9b9b96; font-weight:700; }
-  .support-ticket-status { font-size:.74rem; font-weight:900; padding:3px 10px; border-radius:99px; }
-  .support-ticket-status.open { background:rgba(255, 255, 255,.15); color:#ffffff; border:1px solid rgba(255, 255, 255,.3); }
-  .support-ticket-status.solved { background:rgba(255, 255, 255,.12); color:#787873; border:1px solid rgba(255, 255, 255,.28); }
-  .support-ticket-status.closed { background:rgba(255,255,255,.06); color:#aaaaaa; border:1px solid rgba(255,255,255,.1); }
-  .support-ticket-problem { font-size:.85rem; color:#b6b6b3; line-height:1.5; margin-bottom:4px; }
-  .support-ticket-date { font-size:.74rem; color:#70706d; }
-  </style>
-
-  <script type="module">
-  import { auth, db } from '/js/firebase-core.js';
-  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-  import { collection, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
-
+  <script>
   window.openCustomerService = function() {
     var toggle = document.getElementById('floatChatToggle');
     if (toggle) toggle.click();
   };
-  window.toggleSupportTickets = function() {
-    const panel = document.getElementById('supportTicketsPanel');
-    const btn = document.getElementById('supportTicketsBtn');
-    if (!panel) return;
-    const isVisible = panel.style.display !== 'none';
-    panel.style.display = isVisible ? 'none' : 'block';
-    if (!isVisible) loadUserTickets();
-  };
-
-  function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  function loadUserTickets() {
-    onAuthStateChanged(auth, (user) => {
-      if (!user) return;
-      const list = document.getElementById('supportTicketsList');
-      if (!list) return;
-      // orderBy removed — composite index not required, sort client-side instead
-      const q = query(
-        collection(db, 'supportTickets'),
-        where('userId', '==', user.uid)
-      );
-      onSnapshot(q, (snap) => {
-        if (snap.empty) {
-          list.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center;color:#70706d;font-size:.88rem;">No support tickets yet.</div>';
-          return;
-        }
-        // Sort client-side by createdAt desc
-        const docs = [];
-        snap.forEach(docSnap => docs.push(docSnap.data()));
-        docs.sort((a, b) => {
-          const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-          const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-          return tb - ta;
-        });
-        list.innerHTML = '';
-        docs.forEach(d => {
-          const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('bn-BD') : '';
-          const statusClass = d.status === 'solved' ? 'solved' : d.status === 'closed' ? 'closed' : 'open';
-          const statusLabel = d.status === 'solved' ? 'সমাধান হয়েছে' : d.status === 'closed' ? 'বন্ধ' : 'খোলা আছে';
-          list.innerHTML += `<div class="support-ticket-item">
-            <div class="support-ticket-header">
-              <span class="support-ticket-id">${escH(d.ticketId)}</span>
-              <span class="support-ticket-status ${statusClass}">${statusLabel}</span>
-            </div>
-            <div class="support-ticket-problem">${escH(d.problemDescription || '')}</div>
-            <div class="support-ticket-date">${date}</div>
-          </div>`;
-        });
-      }, (err) => {
-        console.error('Tickets load error:', err);
-        list.innerHTML = '<div style="padding:20px;text-align:center;color:#ff6b6b;font-size:.88rem;">টিকেট লোড করতে সমস্যা হয়েছে।</div>';
-      });
-    });
-  }
   </script>
 
   <script src="/js/lang.js" defer></script>

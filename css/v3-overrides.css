@@ -704,7 +704,8 @@ html[data-theme="light"] body { background:#f5f5f2 !important; color:#161616 !im
 [data-theme="light"] .about-page-v3,
 [data-theme="light"] .wallet-page,
 [data-theme="light"] .settings-page,
-[data-theme="light"] .cart-page { background:#f5f5f2 !important; }
+[data-theme="light"] .cart-page,
+[data-theme="light"] .tickets-page { background:#f5f5f2 !important; }
 
 /* images (default dark bg from base css) */
 [data-theme="light"] img { background:#ececea !important; }
@@ -994,3 +995,53 @@ html[data-theme="light"] #navLoginBtn { background:#ffffff !important; color:#11
 html[data-theme="light"] #navLoginBtn:hover { background:#111111 !important; color:#ffffff !important; border-color:#111111 !important; }
 html[data-theme="light"] #floatChatToggle { background:#ffffff !important; color:#111111 !important; border:1px solid rgba(0,0,0,.16) !important; box-shadow:0 8px 22px rgba(0,0,0,.12) !important; }
 html[data-theme="light"] #floatChatToggle svg { color:#111111 !important; stroke:currentColor !important; }
+
+/* ============================================================
+   Compact fullscreen chrome — cart-like padding on app pages.
+   Late + !important so earlier v3 54px/1080px rules lose.
+   ============================================================ */
+.payment-page{padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+.payment-page-head{display:none!important;margin:0!important;height:0!important;overflow:hidden!important}
+.payment-shell{width:min(560px,100%)!important;max-width:560px!important;margin:0 auto!important}
+.payment-layout{display:block!important;grid-template-columns:none!important}
+.payment-auth-state{width:min(560px,100%)!important;grid-template-columns:1fr!important;gap:12px!important}
+.payment-card-inner{padding:20px!important}
+.amount-input-row{min-height:64px!important;padding:0 16px!important}
+.amount-input-row input{font-size:1.6rem!important}
+.amount-prefix{font-size:1.3rem!important}
+
+.settings-page{padding:calc(var(--nav-h) + 8px) 12px 118px!important}
+.settings-page-inner{max-width:720px!important}
+.settings-page-head{margin-bottom:8px!important}
+.settings-page-head .kicker{display:none!important}
+.settings-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem)!important;margin:2px 0 0!important}
+
+.dashboard-wrap{width:100%!important;max-width:560px!important;margin:0 auto!important;padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+html.orders-only-mode .dashboard-wrap{max-width:720px!important}
+.orders-page-head{margin-bottom:10px!important}
+.orders-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem)!important;margin:0!important}
+.orders-only-title{font-size:clamp(1.35rem,4vw,1.85rem)!important;margin:0 0 8px!important}
+#supportTicketsPanel{display:none!important}
+
+.cart-page,.tickets-page{padding:calc(var(--nav-h) + 8px) 12px 118px!important}
+.tickets-page-inner{max-width:720px;margin:0 auto}
+
+.v2-page-intro,.page-hero,.policy-hero{padding:calc(var(--nav-h) + 12px) 16px 20px!important}
+.v2-page-intro h1,.page-hero h1,.policy-hero h1{font-size:clamp(1.6rem,4vw,2.4rem)!important}
+.v2-page-intro>p:last-child,.page-hero p,.policy-hero p{margin-top:10px!important}
+.faq-body,.policy-body{padding:20px 16px 100px!important}
+.about-intro{padding:20px 0 36px!important;gap:28px!important}
+.checkout-shell{padding:calc(var(--nav-h) + 8px) 12px 90px!important}
+.checkout-head{margin-bottom:16px!important;padding-bottom:14px!important}
+.checkout-head h1{font-size:clamp(1.35rem,4vw,1.85rem)!important}
+
+html[data-theme="light"] .tickets-page{background:#f5f5f2!important}
+html[data-theme="light"] .tickets-card,
+html[data-theme="light"] .support-ticket-item{background:#fff!important;border-color:rgba(0,0,0,.09)!important}
+
+@media(max-width:899px){
+  .payment-page{padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+  .dashboard-wrap{width:100%!important;max-width:560px!important;padding:calc(var(--nav-h) + 8px) 12px 110px!important}
+  html.orders-only-mode .dashboard-wrap{max-width:720px!important}
+  .v2-page-intro,.page-hero,.policy-hero{width:calc(100% - 24px)!important;padding:calc(var(--nav-h) + 10px) 0 16px!important}
+}

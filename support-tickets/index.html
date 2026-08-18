@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support Tickets — RabbiHossainLTD</title>
+  <meta name="description" content="Your support tickets." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://rabbihossainltd.online/support-tickets/" />
+  <link rel="dns-prefetch" href="//firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com" />
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    .tickets-page{min-height:100vh;padding:calc(var(--nav-h) + 8px) 12px 118px;background:var(--bg)}
+    .tickets-page-inner{max-width:720px;margin:0 auto}
+    .tickets-page-head{margin-bottom:12px}
+    .tickets-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem);margin:2px 0 0}
+    .tickets-card{background:#101010;border:1px solid var(--border);border-radius:16px;padding:12px}
+    .tickets-empty{text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:.88rem;line-height:1.6}
+    .tickets-empty a{color:inherit;text-decoration:underline}
+    .support-ticket-item{background:#151515;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+    .support-ticket-item:last-child{margin-bottom:0}
+    .support-ticket-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+    .support-ticket-id{font-family:monospace;font-size:.82rem;color:#9b9b96;font-weight:700}
+    .support-ticket-status{font-size:.74rem;font-weight:900;padding:3px 10px;border-radius:99px}
+    .support-ticket-status.open{background:rgba(255,255,255,.15);color:#ffffff;border:1px solid rgba(255,255,255,.3)}
+    .support-ticket-status.solved{background:rgba(255,255,255,.12);color:#c4c4c0;border:1px solid rgba(255,255,255,.28)}
+    .support-ticket-status.closed{background:rgba(255,255,255,.06);color:#aaaaaa;border:1px solid rgba(255,255,255,.1)}
+    .support-ticket-problem{font-size:.85rem;color:#b6b6b3;line-height:1.5;margin-bottom:4px;word-break:break-word}
+    .support-ticket-date{font-size:.74rem;color:#70706d}
+    .tickets-gate{text-align:center;padding:40px 24px}
+    .tickets-gate .mark{width:52px;height:52px;margin:0 auto 18px;border-radius:50%;background:#fff;color:#080808;display:grid;place-items:center;font-weight:900;font-size:1.3rem}
+    .tickets-gate h2{font-size:1.4rem;margin-bottom:8px}
+    .tickets-gate p{color:var(--text-secondary);margin-bottom:20px}
+    .tickets-login-btn{width:100%;padding:13px;border:none;border-radius:13px;background:#fff;color:#080808;font-weight:800;font-family:inherit;font-size:.9rem;cursor:pointer}
+    html[data-theme="light"] .tickets-page{background:#f5f5f2}
+    html[data-theme="light"] .tickets-card,
+    html[data-theme="light"] .support-ticket-item{background:#fff;border-color:rgba(0,0,0,.09)}
+    html[data-theme="light"] .support-ticket-id{color:#6f6f6c}
+    html[data-theme="light"] .support-ticket-problem{color:#2a2a2a}
+    html[data-theme="light"] .support-ticket-date{color:#8a8a87}
+    html[data-theme="light"] .support-ticket-status.open{background:rgba(0,0,0,.06);color:#161616;border-color:rgba(0,0,0,.16)}
+    html[data-theme="light"] .support-ticket-status.solved{background:rgba(0,0,0,.05);color:#2a2a2a;border-color:rgba(0,0,0,.14)}
+    html[data-theme="light"] .support-ticket-status.closed{background:#f5f5f2;color:#6f6f6c;border-color:rgba(0,0,0,.1)}
+  </style>
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    body.has-bottom-nav main,body.has-bottom-nav .wallet-page,body.has-bottom-nav .dashboard-page{padding-bottom:0!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+</head>
+<body class="has-bottom-nav">
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">RabbiHossainLTD</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="/">Home</a></li>
+        <li><a href="/services/">Services</a></li>
+        <li><a href="/portfolio/">Portfolio</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main class="tickets-page">
+    <div class="tickets-page-inner">
+      <div class="tickets-page-head">
+        <h1>Support Tickets</h1>
+      </div>
+
+      <div class="tickets-card tickets-gate" id="ticketsLoginGate" style="display:none;">
+        <div class="mark">→</div>
+        <h2>Login required</h2>
+        <p>Login to view your support tickets.</p>
+        <button class="tickets-login-btn" id="ticketsLoginBtn" type="button">Login</button>
+      </div>
+
+      <div class="tickets-card" id="ticketsContent" style="display:none;">
+        <div id="supportTicketsList">
+          <div class="tickets-empty">Loading tickets...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+    <a href="/"><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+    <a href="/add-credit/"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+    <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+    <a href="/dashboard/?tab=orders"><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+    <a href="/dashboard/" class="active"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+  </nav>
+
+  <script src="/js/lang.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script type="module">
+    import { auth, db } from '/js/firebase-core.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+    import { collection, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+    const gate = document.getElementById('ticketsLoginGate');
+    const content = document.getElementById('ticketsContent');
+    const list = document.getElementById('supportTicketsList');
+    const loginBtn = document.getElementById('ticketsLoginBtn');
+
+    function escH(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function showGate(show) {
+      if (gate) gate.style.display = show ? '' : 'none';
+      if (content) content.style.display = show ? 'none' : '';
+    }
+    function hasCached() {
+      try {
+        const c = JSON.parse(localStorage.getItem('rh_user_cache') || 'null');
+        return !!(c && c.uid);
+      } catch (e) { return false; }
+    }
+
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.rabbiAuth && window.rabbiAuth.openLogin && window.rabbiAuth.openLogin('tickets');
+      });
+    }
+
+    if (hasCached()) showGate(false);
+    else showGate(true);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        showGate(true);
+        return;
+      }
+      showGate(false);
+      if (!list) return;
+      const q = query(collection(db, 'supportTickets'), where('userId', '==', user.uid));
+      onSnapshot(q, (snap) => {
+        if (snap.empty) {
+          list.innerHTML = '<div class="tickets-empty">No support tickets yet.<br>Open chat from any page to create one.</div>';
+          return;
+        }
+        const docs = [];
+        snap.forEach((docSnap) => docs.push(docSnap.data()));
+        docs.sort((a, b) => {
+          const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+          const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+          return tb - ta;
+        });
+        list.innerHTML = docs.map((d) => {
+          const date = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleDateString('bn-BD') : '';
+          const statusClass = d.status === 'solved' ? 'solved' : d.status === 'closed' ? 'closed' : 'open';
+          const statusLabel = d.status === 'solved' ? 'সমাধান হয়েছে' : d.status === 'closed' ? 'বন্ধ' : 'খোলা আছে';
+          return `<div class="support-ticket-item">
+            <div class="support-ticket-header">
+              <span class="support-ticket-id">${escH(d.ticketId)}</span>
+              <span class="support-ticket-status ${statusClass}">${statusLabel}</span>
+            </div>
+            <div class="support-ticket-problem">${escH(d.problemDescription || '')}</div>
+            <div class="support-ticket-date">${date}</div>
+          </div>`;
+        }).join('');
+      }, (err) => {
+        console.error('Tickets load error:', err);
+        list.innerHTML = '<div class="tickets-empty">টিকেট লোড করতে সমস্যা হয়েছে।</div>';
+      });
+    });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+    }
+  </script>
+</body>
+</html>

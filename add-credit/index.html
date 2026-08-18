@@ -27,7 +27,7 @@
     body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 10% -10%,rgba(255, 255, 255,.14) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 90% 10%,rgba(255, 255, 255,.09) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 50% 100%,rgba(255, 255, 255,.06) 0%,transparent 60%);pointer-events:none;}
     body::after{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,black 0%,transparent 70%);pointer-events:none;}
 
-    .payment-page{min-height:100vh;padding:100px 20px 160px;position:relative;z-index:1;}
+    .payment-page{min-height:100vh;padding:calc(var(--nav-h,64px) + 8px) 12px 110px;position:relative;z-index:1;}
     .payment-shell{width:min(560px,100%);margin:0 auto;}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -294,9 +294,7 @@
   </nav>
 
   <main class="payment-page" id="main-content">
-    <header class="payment-page-head">
-      <h1>Add Credit</h1>
-    </header>
+    <h1 class="sr-only">Add Credit</h1>
 
     <!-- Auth Required -->
     <section id="authRequired" class="payment-auth-state">

@@ -15,11 +15,11 @@
   <link rel="stylesheet" href="/css/style.min.css" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
-    .settings-page{min-height:100vh;padding:calc(var(--nav-h) + 30px) 20px 120px;background:var(--bg)}
+    .settings-page{min-height:100vh;padding:calc(var(--nav-h) + 8px) 12px 118px;background:var(--bg)}
     .settings-page-inner{max-width:620px;margin:0 auto}
-    .settings-page-head{margin-bottom:22px}
-    .settings-page-head .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:800}
-    .settings-page-head h1{font-size:clamp(1.6rem,4vw,2.2rem);margin:6px 0 4px}
+    .settings-page-head{margin-bottom:8px}
+    .settings-page-head .kicker{display:none}
+    .settings-page-head h1{font-size:clamp(1.35rem,4vw,1.85rem);margin:2px 0 0}
     .settings-page-head p{color:var(--text-secondary);font-size:.9rem}
     .settings-card{background:#101010;border:1px solid var(--border);border-radius:22px;padding:26px}
     .settings-divider{height:1px;background:var(--border);margin:22px 0}
@@ -79,9 +79,7 @@
   <main class="settings-page">
     <div class="settings-page-inner">
       <div class="settings-page-head">
-        <div class="kicker">Account</div>
         <h1>Settings</h1>
-        
       </div>
 
       <!-- Login gate -->

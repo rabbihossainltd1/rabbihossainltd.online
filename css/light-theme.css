@@ -64,6 +64,7 @@ html[data-theme="light"] .checkout-page,
 html[data-theme="light"] .wallet-page,
 html[data-theme="light"] .settings-page,
 html[data-theme="light"] .cart-page,
+html[data-theme="light"] .tickets-page,
 html[data-theme="light"] .faq-body,
 html[data-theme="light"] .policy-body {
   background: #f5f5f2 !important;
