@@ -308,7 +308,7 @@ body.has-bottom-nav .site-footer{margin-bottom:0!important;padding-bottom:26px!i
 
 /* Hero: search sat far below the header — pull it up, drop the min-height
    now that the featured showcase is gone. */
-.store-hero{padding:calc(var(--nav-h) + 18px) 20px 34px!important;min-height:0!important;align-items:start!important}
+.store-hero{padding:calc(var(--nav-h) + 6px) 12px 16px!important;min-height:0!important;align-items:start!important}
 .store-hero-inner{grid-template-columns:1fr!important;gap:0!important}
 .store-hero-copy{max-width:none!important}
 .hero-quick-links{margin-top:16px!important}
@@ -335,7 +335,7 @@ body.has-bottom-nav .site-footer{margin-bottom:0!important;padding-bottom:26px!i
 .home-svc-action-row>*,.svc-btn-row>*{margin-top:0!important;margin-bottom:0!important}
 
 @media(max-width:640px){
-  .store-hero{padding:calc(var(--nav-h) + 12px) 16px 26px!important}
+  .store-hero{padding:calc(var(--nav-h) + 4px) 12px 12px!important}
   .section{padding:48px 0!important}
   .home-service-cards{padding:40px 0 48px!important}
   body.has-bottom-nav{padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}

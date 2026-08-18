@@ -189,37 +189,41 @@
 
     var html = '';
     items.forEach(function (item) {
+      var planText = '';
+      if (item.details) {
+        if (item.details.plan_type) planText = item.details.plan_type;
+        else if (item.details.meta_type) planText = item.details.meta_type;
+        else if (item.details.card_type) planText = item.details.card_type;
+        else if (item.details.packageName) planText = item.details.packageName;
+      }
       if (item.needsPlan) {
         html +=
-          '<div class="cart-item" style="opacity:.92;">' +
-            (item.image ? '<img src="' + esc(item.image) + '" alt="">' : '') +
+          '<div class="cart-item is-draft">' +
+            '<span class="cart-item-check-slot"></span>' +
+            (item.image ? '<img src="' + esc(item.image) + '" alt="">' : '<span class="cart-item-ph"></span>') +
             '<div class="cart-item-body">' +
               '<div class="cart-item-title">' + esc(item.title) + '</div>' +
-              '<div class="cart-item-meta" style="color:#ffb454;">Select plan</div>' +
+              '<div class="cart-item-plan need">Select a plan</div>' +
             '</div>' +
-            '<button type="button" class="cart-choose-plan" data-id="' + esc(item.id) + '">Choose plan</button>' +
-            '<button type="button" class="cart-remove" data-id="' + esc(item.id) + '">✕</button>' +
+            '<div class="cart-item-actions">' +
+              '<button type="button" class="cart-choose-plan" data-id="' + esc(item.id) + '">Choose plan</button>' +
+              '<button type="button" class="cart-remove" data-id="' + esc(item.id) + '">Remove</button>' +
+            '</div>' +
           '</div>';
       } else {
-        var kind = planKind(item.slug);
-        var changeBtn = '<button type="button" class="cart-choose-plan" data-id="' + esc(item.id) + '">Change</button>';
-        var planLabel = '';
-        if (item.details) {
-          if (item.details.plan_type) planLabel = ' · ' + esc(item.details.plan_type);
-          else if (item.details.meta_type) planLabel = ' · ' + esc(item.details.meta_type);
-          else if (item.details.card_type) planLabel = ' · ' + esc(item.details.card_type);
-          else if (item.details.packageName) planLabel = ' · ' + esc(item.details.packageName);
-        }
         html +=
           '<div class="cart-item">' +
             '<input type="checkbox" class="cart-item-check" value="' + esc(item.id) + '" checked>' +
-            (item.image ? '<img src="' + esc(item.image) + '" alt="">' : '') +
+            (item.image ? '<img src="' + esc(item.image) + '" alt="">' : '<span class="cart-item-ph"></span>') +
             '<div class="cart-item-body">' +
-              '<div class="cart-item-title">' + esc(item.title) + planLabel + '</div>' +
+              '<div class="cart-item-title">' + esc(item.title) + '</div>' +
+              (planText ? '<div class="cart-item-plan">' + esc(planText) + '</div>' : '') +
               '<div class="cart-item-meta">' + (item.qty > 1 ? esc(item.qty) + ' × ' : '') + esc(window.RhCart.formatUsd(item.amountUsd)) + ' / ' + esc(window.RhCart.formatBdt(item.amountUsd)) + '</div>' +
             '</div>' +
-            changeBtn +
-            '<button type="button" class="cart-remove" data-id="' + esc(item.id) + '">Remove</button>' +
+            '<div class="cart-item-actions">' +
+              '<button type="button" class="cart-choose-plan" data-id="' + esc(item.id) + '">Change</button>' +
+              '<button type="button" class="cart-remove" data-id="' + esc(item.id) + '">Remove</button>' +
+            '</div>' +
           '</div>';
       }
     });

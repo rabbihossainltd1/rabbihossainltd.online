@@ -482,7 +482,9 @@ html[data-theme="light"] .rh-plan-opt.sel {
 }
 html[data-theme="light"] .rh-plan-opt.sel .lbl,
 html[data-theme="light"] .rh-plan-opt.sel .p { color: #fff !important; }
+html[data-theme="light"] .cart-item-plan.need { color: #b36a00 !important; }
 html[data-theme="light"] .cart-empty a,
+html[data-theme="light"] .cart-item-plan,
 html[data-theme="light"] .cart-item-meta,
 html[data-theme="light"] .cart-selectall,
 html[data-theme="light"] .cart-total-row .lbl,
