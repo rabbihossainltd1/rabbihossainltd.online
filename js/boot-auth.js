@@ -120,7 +120,7 @@
         var link = existing || document.createElement('link');
         link.id = 'rh-light-theme-link';
         link.rel = 'stylesheet';
-        link.href = '/css/light-theme.css?v=9';
+        link.href = '/css/light-theme.css?v=10';
         if (link.parentNode !== host) host.appendChild(link);
         var cta = document.getElementById('rh-cta-light-link');
         if (!cta) {
@@ -143,7 +143,7 @@
           cd = document.createElement('link');
           cd.id = 'rh-cta-dark-link';
           cd.rel = 'stylesheet';
-          cd.href = '/css/cta-dark.css?v=4';
+          cd.href = '/css/cta-dark.css?v=5';
         }
         if (cd.parentNode !== host) host.appendChild(cd);
         if (!document.getElementById('rh-cta-inline')) {
@@ -154,10 +154,10 @@
             'html[data-theme="light"] #floatChatToggle svg{color:#111!important;stroke:currentColor!important}' +
             'html[data-theme="light"] .nav-links.open a.active{background:#fff!important;color:#111!important;border:1.5px solid #111!important}' +
             'html[data-theme="light"] .nav-links.open a.active .nav-icon,html[data-theme="light"] .nav-links.open a.active .nav-icon svg,html[data-theme="light"] .nav-links.open a.active span{background:#f0f0ee!important;color:#111!important}' +
-            'html[data-theme="light"] .cart-pay,html[data-theme="light"] .cx-pay,html[data-theme="light"] #buyWithCreditBtn,html[data-theme="light"] #instantPayBtn,html[data-theme="light"] #cartPayBalance,html[data-theme="light"] #cartPayInstant{background:#fff!important;color:#161616!important;border:1.5px solid #c4c4c0!important}' +
+            'html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel,html[data-theme="light"] .cart-pay,html[data-theme="light"] .cx-pay,html[data-theme="light"] #cartPayBalance,html[data-theme="light"] #cartPayInstant{background:#fff!important;color:#111!important;border:1.5px solid #c4c4c0!important}' +
             'html[data-theme="light"] .cart-pay .p-name,html[data-theme="light"] .cx-pay-name{color:#161616!important}' +
             'html[data-theme="light"] .cart-pay .p-desc,html[data-theme="light"] .cx-pay-desc{color:#6f6f6c!important}' +
-            'html[data-theme="light"] .cart-pay.sel,html[data-theme="light"] .cx-pay.sel,html[data-theme="light"] #buyWithCreditBtn.sel,html[data-theme="light"] #instantPayBtn.sel,html[data-theme="light"] #cartPayBalance.sel,html[data-theme="light"] #cartPayInstant.sel{background:#fff!important;color:#111!important;border:2.5px solid #111!important}' +
+            'html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel,html[data-theme="light"] .cart-pay.sel,html[data-theme="light"] .cx-pay.sel,html[data-theme="light"] #cartPayBalance.sel,html[data-theme="light"] #cartPayInstant.sel{background:#fff!important;color:#111!important;border:2.5px solid #111!important}html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-desc,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-desc,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-desc{color:#111!important}' +
             'html[data-theme="light"] .cart-pay.sel .p-name,html[data-theme="light"] .cart-pay.sel .p-desc,html[data-theme="light"] .cx-pay.sel .cx-pay-name,html[data-theme="light"] .cx-pay.sel .cx-pay-desc{color:#111!important}html[data-theme="light"] #servicePriceBdt,html[data-theme="light"] .service-price-pill small,html[data-theme="light"] .rh-cx-body .opt .p,html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-price{color:#111!important}' +
             'html[data-theme="light"] .cart-item-check,html[data-theme="light"] .cart-selectall input[type=checkbox],html[data-theme="light"] .cart-item-check-slot{-webkit-appearance:none!important;appearance:none!important;width:22px!important;height:22px!important;box-sizing:border-box!important;border:2.5px solid #111!important;background:#fff!important;border-radius:7px!important}' +
             'html[data-theme="light"] .cart-item-check:checked,html[data-theme="light"] .cart-selectall input[type=checkbox]:checked{background:#111!important;border-color:#111!important}';

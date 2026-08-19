@@ -598,6 +598,18 @@
       .cx-pay-name { font-size:.82rem; font-weight:800; color:#f5f5f3; line-height:1.2; }
       .cx-pay-desc { font-size:.64rem; color:#a9a9a6; font-weight:600; line-height:1.3; }
       html[data-theme="light"] .service-pay-actions .cx-pay { background:#fff !important; color:#111 !important; border:1.5px solid #c4c4c0 !important; }
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn,
+      html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn,
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,
+      html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel { background:#fff !important; color:#111 !important; border:1.5px solid #c4c4c0 !important; }
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,
+      html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel { border:2.5px solid #111 !important; }
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-name,
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-desc,
+      html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-name,
+      html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-desc,
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-name,
+      html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-desc { color:#111 !important; }
       html[data-theme="light"] .cx-pay-name,
       html[data-theme="light"] .service-pay-actions .cx-pay .cx-pay-name,
       html[data-theme="light"] .service-pay-actions .cx-pay.sel .cx-pay-name { color:#111 !important; }
