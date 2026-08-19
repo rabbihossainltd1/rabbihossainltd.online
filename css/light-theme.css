@@ -501,8 +501,33 @@ html[data-theme="light"] .ci-meta { color: #4a4a48 !important; }
 html[data-theme="light"] .cart-empty a { text-decoration: underline; }
 html[data-theme="light"] .cart-footer,
 html[data-theme="light"] .checkout-subtotal-row { border-top-color: rgba(0,0,0,.10) !important; }
+html[data-theme="light"] .cart-item {
+  overflow: visible !important;
+  grid-template-columns: 26px 52px minmax(0,1fr) !important;
+}
+@media (min-width: 560px) {
+  html[data-theme="light"] .cart-item {
+    grid-template-columns: 26px 52px minmax(0,1fr) auto !important;
+  }
+}
 html[data-theme="light"] .cart-item-check,
-html[data-theme="light"] .cart-selectall input { accent-color: #111; }
+html[data-theme="light"] .cart-selectall input[type="checkbox"],
+html[data-theme="light"] .cart-item-check-slot {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 22px !important;
+  height: 22px !important;
+  box-sizing: border-box !important;
+  border: 2.5px solid #111111 !important;
+  background: #ffffff !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] .cart-item-check:checked,
+html[data-theme="light"] .cart-selectall input[type="checkbox"]:checked {
+  background: #111111 !important;
+  border-color: #111111 !important;
+}
 html[data-theme="light"] .cart-msg.info {
   background: rgba(0,0,0,.04) !important;
   border-color: rgba(0,0,0,.12) !important;
@@ -946,6 +971,53 @@ html[data-theme="light"] .profile-control-btn {
   border: 1px solid rgba(0,0,0,.14) !important;
   color: #161616 !important;
 }
+
+/* Pay method cards: unselected light, selected inverted so the pick is obvious */
+html[data-theme="light"] .cart-pay,
+html[data-theme="light"] .cx-pay,
+html[data-theme="light"] .cc-pay,
+html[data-theme="light"] #buyWithCreditBtn,
+html[data-theme="light"] #instantPayBtn,
+html[data-theme="light"] #cartPayBalance,
+html[data-theme="light"] #cartPayInstant {
+  background: #ffffff !important;
+  color: #161616 !important;
+  border: 1.5px solid #c4c4c0 !important;
+}
+html[data-theme="light"] .cart-pay .p-name,
+html[data-theme="light"] .cx-pay-name,
+html[data-theme="light"] .cc-pay .p-name { color: #161616 !important; }
+html[data-theme="light"] .cart-pay .p-desc,
+html[data-theme="light"] .cx-pay-desc,
+html[data-theme="light"] .cc-pay .p-desc { color: #6f6f6c !important; }
+html[data-theme="light"] .cart-pay.sel,
+html[data-theme="light"] .cx-pay.sel,
+html[data-theme="light"] .cc-pay.sel,
+html[data-theme="light"] #buyWithCreditBtn.sel,
+html[data-theme="light"] #instantPayBtn.sel,
+html[data-theme="light"] #cartPayBalance.sel,
+html[data-theme="light"] #cartPayInstant.sel {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 2.5px solid #111111 !important;
+}
+html[data-theme="light"] .cart-pay.sel .p-name,
+html[data-theme="light"] .cart-pay.sel .p-desc,
+html[data-theme="light"] .cx-pay.sel .cx-pay-name,
+html[data-theme="light"] .cx-pay.sel .cx-pay-desc,
+html[data-theme="light"] .cc-pay.sel .p-name,
+html[data-theme="light"] .cc-pay.sel .p-desc,
+html[data-theme="light"] #buyWithCreditBtn.sel .cx-pay-name,
+html[data-theme="light"] #buyWithCreditBtn.sel .cx-pay-desc,
+html[data-theme="light"] #instantPayBtn.sel .cx-pay-name,
+html[data-theme="light"] #instantPayBtn.sel .cx-pay-desc {
+  color: #111111 !important;
+}
+html[data-theme="light"] #servicePriceBdt,
+html[data-theme="light"] .service-price-pill small { color: #111111 !important; }
+html[data-theme="light"] .rh-cx-body .opt .p,
+html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-price { color: #111111 !important; }
+html[data-theme="light"] .rh-cx-body .opt.sel { border: 2px solid #111 !important; background: #f4f4f1 !important; }
 
 /* Hamburger selected item — light, never a black pill */
 html[data-theme="light"] .nav-links.open a.active,

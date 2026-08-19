@@ -149,6 +149,72 @@ body.cx-embed .rh-cx-sticky .rh-cx-sticky-in{justify-content:stretch}
 body.cx-embed .rh-cx-sticky #addToCartBtn{flex:1;width:auto;height:48px;border:none;background:#111;color:#fff;font-weight:800;font-size:.9rem;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px}
 body.cx-embed .rh-cx-sticky #addToCartBtn:hover{background:#222}
 [data-theme="light"] body.cx-embed .rh-cx-sticky #addToCartBtn{background:#111!important;color:#fff!important}
+
+/* Light checkout — kill leftover near-white text from dark-first CSS */
+html[data-theme="light"] .rh-cx-body .pkg-toggle,
+html[data-theme="light"] .rh-cx-body .opts,
+html[data-theme="light"] .rh-cx-body .opt{
+  background:#ffffff!important;color:#161616!important;border-color:#d0d0cc!important
+}
+html[data-theme="light"] .rh-cx-body .pkg-toggle.open,
+html[data-theme="light"] .rh-cx-body .opts{border-color:#111!important}
+html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-label,
+html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-price,
+html[data-theme="light"] .rh-cx-body .opt .lbl,
+html[data-theme="light"] .rh-cx-body .opt .p{
+  color:#111111!important
+}
+html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-label small,
+html[data-theme="light"] .rh-cx-body .opt .lbl small,
+html[data-theme="light"] .rh-cx-body .pkg-toggle .chev{color:#4a4a48!important}
+html[data-theme="light"] .rh-cx-body .opt.sel{
+  background:#f4f4f1!important;border:2px solid #111!important;color:#111!important
+}
+html[data-theme="light"] .rh-cx-body .opt.sel .lbl,
+html[data-theme="light"] .rh-cx-body .opt.sel .p{color:#111!important}
+html[data-theme="light"] .rh-cx-body .opt .radio{border-color:#111!important}
+html[data-theme="light"] .rh-cx-body .opt.sel .radio{border-color:#111!important}
+html[data-theme="light"] .rh-cx-body .opt.sel .radio::after{background:#111!important}
+html[data-theme="light"] #servicePriceBdt,
+html[data-theme="light"] .service-price-pill small,
+html[data-theme="light"] .rh-cx-body #serviceCheckoutPanel .service-price-pill small{
+  color:#111111!important;opacity:1!important
+}
+html[data-theme="light"] .rh-cx-body #serviceCheckoutPanel .service-checkout-box{
+  background:#fff!important;border:1px solid rgba(0,0,0,.12)!important
+}
+html[data-theme="light"] #buyWithCreditBtn,
+html[data-theme="light"] #instantPayBtn,
+html[data-theme="light"] .cx-pay,
+html[data-theme="light"] .cart-pay{
+  background:#fff!important;color:#111!important;border:1.5px solid #c4c4c0!important
+}
+html[data-theme="light"] #buyWithCreditBtn .cx-pay-name,
+html[data-theme="light"] #instantPayBtn .cx-pay-name,
+html[data-theme="light"] .cx-pay .cx-pay-name,
+html[data-theme="light"] .cart-pay .p-name{color:#111!important}
+html[data-theme="light"] #buyWithCreditBtn .cx-pay-desc,
+html[data-theme="light"] #instantPayBtn .cx-pay-desc,
+html[data-theme="light"] .cx-pay .cx-pay-desc,
+html[data-theme="light"] .cart-pay .p-desc{color:#4a4a48!important}
+html[data-theme="light"] #buyWithCreditBtn.sel,
+html[data-theme="light"] #instantPayBtn.sel,
+html[data-theme="light"] .cx-pay.sel,
+html[data-theme="light"] .cart-pay.sel{
+  background:#fff!important;color:#111!important;border:2.5px solid #111!important
+}
+html[data-theme="light"] #buyWithCreditBtn.sel .cx-pay-name,
+html[data-theme="light"] #instantPayBtn.sel .cx-pay-name,
+html[data-theme="light"] .cx-pay.sel .cx-pay-name,
+html[data-theme="light"] .cx-pay.sel .cx-pay-desc,
+html[data-theme="light"] .cart-pay.sel .p-name,
+html[data-theme="light"] .cart-pay.sel .p-desc{color:#111!important}
+html[data-theme="light"] .cx-pay.sel::after,
+html[data-theme="light"] .cart-pay.sel::after{
+  background:#111!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6.5'/%3E%3C/svg%3E")!important;
+  background-size:10px!important;background-repeat:no-repeat!important;background-position:center!important
+}
 </style>
 </head>
 

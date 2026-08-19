@@ -766,7 +766,7 @@ html[data-theme="light"] body { background:#f5f5f2 !important; color:#161616 !im
 [data-theme="light"] #serviceCheckoutPanel .coupon-input-wrap { background:#fafafa !important; border:1px solid rgba(0,0,0,.14) !important; }
 [data-theme="light"] #serviceCheckoutPanel #couponInput { color:#161616 !important; }
 [data-theme="light"] #serviceCheckoutPanel #couponApplyBtn { background:#ffffff !important; color:#161616 !important; border:1px solid rgba(0,0,0,.2) !important; }
-[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn { background:#111111 !important; color:#ffffff !important; }
+[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn { background:#ffffff !important; color:#161616 !important; border:1.5px solid #c4c4c0 !important; }
 [data-theme="light"] #serviceCheckoutPanel .service-checkout-head strong { color:#161616 !important; }
 
 /* amount input (add-credit) */
@@ -780,7 +780,7 @@ html[data-theme="light"] body { background:#f5f5f2 !important; color:#161616 !im
 [data-theme="light"] .ff-option-item,
 [data-theme="light"] .proapp-plan-item,
 [data-theme="light"] .proapp-select-trigger { background:#ffffff !important; border:1px solid rgba(0,0,0,.12) !important; color:#161616 !important; }
-[d"l
+[data-theme="light"] .radio-option:has(input:checked),
 [data-theme="light"] .ff-option-item:has(input:checked),
 [data-theme="light"] .proapp-plan-item:has(input:checked) { background:#111111 !important; color:#ffffff !important; border-color:#111111 !important; }
 
@@ -895,12 +895,35 @@ html[data-theme="light"] body { background:#f5f5f2 !important; color:#161616 !im
    6. Settings theme buttons — clear selected state
    ============================================================ */
 
-/* ── 1. Checkout payment method cards ── */
+/* ── 1. Checkout payment method cards — selected = inverted ── */
 [data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn,
-[data-theme="light"] #serviceCheckoutPanel #instantPayBtn { background:#ffffff !important; color:#161616 !important; border:1px solid rgba(0,0,0,.14) !important; }
+[data-theme="light"] #serviceCheckoutPanel #instantPayBtn,
+[data-theme="light"] .service-pay-actions .cx-pay,
+[data-theme="light"] .cart-pay {
+  background:#ffffff !important; color:#161616 !important;
+  border:1.5px solid #c4c4c0 !important;
+}
+[data-theme="light"] .cx-pay-name,
+[data-theme="light"] .cart-pay .p-name { color:#161616 !important; }
+[data-theme="light"] .cx-pay-desc,
+[data-theme="light"] .cart-pay .p-desc { color:#6f6f6c !important; }
 [data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,
-[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel { background:#f5f5f2 !important; border-color:#111111 !important; }
-[data-theme="light"] .service-pay-actions .cx-pay.sel::after { background:#111111 !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6.5'/%3E%3C/svg%3E") !important; }
+[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel,
+[data-theme="light"] .service-pay-actions .cx-pay.sel,
+[data-theme="light"] .cart-pay.sel {
+  background:#ffffff !important; color:#111111 !important; border:2.5px solid #111111 !important;
+}
+[data-theme="light"] .cx-pay.sel .cx-pay-name,
+[data-theme="light"] .cx-pay.sel .cx-pay-desc,
+[data-theme="light"] .cart-pay.sel .p-name,
+[data-theme="light"] .cart-pay.sel .p-desc { color:#111111 !important; }
+[data-theme="light"] .service-pay-actions .cx-pay.sel::after,
+[data-theme="light"] .cart-pay.sel::after {
+  content:"" !important; position:absolute; top:10px; right:10px; width:16px; height:16px; border-radius:50%;
+  background:#111111 !important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6.5'/%3E%3C/svg%3E") !important;
+  background-size:10px !important; background-repeat:no-repeat !important; background-position:center !important;
+}
 
 /* ── 2. Hamburger button + mobile drawer icons ── */
 [data-theme="light"] .nav-hamburger span { background:#161616 !important; }
