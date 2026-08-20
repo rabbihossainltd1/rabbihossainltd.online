@@ -1,14 +1,11 @@
-import { auth, db } from './firebase-core.js';
+import { auth } from './firebase-core.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
-import {
-  collection, doc, addDoc, setDoc, onSnapshot,
-  query, orderBy, serverTimestamp, limit, updateDoc, increment
-} from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
 
 (function () {
   'use strict';
 
   const BACKEND = 'https://rabbi-backend-vlr7.onrender.com';
+  const STORE = 'rh_cs_thread';
   const widget = document.getElementById('floatChatWidget');
   const winEl = document.getElementById('floatChatWindow');
   const closeBtn = document.getElementById('floatChatClose');
@@ -19,44 +16,220 @@ import {
   const badge = document.getElementById('floatChatBadge');
   const iconChat = document.getElementById('floatIconChat');
   const iconClose = document.getElementById('floatIconClose');
-  if (!widget || !winEl) return;
-
-  function esc(s) {
-    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-  function genTicketId() {
-    const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let id = 'TKT-';
-    for (let i = 0; i < 8; i++) id += c[Math.floor(Math.random() * c.length)];
-    return id;
-  }
-  function nowStr() {
-    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  if (!widget || !winEl || !msgsEl) return;
 
   let currentUser = null;
   let isOpen = false;
-  let unsubMessages = null;
-  let activeUserId = null;
   let unreadCount = 0;
-  let botState = 'wait_first_msg';
   let geminiBusy = false;
-  const geminiHistory = [];
+  let pendingImage = null;
+  let thread = loadThread();
 
-  function appendMsg(role, html, isHtml) {
+  function loadThread() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE) || 'null');
+      if (!raw || raw.solved || !Array.isArray(raw.messages)) {
+        return { messages: [], history: [], started: false };
+      }
+      return {
+        messages: raw.messages.slice(-80),
+        history: Array.isArray(raw.history) ? raw.history.slice(-16) : [],
+        started: !!raw.started
+      };
+    } catch (e) {
+      return { messages: [], history: [], started: false };
+    }
+  }
+
+  function saveThread() {
+    try {
+      const slim = thread.messages.map(m => {
+        const row = { role: m.role, text: m.text || '', time: m.time || '' };
+        if (m.image && String(m.image).length < 180000) row.image = m.image;
+        return row;
+      });
+      localStorage.setItem(STORE, JSON.stringify({
+        messages: slim,
+        history: thread.history.slice(-16),
+        started: thread.started,
+        solved: false,
+        ts: Date.now()
+      }));
+    } catch (e) {
+      try {
+        const noImg = thread.messages.map(m => ({ role: m.role, text: m.text || '', time: m.time || '' }));
+        localStorage.setItem(STORE, JSON.stringify({
+          messages: noImg,
+          history: thread.history.slice(-16),
+          started: thread.started,
+          solved: false,
+          ts: Date.now()
+        }));
+      } catch (e2) {}
+    }
+  }
+
+  function clearThread() {
+    thread = { messages: [], history: [], started: false };
+    try { localStorage.removeItem(STORE); } catch (e) {}
+  }
+
+  function customerName() {
+    try {
+      const d = window.rabbiAuth && window.rabbiAuth.getUserData && window.rabbiAuth.getUserData();
+      if (d && d.name) return String(d.name).trim();
+    } catch (e) {}
+    if (currentUser && currentUser.displayName) return String(currentUser.displayName).trim();
+    try {
+      const c = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+      if (c.displayName) return String(c.displayName).trim();
+    } catch (e) {}
+    return '';
+  }
+
+  function firstName() {
+    const n = customerName();
+    return n ? n.split(/\s+/)[0] : '';
+  }
+
+  function nowStr() {
+    return new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function injectChrome() {
+    if (!document.getElementById('rh-cs-extra-css')) {
+      const css = document.createElement('style');
+      css.id = 'rh-cs-extra-css';
+      css.textContent =
+        '#floatChatHeaderActions{display:flex;align-items:center;gap:6px;flex-shrink:0}' +
+        '#floatChatSolved{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#e8e8e4;border-radius:999px;padding:6px 10px;font-size:.72rem;font-weight:800;cursor:pointer;font-family:inherit}' +
+        '#floatChatSolved:hover{background:#fff;color:#111;border-color:#fff}' +
+        'html[data-theme="light"] #floatChatSolved{background:#fff;color:#111;border:1px solid #111}' +
+        '#floatChatAttach{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#eee;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
+        '#floatChatAttach:hover{background:rgba(255,255,255,.14)}' +
+        '#floatChatAttach.has-file{border-color:#fff;background:#fff;color:#111}' +
+        '.float-msg-img{display:block;max-width:220px;max-height:180px;border-radius:12px;margin-bottom:6px;object-fit:cover}' +
+        '#floatAttachPreview{display:none;padding:0 12px 8px;align-items:center;gap:8px}' +
+        '#floatAttachPreview.on{display:flex}' +
+        '#floatAttachPreview img{width:44px;height:44px;object-fit:cover;border-radius:8px}' +
+        '#floatAttachPreview button{border:none;background:none;color:#aaa;cursor:pointer;font-size:.8rem}';
+      document.head.appendChild(css);
+    }
+    const header = document.getElementById('floatChatHeader');
+    if (header && !document.getElementById('floatChatSolved')) {
+      let actions = document.getElementById('floatChatHeaderActions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.id = 'floatChatHeaderActions';
+        if (closeBtn) actions.appendChild(closeBtn);
+        header.appendChild(actions);
+      }
+      const solved = document.createElement('button');
+      solved.type = 'button';
+      solved.id = 'floatChatSolved';
+      solved.textContent = 'সমাধান হয়েছে';
+      actions.insertBefore(solved, closeBtn || null);
+      solved.addEventListener('click', markSolved);
+    }
+    const area = document.getElementById('floatChatInputArea');
+    if (area && !document.getElementById('floatChatAttach')) {
+      const attach = document.createElement('button');
+      attach.type = 'button';
+      attach.id = 'floatChatAttach';
+      attach.setAttribute('aria-label', 'ছবি সংযুক্ত করুন');
+      attach.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+      area.insertBefore(attach, inputEl || area.firstChild);
+      const file = document.createElement('input');
+      file.type = 'file';
+      file.accept = 'image/*';
+      file.hidden = true;
+      file.id = 'floatChatFile';
+      area.appendChild(file);
+      attach.addEventListener('click', () => file.click());
+      file.addEventListener('change', () => {
+        const f = file.files && file.files[0];
+        file.value = '';
+        if (f) pickImage(f);
+      });
+    }
+    if (!document.getElementById('floatAttachPreview') && area) {
+      const prev = document.createElement('div');
+      prev.id = 'floatAttachPreview';
+      prev.innerHTML = '<img alt=""><span></span><button type="button">সরান</button>';
+      area.parentNode.insertBefore(prev, area);
+      prev.querySelector('button').addEventListener('click', clearPendingImage);
+    }
+    if (inputEl) inputEl.placeholder = 'বার্তা লিখুন...';
+  }
+
+  function setPendingPreview() {
+    const prev = document.getElementById('floatAttachPreview');
+    const attach = document.getElementById('floatChatAttach');
+    if (!prev) return;
+    if (pendingImage) {
+      prev.classList.add('on');
+      const img = prev.querySelector('img');
+      if (img) img.src = pendingImage;
+      attach && attach.classList.add('has-file');
+    } else {
+      prev.classList.remove('on');
+      attach && attach.classList.remove('has-file');
+    }
+  }
+
+  function clearPendingImage() {
+    pendingImage = null;
+    setPendingPreview();
+  }
+
+  function pickImage(file) {
+    if (!file || !String(file.type || '').startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 720;
+        const scale = Math.min(max / img.width, max / img.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        pendingImage = canvas.toDataURL('image/jpeg', 0.7);
+        setPendingPreview();
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function paintMessage(m, persist) {
     const wrap = document.createElement('div');
-    wrap.className = 'float-msg ' + (role === 'user' ? 'float-msg-user' : 'float-msg-admin');
+    wrap.className = 'float-msg ' + (m.role === 'user' ? 'float-msg-user' : 'float-msg-admin');
     const b = document.createElement('div');
     b.className = 'float-msg-bubble';
-    if (isHtml) b.innerHTML = html;
-    else b.textContent = html;
-    const t = document.createElement('div');
-    t.className = 'float-msg-time';
-    t.textContent = nowStr();
+    if (m.image) {
+      const im = document.createElement('img');
+      im.className = 'float-msg-img';
+      im.src = m.image;
+      im.alt = 'সংযুক্ত ছবি';
+      b.appendChild(im);
+    }
+    if (m.text) {
+      const t = document.createElement('div');
+      t.textContent = m.text;
+      b.appendChild(t);
+    }
+    const time = document.createElement('div');
+    time.className = 'float-msg-time';
+    time.textContent = m.time || nowStr();
     wrap.appendChild(b);
-    wrap.appendChild(t);
+    wrap.appendChild(time);
     msgsEl.appendChild(wrap);
     msgsEl.scrollTop = msgsEl.scrollHeight;
+    if (persist) {
+      thread.messages.push({ role: m.role, text: m.text || '', image: m.image || '', time: m.time || nowStr() });
+      saveThread();
+    }
     return wrap;
   }
 
@@ -71,30 +244,40 @@ import {
     document.querySelector('.float-typing-wrap')?.remove();
   }
 
-  function botSay(html, isHtml, delay) {
-    return new Promise(res => {
-      appendTyping();
-      setTimeout(() => {
-        removeTyping();
-        appendMsg('admin', html, isHtml);
-        res();
-      }, delay || 800);
-    });
+  function restoreMessages() {
+    msgsEl.innerHTML = '';
+    thread.messages.forEach(m => paintMessage(m, false));
+    if (thread.started) showShortcuts(false);
   }
 
-  function showQuickButtons(buttons) {
+  function showShortcuts(afterReply) {
     document.getElementById('floatQuickBtns')?.remove();
     const row = document.createElement('div');
     row.className = 'float-quick-btns';
     row.id = 'floatQuickBtns';
-    buttons.forEach(btn => {
+    const items = afterReply
+      ? [
+          { label: 'আরও সাহায্য চাই', text: 'আরও একটু সাহায্য দরকার' },
+          { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
+        ]
+      : [
+          { label: 'অর্ডার কোথায়?', text: 'আমার অর্ডারের আপডেট জানতে চাই' },
+          { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব?' },
+          { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' },
+          { label: 'হোয়াটসঅ্যাপে কথা বলব', href: 'https://wa.me/8801731410341' }
+        ];
+    items.forEach(item => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'float-quick-btn';
-      b.textContent = btn.label;
+      b.textContent = item.label;
       b.addEventListener('click', () => {
         document.getElementById('floatQuickBtns')?.remove();
-        btn.action();
+        if (item.href) {
+          window.open(item.href, '_blank', 'noopener');
+          return;
+        }
+        sendText(item.text);
       });
       row.appendChild(b);
     });
@@ -102,260 +285,24 @@ import {
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
-  function showWaitingAnimation() {
-    document.getElementById('floatWaitingAnim')?.remove();
-    const w = document.createElement('div');
-    w.className = 'float-msg float-msg-admin float-waiting-wrap';
-    w.id = 'floatWaitingAnim';
-    w.innerHTML = `<div class="float-msg-bubble float-waiting-bubble"><div class="float-waiting-inner"><div class="float-wait-ring"><svg width="22" height="22" viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="rgba(255, 255, 255,.2)" stroke-width="4"/><circle cx="25" cy="25" r="20" stroke="#ffffff" stroke-width="4" stroke-dasharray="60 66" stroke-linecap="round" class="float-wait-arc"/></svg></div><span class="float-waiting-text">Connecting to an agent</span></div><div class="float-wait-dots"><span class="float-typing-dot"></span><span class="float-typing-dot"></span><span class="float-typing-dot"></span></div></div>`;
-    msgsEl.appendChild(w);
-    msgsEl.scrollTop = msgsEl.scrollHeight;
+  async function greetIfNeeded() {
+    if (thread.started) return;
+    const name = firstName();
+    const hello = name
+      ? `আসসালামু আলাইকুম ${name}, স্বাগতম। আমি RH Support। কীভাবে সাহায্য করতে পারি?`
+      : 'আসসালামু আলাইকুম, স্বাগতম। আমি RH Support। কীভাবে সাহায্য করতে পারি?';
+    paintMessage({ role: 'admin', text: hello, time: nowStr() }, true);
+    thread.started = true;
+    thread.history.push({ role: 'model', text: hello });
+    saveThread();
+    showShortcuts(false);
   }
 
-  function setInputLocked(locked, ph) {
-    if (inputEl) {
-      inputEl.disabled = locked;
-      inputEl.placeholder = ph || 'Type a message...';
-    }
-    if (sendBtn) sendBtn.disabled = locked;
-  }
-
-  function showAgentForm() {
-    document.getElementById('floatAgentForm')?.remove();
-    const ticketId = genTicketId();
-    const displayName = currentUser?.displayName || '';
-    const email = currentUser?.email || '';
-    const wrap = document.createElement('div');
-    wrap.className = 'float-agent-form-wrap';
-    wrap.id = 'floatAgentForm';
-    wrap.innerHTML = `
-<div class="float-form-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Talk to an agent</div>
-<div class="float-form-ticket-id"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Ticket: <strong>${ticketId}</strong></div>
-<input class="float-form-input" type="text" id="afName" placeholder="Your name *" value="${esc(displayName)}" />
-<input class="float-form-input" type="email" id="afEmail" placeholder="Gmail / Email *" value="${esc(email)}" />
-<input class="float-form-input" type="tel" id="afPhone" placeholder="Phone number *" />
-<textarea class="float-form-input float-form-textarea" id="afProblem" placeholder="Briefly describe your problem *" rows="3"></textarea>
-<div class="float-form-ticket-note">Save this: <code>${ticketId}</code></div>
-<button type="button" class="float-form-submit" id="afSubmit">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"></path></svg> Submit
-</button>`;
-    msgsEl.appendChild(wrap);
-    msgsEl.scrollTop = msgsEl.scrollHeight;
-    document.getElementById('afSubmit').addEventListener('click', () => submitAgentForm(ticketId));
-  }
-
-  async function submitAgentForm(ticketId) {
-    const name = document.getElementById('afName')?.value.trim();
-    const email = document.getElementById('afEmail')?.value.trim();
-    const phone = document.getElementById('afPhone')?.value.trim();
-    const problem = document.getElementById('afProblem')?.value.trim();
-    const submitEl = document.getElementById('afSubmit');
-    if (!currentUser) {
-      if (window.rabbiAuth && window.rabbiAuth.openLogin) window.rabbiAuth.openLogin('support');
-      else appendMsg('admin', 'Login first, then submit the ticket.', false);
-      return;
-    }
-    if (!name || !email || !phone || !problem) {
-      if (submitEl) {
-        const orig = submitEl.innerHTML;
-        submitEl.textContent = 'Fill in all fields!';
-        submitEl.style.cssText = 'background:rgba(255,80,80,.2);border-color:rgba(255,80,80,.5);';
-        setTimeout(() => { submitEl.innerHTML = orig; submitEl.style.cssText = ''; }, 2200);
-      }
-      return;
-    }
-    if (submitEl) { submitEl.disabled = true; submitEl.textContent = 'Submitting...'; }
-    try {
-      const userId = currentUser.uid;
-      activeUserId = userId;
-      const userEmail = currentUser.email || email;
-      await setDoc(doc(db, 'supportRooms', userId), {
-        userId, userEmail, displayName: name, userPhone: phone, ticketId,
-        lastMessage: problem, lastAt: serverTimestamp(), unreadAdmin: 1, status: 'open'
-      }, { merge: true });
-      await addDoc(collection(db, 'supportChats', userId, 'messages'), {
-        text: problem, role: 'user', userId, userEmail, userName: name, userPhone: phone, ticketId, createdAt: serverTimestamp()
-      });
-      setDoc(doc(db, 'supportTickets', ticketId), {
-        ticketId, userId, userName: name, userEmail, userPhone: phone,
-        problemDescription: problem, status: 'open', createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-      });
-      document.getElementById('floatAgentForm')?.remove();
-      botState = 'agent_waiting';
-      await botSay('Please wait while your issue is transferred to an agent', false, 600);
-      showWaitingAnimation();
-      setInputLocked(true, 'Waiting for an agent...');
-      subscribeToAdminReplies(userId);
-    } catch (err) {
-      if (submitEl) {
-        submitEl.disabled = false;
-        submitEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"></path></svg> Try again`;
-      }
-    }
-  }
-
-  function subscribeToAdminReplies(userId) {
-    if (unsubMessages) unsubMessages();
-    const q = query(collection(db, 'supportChats', userId, 'messages'), orderBy('createdAt', 'asc'), limit(100));
-    let loaded = false;
-    const seen = new Set();
-    unsubMessages = onSnapshot(q, snap => {
-      if (!loaded) {
-        snap.docs.forEach(d => seen.add(d.id));
-        loaded = true;
-        return;
-      }
-      snap.docChanges().forEach(ch => {
-        if (ch.type !== 'added' || seen.has(ch.doc.id)) return;
-        seen.add(ch.doc.id);
-        const d = ch.doc.data();
-        if (d.role === 'system' && d.type === 'solved') handleTicketSolved();
-        else if (d.role === 'admin') {
-          document.getElementById('floatWaitingAnim')?.remove();
-          botState = 'live';
-          setInputLocked(false, 'Type a message...');
-          appendMsg('admin', d.text, false);
-          if (!isOpen) {
-            unreadCount++;
-            badge.textContent = unreadCount;
-            badge.style.display = 'flex';
-          }
-        }
-      });
-    });
-  }
-
-  function handleTicketSolved() {
-    document.getElementById('floatWaitingAnim')?.remove();
-    document.getElementById('floatQuickBtns')?.remove();
-    botState = 'solved';
-    appendMsg('admin', 'Your issue has been resolved. Thank you for using RabbiHossainLTD.', false);
-    const inputArea = document.getElementById('floatChatInputArea') || inputEl?.parentElement;
-    if (inputEl) inputEl.style.display = 'none';
-    if (sendBtn) sendBtn.style.display = 'none';
-    document.getElementById('floatNewChatBtn')?.remove();
-    const ncBtn = document.createElement('button');
-    ncBtn.type = 'button';
-    ncBtn.id = 'floatNewChatBtn';
-    ncBtn.textContent = 'Start a new chat';
-    ncBtn.style.cssText = 'width:100%;padding:10px;background:rgba(255, 255, 255,.12);border:1px solid rgba(255, 255, 255,.3);border-radius:10px;color:#e4e4e0;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:4px;';
-    ncBtn.addEventListener('click', () => {
-      if (unsubMessages) { unsubMessages(); unsubMessages = null; }
-      msgsEl.innerHTML = '';
-      botState = 'wait_first_msg';
-      activeUserId = null;
-      geminiHistory.length = 0;
-      ncBtn.remove();
-      if (inputEl) { inputEl.style.display = ''; inputEl.value = ''; inputEl.disabled = false; inputEl.placeholder = 'Type a message...'; }
-      if (sendBtn) { sendBtn.style.display = ''; sendBtn.disabled = false; }
-    });
-    if (inputArea) inputArea.appendChild(ncBtn);
-    else msgsEl.appendChild(ncBtn);
-  }
-
-  async function startBotFlow() {
-    botState = 'greeted';
-    await botSay('Assalamu Alaikum, welcome to RabbiHossainLTD. Ask anything — or pick a shortcut.', false, 700);
-    await new Promise(r => setTimeout(r, 250));
-    botState = 'menu';
-    showMainMenu();
-  }
-
-  function showMainMenu() {
-    showQuickButtons([
-      { label: 'How do I make a payment?', action: () => handleChoice('payment') },
-      { label: 'How do I buy an app?', action: () => handleChoice('app') },
-      { label: 'How do I top up in a game?', action: () => handleChoice('topup') },
-      { label: 'How do I get a coupon code?', action: () => handleChoice('coupon') },
-      { label: 'Talk to an agent', action: () => handleChoice('agent') }
-    ]);
-  }
-
-  const LABELS = {
-    payment: 'How do I make a payment?',
-    app: 'How do I buy an app?',
-    topup: 'How do I top up in a game?',
-    coupon: 'How do I get a coupon code?',
-    agent: 'Talk to an agent'
-  };
-
-  async function handleChoice(choice) {
-    appendMsg('user', LABELS[choice], false);
-    botState = 'answering';
-    if (choice === 'payment') {
-      await botSay(
-        `<strong>How to pay:</strong><br><br>` +
-        `<div class="float-answer-list">` +
-        `<div style="color:#c4c4c2;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:'Outfit',sans-serif;">Mobile Banking</div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>bKash</strong> — open the Add Credit page &rarr; select bKash &rarr; Send Money to the number shown &rarr; Verify with your Transaction ID.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Nagad</strong> — open the Add Credit page &rarr; select Nagad &rarr; Send Money to the number shown &rarr; Verify with your Transaction ID.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Rocket</strong> — open the Add Credit page &rarr; select Rocket &rarr; Send Money to the number shown &rarr; Verify with your Transaction ID.</span></div>` +
-        `<div style="color:#f3ba2f;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;font-family:'Outfit',sans-serif;">Crypto</div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Binance Pay</strong> — Add Credit &rarr; Crypto &rarr; Binance Pay &rarr; pay via QR Scan or App &rarr; Verify with your Order ID.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>USDT (BSC/TRX/ETH/SOL/TON)</strong> — Add Credit &rarr; Crypto &rarr; Coin &rarr; choose the network, send to the address shown &rarr; Verify with your TxHash.</span></div>` +
-        `</div>`,
-        true, 950);
-      await new Promise(r => setTimeout(r, 350));
-      showBackToMenu();
-    } else if (choice === 'app') {
-      await botSay(
-        `<strong>Steps to buy an app:</strong><br><br>` +
-        `<div class="float-answer-list">` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 1:</strong> find your desired service on the Services page.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 2:</strong> click the "Get Now" button.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 3:</strong> fill in the required information and place the order.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 4:</strong> make the payment and share your Transaction ID.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>Usually <strong style="color:#ffffff;">delivered within 5–30 minutes.</span></div>` +
-        `</div>`, true, 950);
-      await new Promise(r => setTimeout(r, 350));
-      showBackToMenu();
-    } else if (choice === 'topup') {
-      await botSay(
-        `<strong>How to top up a game:</strong><br><br>` +
-        `<div class="float-answer-list">` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 1:</strong> collect your game Player ID or UID.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 2:</strong> choose your top-up package on the Services page.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 3:</strong> Place the order with your Player ID and amount.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span><strong>Step 4:</strong> make the payment and wait a moment.</span></div>` +
-        `<div class="float-answer-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>Top-ups are usually <strong style="color:#ffffff;">completed within 15 minutes.</span></div>` +
-        `</div>`, true, 950);
-      await new Promise(r => setTimeout(r, 350));
-      showBackToMenu();
-    } else if (choice === 'coupon') {
-      const tgSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="#0088cc"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.54c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.374 14.51l-2.95-.924c-.64-.203-.654-.64.136-.948l11.52-4.44c.532-.194.998.13.482.95z"/></svg>`;
-      await botSay(
-        `Join our Telegram group to get coupon codes.<br><br>` +
-        `<div class="float-answer-list">` +
-        `<div class="float-answer-item">${tgSVG}<span>Coupon codes are posted there regularly.</span></div>` +
-        `<div class="float-answer-item">${tgSVG}<span>Get special offers and discounts before everyone else.</span></div>` +
-        `</div><br>` +
-        `<a href="https://t.me/CuponCodeForRH" target="_blank" rel="noopener" ` +
-        `style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:rgba(255, 255, 255,.15);border:1px solid rgba(255, 255, 255,.35);border-radius:10px;color:#a0a09c;font-size:.84rem;font-weight:800;text-decoration:none;">` +
-        `${tgSVG} Join our Telegram group</a>`,
-        true, 900);
-      await new Promise(r => setTimeout(r, 350));
-      showBackToMenu();
-    } else if (choice === 'agent') {
-      botState = 'agent_form';
-      await botSay('Please fill out the form below. An agent will contact you shortly after you submit.', false, 750);
-      await new Promise(r => setTimeout(r, 300));
-      showAgentForm();
-    }
-  }
-
-  function showBackToMenu() {
-    botState = 'menu';
-    showQuickButtons([
-      { label: 'Another issue', action: () => { appendMsg('user', 'I have another issue', false); botSay('Of course! Choose from the options below — or type your question.', false, 500).then(() => { botState = 'menu'; showMainMenu(); }); } },
-      { label: 'Talk to an agent', action: () => handleChoice('agent') },
-      { label: 'Thank you, that helped', action: () => { appendMsg('user', 'Thank you', false); botSay('Glad I could help. Type anytime if you have another question.', false, 700).then(() => { botState = 'menu'; }); } }
-    ]);
-  }
-
-  async function askGemini(text) {
+  async function askGemini(text, image) {
     if (geminiBusy) return;
     geminiBusy = true;
-    setInputLocked(true, 'RH Support is typing...');
+    if (inputEl) inputEl.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
     appendTyping();
     try {
       const headers = { 'Content-Type': 'application/json' };
@@ -367,31 +314,63 @@ import {
       const res = await fetch(BACKEND + '/api/support/chat', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ message: text, history: geminiHistory.slice(-8) }),
+        body: JSON.stringify({
+          message: text || '',
+          name: customerName(),
+          image: image || '',
+          history: thread.history.slice(-8)
+        }),
         signal: ctrl.signal
       });
       clearTimeout(t);
-      let data = null;
-      try { data = await res.json(); } catch (e) { data = {}; }
+      let data = {};
+      try { data = await res.json(); } catch (e) {}
       removeTyping();
-      const reply = (data && data.ok && data.reply) ? String(data.reply) : (data && data.message) || 'AI support is busy. Use a shortcut or WhatsApp.';
-      appendMsg('admin', reply, false);
-      geminiHistory.push({ role: 'user', text });
-      geminiHistory.push({ role: 'model', text: reply });
-      botState = 'menu';
-      showQuickButtons([
-        { label: 'Shortcuts', action: () => { showMainMenu(); } },
-        { label: 'Talk to an agent', action: () => handleChoice('agent') }
-      ]);
+      const reply = (data && data.ok && data.reply)
+        ? String(data.reply)
+        : (data && data.message) || 'এখন উত্তর দিতে পারছি না। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
+      paintMessage({ role: 'admin', text: reply, time: nowStr() }, true);
+      thread.history.push({ role: 'user', text: text || 'ছবি পাঠিয়েছি' });
+      thread.history.push({ role: 'model', text: reply });
+      saveThread();
+      showShortcuts(true);
     } catch (err) {
       removeTyping();
-      appendMsg('admin', 'Could not reach AI support. Try a shortcut below, or WhatsApp.', false);
-      botState = 'menu';
-      showMainMenu();
+      paintMessage({ role: 'admin', text: 'সংযোগ পাওয়া যায়নি। একটু পরে চেষ্টা করুন।', time: nowStr() }, true);
+      showShortcuts(true);
     } finally {
       geminiBusy = false;
-      setInputLocked(false, 'Type a message...');
+      if (inputEl) inputEl.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
     }
+  }
+
+  function sendText(text) {
+    const msg = String(text || '').trim();
+    const image = pendingImage;
+    if (!msg && !image) return;
+    clearPendingImage();
+    paintMessage({ role: 'user', text: msg, image: image || '', time: nowStr() }, true);
+    thread.started = true;
+    saveThread();
+    askGemini(msg, image);
+  }
+
+  function markSolved() {
+    paintMessage({
+      role: 'admin',
+      text: firstName()
+        ? `${firstName()}, আপনার সমস্যা সমাধান হয়েছে ধরে নিচ্ছি। ধন্যবাদ। আবার খুললে নতুন চ্যাট শুরু হবে।`
+        : 'আপনার সমস্যা সমাধান হয়েছে ধরে নিচ্ছি। ধন্যবাদ। আবার খুললে নতুন চ্যাট শুরু হবে।',
+      time: nowStr()
+    }, false);
+    clearThread();
+    pendingImage = null;
+    setPendingPreview();
+    setTimeout(() => {
+      closeChat();
+      msgsEl.innerHTML = '';
+    }, 900);
   }
 
   function openChat() {
@@ -401,8 +380,10 @@ import {
     if (iconClose) iconClose.style.display = '';
     unreadCount = 0;
     if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+    if (!msgsEl.children.length && thread.messages.length) restoreMessages();
+    if (!thread.started) greetIfNeeded();
+    else msgsEl.scrollTop = msgsEl.scrollHeight;
     if (inputEl) setTimeout(() => inputEl.focus(), 60);
-    if (botState === 'wait_first_msg' && msgsEl && !msgsEl.children.length) startBotFlow();
   }
 
   function closeChat() {
@@ -410,41 +391,25 @@ import {
     winEl.style.display = 'none';
     if (iconChat) iconChat.style.display = '';
     if (iconClose) iconClose.style.display = 'none';
+    saveThread();
   }
 
-  async function sendUserMessage() {
-    if (!inputEl) return;
-    const text = inputEl.value.trim();
-    if (!text) return;
-    inputEl.value = '';
-    appendMsg('user', text, false);
-    if (botState === 'live') {
-      const uid = activeUserId || currentUser?.uid;
-      if (!uid) return;
-      try {
-        await addDoc(collection(db, 'supportChats', uid, 'messages'), {
-          text, role: 'user', userId: uid, userEmail: currentUser?.email || '', createdAt: serverTimestamp()
-        });
-        await updateDoc(doc(db, 'supportRooms', uid), {
-          lastMessage: text, lastAt: serverTimestamp(), unreadAdmin: increment(1)
-        });
-      } catch (e) {
-        appendMsg('admin', 'Message could not be sent. Try again.', false);
-      }
-      return;
-    }
-    if (botState === 'agent_waiting' || botState === 'agent_form') return;
-    if (botState === 'wait_first_msg') {
-      botState = 'menu';
-    }
-    await askGemini(text);
-  }
+  injectChrome();
+  if (thread.messages.length) restoreMessages();
 
+  function sendFromBox() {
+    const v = inputEl ? inputEl.value : '';
+    if (inputEl) inputEl.value = '';
+    sendText(v);
+  }
   toggle.addEventListener('click', () => isOpen ? closeChat() : openChat());
   closeBtn.addEventListener('click', closeChat);
-  sendBtn?.addEventListener('click', sendUserMessage);
+  sendBtn?.addEventListener('click', sendFromBox);
   inputEl?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); sendUserMessage(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendFromBox();
+    }
   });
   onAuthStateChanged(auth, user => { currentUser = user; });
 })();
