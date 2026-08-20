@@ -853,7 +853,7 @@
       }
       // Player ID must be verified before submit
       if (!window._i4gPlayerVerified) {
-        showStatus('First verify your UID with the "Check Player ID" button.', 'error');
+        showStatus('First verify your UID with the Check button.', 'error');
         const checkBtn = document.getElementById('i4g-check-player-btn');
         if (checkBtn) { checkBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); checkBtn.focus(); }
         return false;

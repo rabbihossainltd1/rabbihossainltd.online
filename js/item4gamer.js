@@ -248,22 +248,102 @@
       .i4g-load-error{padding:12px 14px;border-radius:12px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.18);color:#ffb0b0;font-size:.84rem;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
       .i4g-retry-btn{border:1px solid rgba(255,80,80,.35);background:rgba(255,80,80,.12);color:#ffb0b0;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:800;cursor:pointer;margin-left:auto}
       .i4g-retry-btn:hover{background:rgba(255,80,80,.22)}
-      /* Check Player button */
-      #i4g-check-player-btn{border:1px solid rgba(255, 255, 255,.35);background:rgba(255, 255, 255,.10);color:#e4e4e0;border-radius:10px;padding:8px 16px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;white-space:nowrap}
-      #i4g-check-player-btn:hover{background:rgba(255, 255, 255,.22)!important;border-color:rgba(255, 255, 255,.60)!important}
-      #i4g-check-player-btn:disabled{opacity:.55;cursor:default!important}
-      #i4g-player-status{font-size:.82rem;font-weight:700;display:none;padding:7px 12px;border-radius:10px;flex:1;min-width:0}
-      #i4g-player-status.success{background:rgba(255, 255, 255,.10);border:1px solid rgba(255, 255, 255,.25);color:#dfe9e0}
-      #i4g-player-status.error{background:rgba(255,80,80,.10);border:1px solid rgba(255,80,80,.22);color:#ffb0b0}
-      #i4g-player-status.info{background:rgba(255, 255, 255,.08);border:1px solid rgba(255, 255, 255,.18);color:#e4e4e0}
-      #i4g-check-player-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-      /* Verify badge on UID input */
-      .i4g-uid-verified::after{content:'✓ Verified';font-size:.72rem;color:#dfe9e0;font-weight:800;margin-left:8px}
+      .i4g-uid-row{display:flex;gap:8px;align-items:stretch}
+      .i4g-uid-row #mo_ff_uid{flex:1;min-width:0}
+      #i4g-check-player-btn{flex:0 0 auto;min-width:78px;max-width:132px;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:12px;padding:0 12px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      html[data-theme="light"] #i4g-check-player-btn{background:#fff;color:#111;border:1px solid #111}
+      #i4g-check-player-btn:hover{opacity:.9}
+      #i4g-check-player-btn:disabled{opacity:.55;cursor:default}
+      #i4g-check-player-btn.is-ok{max-width:160px}
+      #i4g-ff-info-btn{display:none;flex:0 0 42px;width:42px;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:12px;font-weight:900;font-size:1.05rem;cursor:pointer;align-items:center;justify-content:center}
+      html[data-theme="light"] #i4g-ff-info-btn{background:#fff;color:#111;border:1px solid #111}
+      #i4g-ff-info-btn.show{display:flex}
+      #i4g-player-status{font-size:.8rem;font-weight:700;display:none;padding:7px 4px 0;border-radius:0}
+      #i4g-player-status.error{color:#ff8080;display:block}
+      #i4g-ff-info-sheet{position:fixed;inset:0;z-index:4200;background:rgba(4,6,8,.92);display:none;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}
+      #i4g-ff-info-sheet.open{display:flex}
+      #i4g-ff-info-box{width:min(520px,100%);margin:auto;background:#111;border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:18px 18px 22px;color:#eee}
+      html[data-theme="light"] #i4g-ff-info-box{background:#fff;color:#111;border:1px solid #111}
+      #i4g-ff-info-box h3{margin:0 0 12px;font-size:1.05rem}
+      .i4g-info-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(127,127,127,.18);font-size:.82rem}
+      .i4g-info-row span{opacity:.7}
+      .i4g-info-row b{text-align:right;word-break:break-word}
+      #i4g-ff-info-close{margin-top:14px;width:100%;padding:11px;border-radius:12px;border:1px solid #111;background:#fff;color:#111;font-weight:800;cursor:pointer}
     `;
     document.head.appendChild(s);
   }
 
-  /* ── Inject "Check Player" button below UID input ───────── */
+  function resetCheckBtn() {
+    const btn = document.getElementById('i4g-check-player-btn');
+    const info = document.getElementById('i4g-ff-info-btn');
+    if (btn) {
+      btn.classList.remove('is-ok');
+      btn.textContent = 'Check';
+      btn.title = 'Check UID';
+    }
+    if (info) info.classList.remove('show');
+    window._i4gPlayerInfo = null;
+  }
+
+  function prettyKey(key) {
+    return String(key || '')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/_/g, ' ')
+      .replace(/^Account /, '')
+      .trim();
+  }
+
+  function prettyVal(val) {
+    if (val === null || val === undefined || val === '') return '—';
+    if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+    if (typeof val === 'number' && val > 1000000000 && val < 2000000000000) {
+      const ms = val < 1e12 ? val * 1000 : val;
+      try { return new Date(ms).toLocaleString(); } catch (e) { return String(val); }
+    }
+    if (typeof val === 'string' && /^\d{10,13}$/.test(val)) {
+      const n = Number(val);
+      if (n > 1000000000) {
+        const ms = n < 1e12 ? n * 1000 : n;
+        try { return new Date(ms).toLocaleString(); } catch (e) {}
+      }
+    }
+    return String(val);
+  }
+
+  function flattenInfo(obj, prefix, out) {
+    if (!obj || typeof obj !== 'object') return out;
+    Object.keys(obj).forEach(function (k) {
+      if (k === 'raw' || k === '_raw') return;
+      const v = obj[k];
+      const label = prefix ? prefix + ' · ' + prettyKey(k) : prettyKey(k);
+      if (v && typeof v === 'object' && !Array.isArray(v)) flattenInfo(v, label, out);
+      else if (!Array.isArray(v)) out.push([label, prettyVal(v)]);
+    });
+    return out;
+  }
+
+  function openPlayerInfo() {
+    const info = window._i4gPlayerInfo;
+    if (!info) return;
+    let sheet = document.getElementById('i4g-ff-info-sheet');
+    if (!sheet) {
+      sheet = document.createElement('div');
+      sheet.id = 'i4g-ff-info-sheet';
+      sheet.innerHTML = '<div id="i4g-ff-info-box"><h3>Player Info</h3><div id="i4g-ff-info-body"></div><button type="button" id="i4g-ff-info-close">Close</button></div>';
+      document.body.appendChild(sheet);
+      sheet.addEventListener('click', function (e) { if (e.target === sheet) sheet.classList.remove('open'); });
+      document.getElementById('i4g-ff-info-close').addEventListener('click', function () { sheet.classList.remove('open'); });
+    }
+    const body = document.getElementById('i4g-ff-info-body');
+    const rows = flattenInfo(info, '', []);
+    body.innerHTML = rows.length
+      ? rows.map(function (r) {
+          return '<div class="i4g-info-row"><span>' + String(r[0]).replace(/</g, '') + '</span><b>' + String(r[1]).replace(/</g, '') + '</b></div>';
+        }).join('')
+      : '<p>No extra details.</p>';
+    sheet.classList.add('open');
+  }
+
   function injectCheckPlayerUI() {
     const uidInput = document.getElementById('mo_ff_uid');
     if (!uidInput || document.getElementById('i4g-check-player-btn')) return;
@@ -272,33 +352,51 @@
     if (!parent) return;
 
     const row = document.createElement('div');
-    row.id = 'i4g-check-player-row';
-    row.innerHTML = `
-      <button type="button" id="i4g-check-player-btn" aria-label="Check Free Fire Player ID">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Check Player ID
-      </button>
-      <div id="i4g-player-status"></div>`;
-    parent.appendChild(row);
+    row.className = 'i4g-uid-row';
+    uidInput.parentNode.insertBefore(row, uidInput);
+    row.appendChild(uidInput);
 
-    document.getElementById('i4g-check-player-btn').addEventListener('click', runPlayerCheck);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'i4g-check-player-btn';
+    btn.textContent = 'Check';
+    btn.setAttribute('aria-label', 'Check UID');
+    row.appendChild(btn);
 
-    // Re-verify if UID changes after a successful verify
+    const infoBtn = document.createElement('button');
+    infoBtn.type = 'button';
+    infoBtn.id = 'i4g-ff-info-btn';
+    infoBtn.textContent = '!';
+    infoBtn.setAttribute('aria-label', 'Player info');
+    infoBtn.title = 'All player info';
+    row.appendChild(infoBtn);
+
+    let status = document.getElementById('i4g-player-status');
+    if (!status) {
+      status = document.createElement('div');
+      status.id = 'i4g-player-status';
+      parent.appendChild(status);
+    }
+
+    btn.addEventListener('click', runPlayerCheck);
+    infoBtn.addEventListener('click', openPlayerInfo);
+
     uidInput.addEventListener('input', function () {
       if (window._i4gVerifiedUid && this.value.trim() !== window._i4gVerifiedUid) {
         window._i4gPlayerVerified = false;
-        window._i4gVerifiedUid    = null;
-        window._i4gVerifiedName   = null;
-        const st = document.getElementById('i4g-player-status');
-        if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
+        window._i4gVerifiedUid = null;
+        window._i4gVerifiedName = null;
+        resetCheckBtn();
+        if (status) { status.className = ''; status.style.display = 'none'; status.textContent = ''; }
       }
     });
   }
 
   async function runPlayerCheck() {
-    const btn    = document.getElementById('i4g-check-player-btn');
-    const st     = document.getElementById('i4g-player-status');
-    const uid    = (document.getElementById('mo_ff_uid')?.value || '').trim();
+    const btn = document.getElementById('i4g-check-player-btn');
+    const infoBtn = document.getElementById('i4g-ff-info-btn');
+    const st = document.getElementById('i4g-player-status');
+    const uid = (document.getElementById('mo_ff_uid')?.value || '').trim();
 
     if (!uid) {
       if (st) { st.className = 'error'; st.textContent = 'Enter your Free Fire UID.'; st.style.display = 'block'; }
@@ -306,48 +404,56 @@
     }
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="i4g-spinner" style="width:13px;height:13px;border-width:2px"></span> Checking…`;
-    if (st) { st.className = 'info'; st.textContent = 'Verifying player…'; st.style.display = 'block'; }
+    btn.classList.remove('is-ok');
+    btn.innerHTML = '<span class="i4g-spinner" style="width:13px;height:13px;border-width:2px"></span>';
+    if (infoBtn) infoBtn.classList.remove('show');
+    if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
 
     try {
       const result = await checkPlayer(uid);
 
       if (result.ok) {
         window._i4gPlayerVerified = true;
-        window._i4gVerifiedUid    = uid;
-        window._i4gVerifiedName   = result.playerName || '';
-
-        const parts = [];
-        if (result.playerName) parts.push(`✓ ${result.playerName}`);
-        else parts.push('✓ Player verified');
-        if (result.server) parts.push(`Server: ${result.server}`);
-
-        if (st) { st.className = 'success'; st.textContent = parts.join(' · '); st.style.display = 'block'; }
-
+        window._i4gVerifiedUid = uid;
+        window._i4gVerifiedName = result.playerName || '';
+        window._i4gPlayerInfo = result.extra || result;
+        const name = result.playerName || 'Verified';
+        btn.classList.add('is-ok');
+        btn.textContent = name;
+        btn.title = name;
+        if (infoBtn) infoBtn.classList.add('show');
       } else if (result.soft) {
-        // API issue — allow to continue but note it
-        window._i4gPlayerVerified = true; // soft-pass
-        window._i4gVerifiedUid    = uid;
+        window._i4gPlayerVerified = true;
+        window._i4gVerifiedUid = uid;
+        btn.textContent = 'Check';
         if (st) {
-          st.className   = 'info';
-          st.textContent = result.error || 'Player check unavailable. You can still continue manually.';
+          st.className = 'error';
+          st.textContent = result.error || 'Check unavailable. You can still continue.';
           st.style.display = 'block';
         }
       } else {
-        // Hard fail — wrong UID
         window._i4gPlayerVerified = false;
-        window._i4gVerifiedUid    = null;
-        if (st) { st.className = 'error'; st.textContent = result.error || 'Invalid UID. Please check and try again.'; st.style.display = 'block'; }
+        window._i4gVerifiedUid = null;
+        window._i4gPlayerInfo = null;
+        btn.textContent = 'Check';
+        if (st) {
+          st.className = 'error';
+          st.textContent = result.error || 'Invalid UID.';
+          st.style.display = 'block';
+        }
       }
     } catch (err) {
-      // Network error — soft-pass
       window._i4gPlayerVerified = true;
-      window._i4gVerifiedUid    = uid;
-      if (st) { st.className = 'info'; st.textContent = 'Player check unavailable. You can still continue manually.'; st.style.display = 'block'; }
+      window._i4gVerifiedUid = uid;
+      btn.textContent = 'Check';
+      if (st) {
+        st.className = 'error';
+        st.textContent = 'Check unavailable. You can still continue.';
+        st.style.display = 'block';
+      }
     }
 
     btn.disabled = false;
-    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Check Player ID`;
   }
 
   /* ── enrichI4GOrderData — called by service-modal ──────── */
@@ -496,6 +602,7 @@
         window._i4gPlayerVerified = false;
         window._i4gVerifiedUid    = null;
         window._i4gVerifiedName   = null;
+        window._i4gPlayerInfo     = null;
       }
     };
   }
