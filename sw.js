@@ -1,6 +1,6 @@
 // RabbiHossainLTD Service Worker — Static Asset Cache
 // Version bump here forces cache refresh on all clients
-const CACHE_NAME = 'rh-static-v49';
+const CACHE_NAME = 'rh-static-v50';
 
 const STATIC_ASSETS = [
   '/css/style.min.css',

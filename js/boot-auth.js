@@ -19,6 +19,19 @@
 (function () {
   'use strict';
 
+  /* Keep Render from sleeping (15 min idle). Ping health every 10 min
+     while a tab is open. GitHub Action also pings even if nobody is browsing. */
+  (function keepRenderAwake() {
+    var url = 'https://rabbi-backend-vlr7.onrender.com/api/health';
+    function ping() {
+      try {
+        fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store', keepalive: true }).catch(function () {});
+      } catch (e) {}
+    }
+    ping();
+    setInterval(ping, 10 * 60 * 1000);
+  })();
+
   /* Theme — apply before first paint (light is the default). */
   (function () {
     var t = 'light';

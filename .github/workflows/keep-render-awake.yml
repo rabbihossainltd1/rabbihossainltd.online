@@ -1,0 +1,22 @@
+name: Keep Render awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Hit Render health every 10 minutes
+        run: |
+          set -e
+          URL="https://rabbi-backend-vlr7.onrender.com/api/health"
+          echo "Pinging $URL"
+          curl -fsS --max-time 50 "$URL"
+          echo
