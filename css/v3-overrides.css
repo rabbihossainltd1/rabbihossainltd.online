@@ -643,8 +643,8 @@ html[data-theme="light"] body { background:#f5f5f2 !important; color:#161616 !im
 [data-theme="light"] .rabbi-bottom-nav a { color:#4a4a48 !important; }
 [data-theme="light"] .nav-links a:hover,
 [data-theme="light"] .nav-links a.active { color:#161616 !important; }
-[data-theme="light"] .rabbi-bottom-nav a.active,
-[data-theme="light"] .rabbi-bottom-nav a:hover { background:#111111 !important; color:#ffffff !important; }
+[data-theme="light"] .rabbi-bottom-nav a:hover:not(.active) { background:rgba(0,0,0,.06) !important; color:#111111 !important; }
+[data-theme="light"] .rabbi-bottom-nav a.active { background:#111111 !important; color:#ffffff !important; }
 [data-theme="light"] .navbar { border-bottom:1px solid rgba(0,0,0,.09) !important; }
 
 /* ── sticky bars / price pills ── */

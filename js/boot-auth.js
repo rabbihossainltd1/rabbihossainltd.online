@@ -120,7 +120,7 @@
         var link = existing || document.createElement('link');
         link.id = 'rh-light-theme-link';
         link.rel = 'stylesheet';
-        link.href = '/css/light-theme.css?v=10';
+        link.href = '/css/light-theme.css?v=11';
         if (link.parentNode !== host) host.appendChild(link);
         var cta = document.getElementById('rh-cta-light-link');
         if (!cta) {
@@ -169,6 +169,57 @@
         document.addEventListener('DOMContentLoaded', place);
       }
       window.addEventListener('load', place);
+    })();
+
+    /* Bottom nav: keep the bar still across pages, paint active on press. */
+    (function bottomNavFeel() {
+      if (!document.querySelector('meta[name="view-transition"]')) {
+        var meta = document.createElement('meta');
+        meta.setAttribute('name', 'view-transition');
+        meta.setAttribute('content', 'same-origin');
+        (document.head || document.documentElement).appendChild(meta);
+      }
+      if (!document.getElementById('rh-bnav-feel')) {
+        var css = document.createElement('style');
+        css.id = 'rh-bnav-feel';
+        css.textContent =
+          '@view-transition{navigation:auto}' +
+          '.rabbi-bottom-nav{view-transition-name:rh-bnav;contain:layout style}' +
+          '::view-transition-old(rh-bnav),::view-transition-new(rh-bnav){animation:none;mix-blend-mode:normal;height:100%}' +
+          '::view-transition-group(rh-bnav){animation-duration:.01s}' +
+          '::view-transition-old(root){animation:rhVtOut .14s ease both}' +
+          '::view-transition-new(root){animation:rhVtIn .16s ease both}' +
+          '@keyframes rhVtOut{to{opacity:0}}@keyframes rhVtIn{from{opacity:0}}' +
+          '.rabbi-bottom-nav a{-webkit-tap-highlight-color:transparent;transition:background .14s ease,color .14s ease,transform .12s ease}' +
+          '.rabbi-bottom-nav a:active{transform:scale(.96)}' +
+          'html[data-theme="light"] .rabbi-bottom-nav a:hover:not(.active){background:rgba(0,0,0,.06)!important;color:#111!important}' +
+          'html[data-theme="light"] .rabbi-bottom-nav a.active{background:#111!important;color:#fff!important}' +
+          'html[data-theme="dark"] .rabbi-bottom-nav a:hover:not(.active){background:rgba(255,255,255,.08)!important;color:#fff!important}' +
+          'html[data-theme="dark"] .rabbi-bottom-nav a.active{background:#fff!important;color:#080808!important}';
+        (document.head || document.documentElement).appendChild(css);
+      }
+      function mark(a) {
+        var nav = a && a.closest ? a.closest('.rabbi-bottom-nav') : null;
+        if (!nav) return;
+        nav.querySelectorAll('a.active').forEach(function (x) { x.classList.remove('active'); });
+        a.classList.add('active');
+      }
+      function onPress(e) {
+        var a = e.target && e.target.closest ? e.target.closest('.rabbi-bottom-nav a') : null;
+        if (!a) return;
+        mark(a);
+        try {
+          if (a.href && !document.querySelector('link[data-rh-pre="' + a.href + '"]')) {
+            var pre = document.createElement('link');
+            pre.rel = 'prefetch';
+            pre.href = a.href;
+            pre.setAttribute('data-rh-pre', a.href);
+            document.head.appendChild(pre);
+          }
+        } catch (err) {}
+      }
+      document.addEventListener('pointerdown', onPress, true);
+      document.addEventListener('click', onPress, true);
     })();
   })();
 

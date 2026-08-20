@@ -228,9 +228,13 @@ html[data-theme="light"] .rabbi-bottom-nav {
   border: 1px solid rgba(0,0,0,.12) !important;
   box-shadow: 0 16px 40px rgba(0,0,0,.12) !important;
 }
-html[data-theme="light"] .rabbi-bottom-nav a { color: #6f6f6c !important; }
-html[data-theme="light"] .rabbi-bottom-nav a.active,
-html[data-theme="light"] .rabbi-bottom-nav a:hover {
+html[data-theme="light"] .rabbi-bottom-nav a { color: #6f6f6c !important; background: transparent !important; }
+html[data-theme="light"] .rabbi-bottom-nav a:hover:not(.active) {
+  background: rgba(0,0,0,.06) !important;
+  color: #111 !important;
+  box-shadow: none !important;
+}
+html[data-theme="light"] .rabbi-bottom-nav a.active {
   background: #111 !important;
   color: #fff !important;
   box-shadow: none !important;
