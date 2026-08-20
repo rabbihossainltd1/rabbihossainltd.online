@@ -143,9 +143,9 @@
     }
 
     if (!res.ok || data.ok === false || data.success === false) {
-      const msg = data.message || data.error || data.msg || 'Player not found. Check your UID.';
-      // soft = API issue (not wrong UID), hard = wrong UID
-      const soft = res.status >= 500 || !!data.providerError;
+      let msg = data.message || data.error || data.msg || 'Player not found. Check your UID.';
+      if (/no route was found/i.test(String(msg))) msg = 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।';
+      const soft = false;
       return { ok: false, error: msg, soft };
     }
 
