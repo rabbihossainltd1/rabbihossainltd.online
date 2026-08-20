@@ -150,10 +150,11 @@
     }
 
     const info = data.data || data.player || data.result || data;
+    const acc = info.AccountInfo || info.accountInfo || {};
     return {
       ok:         true,
-      playerName: info.playerName || info.name || info.username || info.nickname || '',
-      server:     info.server || info.region || info.zone || '',
+      playerName: acc.AccountName || info.playerName || info.name || info.username || info.nickname || '',
+      server:     acc.AccountRegion || info.server || info.region || info.zone || '',
       extra:      info
     };
   }

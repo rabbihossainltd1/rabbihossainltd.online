@@ -112,7 +112,12 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         '#floatAttachPreview{display:none;padding:0 12px 8px;align-items:center;gap:8px}' +
         '#floatAttachPreview.on{display:flex}' +
         '#floatAttachPreview img{width:44px;height:44px;object-fit:cover;border-radius:8px}' +
-        '#floatAttachPreview button{border:none;background:none;color:#aaa;cursor:pointer;font-size:.8rem}';
+        '#floatAttachPreview button{border:none;background:none;color:#aaa;cursor:pointer;font-size:.8rem}' +
+        '.float-prod-wrap{display:flex;flex-direction:column;gap:8px;align-self:stretch;margin-top:2px}' +
+        '.float-prod-card{display:block;text-decoration:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:11px 12px;color:#eee}' +
+        '.float-prod-card:hover{background:#fff;color:#111;border-color:#fff}' +
+        '.float-prod-card b{display:block;font-size:.86rem;margin-bottom:3px}' +
+        '.float-prod-card small{display:block;opacity:.82;font-size:.74rem;line-height:1.4}';
       document.head.appendChild(css);
     }
     const header = document.getElementById('floatChatHeader');
@@ -250,6 +255,49 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     if (thread.started) showShortcuts(false);
   }
 
+  const PRODUCTS = [
+    { id: 'chatgpt', keys: ['chatgpt', 'জিপিটি', 'gpt'], title: 'ChatGPT', href: '/checkout/?service=chatgpt', price: 'Go $10 · Plus $20 · Pro $200', perk: 'GPT-4o, ছবি তৈরি, দ্রুত উত্তর' },
+    { id: 'gemini', keys: ['gemini', 'জেমিনি'], title: 'Gemini AI', href: '/checkout/?service=gemini', price: 'AI Pro $19.99 · Ultra $249.99', perk: 'Google-এর শক্তিশালী AI + 1TB স্টোরেজ' },
+    { id: 'netflix', keys: ['netflix', 'নেটফ্লিক্স'], title: 'Netflix', href: '/checkout/?service=netflix', price: '$2.99 থেকে $9.99', perk: 'অ্যাড ছাড়া মুভি ও সিরিজ' },
+    { id: 'canva', keys: ['canva', 'ক্যানভা'], title: 'Canva Pro', href: '/checkout/?service=canva', price: 'Pro $12.99/মাস', perk: 'প্রিমিয়াম টেমপ্লেট, ব্যাকগ্রাউন্ড রিমুভার' },
+    { id: 'youtube', keys: ['youtube', 'ইউটিউব'], title: 'YouTube Premium', href: '/checkout/?service=youtube', price: '$2.49 থেকে $6.99', perk: 'অ্যাড ফ্রি + ব্যাকগ্রাউন্ড প্লে' },
+    { id: 'capcut', keys: ['capcut', 'ক্যাপকাট'], title: 'CapCut Pro', href: '/checkout/?service=capcut', price: '$9.99/মাস', perk: 'ওয়াটারমার্ক ছাড়া ৪কে এডিট' },
+    { id: 'grok', keys: ['grok', 'গ্রক'], title: 'Grok AI', href: '/checkout/?service=grok', price: '$5 থেকে $20/মাস', perk: 'রিয়েল-টাইম এক্স/টুইটার ডেটা' },
+    { id: 'meta-verified', keys: ['meta', 'মেটা', 'verified', 'ভেরিফাই', 'blue tick', 'ব্লু টিক'], title: 'Meta Verified', href: '/checkout/?service=meta-verified', price: '$12 / ৳1,500', perk: 'ফেসবুক নীল টিক, বিশ্বাসযোগ্যতা' },
+    { id: 'visa-mastercard', keys: ['visa', 'mastercard', 'ভিসা', 'মাস্টারকার্ড', 'কার্ড'], title: 'Visa / Mastercard', href: '/checkout/?service=visa-mastercard', price: 'ভার্চুয়াল $12 থেকে', perk: 'আন্তর্জাতিক পেমেন্ট ও সাবস্ক্রিপশন' },
+    { id: 'free-fire-topup', keys: ['free fire', 'ফ্রি ফায়ার', 'diamond', 'ডায়মন্ড', 'topup', 'টপআপ', 'টপ-আপ', 'uid'], title: 'Free Fire Diamond', href: '/checkout/?service=free-fire-topup', price: 'লাইভ প্যাকেজ · UID টপ-আপ', perk: 'লগইন ছাড়াই সরাসরি UID-এ ডায়মন্ড' },
+    { id: 'ff-ios', keys: ['ios panel', 'iphone panel', 'আইফোন প্যানেল'], title: 'Free Fire iOS Panel', href: '/checkout/?service=ff-ios', price: '$5 থেকে $40', perk: 'জেলব্রেক ছাড়া আইফোন প্যানেল' },
+    { id: 'ff-drip', keys: ['drip', 'ড্রিপ'], title: 'FF Drip Panel', href: '/checkout/?service=ff-drip', price: '$0.90 থেকে $10', perk: 'রুটেড অ্যান্ড্রয়েড প্যানেল' },
+    { id: 'web-development', keys: ['website', 'ওয়েবসাইট', 'web development'], title: 'Website Development', href: '/checkout/?service=web-development', price: 'শুরু $50', perk: 'বিজনেস সাইট ও ল্যান্ডিং পেজ' }
+  ];
+
+  function matchProducts(text) {
+    const t = String(text || '').toLowerCase();
+    const hits = [];
+    PRODUCTS.forEach(p => {
+      if (p.keys.some(k => t.indexOf(k) !== -1)) hits.push(p);
+    });
+    return hits.slice(0, 3);
+  }
+
+  function showProductCards(text) {
+    document.getElementById('floatProdWrap')?.remove();
+    const hits = matchProducts(text);
+    if (!hits.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'float-prod-wrap';
+    wrap.id = 'floatProdWrap';
+    hits.forEach(p => {
+      const a = document.createElement('a');
+      a.className = 'float-prod-card';
+      a.href = p.href;
+      a.innerHTML = '<b>' + p.title + '</b><small>' + p.price + '</small><small>' + p.perk + '</small><small>এক ক্লিকে অর্ডার →</small>';
+      wrap.appendChild(a);
+    });
+    msgsEl.appendChild(wrap);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
   function showShortcuts(afterReply) {
     document.getElementById('floatQuickBtns')?.remove();
     const row = document.createElement('div');
@@ -262,7 +310,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         ]
       : [
           { label: 'অর্ডার কোথায়?', text: 'আমার অর্ডারের আপডেট জানতে চাই' },
-          { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব?' },
+          { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব? অটো পেমেন্ট কীভাবে কাজ করে?' },
           { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' },
           { label: 'হোয়াটসঅ্যাপে কথা বলব', href: 'https://wa.me/8801731410341' }
         ];
@@ -333,6 +381,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       thread.history.push({ role: 'user', text: text || 'ছবি পাঠিয়েছি' });
       thread.history.push({ role: 'model', text: reply });
       saveThread();
+      showProductCards((text || '') + ' ' + reply);
       showShortcuts(true);
     } catch (err) {
       removeTyping();
