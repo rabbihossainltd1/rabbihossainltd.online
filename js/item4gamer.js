@@ -249,7 +249,8 @@
       .i4g-retry-btn{border:1px solid rgba(255,80,80,.35);background:rgba(255,80,80,.12);color:#ffb0b0;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:800;cursor:pointer;margin-left:auto}
       .i4g-retry-btn:hover{background:rgba(255,80,80,.22)}
       .i4g-uid-row{display:flex;gap:8px;align-items:stretch}
-      .i4g-uid-row #mo_ff_uid{flex:1;min-width:0}
+      .i4g-uid-row #mo_ff_uid{flex:1;min-width:0;min-height:48px}
+      #i4g-check-player-btn,#i4g-ff-info-btn{min-height:48px}
       #i4g-check-player-btn{flex:0 0 auto;min-width:78px;max-width:132px;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:12px;padding:0 12px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       html[data-theme="light"] #i4g-check-player-btn{background:#fff;color:#111;border:1px solid #111}
       #i4g-check-player-btn:hover{opacity:.9}
@@ -345,51 +346,67 @@
   }
 
   function injectCheckPlayerUI() {
+    injectCSS();
     const uidInput = document.getElementById('mo_ff_uid');
-    if (!uidInput || document.getElementById('i4g-check-player-btn')) return;
+    if (!uidInput) return;
 
-    const parent = uidInput.closest('.form-group') || uidInput.parentElement;
-    if (!parent) return;
+    let row = uidInput.closest('.i4g-uid-row');
+    if (!row) {
+      const parent = uidInput.closest('.form-group') || uidInput.parentElement;
+      if (!parent) return;
+      row = document.createElement('div');
+      row.className = 'i4g-uid-row';
+      uidInput.parentNode.insertBefore(row, uidInput);
+      row.appendChild(uidInput);
+    }
 
-    const row = document.createElement('div');
-    row.className = 'i4g-uid-row';
-    uidInput.parentNode.insertBefore(row, uidInput);
-    row.appendChild(uidInput);
+    let btn = document.getElementById('i4g-check-player-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'i4g-check-player-btn';
+      btn.textContent = 'Check';
+      row.appendChild(btn);
+    }
+    let infoBtn = document.getElementById('i4g-ff-info-btn');
+    if (!infoBtn) {
+      infoBtn = document.createElement('button');
+      infoBtn.type = 'button';
+      infoBtn.id = 'i4g-ff-info-btn';
+      infoBtn.textContent = '!';
+      infoBtn.setAttribute('aria-label', 'Player info');
+      row.appendChild(infoBtn);
+    }
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.id = 'i4g-check-player-btn';
-    btn.textContent = 'Check';
-    btn.setAttribute('aria-label', 'Check UID');
-    row.appendChild(btn);
-
-    const infoBtn = document.createElement('button');
-    infoBtn.type = 'button';
-    infoBtn.id = 'i4g-ff-info-btn';
-    infoBtn.textContent = '!';
-    infoBtn.setAttribute('aria-label', 'Player info');
-    infoBtn.title = 'All player info';
-    row.appendChild(infoBtn);
-
+    const parent = uidInput.closest('.form-group') || row.parentElement;
     let status = document.getElementById('i4g-player-status');
-    if (!status) {
+    if (!status && parent) {
       status = document.createElement('div');
       status.id = 'i4g-player-status';
       parent.appendChild(status);
     }
 
-    btn.addEventListener('click', runPlayerCheck);
-    infoBtn.addEventListener('click', openPlayerInfo);
-
-    uidInput.addEventListener('input', function () {
-      if (window._i4gVerifiedUid && this.value.trim() !== window._i4gVerifiedUid) {
-        window._i4gPlayerVerified = false;
-        window._i4gVerifiedUid = null;
-        window._i4gVerifiedName = null;
-        resetCheckBtn();
-        if (status) { status.className = ''; status.style.display = 'none'; status.textContent = ''; }
-      }
-    });
+    if (!btn.dataset.rhBound) {
+      btn.dataset.rhBound = '1';
+      btn.addEventListener('click', runPlayerCheck);
+    }
+    if (!infoBtn.dataset.rhBound) {
+      infoBtn.dataset.rhBound = '1';
+      infoBtn.addEventListener('click', openPlayerInfo);
+    }
+    if (!uidInput.dataset.rhBound) {
+      uidInput.dataset.rhBound = '1';
+      uidInput.addEventListener('input', function () {
+        if (window._i4gVerifiedUid && this.value.trim() !== window._i4gVerifiedUid) {
+          window._i4gPlayerVerified = false;
+          window._i4gVerifiedUid = null;
+          window._i4gVerifiedName = null;
+          resetCheckBtn();
+          const st = document.getElementById('i4g-player-status');
+          if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
+        }
+      });
+    }
   }
 
   async function runPlayerCheck() {
@@ -571,6 +588,10 @@
   /* ── Patch openServiceModal to trigger load on FF open ─── */
   function init() {
     injectCSS();
+    injectCheckPlayerUI();
+    if (document.body) {
+      new MutationObserver(function () { injectCheckPlayerUI(); }).observe(document.body, { childList: true, subtree: true });
+    }
 
     const ffFields = document.getElementById('ffFields');
     if (!ffFields) return;

@@ -46,6 +46,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       const slim = thread.messages.map(m => {
         const row = { role: m.role, text: m.text || '', time: m.time || '' };
         if (m.image && String(m.image).length < 180000) row.image = m.image;
+        if (m.role === 'products' && Array.isArray(m.cards)) row.cards = m.cards;
         return row;
       });
       localStorage.setItem(STORE, JSON.stringify({
@@ -114,10 +115,26 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         '#floatAttachPreview img{width:44px;height:44px;object-fit:cover;border-radius:8px}' +
         '#floatAttachPreview button{border:none;background:none;color:#aaa;cursor:pointer;font-size:.8rem}' +
         '.float-prod-wrap{display:flex;flex-direction:column;gap:8px;align-self:stretch;margin-top:2px}' +
-        '.float-prod-card{display:block;text-decoration:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:11px 12px;color:#eee}' +
-        '.float-prod-card:hover{background:#fff;color:#111;border-color:#fff}' +
+        '.float-prod-card{display:block;text-decoration:none;background:#161616;border:1.5px solid rgba(255,255,255,.34);border-radius:14px;padding:11px 12px;color:#f5f5f3}' +
+        '.float-prod-card b,.float-prod-card small{color:#f5f5f3}' +
+        '.float-prod-card:hover{background:#fff;color:#111;border-color:#111}' +
+        '.float-prod-card:hover b,.float-prod-card:hover small{color:#111}' +
         '.float-prod-card b{display:block;font-size:.86rem;margin-bottom:3px}' +
-        '.float-prod-card small{display:block;opacity:.82;font-size:.74rem;line-height:1.4}';
+        '.float-prod-card small{display:block;font-size:.74rem;line-height:1.45;opacity:1}' +
+        'html[data-theme="light"] #floatChatWindow{background:#fff;border:1px solid #111}' +
+        'html[data-theme="light"] #floatChatHeader{background:#f5f5f2;border-bottom:1px solid rgba(0,0,0,.12)}' +
+        'html[data-theme="light"] #floatChatTitle{color:#111}' +
+        'html[data-theme="light"] #floatChatStatus,html[data-theme="light"] #floatChatClose{color:#555}' +
+        'html[data-theme="light"] .float-msg-admin .float-msg-bubble{background:#f5f5f2;color:#111;border:1px solid rgba(0,0,0,.14)}' +
+        'html[data-theme="light"] .float-msg-user .float-msg-bubble{background:#111;color:#fff;border:1px solid #111}' +
+        'html[data-theme="light"] .float-msg-time{color:#6f6f6c}' +
+        'html[data-theme="light"] .float-quick-btn{background:#fff;color:#111;border:1px solid #111}' +
+        'html[data-theme="light"] .float-quick-btn:hover{background:#111;color:#fff}' +
+        'html[data-theme="light"] .float-prod-card{background:#fff;color:#111;border:1.5px solid #111}' +
+        'html[data-theme="light"] .float-prod-card b,html[data-theme="light"] .float-prod-card small{color:#111}' +
+        'html[data-theme="light"] #floatChatInput{background:#fff;color:#111;border:1px solid rgba(0,0,0,.18)}' +
+        'html[data-theme="light"] #floatChatAttach{background:#fff;color:#111;border:1px solid #111}' +
+        'html[data-theme="light"] #floatChatInputArea{border-top:1px solid rgba(0,0,0,.1)}';
       document.head.appendChild(css);
     }
     const header = document.getElementById('floatChatHeader');
@@ -208,6 +225,14 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   }
 
   function paintMessage(m, persist) {
+    if (m && m.role === 'products') {
+      renderProductCards(m.cards || [], false);
+      if (persist) {
+        thread.messages.push({ role: 'products', cards: m.cards || [], time: m.time || nowStr() });
+        saveThread();
+      }
+      return null;
+    }
     const wrap = document.createElement('div');
     wrap.className = 'float-msg ' + (m.role === 'user' ? 'float-msg-user' : 'float-msg-admin');
     const b = document.createElement('div');
@@ -280,13 +305,10 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     return hits.slice(0, 3);
   }
 
-  function showProductCards(text) {
-    document.getElementById('floatProdWrap')?.remove();
-    const hits = matchProducts(text);
-    if (!hits.length) return;
+  function renderProductCards(hits, persist) {
+    if (!hits || !hits.length) return;
     const wrap = document.createElement('div');
     wrap.className = 'float-prod-wrap';
-    wrap.id = 'floatProdWrap';
     hits.forEach(p => {
       const a = document.createElement('a');
       a.className = 'float-prod-card';
@@ -296,6 +318,19 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     });
     msgsEl.appendChild(wrap);
     msgsEl.scrollTop = msgsEl.scrollHeight;
+    if (persist) {
+      thread.messages.push({
+        role: 'products',
+        cards: hits.map(p => ({ title: p.title, href: p.href, price: p.price, perk: p.perk })),
+        time: nowStr()
+      });
+      saveThread();
+    }
+  }
+
+  function showProductCards(text) {
+    const hits = matchProducts(text);
+    renderProductCards(hits, true);
   }
 
   function showShortcuts(afterReply) {

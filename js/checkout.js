@@ -330,7 +330,12 @@
       </div>
       <div class="form-group">
         <label class="form-label">Free Fire UID <span class="req">*</span></label>
-        <input class="form-input" type="text" id="mo_ff_uid" name="ff_uid" placeholder="Enter your Free Fire UID number" />
+        <div class="i4g-uid-row">
+          <input class="form-input" type="text" id="mo_ff_uid" name="ff_uid" placeholder="Enter your Free Fire UID number" />
+          <button type="button" id="i4g-check-player-btn">Check</button>
+          <button type="button" id="i4g-ff-info-btn" aria-label="Player info">!</button>
+        </div>
+        <div id="i4g-player-status"></div>
       </div>`;
 
     const tg = wrap.querySelector('#ffTypeToggle');
