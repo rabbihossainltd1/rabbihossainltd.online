@@ -12,7 +12,7 @@
 
   if (!document.getElementById('ccContent')) return;
 
-  var BACKEND = 'https://rabbi-backend-production.up.railway.app';
+  var BACKEND = 'https://rabbi-backend-vlr7.onrender.com';
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 

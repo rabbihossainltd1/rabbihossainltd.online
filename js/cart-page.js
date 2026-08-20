@@ -404,7 +404,7 @@
       var user = window.rabbiAuth && window.rabbiAuth.getUser && window.rabbiAuth.getUser();
       if (!user || typeof user.getIdToken !== 'function') throw new Error('NOT_LOGGED_IN');
       var token = await user.getIdToken(true);
-      var res = await fetch('https://rabbi-backend-production.up.railway.app/api/payment/spv/create-intent', {
+      var res = await fetch('https://rabbi-backend-vlr7.onrender.com/api/payment/spv/create-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify({ amountUsd: subtotalUsd })

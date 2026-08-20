@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var I4G_URL = 'https://rabbi-backend-production.up.railway.app/api/item4gamer/products?category_id=19';
+  var I4G_URL = 'https://rabbi-backend-vlr7.onrender.com/api/item4gamer/products?category_id=19';
 
   function rh() { return window.RH_PLANS || {}; }
   function esc(s) {

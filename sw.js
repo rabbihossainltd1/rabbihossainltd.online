@@ -1,6 +1,6 @@
 // RabbiHossainLTD Service Worker — Static Asset Cache
 // Version bump here forces cache refresh on all clients
-const CACHE_NAME = 'rh-static-v48';
+const CACHE_NAME = 'rh-static-v49';
 
 const STATIC_ASSETS = [
   '/css/style.min.css',
@@ -56,6 +56,7 @@ self.addEventListener('fetch', (event) => {
   if (url.hostname.includes('googleapis.com')) return;
   if (url.hostname.includes('gstatic.com')) return;
   if (url.hostname.includes('up.railway.app')) return;
+  if (url.hostname.includes('onrender.com')) return;
   if (url.hostname.includes('formspree.io')) return;
 
   // For same-origin CSS, JS, images: cache-first
