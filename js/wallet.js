@@ -454,6 +454,28 @@ function hasCachedUser() {
   }
 }
 
+function isAuthDefaultPhoto(url) {
+  return /googleusercontent\.com|ggpht\.com|gravatar\.com/i.test(String(url || ""));
+}
+
+function pickDashPhoto(data, user, cached) {
+  const fromDoc = data && data.photoURL ? data.photoURL : "";
+  let stored = "";
+  try { stored = localStorage.getItem("rh_photo_custom") || ""; } catch (e) {}
+  const fromCache = (cached && cached.photoURL) || "";
+  const fromAuth = user && user.photoURL ? user.photoURL : "";
+  if (fromDoc && !isAuthDefaultPhoto(fromDoc)) {
+    try { localStorage.setItem("rh_photo_custom", fromDoc); } catch (e) {}
+    return fromDoc;
+  }
+  if (stored && !isAuthDefaultPhoto(stored)) return stored;
+  if (fromCache && !isAuthDefaultPhoto(fromCache)) {
+    try { localStorage.setItem("rh_photo_custom", fromCache); } catch (e) {}
+    return fromCache;
+  }
+  return fromDoc || stored || fromCache || fromAuth || "";
+}
+
 window.loadWalletPage = function () {
   setupPageMode();
   window.updatePaymentNumber();
@@ -1536,7 +1558,7 @@ window.loadUserDashboard = function () {
 
     const cachedName    = cached.displayName || user.displayName || user.email || "User";
     const cachedEmail   = cached.email       || user.email || "";
-    const cachedPhoto   = cached.photoURL    || user.photoURL || "";
+    const cachedPhoto   = pickDashPhoto(null, user, cached);
 
     setDashboardName(cachedName);
     setText("dashboardEmail", cachedEmail);
@@ -1566,9 +1588,18 @@ window.loadUserDashboard = function () {
         setText("dashboardBalance", moneyPair(data.credit || 0));
       }
       const avatar = document.getElementById("dashboardAvatar");
+      const livePhoto = pickDashPhoto(data, user, cached);
       if (avatar) {
-        if (data.photoURL || user.photoURL) {
-          avatar.innerHTML = `<img src="${escapeHtml(data.photoURL || user.photoURL)}" alt="Profile photo">`;
+        const shownImg = avatar.querySelector("img");
+        const shown = shownImg ? (shownImg.getAttribute("src") || "") : "";
+        let paint = livePhoto;
+        if (paint && isAuthDefaultPhoto(paint) && shown && !isAuthDefaultPhoto(shown)) paint = shown;
+        if (paint) {
+          if (shownImg) {
+            if (shownImg.getAttribute("src") !== paint) shownImg.src = paint;
+          } else {
+            avatar.innerHTML = `<img src="${escapeHtml(paint)}" alt="Profile photo">`;
+          }
         } else {
           avatar.textContent = String(data.name || user.displayName || user.email || "U").charAt(0).toUpperCase();
         }
@@ -1581,7 +1612,7 @@ window.loadUserDashboard = function () {
         }
         next.displayName = data.name || user.displayName || next.displayName || '';
         next.email = data.email || user.email || next.email || '';
-        next.photoURL = data.photoURL || user.photoURL || next.photoURL || '';
+        next.photoURL = livePhoto || next.photoURL || '';
         next.uid = user.uid;
         next.cache_ts = Date.now();
         localStorage.setItem('rh_user_cache', JSON.stringify(next));

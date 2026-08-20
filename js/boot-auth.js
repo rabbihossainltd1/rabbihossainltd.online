@@ -262,20 +262,41 @@
     '.rh-authed .auth-only{visibility:visible}';
   (document.head || html).appendChild(style);
 
+  function isAuthDefaultPhoto(url) {
+    return /googleusercontent\.com|ggpht\.com|gravatar\.com/i.test(String(url || ''));
+  }
+
+  function pickCachedPhoto() {
+    var live = null;
+    try { live = JSON.parse(localStorage.getItem('rh_user_cache') || 'null'); } catch (e) {}
+    if (live && live.uid) cached = live;
+    var stored = '';
+    try { stored = localStorage.getItem('rh_photo_custom') || ''; } catch (e) {}
+    var fromCache = (cached && cached.photoURL) || '';
+    if (stored && !isAuthDefaultPhoto(stored)) return stored;
+    if (fromCache && !isAuthDefaultPhoto(fromCache)) return fromCache;
+    return stored || fromCache || '';
+  }
+
   // 2. Fill the avatar + balance as soon as the nodes exist.
   function hydrate() {
     var img = document.getElementById('navUserImg');
     var initial = document.getElementById('navUserInitial');
     var avatar = document.getElementById('navUserAvatar');
+    var photo = pickCachedPhoto();
 
     if (avatar) avatar.style.display = 'flex';
 
-    if (img && cached.photoURL) {
-      img.src = cached.photoURL;
+    if (img && photo) {
+      var showing = img.getAttribute('src') || '';
+      if (isAuthDefaultPhoto(photo) && showing && !isAuthDefaultPhoto(showing)) {
+        photo = showing;
+      }
+      if (img.getAttribute('src') !== photo) img.src = photo;
       img.style.display = 'block';
       if (initial) initial.style.display = 'none';
     } else if (initial) {
-      var src = cached.displayName || cached.email || 'U';
+      var src = (cached && (cached.displayName || cached.email)) || 'U';
       initial.textContent = src.trim().charAt(0).toUpperCase();
       initial.style.display = 'block';
       if (img) img.style.display = 'none';
@@ -319,10 +340,17 @@
 
     var av = document.getElementById('dashboardAvatar');
     if (av) {
-      if (cached.photoURL) {
-        if (!av.querySelector('img')) {
+      if (photo) {
+        var existing = av.querySelector('img');
+        var shown = existing ? (existing.getAttribute('src') || '') : '';
+        if (isAuthDefaultPhoto(photo) && shown && !isAuthDefaultPhoto(shown)) {
+          photo = shown;
+        }
+        if (existing) {
+          if (existing.getAttribute('src') !== photo) existing.src = photo;
+        } else {
           var im = document.createElement('img');
-          im.src = cached.photoURL;
+          im.src = photo;
           im.alt = '';
           im.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block';
           av.textContent = '';
@@ -355,7 +383,9 @@
   var tries = 0;
   (function poll() {
     hydrate();
-    if (++tries < 40 && !document.getElementById('navUserImg')) {
+    var img = document.getElementById('navUserImg');
+    var empty = img && !(img.getAttribute('src') || '');
+    if (++tries < 80 && (!img || empty)) {
       setTimeout(poll, 25);
     }
   })();

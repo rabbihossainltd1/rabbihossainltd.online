@@ -61,7 +61,7 @@
       authBtn.id = 'navAuthBtn';
       authBtn.innerHTML = `
         <div id="navUserAvatar" aria-label="Open profile dashboard">
-          <img id="navUserImg" src="" alt="Profile" />
+          <img id="navUserImg" alt="Profile" />
           <span id="navUserInitial">U</span>
         </div>
         <button id="navLoginBtn" type="button">Login</button>
@@ -69,6 +69,9 @@
       const navCta = navbar.querySelector('.nav-cta');
       if (navCta) navbar.insertBefore(authBtn, navCta);
       else navbar.appendChild(authBtn);
+      if (typeof window.rhPaintCachedAuth === 'function') {
+        try { window.rhPaintCachedAuth(); } catch (e) {}
+      }
     }
 
     injectAuthCSS();
@@ -318,6 +321,37 @@
     return (user?.displayName || user?.email || 'U').charAt(0).toUpperCase();
   }
 
+  function isAuthDefaultPhoto(url) {
+    return /googleusercontent\.com|ggpht\.com|gravatar\.com/i.test(String(url || ''));
+  }
+
+  function storedCustomPhoto() {
+    try { return localStorage.getItem('rh_photo_custom') || ''; } catch (e) { return ''; }
+  }
+
+  function rememberCustomPhoto(url) {
+    if (!url || isAuthDefaultPhoto(url)) return;
+    try { localStorage.setItem('rh_photo_custom', url); } catch (e) {}
+  }
+
+  function pickPhotoURL(data, user) {
+    const cache = cachedAuth();
+    const fromDoc = data && data.photoURL ? data.photoURL : '';
+    const fromStored = storedCustomPhoto();
+    const fromCache = cache.photoURL || '';
+    const fromAuth = user && user.photoURL ? user.photoURL : '';
+    if (fromDoc && !isAuthDefaultPhoto(fromDoc)) {
+      rememberCustomPhoto(fromDoc);
+      return fromDoc;
+    }
+    if (fromStored && !isAuthDefaultPhoto(fromStored)) return fromStored;
+    if (fromCache && !isAuthDefaultPhoto(fromCache)) {
+      rememberCustomPhoto(fromCache);
+      return fromCache;
+    }
+    return fromDoc || fromStored || fromCache || fromAuth || '';
+  }
+
   function updateAvatar(photoURL, user) {
     const avatar = document.getElementById('navUserAvatar');
     const img = document.getElementById('navUserImg');
@@ -327,10 +361,21 @@
 
     if (!avatar) return;
 
+    const showing = (img && img.getAttribute('src')) || '';
+    if (photoURL && isAuthDefaultPhoto(photoURL) && showing && !isAuthDefaultPhoto(showing)) {
+      photoURL = showing;
+    }
+
     if (photoURL) {
-      if (img) { img.src = photoURL; img.style.display = 'block'; }
+      if (img) {
+        if (img.getAttribute('src') !== photoURL) img.src = photoURL;
+        img.style.display = 'block';
+      }
       if (initial) initial.style.display = 'none';
-      if (profileImg) { profileImg.src = photoURL; profileImg.style.display = 'block'; }
+      if (profileImg) {
+        if (profileImg.getAttribute('src') !== photoURL) profileImg.src = photoURL;
+        profileImg.style.display = 'block';
+      }
       if (profileInitial) profileInitial.style.display = 'none';
     } else {
       if (img) { img.removeAttribute('src'); img.style.display = 'none'; }
@@ -402,7 +447,7 @@
     }
     if (adminBtn) adminBtn.hidden = !currentIsAdmin;
 
-    updateAvatar(data?.photoURL || user?.photoURL || cache.photoURL || '', user);
+    updateAvatar(pickPhotoURL(data, user), user);
   }
 
   async function checkAdmin(user) {
@@ -444,7 +489,7 @@
         localStorage.setItem('rh_user_cache', JSON.stringify({
           ...cached,
           displayName: currentUserData.name || user.displayName || '',
-          photoURL: currentUserData.photoURL || user.photoURL || '',
+          photoURL: pickPhotoURL(currentUserData, user),
           balance: dollar(currentUserData.credit || 0),
           credit_raw: currentUserData.credit || 0,
           cache_ts: Date.now()
@@ -637,6 +682,7 @@
       e.stopPropagation();
       localStorage.removeItem('rabbiLandingPopupSeen');
       localStorage.removeItem('rh_user_cache');
+      localStorage.removeItem('rh_photo_custom');
       sessionStorage.setItem('rabbiShowLandingPopup', '1');
       document.documentElement.classList.remove('rh-authed');
       document.documentElement.classList.add('rh-guest');
@@ -721,7 +767,7 @@
     if (nameInput) nameInput.value = currentUserData?.name || currentUser?.displayName || cache.displayName || '';
     if (emailInput) emailInput.value = currentUser?.email || currentUserData?.email || cache.email || '';
     const preview = document.getElementById('settingsAvatarPreview');
-    const photo = currentUserData?.photoURL || currentUser?.photoURL || cache.photoURL || '';
+    const photo = pickPhotoURL(currentUserData, currentUser);
     if (preview) {
       const fileKeep = preview.querySelector('#settingsPhotoInput');
       preview.querySelectorAll('img').forEach(function (im) { im.remove(); });
@@ -1157,7 +1203,7 @@
       localStorage.setItem('rh_user_cache', JSON.stringify({
         ...cached,
         displayName: currentUserData.name || cached.displayName || '',
-        photoURL: currentUserData.photoURL || cached.photoURL || '',
+        photoURL: pickPhotoURL(currentUserData, currentUser),
         cache_ts: Date.now()
       }));
     } catch (e) {}
@@ -1192,6 +1238,7 @@
   async function saveProfilePhoto(dataUrl) {
     if (!dataUrl) return;
     try {
+      rememberCustomPhoto(dataUrl);
       await writeUserFields({ photoURL: dataUrl });
       updateAvatar(dataUrl, currentUser);
       window._pendingCroppedPhoto = null;
@@ -1458,7 +1505,7 @@
       openLogin: (action) => openLoginModal(action),
       openProfileSettings: (focus) => openProfileSettings(focus),
       initSettingsPage: () => initSettingsPage(),
-      signOut: () => { localStorage.removeItem('rabbiLandingPopupSeen'); localStorage.removeItem('rh_user_cache'); sessionStorage.setItem('rabbiShowLandingPopup','1'); return authApi.signOut(auth); }
+      signOut: () => { localStorage.removeItem('rabbiLandingPopupSeen'); localStorage.removeItem('rh_user_cache'); localStorage.removeItem('rh_photo_custom'); sessionStorage.setItem('rabbiShowLandingPopup','1'); return authApi.signOut(auth); }
     };
 
     onAuthStateChanged(auth, async (user) => {
@@ -1478,10 +1525,11 @@
             uid: user.uid,
             displayName: user.displayName || prev.displayName || '',
             email: user.email || prev.email || '',
-            photoURL: user.photoURL || prev.photoURL || '',
+            photoURL: pickPhotoURL({ photoURL: prev.photoURL || storedCustomPhoto() }, user),
             cache_ts: Date.now()
           }));
         } catch(e) {}
+        updateAvatar(pickPhotoURL({}, user), user);
         await ensureUserDoc(user);
         await checkAdmin(user);
         listenUserDoc(user);
