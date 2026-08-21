@@ -25,19 +25,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   let pendingImage = null;
   let thread = loadThread();
 
-  function isSmallTalk(text) {
-    const t = String(text || '').trim().toLowerCase()
-      .replace(/[।!?,.]+/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!t || t.length > 48) return false;
-    return /^(hi|hello|hey|yo|salam|assalamu alaikum|as-salamu alaikum|assalamualaikum|walaikum|kemon acho|kemon aso|kemon achho|ki khobor|ki obostha|what's up|whats up|sup|how are you|how r u)$/i.test(t)
-      || /কেমন আছ|কেমন আছো|কি খবর|কী খবর|আসসালামু|সালাম/.test(text);
-  }
-  function smallTalkReply() {
-    const name = firstName();
-    const hi = name ? name + ', ' : '';
-    return 'আলহামদুলিল্লাহ ' + hi + 'ভালো আছি — আরও ভালো থাকব যদি আমাদের ওয়েবসাইট থেকে একটু অর্ডার করেন তো! বলুন, কী লাগবে?';
-  }
-
   function loadThread() {
     try {
       const raw = JSON.parse(localStorage.getItem(STORE) || 'null');
@@ -680,11 +667,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         }
       }
     } catch (e) {}
-    if (!image && isSmallTalk(msg)) {
-      paintMessage({ role: 'admin', text: smallTalkReply(msg), time: nowStr() }, true);
-      refreshShortcutsAfter(msg);
-      return;
-    }
     askGemini(msg, image);
   }
 
