@@ -203,7 +203,7 @@
           cd = document.createElement('link');
           cd.id = 'rh-cta-dark-link';
           cd.rel = 'stylesheet';
-          cd.href = '/css/cta-dark.css?v=6';
+          cd.href = '/css/cta-dark.css?v=7';
         }
         if (cd.parentNode !== host) host.appendChild(cd);
         if (!document.getElementById('rh-cta-inline')) {
