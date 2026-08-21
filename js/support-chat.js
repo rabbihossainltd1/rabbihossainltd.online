@@ -29,16 +29,22 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     try {
       const raw = JSON.parse(localStorage.getItem(STORE) || 'null');
       if (!raw || raw.solved || !Array.isArray(raw.messages)) {
-        return { messages: [], history: [], started: false };
+        return emptyThread();
       }
       return {
         messages: raw.messages.slice(-80),
         history: Array.isArray(raw.history) ? raw.history.slice(-16) : [],
-        started: !!raw.started
+        started: !!raw.started,
+        topic: raw.topic || '',
+        homeShown: !!raw.homeShown
       };
     } catch (e) {
-      return { messages: [], history: [], started: false };
+      return emptyThread();
     }
+  }
+
+  function emptyThread() {
+    return { messages: [], history: [], started: false, topic: '', homeShown: false };
   }
 
   function saveThread() {
@@ -53,6 +59,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         messages: slim,
         history: thread.history.slice(-16),
         started: thread.started,
+        topic: thread.topic || '',
+        homeShown: !!thread.homeShown,
         solved: false,
         ts: Date.now()
       }));
@@ -63,6 +71,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
           messages: noImg,
           history: thread.history.slice(-16),
           started: thread.started,
+          topic: thread.topic || '',
+          homeShown: !!thread.homeShown,
           solved: false,
           ts: Date.now()
         }));
@@ -71,7 +81,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   }
 
   function clearThread() {
-    thread = { messages: [], history: [], started: false };
+    thread = emptyThread();
     try { localStorage.removeItem(STORE); } catch (e) {}
   }
 
@@ -284,7 +294,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   function restoreMessages() {
     msgsEl.innerHTML = '';
     thread.messages.forEach(m => paintMessage(m, false));
-    if (thread.started) showShortcuts(false);
   }
 
   const PRODUCTS = [
@@ -362,6 +371,9 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     const name = firstName();
     const hi = name ? name + ', ' : '';
     const t = String(text || '').toLowerCase();
+    if (/ডেলিভারি|delivery|কতক্ষণ|কত খনে|কতক্ষনে/.test(t) && hits.length) {
+      return hi + deliveryLine(hits[0]);
+    }
     if (/ক্রেডিট|credit|wallet|ওয়ালেট|বিকাশ|নগদ|রকেট|টাকা যোগ|add credit/.test(t)) {
       return hi + 'ওয়ালেটে ক্রেডিট যোগ করতে https://rabbihossainltd.online/add-credit/ খুলুন। ডলার অ্যামাউন্ট (কমপক্ষে $1) লিখে Continue to Payment চাপুন। SPV অটো পেমেন্টে বিকাশ/নগদ/রকেট দিয়ে পে করলে ক্রেডিট কয়েক সেকেন্ডে যোগ হয়। ম্যানুয়াল TxID লাগে না। রেট সাধারণত $1 = ৳125।';
     }
@@ -418,39 +430,129 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     renderProductCards(hits, true);
   }
 
-  function showShortcuts(afterReply) {
+  function productById(id) {
+    return PRODUCTS.find(p => p.id === id) || null;
+  }
+
+  function detectTopic(text) {
+    const t = String(text || '').toLowerCase();
+    const hits = matchProducts(t);
+    if (hits.length) return hits[0].id;
+    if (/ক্রেডিট|credit|wallet|ওয়ালেট|বিকাশ|নগদ|রকেট|add credit/.test(t)) return 'credit';
+    if (/অর্ডার কোথায়|order status|স্ট্যাটাস|ট্র্যাক/.test(t)) return 'order';
+    return thread.topic || '';
+  }
+
+  function deliveryLine(p) {
+    if (!p) return 'পেমেন্ট কনফার্ম হলে সাধারণত কয়েক মিনিট থেকে কয়েক ঘণ্টার মধ্যে ডেলিভারি হয়।';
+    if (p.serviceId === 'ff') return p.title + ' UID চেক করে পে করলে সাধারণত কয়েক মিনিটের মধ্যে অ্যাকাউন্টে যায়।';
+    if (p.serviceId === 'card') return 'ভার্চুয়াল কার্ড সাধারণত দ্রুত; ফিজিক্যাল কার্ডে শিপিং সময় লাগে।';
+    if (p.serviceId === 'meta') return 'মেটা ভেরিফাইডে NID/পাসপোর্ট লাগতে পারে — প্রসেস কয়েক ঘণ্টা থেকে কয়েক দিন।';
+    if (p.serviceId === 'webDev' || p.serviceId === 'android' || p.serviceId === 'security') {
+      return 'কাস্টম কাজ, সময় প্রজেক্ট অনুযায়ী। অর্ডারের পর আপডেট দেওয়া হয়।';
+    }
+    if (/^ff/i.test(String(p.serviceId || '')) || /panel/i.test(p.title)) {
+      return p.title + ' কী/সেটআপ সাধারণত ইমেইলে দ্রুত যায়।';
+    }
+    return p.title + ' সাধারণত পেমেন্টের পর ইমেইলে কয়েক মিনিট থেকে কয়েক ঘণ্টার মধ্যে অ্যাক্টিভ হয়।';
+  }
+
+  function removeShortcuts() {
     document.getElementById('floatQuickBtns')?.remove();
+  }
+
+  function paintShortcutRow(items) {
+    removeShortcuts();
+    if (!items || !items.length) return;
     const row = document.createElement('div');
     row.className = 'float-quick-btns';
     row.id = 'floatQuickBtns';
-    const items = afterReply
-      ? [
-          { label: 'আরও সাহায্য চাই', text: 'আরও একটু সাহায্য দরকার' },
-          { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
-        ]
-      : [
-          { label: 'অর্ডার কোথায়?', text: 'আমার অর্ডারের আপডেট জানতে চাই' },
-          { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব? অটো পেমেন্ট কীভাবে কাজ করে?' },
-          { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' },
-          { label: 'হোয়াটসঅ্যাপে কথা বলব', href: 'https://wa.me/8801731410341' }
-        ];
     items.forEach(item => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'float-quick-btn';
       b.textContent = item.label;
       b.addEventListener('click', () => {
-        document.getElementById('floatQuickBtns')?.remove();
-        if (item.href) {
-          window.open(item.href, '_blank', 'noopener');
+        removeShortcuts();
+        if (item.action === 'cart' && item.product) {
+          const r = addProductToCart(item.product);
+          if (r && r.ok) {
+            paintMessage({
+              role: 'admin',
+              text: r.title + ' কার্টে যোগ হয়েছে। কার্ট খুলে প্ল্যান বেছে নিয়ে পে করুন: https://rabbihossainltd.online/cart/',
+              time: nowStr()
+            }, true);
+            renderProductCards([item.product], true);
+            showContextShortcuts(item.product.id);
+          } else {
+            sendText(item.product.title + ' কার্টে যোগ করুন');
+          }
           return;
         }
-        sendText(item.text);
+        if (item.href) {
+          if (item.href.indexOf('http') === 0) window.open(item.href, '_blank', 'noopener');
+          else window.location.href = item.href;
+          return;
+        }
+        if (item.text) sendText(item.text);
       });
       row.appendChild(b);
     });
     msgsEl.appendChild(row);
     msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function homeShortcuts() {
+    return [
+      { label: 'অর্ডার কোথায়?', text: 'আমার অর্ডারের আপডেট জানতে চাই' },
+      { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব? অটো পেমেন্ট কীভাবে কাজ করে?' },
+      { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' },
+      { label: 'হোয়াটসঅ্যাপে কথা বলব', href: 'https://wa.me/8801731410341' }
+    ];
+  }
+
+  function contextItems(topic) {
+    const p = productById(topic);
+    if (p) {
+      return [
+        { label: p.title + ' কার্টে যোগ করুন', action: 'cart', product: p },
+        { label: 'কতক্ষণে ডেলিভারি?', text: p.title + ' অর্ডার করলে কতক্ষণে ডেলিভারি হবে?' },
+        { label: 'এখনই অর্ডার', href: p.href },
+        { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
+      ];
+    }
+    if (topic === 'credit') {
+      return [
+        { label: 'ক্রেডিট যোগ করুন', href: '/add-credit/' },
+        { label: 'রেট কত?', text: 'ওয়ালেট ক্রেডিটের রেট কত? অটো পেমেন্ট কীভাবে কাজ করে?' },
+        { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
+      ];
+    }
+    if (topic === 'order') {
+      return [
+        { label: 'হোয়াটসঅ্যাপে জানাব', href: 'https://wa.me/8801731410341' }
+      ];
+    }
+    return [];
+  }
+
+  function showHomeShortcuts() {
+    if (thread.homeShown) return;
+    thread.homeShown = true;
+    saveThread();
+    paintShortcutRow(homeShortcuts());
+  }
+
+  function showContextShortcuts(topic) {
+    thread.topic = topic || thread.topic || '';
+    saveThread();
+    paintShortcutRow(contextItems(thread.topic));
+  }
+
+  function refreshShortcutsAfter(text) {
+    const topic = detectTopic(text);
+    if (topic) showContextShortcuts(topic);
+    else removeShortcuts();
   }
 
   async function greetIfNeeded() {
@@ -462,7 +564,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     paintMessage({ role: 'admin', text: hello, time: nowStr() }, true);
     thread.started = true;
     saveThread();
-    showShortcuts(false);
+    showHomeShortcuts();
   }
 
   async function askGemini(text, image) {
@@ -500,12 +602,12 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       thread.history.push({ role: 'model', text: reply });
       saveThread();
       showProductCards((text || '') + ' ' + reply);
-      showShortcuts(true);
+      refreshShortcutsAfter((text || '') + ' ' + reply);
     } catch (err) {
       removeTyping();
       const fallback = localReply(text) || 'সংযোগ পাওয়া যায়নি। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
       paintMessage({ role: 'admin', text: fallback, time: nowStr() }, true);
-      showShortcuts(true);
+      refreshShortcutsAfter(text);
     } finally {
       geminiBusy = false;
       if (inputEl) inputEl.disabled = false;
@@ -517,6 +619,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     const msg = String(text || '').trim();
     const image = pendingImage;
     if (!msg && !image) return;
+    removeShortcuts();
     clearPendingImage();
     paintMessage({ role: 'user', text: msg, image: image || '', time: nowStr() }, true);
     thread.started = true;
@@ -568,9 +671,11 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     if (iconClose) iconClose.style.display = '';
     unreadCount = 0;
     if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
-    if (!msgsEl.children.length && thread.messages.length) restoreMessages();
+    if (!msgsEl.querySelector('.float-msg') && thread.messages.length) restoreMessages();
+    else removeShortcuts();
     if (!thread.started) greetIfNeeded();
-    else msgsEl.scrollTop = msgsEl.scrollHeight;
+    else if (thread.topic) showContextShortcuts(thread.topic);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
     if (inputEl) setTimeout(() => inputEl.focus(), 60);
   }
 
