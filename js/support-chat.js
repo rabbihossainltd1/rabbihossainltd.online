@@ -10,7 +10,9 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   // Production uses Render. Local/Arena preview uses the same-origin test route
   // so the updated backend can be verified before either repository is pushed.
   const BACKEND = PREVIEW_HOST ? '' : 'https://rabbi-backend-vlr7.onrender.com';
-  const STORE = 'rh_cs_thread';
+  // New thread namespace clears old cached conversations that introduced the
+  // assistant as "RH Support" before the Samiya identity was added.
+  const STORE = 'rh_cs_thread_v2';
   const widget = document.getElementById('floatChatWidget');
   const winEl = document.getElementById('floatChatWindow');
   const closeBtn = document.getElementById('floatChatClose');
@@ -588,8 +590,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     if (thread.started) return;
     const name = firstName();
     const hello = name
-      ? `আসসালামু আলাইকুম ${name}, স্বাগতম। আমি RH Support। কীভাবে সাহায্য করতে পারি?`
-      : 'আসসালামু আলাইকুম, স্বাগতম। আমি RH Support। কীভাবে সাহায্য করতে পারি?';
+      ? `আসসালামু আলাইকুম ${name}, স্বাগতম। আমি সামিয়া—আপনার ডিজিটাল সহকারী। বলুন, আজ কী নিয়ে উদ্ধার অভিযানে নামব?`
+      : 'আসসালামু আলাইকুম, স্বাগতম। আমি সামিয়া—আপনার ডিজিটাল সহকারী। বলুন, আজ কী নিয়ে উদ্ধার অভিযানে নামব?';
     paintMessage({ role: 'admin', text: hello, time: nowStr() }, true);
     thread.started = true;
     saveThread();
