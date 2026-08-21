@@ -1089,23 +1089,36 @@ html[data-theme="light"] .support-ticket-item{background:#fff!important;border-c
   background: none !important;
   border: none !important;
   box-shadow: none !important;
-  color: #f2f2ef !important;
   padding: 10px 0 !important;
   text-align: left !important;
   font-weight: 750 !important;
   font-size: .86rem !important;
   border-radius: 0 !important;
 }
+.service-modal-status.error,
+#modalStatus.error,
+#couponMsg.error,
+.settings-message.error,
+.wallet-message.error,
+.spv-auto-msg.error,
+#formStatus.status-error,
+.i4g-load-error,
+#i4g-player-status.error,
+.cart-msg.error,
 .auth-error {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
-  color: #f2f2ef !important;
+  color: #ff4d4d !important;
   padding: 10px 0 !important;
   text-align: left !important;
   font-weight: 750 !important;
   font-size: .86rem !important;
   border-radius: 0 !important;
+}
+.service-modal-status.info,
+#modalStatus.info {
+  color: #f2f2ef !important;
 }
 .i4g-retry-btn {
   border: 1px solid rgba(255,255,255,.28) !important;

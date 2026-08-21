@@ -368,8 +368,8 @@
       html[data-theme="light"] #i4g-ff-info-btn{background:#fff;color:#111;border:1px solid #111}
       #i4g-ff-info-btn.show{display:flex}
       #i4g-player-status{font-size:.86rem;font-weight:750;display:none;padding:10px 0 0;border-radius:0;background:none;border:none}
-      #i4g-player-status.error{color:#f2f2ef;display:block!important;background:none;border:none}
-      html[data-theme="light"] #i4g-player-status.error{color:#111}
+      #i4g-player-status.error{color:#ff4d4d;display:block!important;background:none;border:none}
+      html[data-theme="light"] #i4g-player-status.error{color:#dc2626}
       #i4g-player-status.ok{color:#3ddc84;display:block}
       #i4g-player-card{display:none;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#161616;color:#f5f5f3}
       #i4g-player-card.on{display:block}

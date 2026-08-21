@@ -477,7 +477,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   line-height: 1.5;
   background: none;
   border: none;
-  color: #f2f2ef;
+  color: #ff4d4d;
 }
 @keyframes statusFadeIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -973,7 +973,13 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
   border: none;
   color: #3ddc84; display: block;
 }
-.service-modal-status.error,
+.service-modal-status.error {
+  background: none;
+  border: none;
+  color: #ff4d4d;
+  display: block !important;
+  font-weight: 750;
+}
 .service-modal-status.info {
   background: none;
   border: none;

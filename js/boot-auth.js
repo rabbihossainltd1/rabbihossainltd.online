@@ -133,7 +133,7 @@
         var link = existing || document.createElement('link');
         link.id = 'rh-light-theme-link';
         link.rel = 'stylesheet';
-        link.href = '/css/light-theme.css?v=14';
+        link.href = '/css/light-theme.css?v=15';
         if (link.parentNode !== host) host.appendChild(link);
         var cta = document.getElementById('rh-cta-light-link');
         if (!cta) {
