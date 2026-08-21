@@ -367,9 +367,9 @@
       #i4g-ff-info-btn{display:none;flex:0 0 48px;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:50%!important;font-weight:900;font-size:1.05rem;cursor:pointer;align-items:center;justify-content:center;line-height:1;overflow:hidden}
       html[data-theme="light"] #i4g-ff-info-btn{background:#fff;color:#111;border:1px solid #111}
       #i4g-ff-info-btn.show{display:flex}
-      #i4g-player-status{font-size:.8rem;font-weight:650;display:none;padding:8px 2px 0;border-radius:0;background:none;border:none}
-      #i4g-player-status.error{color:#b5b5b1;display:block;background:none;border:none}
-      html[data-theme="light"] #i4g-player-status.error{color:#4a4a48}
+      #i4g-player-status{font-size:.86rem;font-weight:750;display:none;padding:10px 0 0;border-radius:0;background:none;border:none}
+      #i4g-player-status.error{color:#f2f2ef;display:block!important;background:none;border:none}
+      html[data-theme="light"] #i4g-player-status.error{color:#111}
       #i4g-player-status.ok{color:#3ddc84;display:block}
       #i4g-player-card{display:none;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#161616;color:#f5f5f3}
       #i4g-player-card.on{display:block}

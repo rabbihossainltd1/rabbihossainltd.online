@@ -470,14 +470,14 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 /* ── Error message ── */
 #formStatus.status-error {
   display: block;
-  padding: 8px 2px;
+  padding: 10px 0;
   border-radius: 0;
-  font-size: 0.875rem;
-  font-weight: 650;
+  font-size: 0.86rem;
+  font-weight: 750;
   line-height: 1.5;
   background: none;
   border: none;
-  color: #b5b5b1;
+  color: #f2f2ef;
 }
 @keyframes statusFadeIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -963,19 +963,23 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 }
 .service-modal-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 .service-modal-status {
-  margin-top: 14px; padding: 14px 18px;
-  border-radius: var(--radius-sm); font-size: 0.875rem;
-  display: none; text-align: center;
+  margin-top: 10px; padding: 10px 0;
+  border-radius: 0; font-size: 0.86rem;
+  display: none; text-align: left;
+  background: none; border: none; box-shadow: none;
 }
 .service-modal-status.success {
-  background: rgba(255, 255, 255,0.08);
-  border: 1px solid rgba(255, 255, 255,0.25);
-  color: #ababa8; display: block;
+  background: none;
+  border: none;
+  color: #3ddc84; display: block;
 }
-.service-modal-status.error {
-  background: rgba(255,80,80,0.08);
-  border: 1px solid rgba(255,80,80,0.25);
-  color: #ff8080; display: block;
+.service-modal-status.error,
+.service-modal-status.info {
+  background: none;
+  border: none;
+  color: #f2f2ef;
+  display: block !important;
+  font-weight: 750;
 }
 
 /* ============================================================

@@ -1043,7 +1043,9 @@ html[data-theme="light"] .nav-links.open a.active span {
 }
 
 html[data-theme="light"] .service-modal-status.error,
+html[data-theme="light"] .service-modal-status.info,
 html[data-theme="light"] #modalStatus.error,
+html[data-theme="light"] #modalStatus.info,
 html[data-theme="light"] #couponMsg.error,
 html[data-theme="light"] .auth-error,
 html[data-theme="light"] .settings-message.error,
@@ -1056,13 +1058,27 @@ html[data-theme="light"] .cart-msg.error {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
-  color: #4a4a48 !important;
-  padding: 8px 2px !important;
+  color: #111111 !important;
+  padding: 10px 0 !important;
   text-align: left !important;
+}
+html[data-theme="light"] .service-modal-status.error,
+html[data-theme="light"] .service-modal-status.info,
+html[data-theme="light"] #modalStatus.error,
+html[data-theme="light"] #modalStatus.info,
+html[data-theme="light"] #couponMsg.error,
+html[data-theme="light"] .settings-message.error,
+html[data-theme="light"] .wallet-message.error,
+html[data-theme="light"] .spv-auto-msg.error,
+html[data-theme="light"] #formStatus.status-error,
+html[data-theme="light"] .i4g-load-error,
+html[data-theme="light"] #i4g-player-status.error,
+html[data-theme="light"] .cart-msg.error {
+  display: block !important;
 }
 html[data-theme="light"] .i4g-retry-btn {
   border: 1px solid #111 !important;
   background: #fff !important;
   color: #111 !important;
 }
-html[data-theme="light"] #i4g-player-status.error { color: #4a4a48 !important; }
+html[data-theme="light"] #i4g-player-status.error { color: #111111 !important; }

@@ -1074,9 +1074,10 @@ html[data-theme="light"] .support-ticket-item{background:#fff!important;border-c
 
 /* Form/validation errors: no red "alert" boxes — plain text only */
 .service-modal-status.error,
+.service-modal-status.info,
 #modalStatus.error,
+#modalStatus.info,
 #couponMsg.error,
-.auth-error,
 .settings-message.error,
 .wallet-message.error,
 .spv-auto-msg.error,
@@ -1084,13 +1085,26 @@ html[data-theme="light"] .support-ticket-item{background:#fff!important;border-c
 .i4g-load-error,
 #i4g-player-status.error,
 .cart-msg.error {
+  display: block !important;
   background: none !important;
   border: none !important;
   box-shadow: none !important;
-  color: #b5b5b1 !important;
-  padding: 8px 2px !important;
+  color: #f2f2ef !important;
+  padding: 10px 0 !important;
   text-align: left !important;
-  font-weight: 650 !important;
+  font-weight: 750 !important;
+  font-size: .86rem !important;
+  border-radius: 0 !important;
+}
+.auth-error {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #f2f2ef !important;
+  padding: 10px 0 !important;
+  text-align: left !important;
+  font-weight: 750 !important;
+  font-size: .86rem !important;
   border-radius: 0 !important;
 }
 .i4g-retry-btn {

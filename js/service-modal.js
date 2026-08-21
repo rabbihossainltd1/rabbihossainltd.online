@@ -305,9 +305,14 @@
   }
 
   function showStatus(message, type) {
-    if (!statusEl) return;
-    statusEl.className = 'service-modal-status ' + (type || '');
-    statusEl.textContent = message || '';
+    const el = document.getElementById('modalStatus') || statusEl;
+    if (!el) return;
+    el.className = 'service-modal-status ' + (type || '');
+    el.textContent = message || '';
+    el.style.display = message ? 'block' : 'none';
+    if (message && type === 'error') {
+      try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    }
   }
 
   function ensureServiceSuccessStyle() {
