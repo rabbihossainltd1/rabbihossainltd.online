@@ -154,7 +154,12 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         'html[data-theme="light"] #floatChatInputArea{border-top:1px solid rgba(0,0,0,.1)}' +
         '#floatQuickSlot{display:none;flex-direction:column;gap:7px;padding:4px 12px 8px;flex-shrink:0}' +
         '#floatQuickSlot.on{display:flex}' +
-        '#floatQuickSlot .float-quick-btns{margin:0;align-self:stretch}';
+        '#floatQuickSlot .float-quick-btns{margin:0;align-self:stretch}' +
+        '#floatChatWidget{bottom:12px!important;right:16px!important}' +
+        'body.has-bottom-nav #floatChatWidget{bottom:72px!important;right:12px!important}' +
+        '#floatChatWindow{max-height:calc(100dvh - var(--nav-h, 70px) - 88px)!important}' +
+        'body.has-bottom-nav #floatChatWindow{max-height:calc(100dvh - var(--nav-h, 70px) - 152px)!important}' +
+        '#floatChatMessages{max-height:none!important;min-height:120px}';
       document.head.appendChild(css);
     }
     const header = document.getElementById('floatChatHeader');
@@ -425,7 +430,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       const a = document.createElement('a');
       a.className = 'float-prod-card';
       a.href = p.href;
-      a.innerHTML = '<b>' + p.title + '</b><small>' + p.price + '</small><small>' + p.perk + '</small><small>এক ক্লিকে অর্ডার →</small>';
+      a.innerHTML = '<b>' + p.title + '</b><small>' + p.price + '</small><small>' + p.perk + '</small>';
       wrap.appendChild(a);
     });
     msgsEl.appendChild(wrap);
@@ -488,6 +493,14 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     const row = document.createElement('div');
     row.className = 'float-quick-btns';
     row.id = 'floatQuickBtns';
+    items = items.filter(item => {
+      const label = String(item && item.label || '');
+      const href = String(item && item.href || '');
+      if (/হোয়াটস|whatsapp/i.test(label) || /wa\.me/i.test(href)) return false;
+      if (/এখনই অর্ডার|এক ক্লিকে অর্ডার/i.test(label)) return false;
+      return true;
+    });
+    if (!items.length) return;
     items.forEach(item => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -525,8 +538,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     return [
       { label: 'অর্ডার কোথায়?', text: 'আমার অর্ডারের আপডেট জানতে চাই' },
       { label: 'ক্রেডিট যোগ করব কীভাবে?', text: 'ওয়ালেটে ক্রেডিট কীভাবে যোগ করব? অটো পেমেন্ট কীভাবে কাজ করে?' },
-      { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' },
-      { label: 'হোয়াটসঅ্যাপে কথা বলব', href: 'https://wa.me/8801731410341' }
+      { label: 'সার্ভিস নিতে চাই', text: 'একটা সার্ভিস নিতে চাই, কীভাবে শুরু করব?' }
     ];
   }
 
@@ -542,11 +554,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       return [
         { label: 'ক্রেডিট যোগ করুন', href: '/add-credit/' },
         { label: 'রেট কত?', text: 'ওয়ালেট ক্রেডিটের রেট কত? অটো পেমেন্ট কীভাবে কাজ করে?' }
-      ];
-    }
-    if (topic === 'order') {
-      return [
-        { label: 'হোয়াটসঅ্যাপে জানাব', href: 'https://wa.me/8801731410341' }
       ];
     }
     return [];
