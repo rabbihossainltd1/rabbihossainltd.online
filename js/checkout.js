@@ -112,13 +112,22 @@
       text.innerHTML = html;
       btn.style.display = 'grid';
       btn.hidden = false;
-      btn.onclick = function () {
+      function toggleInfo(e) {
+        if (e && e.target && e.target.closest && e.target.closest('a')) return;
         infoOpen = !infoOpen;
         panel.classList.toggle('open', infoOpen);
         btn.classList.toggle('open', infoOpen);
         btn.setAttribute('aria-expanded', infoOpen ? 'true' : 'false');
         btn.setAttribute('aria-label', infoOpen ? 'Hide product info' : 'Product info');
-      };
+      }
+      btn.onclick = toggleInfo;
+      panel.onclick = toggleInfo;
+      const title = $('checkoutTitle');
+      if (title && !title._infoWired) {
+        title._infoWired = true;
+        title.style.cursor = 'pointer';
+        title.addEventListener('click', toggleInfo);
+      }
     } else {
       btn.style.display = 'none';
     }

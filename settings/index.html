@@ -121,10 +121,10 @@
         <div class="settings-avatar-row">
           <div class="settings-avatar-wrap" id="settingsAvatarWrap">
             <div class="settings-avatar-preview" id="settingsAvatarPreview">U</div>
-            <button class="settings-avatar-pencil" id="settingsAvatarPencil" type="button" aria-label="Change picture">
+            <label class="settings-avatar-pencil" id="settingsAvatarPencil" for="settingsPhotoInput" aria-label="Change picture">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            </button>
-            <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
+            </label>
+            <input type="file" id="settingsPhotoInput" class="settings-photo-file" accept="image/*" />
           </div>
         </div>
 
@@ -219,7 +219,7 @@
 
   <script src="/js/lang.js" defer></script>
   <script src="/js/main.js" defer></script>
-  <script src="/js/auth.js" defer></script>
+  <script src="/js/auth.js?v=75" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js').catch(function() {}); });

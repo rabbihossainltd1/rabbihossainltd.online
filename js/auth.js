@@ -794,7 +794,8 @@
 
     // Photo file input → crop modal
     window._pendingCroppedPhoto = null;
-    const fileInput = document.getElementById('settingsPhotoInput');
+    const fileInput = document.querySelector('#settingsAvatarWrap input[type="file"]')
+      || document.getElementById('settingsPhotoInput');
     if (fileInput) {
       fileInput.value = '';
       if (!fileInput.dataset.rhBound) {
@@ -1086,15 +1087,10 @@
     }
     function pickPhotoFile() {
       if (!(page && page.classList.contains('is-editing'))) return;
-      const fileInput = document.getElementById('settingsPhotoInput');
+      const fileInput = document.querySelector('#settingsAvatarWrap input[type="file"]')
+        || document.querySelector('.settings-page #settingsPhotoInput');
       if (fileInput) fileInput.click();
     }
-    const pencilBtn = document.getElementById('settingsAvatarPencil');
-    if (pencilBtn) pencilBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      pickPhotoFile();
-    });
     const avatarPreview = document.getElementById('settingsAvatarPreview');
     if (avatarPreview) avatarPreview.addEventListener('click', function (e) {
       e.preventDefault();
@@ -1117,11 +1113,8 @@
         if (e.key === 'Enter') { e.preventDefault(); nameInput.blur(); }
       });
     }
-    document.addEventListener('pointerdown', function (e) {
-      if (!page || !page.classList.contains('is-editing')) return;
-      if (e.target.closest('#settingsName') || e.target.closest('#settingsEditProfileBtn') || e.target.closest('#settingsAvatarWrap')) return;
-      saveProfileName();
-    });
+    /* Stay in edit mode until the Edit button is toggled off — do not
+       hide the pencil when tapping empty space. */
     function setPwOpen(on) {
       if (page) page.classList.toggle('is-pw-open', !!on);
       const panel = document.getElementById('settingsPwPanel');
@@ -1468,16 +1461,22 @@
         closeLoginModal();
         return;
       }
-      // Remember the page (and query) the visitor was on, so after logging in
-      // they land back exactly here instead of being dumped on the home page.
       try {
-        sessionStorage.setItem('rhReturnTo', location.pathname + location.search + location.hash);
+        const back = location.pathname + location.search + location.hash;
+        if (!document.body.classList.contains('login-page')) {
+          sessionStorage.setItem('rhReturnTo', back);
+          localStorage.setItem('rhReturnTo', back);
+        }
       } catch (e) {}
       _afterLoginAction = action || null;
       clearAuthError();
-      loginModal.classList.add('open');
-      loginModal.style.display = '';
-      document.body.style.overflow = 'hidden';
+      if (document.body.classList.contains('login-page')) {
+        loginModal.classList.add('open');
+        loginModal.style.display = 'flex';
+        document.body.style.overflow = '';
+        return;
+      }
+      window.location.assign('/login/');
     }
 
     function closeLoginModal() {
