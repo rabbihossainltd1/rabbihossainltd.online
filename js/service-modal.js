@@ -369,12 +369,13 @@
 
   function rhGoOrderSuccess(payload) {
     try { sessionStorage.setItem('rh_order_success', JSON.stringify(payload || {})); } catch (e) {}
-    window.location.href = '/order-success/';
+    window.location.replace('/order-success/');
   }
   window.rhGoOrderSuccess = rhGoOrderSuccess;
 
   function buildOrderSuccessPayload(result, amountUsd, extra) {
-    const details = (typeof collectFormData === 'function') ? (collectFormData() || {}) : {};
+    let details = {};
+    try { details = (typeof collectFormData === 'function') ? (collectFormData() || {}) : {}; } catch (e) { details = {}; }
     const usd = Number((result && result.amountUsd) || amountUsd || 0);
     const extraSafe = extra || {};
     return {
@@ -394,10 +395,12 @@
   }
 
   function showServiceSuccess(result, amountUsd) {
-    const overlay = document.getElementById('serviceModal');
-    if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-    const ov = document.getElementById('orderPlacedOverlay');
-    if (ov) ov.remove();
+    try {
+      const overlay = document.getElementById('serviceModal');
+      if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+      const ov = document.getElementById('orderPlacedOverlay');
+      if (ov) ov.remove();
+    } catch (e) {}
     rhGoOrderSuccess(buildOrderSuccessPayload(result, amountUsd));
   }
 

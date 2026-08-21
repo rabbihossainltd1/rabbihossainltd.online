@@ -19,6 +19,48 @@
 (function () {
   'use strict';
 
+  /* Kill the old order-success popup if a cached JS file still injects it. */
+  (function interceptOldOrderPopup() {
+    function hijack(node) {
+      if (!node) return;
+      var t = node.textContent || '';
+      if (
+        t.indexOf('Redirecting to My Orders') === -1 &&
+        t.indexOf('Your Order is Placed') === -1 &&
+        t.indexOf('View My Orders Now') === -1
+      ) return;
+      try {
+        sessionStorage.setItem('rh_order_success', JSON.stringify({ serviceName: 'Order', ts: Date.now() }));
+      } catch (e) {}
+      window.location.replace('/order-success/');
+    }
+    try {
+      var mo = new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          var nodes = muts[i].addedNodes;
+          for (var j = 0; j < nodes.length; j++) {
+            var n = nodes[j];
+            if (!n) continue;
+            if (n.id === 'orderPlacedOverlay') hijack(n);
+            else if (n.querySelector) {
+              var inner = n.querySelector('#orderPlacedOverlay');
+              if (inner) hijack(inner);
+            }
+          }
+        }
+      });
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  })();
+
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        regs.forEach(function (r) { try { r.update(); } catch (e) {} });
+      });
+    }
+  } catch (e) {}
+
   /* Keep Render from sleeping (15 min idle). Ping health every 10 min
      while a tab is open. GitHub Action also pings even if nobody is browsing. */
   (function keepRenderAwake() {
