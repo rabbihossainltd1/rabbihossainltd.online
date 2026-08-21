@@ -106,9 +106,11 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         '#floatChatSolved{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#e8e8e4;border-radius:999px;padding:6px 10px;font-size:.72rem;font-weight:800;cursor:pointer;font-family:inherit}' +
         '#floatChatSolved:hover{background:#fff;color:#111;border-color:#fff}' +
         'html[data-theme="light"] #floatChatSolved{background:#fff;color:#111;border:1px solid #111}' +
-        '#floatChatAttach{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#eee;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
-        '#floatChatAttach:hover{background:rgba(255,255,255,.14)}' +
-        '#floatChatAttach.has-file{border-color:#fff;background:#fff;color:#111}' +
+        '#floatChatAttach{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.34)!important;background:#161616!important;color:#f5f5f3!important;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
+        '#floatChatAttach svg{stroke:currentColor!important;color:#f5f5f3!important}' +
+        '#floatChatAttach:hover{background:#2a2a2a!important}' +
+        '#floatChatAttach.has-file{border-color:#fff!important;background:#fff!important;color:#111!important}' +
+        '#floatChatAttach.has-file svg{color:#111!important;stroke:currentColor!important}' +
         '.float-msg-img{display:block;max-width:220px;max-height:180px;border-radius:12px;margin-bottom:6px;object-fit:cover}' +
         '#floatAttachPreview{display:none;padding:0 12px 8px;align-items:center;gap:8px}' +
         '#floatAttachPreview.on{display:flex}' +
@@ -121,6 +123,11 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         '.float-prod-card:hover b,.float-prod-card:hover small{color:#111}' +
         '.float-prod-card b{display:block;font-size:.86rem;margin-bottom:3px}' +
         '.float-prod-card small{display:block;font-size:.74rem;line-height:1.45;opacity:1}' +
+        '.float-prod-actions{display:flex;gap:8px;margin-top:9px}' +
+        '.float-prod-cart,.float-prod-buy{flex:1;text-align:center;text-decoration:none;border-radius:10px;padding:8px 8px;font-size:.74rem;font-weight:800;cursor:pointer;font-family:inherit}' +
+        '.float-prod-cart{background:#161616;color:#f5f5f3;border:1px solid rgba(255,255,255,.34)}' +
+        '.float-prod-buy{background:#161616;color:#f5f5f3;border:1px solid rgba(255,255,255,.34)}' +
+        'html[data-theme="light"] .float-prod-cart,html[data-theme="light"] .float-prod-buy{background:#fff;color:#111;border:1px solid #111}' +
         'html[data-theme="light"] #floatChatWindow{background:#fff;border:1px solid #111}' +
         'html[data-theme="light"] #floatChatHeader{background:#f5f5f2;border-bottom:1px solid rgba(0,0,0,.12)}' +
         'html[data-theme="light"] #floatChatTitle{color:#111}' +
@@ -281,19 +288,19 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   }
 
   const PRODUCTS = [
-    { id: 'chatgpt', keys: ['chatgpt', 'জিপিটি', 'gpt'], title: 'ChatGPT', href: '/checkout/?service=chatgpt', price: 'Go $10 · Plus $20 · Pro $200', perk: 'GPT-4o, ছবি তৈরি, দ্রুত উত্তর' },
-    { id: 'gemini', keys: ['gemini', 'জেমিনি'], title: 'Gemini AI', href: '/checkout/?service=gemini', price: 'AI Pro $19.99 · Ultra $249.99', perk: 'Google-এর শক্তিশালী AI + 1TB স্টোরেজ' },
-    { id: 'netflix', keys: ['netflix', 'নেটফ্লিক্স'], title: 'Netflix', href: '/checkout/?service=netflix', price: '$2.99 থেকে $9.99', perk: 'অ্যাড ছাড়া মুভি ও সিরিজ' },
-    { id: 'canva', keys: ['canva', 'ক্যানভা'], title: 'Canva Pro', href: '/checkout/?service=canva', price: 'Pro $12.99/মাস', perk: 'প্রিমিয়াম টেমপ্লেট, ব্যাকগ্রাউন্ড রিমুভার' },
-    { id: 'youtube', keys: ['youtube', 'ইউটিউব'], title: 'YouTube Premium', href: '/checkout/?service=youtube', price: '$2.49 থেকে $6.99', perk: 'অ্যাড ফ্রি + ব্যাকগ্রাউন্ড প্লে' },
-    { id: 'capcut', keys: ['capcut', 'ক্যাপকাট'], title: 'CapCut Pro', href: '/checkout/?service=capcut', price: '$9.99/মাস', perk: 'ওয়াটারমার্ক ছাড়া ৪কে এডিট' },
-    { id: 'grok', keys: ['grok', 'গ্রক'], title: 'Grok AI', href: '/checkout/?service=grok', price: '$5 থেকে $20/মাস', perk: 'রিয়েল-টাইম এক্স/টুইটার ডেটা' },
-    { id: 'meta-verified', keys: ['meta', 'মেটা', 'verified', 'ভেরিফাই', 'blue tick', 'ব্লু টিক'], title: 'Meta Verified', href: '/checkout/?service=meta-verified', price: '$12 / ৳1,500', perk: 'ফেসবুক নীল টিক, বিশ্বাসযোগ্যতা' },
-    { id: 'visa-mastercard', keys: ['visa', 'mastercard', 'ভিসা', 'মাস্টারকার্ড', 'কার্ড'], title: 'Visa / Mastercard', href: '/checkout/?service=visa-mastercard', price: 'ভার্চুয়াল $12 থেকে', perk: 'আন্তর্জাতিক পেমেন্ট ও সাবস্ক্রিপশন' },
-    { id: 'free-fire-topup', keys: ['free fire', 'ফ্রি ফায়ার', 'diamond', 'ডায়মন্ড', 'topup', 'টপআপ', 'টপ-আপ', 'uid'], title: 'Free Fire Diamond', href: '/checkout/?service=free-fire-topup', price: 'লাইভ প্যাকেজ · UID টপ-আপ', perk: 'লগইন ছাড়াই সরাসরি UID-এ ডায়মন্ড' },
-    { id: 'ff-ios', keys: ['ios panel', 'iphone panel', 'আইফোন প্যানেল'], title: 'Free Fire iOS Panel', href: '/checkout/?service=ff-ios', price: '$5 থেকে $40', perk: 'জেলব্রেক ছাড়া আইফোন প্যানেল' },
-    { id: 'ff-drip', keys: ['drip', 'ড্রিপ'], title: 'FF Drip Panel', href: '/checkout/?service=ff-drip', price: '$0.90 থেকে $10', perk: 'রুটেড অ্যান্ড্রয়েড প্যানেল' },
-    { id: 'web-development', keys: ['website', 'ওয়েবসাইট', 'web development'], title: 'Website Development', href: '/checkout/?service=web-development', price: 'শুরু $50', perk: 'বিজনেস সাইট ও ল্যান্ডিং পেজ' }
+    { id: 'chatgpt', keys: ['chatgpt', 'জিপিটি', 'gpt'], title: 'ChatGPT', href: '/checkout/?service=chatgpt', price: 'Go $10 · Plus $20 · Pro $200', perk: 'GPT-4o, ছবি তৈরি, দ্রুত উত্তর', slug: 'chatgpt', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'chatgpt', plans: [{ k: 'go', label: 'Go · 1 Month', usd: 10 }, { k: 'plus', label: 'Plus · 1 Month', usd: 20 }, { k: 'pro', label: 'Pro · 1 Month', usd: 200 }] },
+    { id: 'gemini', keys: ['gemini', 'জেমিনি'], title: 'Gemini AI', href: '/checkout/?service=gemini', price: 'AI Pro $19.99 · Ultra $249.99', perk: 'Google-এর শক্তিশালী AI + 1TB স্টোরেজ', slug: 'gemini', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'gemini', plans: [{ k: 'pro', label: 'AI Pro · 1 Month', usd: 19.99 }, { k: 'ultra', label: 'AI Ultra · 1 Month', usd: 249.99 }] },
+    { id: 'netflix', keys: ['netflix', 'নেটফ্লিক্স'], title: 'Netflix', href: '/checkout/?service=netflix', price: '$2.99 থেকে $9.99', perk: 'অ্যাড ছাড়া মুভি ও সিরিজ', slug: 'netflix', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'netflix', plans: [{ k: 'mobile', label: 'Mobile · 1 Month', usd: 2.99 }, { k: 'basic', label: 'Basic · 1 Month', usd: 4.99 }, { k: 'standard', label: 'Standard · 1 Month', usd: 6.99 }, { k: 'premium', label: 'Premium · 1 Month', usd: 9.99 }] },
+    { id: 'canva', keys: ['canva', 'ক্যানভা'], title: 'Canva Pro', href: '/checkout/?service=canva', price: 'Pro $12.99/মাস', perk: 'প্রিমিয়াম টেমপ্লেট, ব্যাকগ্রাউন্ড রিমুভার', slug: 'canva', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'canva', plans: [{ k: 'pro', label: 'Pro · 1 Month', usd: 12.99 }] },
+    { id: 'youtube', keys: ['youtube', 'ইউটিউব'], title: 'YouTube Premium', href: '/checkout/?service=youtube', price: '$2.49 থেকে $6.99', perk: 'অ্যাড ফ্রি + ব্যাকগ্রাউন্ড প্লে', slug: 'youtube', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'youtube', plans: [{ k: 'individual', label: 'Premium Individual · 1 Month', usd: 3.99 }, { k: 'family', label: 'Premium Family · 1 Month', usd: 6.99 }, { k: 'student', label: 'Premium Student · 1 Month', usd: 2.49 }] },
+    { id: 'capcut', keys: ['capcut', 'ক্যাপকাট'], title: 'CapCut Pro', href: '/checkout/?service=capcut', price: '$9.99/মাস', perk: 'ওয়াটারমার্ক ছাড়া ৪কে এডিট', slug: 'capcut', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'capcut', plans: [{ k: 'pro', label: 'Pro · 1 Month', usd: 9.99 }] },
+    { id: 'grok', keys: ['grok', 'গ্রক'], title: 'Grok AI', href: '/checkout/?service=grok', price: '$5 থেকে $20/মাস', perk: 'রিয়েল-টাইম এক্স/টুইটার ডেটা', slug: 'grok', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'grok', plans: [{ k: 'basic', label: 'Grok Basic · 1 Month', usd: 5 }, { k: 'plus', label: 'Grok Plus · 1 Month', usd: 15 }, { k: 'premium', label: 'Grok Premium · 1 Month', usd: 20 }] },
+    { id: 'meta-verified', keys: ['meta', 'মেটা', 'verified', 'ভেরিফাই', 'blue tick', 'ব্লু টিক'], title: 'Meta Verified', href: '/checkout/?service=meta-verified', price: '$12 / ৳1,500', perk: 'ফেসবুক নীল টিক, বিশ্বাসযোগ্যতা', slug: 'meta-verified', serviceName: 'Facebook Meta Verified', serviceId: 'meta', amountUsd: 12 },
+    { id: 'visa-mastercard', keys: ['visa', 'mastercard', 'ভিসা', 'মাস্টারকার্ড', 'কার্ড'], title: 'Visa / Mastercard', href: '/checkout/?service=visa-mastercard', price: 'ভার্চুয়াল $12 থেকে', perk: 'আন্তর্জাতিক পেমেন্ট ও সাবস্ক্রিপশন', slug: 'visa-mastercard', serviceName: 'Visa / Mastercard', serviceId: 'card' },
+    { id: 'free-fire-topup', keys: ['free fire', 'ফ্রি ফায়ার', 'diamond', 'ডায়মন্ড', 'topup', 'টপআপ', 'টপ-আপ', 'uid'], title: 'Free Fire Diamond', href: '/checkout/?service=free-fire-topup', price: 'লাইভ প্যাকেজ · UID টপ-আপ', perk: 'লগইন ছাড়াই সরাসরি UID-এ ডায়মন্ড', slug: 'free-fire-topup', serviceName: 'Free Fire Diamond Top-up', serviceId: 'ff' },
+    { id: 'ff-ios', keys: ['ios panel', 'iphone panel', 'আইফোন প্যানেল'], title: 'Free Fire iOS Panel', href: '/checkout/?service=ff-ios', price: '$5 থেকে $40', perk: 'জেলব্রেক ছাড়া আইফোন প্যানেল', slug: 'ff-ios', serviceName: 'Free Fire iPhone Panel (iOS)', serviceId: 'ffIos' },
+    { id: 'ff-drip', keys: ['drip', 'ড্রিপ'], title: 'FF Drip Panel', href: '/checkout/?service=ff-drip', price: '$0.90 থেকে $10', perk: 'রুটেড অ্যান্ড্রয়েড প্যানেল', slug: 'ff-drip', serviceName: 'Free Fire Android Panel Drip Client (Root)', serviceId: 'ffDrip' },
+    { id: 'web-development', keys: ['website', 'ওয়েবসাইট', 'web development'], title: 'Website Development', href: '/checkout/?service=web-development', price: 'শুরু $50', perk: 'বিজনেস সাইট ও ল্যান্ডিং পেজ', slug: 'web-development', serviceName: 'Website Development', serviceId: 'webDev', amountUsd: 50 }
   ];
 
   function matchProducts(text) {
@@ -437,6 +444,24 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     paintMessage({ role: 'user', text: msg, image: image || '', time: nowStr() }, true);
     thread.started = true;
     saveThread();
+    if (msg && isCartIntent(msg)) {
+      const hits = matchProducts(msg);
+      if (hits.length) {
+        const added = [];
+        hits.forEach(p => {
+          const r = addProductToCart(p, msg);
+          if (r && r.ok) added.push(r.title);
+        });
+        if (added.length) {
+          paintMessage({
+            role: 'admin',
+            text: added.join(', ') + ' কার্টে যোগ হয়েছে। কার্ট খুলে প্ল্যান বেছে নিয়ে পে করুন: https://rabbihossainltd.online/cart/',
+            time: nowStr()
+          }, true);
+          renderProductCards(hits, true);
+        }
+      }
+    }
     askGemini(msg, image);
   }
 

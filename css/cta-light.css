@@ -22,6 +22,9 @@ html[data-theme="light"] .cx-pay-now,
 html[data-theme="light"] .cc-pay-now,
 html[data-theme="light"] #floatChatToggle,
 html[data-theme="light"] #floatChatSend,
+html[data-theme="light"] #floatChatAttach,
+html[data-theme="light"] .float-prod-cart,
+html[data-theme="light"] .float-prod-buy,
 html[data-theme="light"] .float-form-submit {
   background: #ffffff !important;
   background-image: none !important;
@@ -29,6 +32,7 @@ html[data-theme="light"] .float-form-submit {
   border: 1px solid #111111 !important;
 }
 html[data-theme="light"] #floatChatToggle svg,
+html[data-theme="light"] #floatChatAttach svg,
 html[data-theme="light"] .nav-cta,
 html[data-theme="light"] .home-svc-action {
   color: #111111 !important;

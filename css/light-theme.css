@@ -783,7 +783,9 @@ html[data-theme="light"] .float-form-input {
   border-color: rgba(0,0,0,.12) !important;
   color: #161616 !important;
 }
-html[data-theme="light"] #floatChatSend { background: #ffffff !important; color: #111111 !important; border: 1px solid #111111 !important; }
+html[data-theme="light"] #floatChatSend,
+html[data-theme="light"] #floatChatAttach { background: #ffffff !important; color: #111111 !important; border: 1px solid #111111 !important; }
+html[data-theme="light"] #floatChatAttach svg { color: #111111 !important; stroke: currentColor !important; }
 html[data-theme="light"] .float-msg-admin .float-msg-bubble {
   background: #f0f0ee !important;
   border-color: rgba(0,0,0,.10) !important;

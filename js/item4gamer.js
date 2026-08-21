@@ -89,6 +89,20 @@
     };
   }
 
+  const LS_PRODUCTS = 'rh_ff_products_v1';
+
+  function saveLocalProducts(products) {
+    try { localStorage.setItem(LS_PRODUCTS, JSON.stringify({ t: Date.now(), products })); } catch (e) {}
+  }
+  function loadLocalProducts() {
+    try {
+      const d = JSON.parse(localStorage.getItem(LS_PRODUCTS) || 'null');
+      if (!d || !Array.isArray(d.products) || !d.products.length) return [];
+      if (Date.now() - Number(d.t || 0) > 72 * 3600 * 1000) return [];
+      return d.products.filter(p => p && p.hasPrice && Number(p.amountUsd) > 0);
+    } catch (e) { return []; }
+  }
+
   /* ── Fetch products from backend cache (instant) ───────── */
   async function fetchProducts() {
     const url = `${BACKEND_BASE}/api/item4gamer/products?category_id=${FF_CATEGORY_ID}`;
@@ -96,20 +110,32 @@
     try {
       res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
     } catch (e) {
+      const local = loadLocalProducts();
+      if (local.length) return local;
       throw new Error('Network error loading products. Please try again.');
     }
-    if (!res.ok) throw new Error(`Backend HTTP ${res.status} fetching products.`);
+    if (!res.ok) {
+      const local = loadLocalProducts();
+      if (local.length) return local;
+      throw new Error(`Backend HTTP ${res.status} fetching products.`);
+    }
 
     let raw;
     try { raw = await res.json(); } catch (e) { throw new Error('Invalid JSON from backend.'); }
 
     const list = unwrapProducts(raw);
-    return list
+    const products = list
       .map(p => normalizeProduct(p))
       .filter(p => {
         if (!p.hasPrice) return false;
         return true;
       });
+    if (products.length) saveLocalProducts(products);
+    else {
+      const local = loadLocalProducts();
+      if (local.length) return local;
+    }
+    return products;
   }
 
   /* ── Check player via backend ──────────────────────────── */
@@ -532,10 +558,10 @@
 
     window._i4gRetry = loadAndRender;
 
-    // Auto-retry up to 4 times (handles Render cold start / empty cache)
+    // Auto-retry (handles Render cold start / empty cache)
     let products = [];
-    const MAX_ATTEMPTS = 4;
-    const RETRY_DELAY_MS = 4000;
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY_MS = 3000;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
