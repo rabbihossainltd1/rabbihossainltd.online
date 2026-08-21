@@ -151,7 +151,10 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         'html[data-theme="light"] .float-prod-card b,html[data-theme="light"] .float-prod-card small{color:#111}' +
         'html[data-theme="light"] #floatChatInput{background:#fff;color:#111;border:1px solid rgba(0,0,0,.18)}' +
         'html[data-theme="light"] #floatChatAttach{background:#fff;color:#111;border:1px solid #111}' +
-        'html[data-theme="light"] #floatChatInputArea{border-top:1px solid rgba(0,0,0,.1)}';
+        'html[data-theme="light"] #floatChatInputArea{border-top:1px solid rgba(0,0,0,.1)}' +
+        '#floatQuickSlot{display:none;flex-direction:column;gap:7px;padding:4px 12px 8px;flex-shrink:0}' +
+        '#floatQuickSlot.on{display:flex}' +
+        '#floatQuickSlot .float-quick-btns{margin:0;align-self:stretch}';
       document.head.appendChild(css);
     }
     const header = document.getElementById('floatChatHeader');
@@ -199,6 +202,18 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       prev.querySelector('button').addEventListener('click', clearPendingImage);
     }
     if (inputEl) inputEl.placeholder = 'বার্তা লিখুন...';
+    ensureQuickSlot();
+  }
+
+  function ensureQuickSlot() {
+    let slot = document.getElementById('floatQuickSlot');
+    if (slot) return slot;
+    slot = document.createElement('div');
+    slot.id = 'floatQuickSlot';
+    const area = document.getElementById('floatChatInputArea');
+    if (area && area.parentNode) area.parentNode.insertBefore(slot, area);
+    else if (winEl) winEl.appendChild(slot);
+    return slot;
   }
 
   function setPendingPreview() {
@@ -440,7 +455,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     if (hits.length) return hits[0].id;
     if (/ক্রেডিট|credit|wallet|ওয়ালেট|বিকাশ|নগদ|রকেট|add credit/.test(t)) return 'credit';
     if (/অর্ডার কোথায়|order status|স্ট্যাটাস|ট্র্যাক/.test(t)) return 'order';
-    return thread.topic || '';
+    return '';
   }
 
   function deliveryLine(p) {
@@ -458,12 +473,18 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
   }
 
   function removeShortcuts() {
-    document.getElementById('floatQuickBtns')?.remove();
+    document.querySelectorAll('.float-quick-btns').forEach(el => el.remove());
+    const slot = document.getElementById('floatQuickSlot');
+    if (slot) {
+      slot.innerHTML = '';
+      slot.classList.remove('on');
+    }
   }
 
   function paintShortcutRow(items) {
     removeShortcuts();
     if (!items || !items.length) return;
+    const slot = ensureQuickSlot();
     const row = document.createElement('div');
     row.className = 'float-quick-btns';
     row.id = 'floatQuickBtns';
@@ -473,7 +494,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       b.className = 'float-quick-btn';
       b.textContent = item.label;
       b.addEventListener('click', () => {
-        removeShortcuts();
         if (item.action === 'cart' && item.product) {
           const r = addProductToCart(item.product);
           if (r && r.ok) {
@@ -482,7 +502,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
               text: r.title + ' কার্টে যোগ হয়েছে। কার্ট খুলে প্ল্যান বেছে নিয়ে পে করুন: https://rabbihossainltd.online/cart/',
               time: nowStr()
             }, true);
-            renderProductCards([item.product], true);
             showContextShortcuts(item.product.id);
           } else {
             sendText(item.product.title + ' কার্টে যোগ করুন');
@@ -498,8 +517,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       });
       row.appendChild(b);
     });
-    msgsEl.appendChild(row);
-    msgsEl.scrollTop = msgsEl.scrollHeight;
+    slot.appendChild(row);
+    slot.classList.add('on');
   }
 
   function homeShortcuts() {
@@ -516,16 +535,13 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     if (p) {
       return [
         { label: p.title + ' কার্টে যোগ করুন', action: 'cart', product: p },
-        { label: 'কতক্ষণে ডেলিভারি?', text: p.title + ' অর্ডার করলে কতক্ষণে ডেলিভারি হবে?' },
-        { label: 'এখনই অর্ডার', href: p.href },
-        { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
+        { label: 'কতক্ষণে ডেলিভারি?', text: p.title + ' অর্ডার করলে কতক্ষণে ডেলিভারি হবে?' }
       ];
     }
     if (topic === 'credit') {
       return [
         { label: 'ক্রেডিট যোগ করুন', href: '/add-credit/' },
-        { label: 'রেট কত?', text: 'ওয়ালেট ক্রেডিটের রেট কত? অটো পেমেন্ট কীভাবে কাজ করে?' },
-        { label: 'হোয়াটসঅ্যাপ', href: 'https://wa.me/8801731410341' }
+        { label: 'রেট কত?', text: 'ওয়ালেট ক্রেডিটের রেট কত? অটো পেমেন্ট কীভাবে কাজ করে?' }
       ];
     }
     if (topic === 'order') {
@@ -549,8 +565,9 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     paintShortcutRow(contextItems(thread.topic));
   }
 
-  function refreshShortcutsAfter(text) {
-    const topic = detectTopic(text);
+  function refreshShortcutsAfter(userText) {
+    const fresh = detectTopic(userText);
+    const topic = fresh || thread.topic || '';
     if (topic) showContextShortcuts(topic);
     else removeShortcuts();
   }
@@ -601,8 +618,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       thread.history.push({ role: 'user', text: text || 'ছবি পাঠিয়েছি' });
       thread.history.push({ role: 'model', text: reply });
       saveThread();
-      showProductCards((text || '') + ' ' + reply);
-      refreshShortcutsAfter((text || '') + ' ' + reply);
+      refreshShortcutsAfter(text);
     } catch (err) {
       removeTyping();
       const fallback = localReply(text) || 'সংযোগ পাওয়া যায়নি। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
@@ -672,7 +688,7 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     unreadCount = 0;
     if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
     if (!msgsEl.querySelector('.float-msg') && thread.messages.length) restoreMessages();
-    else removeShortcuts();
+    removeShortcuts();
     if (!thread.started) greetIfNeeded();
     else if (thread.topic) showContextShortcuts(thread.topic);
     msgsEl.scrollTop = msgsEl.scrollHeight;
