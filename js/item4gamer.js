@@ -230,7 +230,7 @@
   function buildOption(p) {
     const usdStr = `$${p.amountUsd.toFixed(p.amountUsd < 1 ? 3 : 2)}`;
     const bdtStr = p.amountBDT ? `৳${p.amountBDT.toLocaleString('en-BD')}` : '';
-    const icon   = p.isMembership ? membershipSVG() : diamondSVG();
+    const shown  = shortPackName(p);
 
     const label  = document.createElement('label');
     label.className = 'ff-option-item';
@@ -247,10 +247,7 @@
         data-provider="item4gamer"
         data-is-membership="${p.isMembership ? '1' : '0'}"
       />
-      <span class="ff-option-label">
-        <span class="ff-pack-icon${p.isMembership ? ' ff-card-pro' : ''}" aria-hidden="true">${icon}</span>
-        ${p.productName}
-      </span>
+      <span class="ff-option-label">${shown}</span>
       <span class="ff-option-price">
         <strong>${usdStr}</strong>
         ${bdtStr ? `<small>${bdtStr}</small>` : ''}
@@ -396,7 +393,37 @@
       document.getElementById('i4g-ff-info-close').addEventListener('click', function () { sheet.classList.remove('open'); });
     }
     const body = document.getElementById('i4g-ff-info-body');
-    const rows = flattenInfo(info, '', []);
+    const acc = info.AccountInfo || info.accountInfo || {};
+    const prof = info.AccountProfileInfo || info.accountProfileInfo || {};
+    const guild = info.GuildInfo || {};
+    const credit = info.CreditScoreInfo || {};
+    const social = info.SocialInfo || {};
+    const pet = info.PetInfo || {};
+    const head = [];
+    function add(label, val) {
+      if (val === undefined || val === null || val === '') return;
+      head.push([label, prettyVal(val)]);
+    }
+    add('Name', acc.AccountName);
+    add('UID', window._i4gVerifiedUid);
+    add('Server', acc.AccountRegion);
+    add('Level', acc.AccountLevel);
+    add('Likes', acc.AccountLikes);
+    add('EXP', acc.AccountEXP);
+    add('Season', acc.AccountSeasonId);
+    add('Created', acc.AccountCreateTime);
+    add('Last login', acc.AccountLastLogin);
+    add('BR max rank', prof.BrMaxRank);
+    add('BR points', prof.BrRankPoint);
+    add('CS max rank', prof.CsMaxRank);
+    add('CS points', prof.CsRankPoint);
+    add('Credit score', credit.creditScore);
+    add('Language', social.language);
+    add('Guild', guild.GuildName);
+    add('Guild level', guild.GuildLevel);
+    add('Members', guild.GuildMember != null ? (guild.GuildMember + ' / ' + (guild.GuildCapacity || '')) : '');
+    add('Pet level', pet.level);
+    const rows = head.length ? head : flattenInfo(info, '', []);
     body.innerHTML = rows.length
       ? rows.map(function (r) {
           return '<div class="i4g-info-row"><span>' + String(r[0]).replace(/</g, '') + '</span><b>' + String(r[1]).replace(/</g, '') + '</b></div>';
