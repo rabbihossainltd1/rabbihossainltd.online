@@ -188,9 +188,21 @@ html[data-theme="dark"] #cartPayInstant.sel {
 }
 html[data-theme="dark"] .cart-pay.sel .p-name,
 html[data-theme="dark"] .cart-pay.sel .p-desc,
+html[data-theme="dark"] .cart-pay.sel span,
 html[data-theme="dark"] .cx-pay.sel .cx-pay-name,
-html[data-theme="dark"] .cx-pay.sel .cx-pay-desc {
+html[data-theme="dark"] .cx-pay.sel .cx-pay-desc,
+html[data-theme="dark"] .cx-pay.sel span,
+html[data-theme="dark"] .cc-pay.sel span,
+html[data-theme="dark"] #buyWithCreditBtn.sel .cx-pay-name,
+html[data-theme="dark"] #buyWithCreditBtn.sel .cx-pay-desc,
+html[data-theme="dark"] #buyWithCreditBtn.sel span,
+html[data-theme="dark"] #instantPayBtn.sel .cx-pay-name,
+html[data-theme="dark"] #instantPayBtn.sel .cx-pay-desc,
+html[data-theme="dark"] #instantPayBtn.sel span,
+html[data-theme="dark"] #cartPayBalance.sel span,
+html[data-theme="dark"] #cartPayInstant.sel span {
   color: #111111 !important;
+  opacity: 1 !important;
 }
 html[data-theme="dark"] .cart-item-check,
 html[data-theme="dark"] .cart-selectall input[type="checkbox"] {

@@ -594,6 +594,10 @@
       .service-pay-actions .cx-pay.sel { border:2px solid #fff; background:#fff; color:#111; }
       .service-pay-actions .cx-pay.sel .cx-pay-name,
       .service-pay-actions .cx-pay.sel .cx-pay-desc { color:#111; }
+      html[data-theme="dark"] .service-pay-actions .cx-pay.sel { background:#fff !important; color:#111 !important; border:2px solid #fff !important; }
+      html[data-theme="dark"] .service-pay-actions .cx-pay.sel .cx-pay-name,
+      html[data-theme="dark"] .service-pay-actions .cx-pay.sel .cx-pay-desc,
+      html[data-theme="dark"] .service-pay-actions .cx-pay.sel span { color:#111 !important; opacity:1 !important; }
       .service-pay-actions .cx-pay.sel::after { content:""; position:absolute; top:10px; right:10px; width:16px; height:16px; border-radius:50%; background:#111; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6.5'/%3E%3C/svg%3E"); background-size:10px; background-repeat:no-repeat; background-position:center; }
       .cx-pay-name { font-size:.82rem; font-weight:800; color:#f5f5f3; line-height:1.2; }
       .cx-pay-desc { font-size:.64rem; color:#a9a9a6; font-weight:600; line-height:1.3; }

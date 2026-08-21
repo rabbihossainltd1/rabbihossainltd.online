@@ -163,52 +163,49 @@
     return n.trim() || p.productName;
   }
 
-  async function checkPlayer(uid) {
-    if (!String(uid).trim()) return { ok: false, error: 'UID is empty.' };
-
-    let res;
-    const uidEnc = encodeURIComponent(String(uid).trim());
-    const region = GK_CODE[selectedRegion] || 'BD';
-    try {
-      res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire&region=${encodeURIComponent(region)}`);
-    } catch (e) {
-      return { ok: false, error: 'Network error. You can still continue manually.', soft: true };
-    }
-
-    if (res.status === 405) {
-      try {
-        res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: String(uid).trim(), game: 'freefire' })
-        });
-      } catch (e) {
-        return { ok: false, error: 'Network error. You can still continue manually.', soft: true };
-      }
-    }
-
-    let data;
-    try { data = await res.json(); } catch (e) {
-      return { ok: false, error: 'Could not verify player. You can still continue manually.', soft: true };
-    }
-
-    if (!res.ok || data.ok === false || data.success === false) {
-      let msg = data.message || data.error || data.msg || 'Player not found. Check your UID.';
-      if (/no route was found/i.test(String(msg))) {
-        return { ok: false, error: 'UID চেক এখন কাজ করছে না। একটু পরে চেষ্টা করুন।', soft: true };
-      }
-      const soft = res.status === 429 || res.status === 503 || /UNAVAILABLE|BUSY/i.test(String(data.error || ''));
-      return { ok: false, error: msg, soft };
-    }
-
-    const info = data.data || data.player || data.result || data;
-    const acc = info.AccountInfo || info.accountInfo || {};
+  function parseFFX(data) {
+    if (!data || typeof data !== 'object') return null;
+    if (data.error && !data.AccountInfo && !(data.data && data.data.AccountInfo)) return null;
+    const body = (data.AccountInfo || data.accountInfo) ? data : (data.data || data);
+    const acc = body.AccountInfo || body.accountInfo || {};
+    const name = String(acc.AccountName || acc.accountName || body.playerName || body.name || body.nickname || '').trim();
+    if (!name && !acc.AccountRegion && !acc.AccountLevel) return null;
     return {
-      ok:         true,
-      playerName: acc.AccountName || info.playerName || info.name || info.username || info.nickname || '',
-      server:     acc.AccountRegion || info.server || info.region || info.zone || '',
-      extra:      info
+      ok: true,
+      playerName: name || 'Verified',
+      server: acc.AccountRegion || acc.accountRegion || body.server || body.region || '',
+      extra: body
     };
+  }
+
+  async function checkPlayer(uid) {
+    const id = String(uid || '').trim();
+    if (!id) return { ok: false, error: 'UID is empty.' };
+    const uidEnc = encodeURIComponent(id);
+    const urls = [
+      `${BACKEND_BASE}/api/item4gamer/ff-info?uid=${uidEnc}`,
+      `${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire`,
+      `https://api.gameskinbo.com/ff-info/get?uid=${uidEnc}`
+    ];
+    let lastSoft = null;
+    for (let i = 0; i < urls.length; i++) {
+      try {
+        const res = await fetch(urls[i], { method: 'GET', headers: { Accept: 'application/json' } });
+        const data = await res.json().catch(() => ({}));
+        const parsed = parseFFX(data);
+        if (parsed) return parsed;
+        if (res.status === 402 || data.error === 'PLAYER_NOT_FOUND') {
+          return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
+        }
+        if (res.status === 429 || res.status === 503 || res.status === 401) {
+          lastSoft = { ok: false, error: '', soft: true };
+          continue;
+        }
+      } catch (e) {
+        lastSoft = { ok: false, error: '', soft: true };
+      }
+    }
+    return lastSoft || { ok: false, error: '', soft: true };
   }
 
   /* ── SVG icons ──────────────────────────────────────────── */
@@ -258,23 +255,73 @@
         const usd = parseFloat(this.dataset.amountUsd || 0);
         if (typeof window.ffUpdateAmount === 'function') window.ffUpdateAmount(usd);
         else if (typeof window.setServiceAmountUsd === 'function') window.setServiceAmountUsd(usd);
+        const panel = this.closest('.ff-pack-panel');
+        if (panel) collapsePack(panel, true);
       }
     });
     return label;
   }
 
+  function packToggleLabel(listEl, kind) {
+    const checked = listEl.querySelector('input:checked');
+    if (checked) {
+      const shown = shortPackName({ productName: checked.dataset.packageName || '' });
+      const usd = parseFloat(checked.dataset.amountUsd || 0);
+      const usdStr = '$' + usd.toFixed(usd < 1 ? 3 : 2);
+      return '<span class="pt-label">' + shown + '</span><span class="pt-right"><span class="pt-price">' + usdStr + '</span><span class="ff-pack-chev">▾</span></span>';
+    }
+    const title = kind === 'mem' ? 'Membership Choose' : 'Package Choose';
+    return '<span class="pt-label">' + title + '<small>Tap to view</small></span><span class="pt-right"><span class="ff-pack-chev">▾</span></span>';
+  }
+
+  function collapsePack(panel, afterPick) {
+    const wrap = panel.parentElement;
+    const btn = wrap && wrap.querySelector('.ff-pack-toggle');
+    if (!btn) return;
+    panel.hidden = true;
+    btn.classList.remove('open');
+    if (afterPick) btn.innerHTML = packToggleLabel(panel, btn.dataset.kind || 'dia');
+  }
+
+  function ensurePackToggle(container, kind) {
+    const parent = container.parentElement;
+    if (!parent) return;
+    let btn = parent.querySelector(':scope > .ff-pack-toggle');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ff-pack-toggle';
+      parent.insertBefore(btn, container);
+    }
+    btn.dataset.kind = kind;
+    container.classList.add('ff-pack-panel');
+    container.hidden = true;
+    btn.classList.remove('open');
+    btn.innerHTML = packToggleLabel(container, kind);
+    if (!btn.dataset.rhBound) {
+      btn.dataset.rhBound = '1';
+      btn.addEventListener('click', function () {
+        const open = container.hidden;
+        container.hidden = !open;
+        btn.classList.toggle('open', open);
+      });
+    }
+  }
+
   /* ── Render product list into a container ──────────────── */
-  function renderList(products, container, emptyMsg) {
+  function renderList(products, container, emptyMsg, kind) {
     if (!container) return;
     container.innerHTML = '';
     if (!products.length) {
       container.innerHTML = `<div class="i4g-load-error">${emptyMsg || 'No products available.'}</div>`;
+      ensurePackToggle(container, kind || 'dia');
       return;
     }
     const list = document.createElement('div');
     list.className = 'ff-option-list';
     products.forEach(p => list.appendChild(buildOption(p)));
     container.appendChild(list);
+    ensurePackToggle(container, kind || 'dia');
   }
 
   /* ── Loading / error state helpers ─────────────────────── */
@@ -327,6 +374,18 @@
       .ff-option-price small{font-size:.68rem!important}
       #ffServerSelect,#ffServerSelect.form-input{min-height:42px;font-weight:800;font-size:.86rem}
       html[data-theme="light"] #ffServerSelect{background:#fff;color:#111;border:1px solid #111}
+      .ff-pack-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:1px solid rgba(255,255,255,.14);background:#0a0a0a;border-radius:10px;padding:10px 12px;cursor:pointer;font-family:inherit;text-align:left;color:#f5f5f3}
+      .ff-pack-toggle .pt-label{font-size:.86rem;font-weight:700}
+      .ff-pack-toggle .pt-label small{display:block;font-size:.68rem;color:#a9a9a6;font-weight:600;margin-top:1px}
+      .ff-pack-toggle .pt-right{display:flex;align-items:center;gap:8px}
+      .ff-pack-toggle .pt-price{font-weight:800}
+      .ff-pack-toggle .ff-pack-chev{transition:transform .18s}
+      .ff-pack-toggle.open .ff-pack-chev{transform:rotate(180deg)}
+      .ff-pack-toggle.open{border-color:#fff;border-bottom-left-radius:0;border-bottom-right-radius:0}
+      .ff-pack-panel{margin-top:0;border:1px solid #fff;border-top:none;border-radius:0 0 10px 10px;padding:6px;background:#0a0a0a}
+      html[data-theme="light"] .ff-pack-toggle{background:#fff;color:#111;border:1px solid #111}
+      html[data-theme="light"] .ff-pack-toggle .pt-label small{color:#4a4a48}
+      html[data-theme="light"] .ff-pack-panel{background:#fff;border-color:#111}
     `;
     document.head.appendChild(s);
   }
@@ -537,11 +596,7 @@
         window._i4gPlayerVerified = true;
         window._i4gVerifiedUid = uid;
         btn.textContent = 'Check';
-        if (st) {
-          st.className = 'error';
-          st.textContent = result.error || 'Check unavailable. You can still continue.';
-          st.style.display = 'block';
-        }
+        if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
       } else {
         window._i4gPlayerVerified = false;
         window._i4gVerifiedUid = null;
@@ -725,8 +780,8 @@
     const filtered = products.filter(p => regionOf(p) === region);
     const diamonds    = filtered.filter(p => !p.isMembership);
     const memberships = filtered.filter(p => p.isMembership);
-    renderList(diamonds,    diamondEl,    'এই সার্ভারে ডায়মন্ড প্যাকেজ নেই।');
-    renderList(memberships, membershipEl, 'এই সার্ভারে উইকলি/মান্থলি নেই।');
+    renderList(diamonds,    diamondEl,    'এই সার্ভারে ডায়মন্ড প্যাকেজ নেই।', 'dia');
+    renderList(memberships, membershipEl, 'এই সার্ভারে উইকলি/মান্থলি নেই।', 'mem');
   }
 
   /* ── Public API ─────────────────────────────────────────── */
