@@ -78,6 +78,8 @@
 .rh-cx-body .radio-option:has(input:checked){border-color:#fff;background:#fff;color:#080808}
 .rh-cx-body .radio-option input{accent-color:#fff}
 .rh-cx-body .form-note{font-size:.72rem!important;color:#6f6f6c!important;line-height:1.6;margin-top:-2px}
+.rh-field-error{display:block;color:#ff4d4d;font-size:.86rem;font-weight:750;padding:8px 0 0;text-align:left;background:none;border:none}
+html[data-theme="light"] .rh-field-error{color:#dc2626}
 .rh-cx-body .service-notice{margin:8px 0 12px;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#c9c9c6;font-weight:700;line-height:1.5;font-size:.8rem}
 .rh-cx-body .ff-option-list{display:grid!important;gap:4px}
 .rh-cx-body .ff-option-item{padding:7px 10px;border-radius:10px}
@@ -274,13 +276,13 @@ html[data-theme="light"] .cart-pay.sel::after{
           <div class="rh-cx-body">
             <div class="rh-cx-head">
               <div>
-                <h1 class="rh-cx-title" id="checkoutTitle">Service</h1>
-                <div class="rh-cx-sub" id="checkoutSubtitle"></div>
-                <div class="rh-cx-titlerow">
+                <div class="rh-cx-titleline">
+                  <h1 class="rh-cx-title" id="checkoutTitle">Service</h1>
                   <button class="rh-cx-info" id="infoBtn" type="button" aria-expanded="false" aria-controls="infoPanel" aria-label="Product info">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                   </button>
                 </div>
+                <div class="rh-cx-sub" id="checkoutSubtitle"></div>
               </div>
               <div class="rh-cx-price">
                 <div class="rh-cx-usd" id="headerPriceUsd">$0</div>
@@ -321,7 +323,7 @@ html[data-theme="light"] .cart-pay.sel::after{
   <script src="/js/service-info.js" defer></script>
   <script src="/js/auth.js" defer></script>
   <script type="module" src="/js/wallet.js"></script>
-  <script src="/js/service-modal.js?v=73" defer></script>
+  <script src="/js/service-modal.js?v=74" defer></script>
   <script>
     (function () {
       function hijack(node) {

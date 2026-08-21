@@ -315,6 +315,27 @@
     }
   }
 
+  function clearFieldErrors() {
+    document.querySelectorAll('.rh-field-error').forEach(function (n) { n.remove(); });
+  }
+
+  function fieldError(anchor, message) {
+    clearFieldErrors();
+    showStatus('', '');
+    if (!anchor) {
+      showStatus(message, 'error');
+      return false;
+    }
+    const host = anchor.closest('.form-group') || anchor.closest('.i4g-uid-row') || anchor.parentNode;
+    const p = document.createElement('div');
+    p.className = 'rh-field-error';
+    p.textContent = message;
+    if (host) host.appendChild(p);
+    else showStatus(message, 'error');
+    try { (p.parentNode || anchor).scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    return false;
+  }
+
   function ensureServiceSuccessStyle() {
     if (document.getElementById('serviceSuccessStyle')) return;
     const style = document.createElement('style');
@@ -751,56 +772,52 @@
   }
 
   function validateBasicDetails() {
+    clearFieldErrors();
     const isNoContact = NO_CONTACT_FIELDS.includes(activeFieldsType);
 
     if (!isNoContact) {
-      const name = document.getElementById('mo_name')?.value.trim();
-      const email = document.getElementById('mo_email')?.value.trim();
-      if (!name || !email) {
-        showStatus('Fill in your Name and Email.', 'error');
-        return false;
-      }
+      const nameEl = document.getElementById('mo_name');
+      const emailEl = document.getElementById('mo_email');
+      const name = nameEl?.value.trim();
+      const email = emailEl?.value.trim();
+      if (!name) return fieldError(nameEl, 'Fill in your Name.');
+      if (!email) return fieldError(emailEl, 'Fill in your Email.');
     }
 
     if (activeFieldsType === 'card') {
       const selectedCardType = document.querySelector('input[name="card_type"]:checked')?.value || '';
       const selectedCardPrice = document.getElementById('mo_card_price_usd')?.value
         || document.querySelector('input[name="card_price_package"]')?.value || '';
-      if (!selectedCardType || !selectedCardPrice) {
-        showStatus('Select card type and fixed price.', 'error');
-        return false;
+      if (!selectedCardType) {
+        return fieldError(document.querySelector('input[name="card_type"]') || document.querySelector('.tgl'), 'Select card type.');
+      }
+      if (!selectedCardPrice) {
+        return fieldError(document.querySelector('.pkg-toggle') || document.getElementById('mo_card_price_usd'), 'Select a card price.');
       }
     }
 
     if (activeFieldsType === 'ff') {
-      const ffUid = document.getElementById('mo_ff_uid')?.value.trim();
+      const ffUidEl = document.getElementById('mo_ff_uid');
+      const ffUid = ffUidEl?.value.trim();
       const selectedPackage = form?.querySelector('input[name="ff_package"]:checked');
       if (!selectedPackage) {
-        showStatus('Select a Free Fire package first.', 'error');
-        return false;
+        const packHost = document.getElementById('ffDiamondOptions') || document.getElementById('ffWeeklyOptions') || document.getElementById('ffDiamondOptionsList');
+        return fieldError(packHost, 'Select a Free Fire package first.');
       }
-      if (!ffUid) {
-        showStatus('Enter your Free Fire UID.', 'error');
-        return false;
-      }
-      // Player ID must be verified before submit
+      if (!ffUid) return fieldError(ffUidEl, 'Enter your Free Fire UID.');
       if (!window._i4gPlayerVerified) {
-        showStatus('First verify your UID with the Check button.', 'error');
-        const checkBtn = document.getElementById('i4g-check-player-btn');
-        if (checkBtn) { checkBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); checkBtn.focus(); }
-        return false;
+        return fieldError(document.getElementById('i4g-check-player-btn') || ffUidEl, 'First verify your UID with the Check button.');
       }
       if (window._i4gVerifiedUid && ffUid !== window._i4gVerifiedUid) {
-        showStatus('UID has changed. Run "Check Player ID" again.', 'error');
         window._i4gPlayerVerified = false;
-        return false;
+        return fieldError(ffUidEl, 'UID has changed. Run "Check Player ID" again.');
       }
     }
 
     const amount = getServiceAmount();
     if (!amount || amount < 0.1) {
-      showStatus('Select a package/variant first.', 'error');
-      return false;
+      const pack = document.querySelector('.pkg-toggle') || document.getElementById('ffDiamondOptions') || document.getElementById('serviceCheckoutPanel');
+      return fieldError(pack, 'Select a package/variant first.');
     }
 
     return true;

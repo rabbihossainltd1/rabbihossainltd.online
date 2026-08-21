@@ -110,12 +110,14 @@
         html += '<div style="margin-top:10px;opacity:.8;">' + (bn ? info.note_bn : info.note_en) + '</div>';
       }
       text.innerHTML = html;
-      btn.style.display = '';
+      btn.style.display = 'grid';
+      btn.hidden = false;
       btn.onclick = function () {
         infoOpen = !infoOpen;
         panel.classList.toggle('open', infoOpen);
         btn.classList.toggle('open', infoOpen);
         btn.setAttribute('aria-expanded', infoOpen ? 'true' : 'false');
+        btn.setAttribute('aria-label', infoOpen ? 'Hide product info' : 'Product info');
       };
     } else {
       btn.style.display = 'none';

@@ -51,7 +51,14 @@
     .settings-edit-btn[aria-pressed="true"]{background:#111;color:#fff;border-color:#111}
     html[data-theme="light"] .settings-edit-btn{color:#161616;border-color:rgba(0,0,0,.16)}
     .settings-photo-btn{display:none!important}
-    .settings-avatar-preview{cursor:pointer}
+    .settings-avatar-preview{cursor:default;pointer-events:none}
+    .settings-avatar-wrap{position:relative;display:inline-block;width:88px;height:88px}
+    .settings-avatar-wrap .settings-avatar-preview{width:88px;height:88px;border-radius:50%}
+    .settings-avatar-pencil{display:none;position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:50%;border:2px solid #111;background:#161616;color:#fff;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2}
+    .settings-avatar-pencil svg{width:16px;height:16px}
+    .settings-page.is-editing .settings-avatar-pencil{display:flex}
+    .settings-page.is-editing .settings-avatar-preview{pointer-events:auto;cursor:pointer}
+    html[data-theme="light"] .settings-avatar-pencil{background:#111;color:#fff;border-color:#fff}
     .settings-field input[readonly]{opacity:.78;cursor:default}
     #settingsPwPanel,.settings-pw-panel{display:none!important}
     .settings-page.is-pw-open #settingsPwPanel,
@@ -112,9 +119,13 @@
           </button>
         </div>
         <div class="settings-avatar-row">
-          <label class="settings-avatar-preview" id="settingsAvatarPreview" title="Change picture">U
+          <div class="settings-avatar-wrap" id="settingsAvatarWrap">
+            <div class="settings-avatar-preview" id="settingsAvatarPreview">U</div>
+            <button class="settings-avatar-pencil" id="settingsAvatarPencil" type="button" aria-label="Change picture">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
             <input type="file" id="settingsPhotoInput" accept="image/*" hidden />
-          </label>
+          </div>
         </div>
 
         <div class="settings-grid">

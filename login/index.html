@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | RabbiHossainLTD</title>
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://rabbihossainltd.online/login/" />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    body.login-page{min-height:100vh;margin:0;background:var(--bg,#080808)}
+    .login-brand{position:absolute;top:18px;left:18px;display:flex;align-items:center;gap:8px;text-decoration:none;z-index:2}
+    .login-brand span{font-weight:800;letter-spacing:.1em;font-size:.72rem;color:#f5f5f3}
+    html[data-theme="light"] .login-brand span{color:#111}
+  </style>
+</head>
+<body class="login-page">
+  <a class="login-brand" href="/"><span>RABBIHOSSAINLTD</span></a>
+  <script src="/js/auth.js" defer></script>
+  <script>
+    (function boot() {
+      if (window.rabbiAuth && typeof window.rabbiAuth.openLogin === 'function') {
+        window.rabbiAuth.openLogin('login-page');
+      } else {
+        setTimeout(boot, 80);
+      }
+    })();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+    }
+  </script>
+</body>
+</html>

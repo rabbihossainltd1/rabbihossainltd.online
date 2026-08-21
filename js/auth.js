@@ -84,6 +84,12 @@
     style.id = 'rabbiAuthStyles';
     style.textContent = `
       #authModal.open { display:flex !important; animation:fadeIn 0.2s ease; }
+      body.login-page #authModal, body.login-page #authModal.open {
+        display:flex !important; position:relative !important; inset:auto !important;
+        background:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+        min-height:100vh; z-index:1; padding:28px 16px;
+      }
+      body.login-page .auth-modal-close { display:none !important; }
       .auth-modal-box { background:var(--surface-2,#131312); border:1px solid rgba(255, 255, 255,0.15); border-radius:16px; width:100%; max-width:420px; padding:36px 32px; position:relative; animation:slideUp 0.25s cubic-bezier(0.4,0,0.2,1); box-shadow:0 32px 80px rgba(0,0,0,0.8); }
       .auth-modal-close { position:absolute;top:14px;right:14px;width:30px;height:30px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#aaaaaa;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s; }
       .auth-modal-close:hover { color:#ffffff; border-color:rgba(255, 255, 255,0.3); }
@@ -769,18 +775,16 @@
     const preview = document.getElementById('settingsAvatarPreview');
     const photo = pickPhotoURL(currentUserData, currentUser);
     if (preview) {
-      const fileKeep = preview.querySelector('#settingsPhotoInput');
       preview.querySelectorAll('img').forEach(function (im) { im.remove(); });
       Array.from(preview.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
       if (photo) {
         const im = document.createElement('img');
         im.src = photo;
         im.alt = 'Profile photo';
-        preview.insertBefore(im, preview.firstChild);
+        preview.appendChild(im);
       } else {
-        preview.insertBefore(document.createTextNode(String(currentUserData?.name || currentUser?.displayName || currentUser?.email || 'U').charAt(0).toUpperCase()), preview.firstChild);
+        preview.appendChild(document.createTextNode(String(currentUserData?.name || currentUser?.displayName || currentUser?.email || 'U').charAt(0).toUpperCase()));
       }
-      if (fileKeep && fileKeep.parentNode !== preview) preview.appendChild(fileKeep);
     }
     const pass1 = document.getElementById('settingsNewPassword');
     const pass2 = document.getElementById('settingsConfirmPassword');
@@ -908,15 +912,13 @@
 
       const preview = document.getElementById('settingsAvatarPreview');
       if (preview) {
-        const fileKeep = preview.querySelector('#settingsPhotoInput');
         preview.querySelectorAll('img').forEach(function (im) { im.remove(); });
         Array.from(preview.childNodes).forEach(function (n) { if (n.nodeType === 3) n.remove(); });
         const im = document.createElement('img');
         im.src = cropped;
         im.alt = 'Preview';
         im.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-        preview.insertBefore(im, preview.firstChild);
-        if (fileKeep && fileKeep.parentNode !== preview) preview.appendChild(fileKeep);
+        preview.appendChild(im);
       }
       window._pendingCroppedPhoto = cropped;
       cm.remove();
@@ -1082,6 +1084,23 @@
         else nameInput.setAttribute('readonly', '');
       }
     }
+    function pickPhotoFile() {
+      if (!(page && page.classList.contains('is-editing'))) return;
+      const fileInput = document.getElementById('settingsPhotoInput');
+      if (fileInput) fileInput.click();
+    }
+    const pencilBtn = document.getElementById('settingsAvatarPencil');
+    if (pencilBtn) pencilBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      pickPhotoFile();
+    });
+    const avatarPreview = document.getElementById('settingsAvatarPreview');
+    if (avatarPreview) avatarPreview.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      pickPhotoFile();
+    });
     if (editBtn) {
       editBtn.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -1100,7 +1119,7 @@
     }
     document.addEventListener('pointerdown', function (e) {
       if (!page || !page.classList.contains('is-editing')) return;
-      if (e.target.closest('#settingsName') || e.target.closest('#settingsEditProfileBtn')) return;
+      if (e.target.closest('#settingsName') || e.target.closest('#settingsEditProfileBtn') || e.target.closest('#settingsAvatarWrap')) return;
       saveProfileName();
     });
     function setPwOpen(on) {
@@ -1440,6 +1459,12 @@
 
     function openLoginModal(action) {
       if (currentUser) {
+        if (document.body.classList.contains('login-page')) {
+          var go = '/';
+          try { go = sessionStorage.getItem('rhReturnTo') || localStorage.getItem('rhReturnTo') || '/'; } catch (e) {}
+          window.location.replace(go);
+          return;
+        }
         closeLoginModal();
         return;
       }
@@ -1467,8 +1492,9 @@
       sessionStorage.setItem('rabbiLoginRefreshDone', '1');
       let back = '';
       try {
-        back = sessionStorage.getItem('rhReturnTo') || '';
+        back = sessionStorage.getItem('rhReturnTo') || localStorage.getItem('rhReturnTo') || '';
         sessionStorage.removeItem('rhReturnTo');
+        localStorage.removeItem('rhReturnTo');
       } catch (e) {}
       const here = location.pathname + location.search + location.hash;
       setTimeout(() => {
