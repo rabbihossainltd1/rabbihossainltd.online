@@ -178,44 +178,43 @@
     };
   }
 
-  let _gkBoot = '';
-  async function gkBoot() {
-    if (_gkBoot) return _gkBoot;
-    const res = await fetch(BACKEND_BASE + '/api/item4gamer/ff-boot', { method: 'GET', headers: { Accept: 'application/json' } });
-    const data = await res.json().catch(() => ({}));
-    _gkBoot = String((data && data.k) || '').trim();
-    return _gkBoot;
-  }
+  const UID_CHECK_API = 'https://rh-uid-check.rabbihossainltd.workers.dev';
 
   async function checkPlayer(uid) {
     const id = String(uid || '').trim();
     if (!id) return { ok: false, error: 'UID is empty.' };
     const uidEnc = encodeURIComponent(id);
 
+    // Same-origin-approved Cloudflare Worker keeps the provider credential
+    // server-side and avoids mobile ISP/DNS blocks against Gameskinbo.
     try {
-      const key = await gkBoot();
-      const headers = { Accept: 'application/json' };
-      if (key) headers['x-api-key'] = key;
-      const res = await fetch('https://api.gameskinbo.com/ff-info/get?uid=' + uidEnc, { method: 'GET', headers });
+      const res = await fetch(UID_CHECK_API + '/?uid=' + uidEnc, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { Accept: 'application/json' }
+      });
       const data = await res.json().catch(() => ({}));
       const parsed = parseFFX(data);
-      if (parsed) return parsed;
-      if (res.status === 402 || /invalid uid/i.test(String(data.error || ''))) {
+      if (parsed && parsed.playerName && parsed.playerName !== 'Verified') return parsed;
+      if (res.status === 402 || res.status === 404 || data.error === 'PLAYER_NOT_FOUND' || /invalid uid/i.test(String(data.error || ''))) {
         return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
       }
     } catch (e) {}
 
+    // Last-resort backend lookup. This may be unavailable if the upstream
+    // provider blocks the Render network, but it must never become fake "OK".
     try {
       const res = await fetch(BACKEND_BASE + '/api/item4gamer/ff-info?uid=' + uidEnc, { method: 'GET', headers: { Accept: 'application/json' } });
       const data = await res.json().catch(() => ({}));
       const parsed = parseFFX(data);
-      if (parsed) return parsed;
-      if (res.status === 402 || data.error === 'PLAYER_NOT_FOUND') {
+      if (parsed && parsed.playerName && parsed.playerName !== 'Verified') return parsed;
+      if (res.status === 402 || res.status === 404 || data.error === 'PLAYER_NOT_FOUND') {
         return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
       }
     } catch (e) {}
 
-    return { ok: false, error: '', soft: true };
+    return { ok: false, error: 'UID-এর নাম এখন পাওয়া যাচ্ছে না। একটু পরে আবার Check করুন।' };
   }
 
   /* ── SVG icons ──────────────────────────────────────────── */
@@ -611,16 +610,10 @@
           sel.value = mapped;
           renderByRegion();
         }
-      } else if (result.soft) {
-        window._i4gPlayerVerified = true;
-        window._i4gVerifiedUid = uid;
-        btn.classList.add('is-ok');
-        btn.textContent = 'OK';
-        btn.title = 'UID saved';
-        if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
       } else {
         window._i4gPlayerVerified = false;
         window._i4gVerifiedUid = null;
+        window._i4gVerifiedName = null;
         window._i4gPlayerInfo = null;
         btn.textContent = 'Check';
         if (st) {
@@ -630,12 +623,14 @@
         }
       }
     } catch (err) {
-      window._i4gPlayerVerified = true;
-      window._i4gVerifiedUid = uid;
+      window._i4gPlayerVerified = false;
+      window._i4gVerifiedUid = null;
+      window._i4gVerifiedName = null;
+      window._i4gPlayerInfo = null;
       btn.textContent = 'Check';
       if (st) {
         st.className = 'error';
-        st.textContent = 'Check unavailable. You can still continue.';
+        st.textContent = 'UID check unavailable. Please try again.';
         st.style.display = 'block';
       }
     }
