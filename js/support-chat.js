@@ -4,7 +4,12 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
 (function () {
   'use strict';
 
-  const BACKEND = 'https://rabbi-backend-vlr7.onrender.com';
+  const PREVIEW_HOST = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+    || location.hostname.includes('e2b.app')
+    || location.hostname.includes('e2b.dev');
+  // Production uses Render. Local/Arena preview uses the same-origin test route
+  // so the updated backend can be verified before either repository is pushed.
+  const BACKEND = PREVIEW_HOST ? '' : 'https://rabbi-backend-vlr7.onrender.com';
   const STORE = 'rh_cs_thread';
   const widget = document.getElementById('floatChatWidget');
   const winEl = document.getElementById('floatChatWindow');
@@ -667,6 +672,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
         }
       }
     } catch (e) {}
+    // Every message, including greetings, goes to Gemini so the reply follows
+    // the user's actual wording and conversation history.
     askGemini(msg, image);
   }
 

@@ -37,6 +37,8 @@
     .settings-btn.secondary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#e4e4e0}
     .settings-btn.secondary:hover{background:rgba(255,255,255,.12)}
     .settings-btn:disabled{opacity:.6;cursor:not-allowed}
+    .settings-profile-save{display:none;margin-top:12px}
+    .settings-page.is-editing .settings-profile-save{display:flex}
     .settings-message{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;font-size:.82rem;line-height:1.5}
     .settings-message.success{display:block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#e0e0df}
     .settings-message.error{display:block;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.24);color:#ffb2b2}
@@ -58,7 +60,7 @@
     .settings-avatar-pencil svg{width:16px;height:16px;pointer-events:none}
     .settings-page.is-editing .settings-avatar-pencil{display:flex}
     .settings-page.is-editing .settings-avatar-preview{pointer-events:auto;cursor:pointer}
-    html[data-theme="light"] .settings-avatar-pencil{background:#111;color:#fff;border-color:#fff}
+    html[data-theme="light"] .settings-avatar-pencil{background:#fff;color:#111;border-color:#111;box-shadow:0 2px 10px rgba(0,0,0,.14)}
     .settings-page input[type="file"],
     #settingsPhotoInput,
     .settings-photo-file{
@@ -156,6 +158,10 @@
             <input type="email" id="settingsEmail" disabled />
           </div>
         </div>
+        <button class="settings-btn settings-profile-save" id="settingsSaveProfileBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>
+          <span>Save Profile</span>
+        </button>
 
         <div class="settings-divider"></div>
 
@@ -237,7 +243,7 @@
 
   <script src="/js/lang.js" defer></script>
   <script src="/js/main.js" defer></script>
-  <script src="/js/auth.js?v=75" defer></script>
+  <script src="/js/auth.js?v=76" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js').catch(function() {}); });

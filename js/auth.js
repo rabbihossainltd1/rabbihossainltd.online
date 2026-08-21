@@ -84,12 +84,31 @@
     style.id = 'rabbiAuthStyles';
     style.textContent = `
       #authModal.open { display:flex !important; animation:fadeIn 0.2s ease; }
+      body.login-page { min-height:100dvh !important; overflow:hidden !important; padding:0 !important; }
+      body.login-page .navbar,
+      body.login-page .rabbi-bottom-nav,
+      body.login-page #rabbiBottomNav,
+      body.login-page #rh-preview-nav,
+      body.login-page .login-brand { display:none !important; }
       body.login-page #authModal, body.login-page #authModal.open {
-        display:flex !important; position:relative !important; inset:auto !important;
-        background:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
-        min-height:100vh; z-index:1; padding:28px 16px;
+        display:flex !important; position:fixed !important; inset:0 !important;
+        width:100% !important; height:100dvh !important; min-height:100dvh !important;
+        background:var(--bg,#080808) !important;
+        backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+        z-index:10000 !important; padding:clamp(16px,4vw,36px) !important;
+        overflow:auto !important;
       }
+      body.login-page .auth-modal-box { width:min(100%,440px); margin:auto; }
       body.login-page .auth-modal-close { display:none !important; }
+      @media(max-width:560px) {
+        body.login-page #authModal, body.login-page #authModal.open { padding:0 !important; }
+        body.login-page .auth-modal-box {
+          width:100% !important; max-width:none !important; min-height:100dvh !important;
+          border:0 !important; border-radius:0 !important; box-shadow:none !important;
+          display:flex !important; flex-direction:column !important; justify-content:center !important;
+          padding:32px 22px !important;
+        }
+      }
       .auth-modal-box { background:var(--surface-2,#131312); border:1px solid rgba(255, 255, 255,0.15); border-radius:16px; width:100%; max-width:420px; padding:36px 32px; position:relative; animation:slideUp 0.25s cubic-bezier(0.4,0,0.2,1); box-shadow:0 32px 80px rgba(0,0,0,0.8); }
       .auth-modal-close { position:absolute;top:14px;right:14px;width:30px;height:30px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#aaaaaa;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s; }
       .auth-modal-close:hover { color:#ffffff; border-color:rgba(255, 255, 255,0.3); }
@@ -923,7 +942,7 @@
       }
       window._pendingCroppedPhoto = cropped;
       cm.remove();
-      saveProfilePhoto(cropped);
+      setSettingsMessage('success', 'New profile picture selected. Click Save Profile to update it.');
     });
   }
 
@@ -1076,6 +1095,7 @@
 
     const page = document.querySelector('.settings-page');
     const editBtn = document.getElementById('settingsEditProfileBtn');
+    const saveProfileBtn = document.getElementById('settingsSaveProfileBtn');
     const nameInput = document.getElementById('settingsName');
     function setProfileEditing(on) {
       if (page) page.classList.toggle('is-editing', !!on);
@@ -1102,19 +1122,27 @@
         e.stopPropagation();
         const next = !(page && page.classList.contains('is-editing'));
         setProfileEditing(next);
-        if (next && nameInput) setTimeout(function () { nameInput.focus(); }, 0);
+        if (next && nameInput) {
+          setTimeout(function () { nameInput.focus(); }, 0);
+        } else if (!next) {
+          // Leaving edit mode without Save Profile discards unsaved changes.
+          window._pendingCroppedPhoto = null;
+          fillSettingsForm();
+        }
       });
+    }
+    if (saveProfileBtn) {
+      saveProfileBtn.addEventListener('click', saveProfileSettings);
     }
     if (nameInput) {
-      nameInput.addEventListener('blur', function () {
-        if (page && page.classList.contains('is-editing')) saveProfileName();
-      });
+      // Profile changes are committed only by the explicit Save Profile button.
+      // Clicking empty space or tabbing away must never write profile data.
       nameInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); nameInput.blur(); }
+        if (e.key === 'Enter') e.preventDefault();
       });
     }
-    /* Stay in edit mode until the Edit button is toggled off — do not
-       hide the pencil when tapping empty space. */
+    /* Stay in edit mode until Save Profile succeeds or the Edit button is
+       toggled off — tapping empty space never saves or closes the editor. */
     function setPwOpen(on) {
       if (page) page.classList.toggle('is-pw-open', !!on);
       const panel = document.getElementById('settingsPwPanel');
@@ -1309,7 +1337,18 @@
       }
 
       currentUserData = { ...(currentUserData || {}), name: fullName, photoURL: photoURL || '' };
+      if (photoURL) rememberCustomPhoto(photoURL);
       updateProfileMenu(currentUser, currentUserData);
+      updateAvatar(photoURL, currentUser);
+      try {
+        const cached = JSON.parse(localStorage.getItem('rh_user_cache') || '{}');
+        localStorage.setItem('rh_user_cache', JSON.stringify({
+          ...cached,
+          displayName: fullName,
+          photoURL: photoURL || cached.photoURL || '',
+          cache_ts: Date.now()
+        }));
+      } catch (e) {}
       if (fileInput) fileInput.value = '';
       setSettingsMessage('success', 'Profile updated successfully.');
       const settingsPage = document.querySelector('.settings-page');
@@ -1410,8 +1449,8 @@
   }
 
   function injectBottomNavigation() {
-    // checkout.html is a standalone, distraction-free page — no app chrome.
-    if (document.body.classList.contains('checkout-standalone')) return;
+    // Checkout and login are standalone, distraction-free pages — no app chrome.
+    if (document.body.classList.contains('checkout-standalone') || document.body.classList.contains('login-page')) return;
     if (document.getElementById('rabbiBottomNav')) return; // Already in HTML
     document.body.classList.add('has-bottom-nav');
     const page = (location.pathname.split('/').pop() || '/').toLowerCase();
