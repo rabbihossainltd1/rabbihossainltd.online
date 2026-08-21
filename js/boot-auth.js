@@ -133,7 +133,7 @@
         var link = existing || document.createElement('link');
         link.id = 'rh-light-theme-link';
         link.rel = 'stylesheet';
-        link.href = '/css/light-theme.css?v=11';
+        link.href = '/css/light-theme.css?v=12';
         if (link.parentNode !== host) host.appendChild(link);
         var cta = document.getElementById('rh-cta-light-link');
         if (!cta) {
@@ -172,6 +172,8 @@
             'html[data-theme="light"] .cart-pay .p-desc,html[data-theme="light"] .cx-pay-desc{color:#6f6f6c!important}' +
             'html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn.sel,html[data-theme="light"] .cart-pay.sel,html[data-theme="light"] .cx-pay.sel,html[data-theme="light"] #cartPayBalance.sel,html[data-theme="light"] #cartPayInstant.sel{background:#fff!important;color:#111!important;border:2.5px solid #111!important}html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn .cx-pay-desc,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #instantPayBtn .cx-pay-desc,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-name,html[data-theme="light"] #serviceCheckoutPanel #buyWithCreditBtn.sel .cx-pay-desc{color:#111!important}' +
             'html[data-theme="light"] .cart-pay.sel .p-name,html[data-theme="light"] .cart-pay.sel .p-desc,html[data-theme="light"] .cx-pay.sel .cx-pay-name,html[data-theme="light"] .cx-pay.sel .cx-pay-desc{color:#111!important}html[data-theme="light"] #servicePriceBdt,html[data-theme="light"] .service-price-pill small,html[data-theme="light"] .rh-cx-body .opt .p,html[data-theme="light"] .rh-cx-body .pkg-toggle .pt-price{color:#111!important}' +
+            'html[data-theme="dark"] #buyWithCreditBtn.sel,html[data-theme="dark"] #instantPayBtn.sel,html[data-theme="dark"] #cartPayBalance.sel,html[data-theme="dark"] #cartPayInstant.sel,html[data-theme="dark"] .cx-pay.sel,html[data-theme="dark"] .cart-pay.sel{background:#161616!important;color:#f5f5f3!important;border:2px solid #fff!important}' +
+            'html[data-theme="dark"] #buyWithCreditBtn.sel span,html[data-theme="dark"] #instantPayBtn.sel span,html[data-theme="dark"] #cartPayBalance.sel span,html[data-theme="dark"] #cartPayInstant.sel span,html[data-theme="dark"] .cx-pay.sel .cx-pay-name,html[data-theme="dark"] .cx-pay.sel .cx-pay-desc,html[data-theme="dark"] .cart-pay.sel .p-name,html[data-theme="dark"] .cart-pay.sel .p-desc{color:#f5f5f3!important;background:transparent!important}' +
             'html[data-theme="light"] .cart-item-check,html[data-theme="light"] .cart-selectall input[type=checkbox],html[data-theme="light"] .cart-item-check-slot{-webkit-appearance:none!important;appearance:none!important;width:22px!important;height:22px!important;box-sizing:border-box!important;border:2.5px solid #111!important;background:#fff!important;border-radius:7px!important}' +
             'html[data-theme="light"] .cart-item-check:checked,html[data-theme="light"] .cart-selectall input[type=checkbox]:checked{background:#111!important;border-color:#111!important}';
           host.appendChild(inline);

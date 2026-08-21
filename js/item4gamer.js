@@ -595,7 +595,9 @@
       } else if (result.soft) {
         window._i4gPlayerVerified = true;
         window._i4gVerifiedUid = uid;
-        btn.textContent = 'Check';
+        btn.classList.add('is-ok');
+        btn.textContent = 'OK';
+        btn.title = 'UID saved';
         if (st) { st.className = ''; st.style.display = 'none'; st.textContent = ''; }
       } else {
         window._i4gPlayerVerified = false;
