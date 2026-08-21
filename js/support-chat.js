@@ -300,8 +300,86 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     { id: 'free-fire-topup', keys: ['free fire', 'ফ্রি ফায়ার', 'diamond', 'ডায়মন্ড', 'topup', 'টপআপ', 'টপ-আপ', 'uid'], title: 'Free Fire Diamond', href: '/checkout/?service=free-fire-topup', price: 'লাইভ প্যাকেজ · UID টপ-আপ', perk: 'লগইন ছাড়াই সরাসরি UID-এ ডায়মন্ড', slug: 'free-fire-topup', serviceName: 'Free Fire Diamond Top-up', serviceId: 'ff' },
     { id: 'ff-ios', keys: ['ios panel', 'iphone panel', 'আইফোন প্যানেল'], title: 'Free Fire iOS Panel', href: '/checkout/?service=ff-ios', price: '$5 থেকে $40', perk: 'জেলব্রেক ছাড়া আইফোন প্যানেল', slug: 'ff-ios', serviceName: 'Free Fire iPhone Panel (iOS)', serviceId: 'ffIos' },
     { id: 'ff-drip', keys: ['drip', 'ড্রিপ'], title: 'FF Drip Panel', href: '/checkout/?service=ff-drip', price: '$0.90 থেকে $10', perk: 'রুটেড অ্যান্ড্রয়েড প্যানেল', slug: 'ff-drip', serviceName: 'Free Fire Android Panel Drip Client (Root)', serviceId: 'ffDrip' },
-    { id: 'web-development', keys: ['website', 'ওয়েবসাইট', 'web development'], title: 'Website Development', href: '/checkout/?service=web-development', price: 'শুরু $50', perk: 'বিজনেস সাইট ও ল্যান্ডিং পেজ', slug: 'web-development', serviceName: 'Website Development', serviceId: 'webDev', amountUsd: 50 }
+    { id: 'web-development', keys: ['website', 'ওয়েবসাইট', 'web development'], title: 'Website Development', href: '/checkout/?service=web-development', price: 'শুরু $50', perk: 'বিজনেস সাইট ও ল্যান্ডিং পেজ', slug: 'web-development', serviceName: 'Website Development', serviceId: 'webDev', amountUsd: 50 },
+    { id: 'truecaller', keys: ['truecaller', 'ট্রু কলার', 'ট্রুকলার'], title: 'Truecaller', href: '/checkout/?service=truecaller', price: 'Premium $1.99 থেকে · Gold $4.99', perk: 'কলার আইডি ও স্প্যাম ব্লক', slug: 'truecaller', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'truecaller' },
+    { id: 'imo', keys: ['imo', 'আইএমও'], title: 'imo Premium', href: '/checkout/?service=imo', price: '$0.29 থেকে $7.49', perk: 'প্রিমিয়াম ব্যাজ ও স্টোরি ভিউ', slug: 'imo', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'imo' },
+    { id: 'vpn', keys: ['vpn', 'ভিপিএন'], title: 'Premium VPN', href: '/checkout/?service=vpn', price: '$4.99 থেকে $29.99/বছর', perk: 'আইপি হাইড, ব্লক সাইট খোলা', slug: 'vpn', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'vpn' },
+    { id: 'antivirus', keys: ['antivirus', 'অ্যান্টিভাইরাস'], title: 'Antivirus', href: '/checkout/?service=antivirus', price: '$4.99 থেকে $29.99/বছর', perk: 'ভাইরাস ও ম্যালওয়্যার সুরক্ষা', slug: 'antivirus', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'antivirus' },
+    { id: 'adsremove', keys: ['ads remove', 'adblock', 'অ্যাড রিমুভ', 'adsremove'], title: 'Remove Ads', href: '/checkout/?service=adsremove', price: 'Lifetime $5.99', perk: 'একবার পে, চিরকাল অ্যাড বন্ধ', slug: 'adsremove', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'adsremove', amountUsd: 5.99 },
+    { id: 'premiere', keys: ['premiere', 'প্রিমিয়ার'], title: 'Adobe Premiere Pro', href: '/checkout/?service=premiere', price: '$19.99/মাস থেকে', perk: 'প্রো ভিডিও এডিটিং', slug: 'premiere', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'premiere' },
+    { id: 'photoshop', keys: ['photoshop', 'ফটোশপ'], title: 'Adobe Photoshop', href: '/checkout/?service=photoshop', price: '$18.99/মাস থেকে', perk: 'ফটো এডিট ও ডিজাইন', slug: 'photoshop', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'photoshop' },
+    { id: 'illustrator', keys: ['illustrator', 'ইলাস্ট্রেটর'], title: 'Adobe Illustrator', href: '/checkout/?service=illustrator', price: '$19.99/মাস থেকে', perk: 'লোগো ও ভেক্টর ডিজাইন', slug: 'illustrator', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'illustrator' },
+    { id: 'windows', keys: ['windows', 'উইন্ডোজ'], title: 'Windows License', href: '/checkout/?service=windows', price: '$11.99 থেকে $29.99', perk: 'লাইফটাইম অরিজিনাল কী', slug: 'windows', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'windows' },
+    { id: 'excel', keys: ['excel', 'office', 'এক্সেল', 'অফিস'], title: 'Microsoft Excel / Office', href: '/checkout/?service=excel', price: '$14.99 থেকে $49.99', perk: 'Excel, Word, PowerPoint', slug: 'excel', serviceName: 'Premium App & Subscription', serviceId: 'proapp', proapp: 'excel' },
+    { id: 'ff-ff4x', keys: ['ff4x', 'ff 4x'], title: 'Free Fire FF4X Panel', href: '/checkout/?service=ff-ff4x', price: '$5 / $10 / $30', perk: 'অ্যান্ড্রয়েড প্যানেল', slug: 'ff-ff4x', serviceName: 'Free Fire Android Panel (FF4X)', serviceId: 'ffFf4x' },
+    { id: 'ff-pc', keys: ['pc panel', 'পিসি প্যানেল'], title: 'Free Fire PC Panel', href: '/checkout/?service=ff-pc', price: '$0.50 থেকে $15', perk: 'ইমুলেটর প্যানেল', slug: 'ff-pc', serviceName: 'Free Fire PC Panel', serviceId: 'ffPc' },
+    { id: 'br-mods', keys: ['br mods', 'brmods', 'বিআর মড'], title: 'BR Mods', href: '/checkout/?service=br-mods', price: '$0.90 থেকে $9', perk: 'রুট ছাড়া অ্যান্ড্রয়েড', slug: 'br-mods', serviceName: 'BR Mods', serviceId: 'ffBrMods' },
+    { id: 'ethical-hacking', keys: ['hacking', 'security audit', 'হ্যাকিং'], title: 'Ethical Hacking', href: '/checkout/?service=ethical-hacking', price: '$30', perk: 'সিকিউরিটি অডিট', slug: 'ethical-hacking', serviceName: 'Ethical Hacking / Security Audit', serviceId: 'security', amountUsd: 30 },
+    { id: 'android-development', keys: ['android app', 'অ্যান্ড্রয়েড অ্যাপ'], title: 'Android App Development', href: '/checkout/?service=android-development', price: 'শুরু $40', perk: 'কাস্টম অ্যান্ড্রয়েড অ্যাপ', slug: 'android-development', serviceName: 'Android App Development', serviceId: 'android', amountUsd: 40 },
+    { id: 'digital-branding', keys: ['branding', 'লোগো', 'ব্র্যান্ডিং'], title: 'Digital Branding', href: '/checkout/?service=digital-branding', price: '$15', perk: 'লোগো ও ব্র্যান্ড আইডেন্টিটি', slug: 'digital-branding', serviceName: 'Digital Branding', serviceId: '', amountUsd: 15 },
+    { id: 'premium-services', keys: ['premium digital', 'প্রিমিয়াম সার্ভিস'], title: 'Premium Digital Services', href: '/checkout/?service=premium-services', price: '$10', perk: 'কাস্টম ডিজিটাল কাজ', slug: 'premium-services', serviceName: 'Premium Digital Services', serviceId: '', amountUsd: 10 }
   ];
+
+  function isCartIntent(text) {
+    return /কার্ট|cart|যোগ কর/i.test(String(text || ''));
+  }
+
+  function addProductToCart(p) {
+    if (!p || !p.slug) return null;
+    const draft = {
+      slug: p.slug,
+      title: p.title,
+      image: '/images/service-cards/' + p.slug + '.png',
+      serviceName: p.serviceName || p.title,
+      serviceId: p.serviceId || '',
+      proapp: p.proapp || ''
+    };
+    try {
+      if (typeof window.rhAddToCartDraft === 'function') {
+        window.rhAddToCartDraft(draft);
+        return { ok: true, title: p.title };
+      }
+      if (window.RhCart && typeof window.RhCart.add === 'function') {
+        window.RhCart.add({
+          slug: p.slug,
+          title: p.title,
+          image: draft.image,
+          serviceName: draft.serviceName,
+          serviceId: draft.serviceId,
+          proapp: draft.proapp,
+          needsPlan: true,
+          amountUsd: Number(p.amountUsd) || 0,
+          details: {}
+        });
+        return { ok: true, title: p.title };
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function localReply(text) {
+    const hits = matchProducts(text);
+    const name = firstName();
+    const hi = name ? name + ', ' : '';
+    const t = String(text || '').toLowerCase();
+    if (/ক্রেডিট|credit|wallet|ওয়ালেট|বিকাশ|নগদ|রকেট|টাকা যোগ|add credit/.test(t)) {
+      return hi + 'ওয়ালেটে ক্রেডিট যোগ করতে https://rabbihossainltd.online/add-credit/ খুলুন। ডলার অ্যামাউন্ট (কমপক্ষে $1) লিখে Continue to Payment চাপুন। SPV অটো পেমেন্টে বিকাশ/নগদ/রকেট দিয়ে পে করলে ক্রেডিট কয়েক সেকেন্ডে যোগ হয়। ম্যানুয়াল TxID লাগে না। রেট সাধারণত $1 = ৳125।';
+    }
+    if (/অর্ডার|order status|স্ট্যাটাস|ট্র্যাক/.test(t)) {
+      return hi + 'অর্ডার স্ট্যাটাস আমি এখানে দেখতে পারি না, অনুমানও করি না। প্রোফাইলের অর্ডার লিস্ট দেখুন, অথবা হোয়াটসঅ্যাপে ইমেইল/অর্ডার আইডি দিয়ে লিখুন: https://wa.me/8801731410341';
+    }
+    if (hits.length) {
+      const bits = hits.map(p => p.title + ': ' + p.price + ' — https://rabbihossainltd.online' + p.href);
+      return hi + bits.join('\n') + '\nকার্ট: https://rabbihossainltd.online/cart/';
+    }
+    if (/সার্ভিস|কীভাবে শুরু|কিভাবে শুরু|কিনব|অর্ডার কর/.test(t)) {
+      return hi + 'লগইন করে সার্ভিস বেছে নিন, প্ল্যান সিলেক্ট করুন, তারপর ওয়ালেট বা ইনস্ট্যান্ট পে দিয়ে পে করুন। সব সার্ভিস: https://rabbihossainltd.online/services/';
+    }
+    if (/হোয়াটস|whatsapp|যোগাযোগ|কন্টাক্ট/.test(t)) {
+      return hi + 'হোয়াটসঅ্যাপ: https://wa.me/8801731410341 — ইমেইল: support@rabbihossainltd.online';
+    }
+    return '';
+  }
 
   function matchProducts(text) {
     const t = String(text || '').toLowerCase();
@@ -383,7 +461,6 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       : 'আসসালামু আলাইকুম, স্বাগতম। আমি RH Support। কীভাবে সাহায্য করতে পারি?';
     paintMessage({ role: 'admin', text: hello, time: nowStr() }, true);
     thread.started = true;
-    thread.history.push({ role: 'model', text: hello });
     saveThread();
     showShortcuts(false);
   }
@@ -416,9 +493,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       let data = {};
       try { data = await res.json(); } catch (e) {}
       removeTyping();
-      const reply = (data && data.ok && data.reply)
-        ? String(data.reply)
-        : (data && data.message) || 'এখন উত্তর দিতে পারছি না। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
+      let reply = (data && data.ok && data.reply) ? String(data.reply) : '';
+      if (!reply) reply = localReply(text) || (data && data.message) || 'এখন উত্তর দিতে পারছি না। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
       paintMessage({ role: 'admin', text: reply, time: nowStr() }, true);
       thread.history.push({ role: 'user', text: text || 'ছবি পাঠিয়েছি' });
       thread.history.push({ role: 'model', text: reply });
@@ -427,7 +503,8 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
       showShortcuts(true);
     } catch (err) {
       removeTyping();
-      paintMessage({ role: 'admin', text: 'সংযোগ পাওয়া যায়নি। একটু পরে চেষ্টা করুন।', time: nowStr() }, true);
+      const fallback = localReply(text) || 'সংযোগ পাওয়া যায়নি। একটু পরে চেষ্টা করুন, অথবা হোয়াটসঅ্যাপে লিখুন।';
+      paintMessage({ role: 'admin', text: fallback, time: nowStr() }, true);
       showShortcuts(true);
     } finally {
       geminiBusy = false;
@@ -444,24 +521,26 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/f
     paintMessage({ role: 'user', text: msg, image: image || '', time: nowStr() }, true);
     thread.started = true;
     saveThread();
-    if (msg && isCartIntent(msg)) {
-      const hits = matchProducts(msg);
-      if (hits.length) {
-        const added = [];
-        hits.forEach(p => {
-          const r = addProductToCart(p, msg);
-          if (r && r.ok) added.push(r.title);
-        });
-        if (added.length) {
-          paintMessage({
-            role: 'admin',
-            text: added.join(', ') + ' কার্টে যোগ হয়েছে। কার্ট খুলে প্ল্যান বেছে নিয়ে পে করুন: https://rabbihossainltd.online/cart/',
-            time: nowStr()
-          }, true);
-          renderProductCards(hits, true);
+    try {
+      if (msg && isCartIntent(msg)) {
+        const hits = matchProducts(msg);
+        if (hits.length) {
+          const added = [];
+          hits.forEach(p => {
+            const r = addProductToCart(p);
+            if (r && r.ok) added.push(r.title);
+          });
+          if (added.length) {
+            paintMessage({
+              role: 'admin',
+              text: added.join(', ') + ' কার্টে যোগ হয়েছে। কার্ট খুলে প্ল্যান বেছে নিয়ে পে করুন: https://rabbihossainltd.online/cart/',
+              time: nowStr()
+            }, true);
+            renderProductCards(hits, true);
+          }
         }
       }
-    }
+    } catch (e) {}
     askGemini(msg, image);
   }
 
