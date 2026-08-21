@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="/js/boot-auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Successful | RabbiHossainLTD</title>
+  <meta name="description" content="Your order has been placed. Track it anytime from My Orders." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://rabbihossainltd.online/order-success/" />
+  <link rel="preload" href="/css/style.min.css" as="style" />
+  <link rel="stylesheet" href="/css/style.min.css" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style id="rh-bottom-nav-css">
+    .rabbi-bottom-nav{position:fixed;left:14px;right:14px;bottom:12px;z-index:2400;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:620px;margin:0 auto;padding:8px;border-radius:24px;background:rgba(5,10,16,.92);border:1px solid rgba(255, 255, 255,.18);box-shadow:0 18px 55px rgba(0,0,0,.55),0 0 24px rgba(255, 255, 255,.08);backdrop-filter:blur(18px);}
+    .rabbi-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;border-radius:18px;color:#aaaaaa;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:.01em;transition:.2s ease;}
+    .rabbi-bottom-nav a svg{width:20px;height:20px;stroke-width:1.8;}
+    .rabbi-bottom-nav a.active,.rabbi-bottom-nav a:hover{color:#080808;background:#ffffff;box-shadow:0 8px 24px rgba(255, 255, 255,.20);}
+    body.has-bottom-nav{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important;}
+    @media(min-width:900px){.rabbi-bottom-nav{bottom:18px;left:50%;right:auto;transform:translateX(-50%);width:560px;}}
+  </style>
+  <style>
+    .os-wrap{max-width:440px;margin:0 auto;padding:calc(var(--nav-h,64px) + 28px) 16px 40px;box-sizing:border-box}
+    .os-card{text-align:center;padding:8px 4px 4px}
+    .os-ring{width:88px;height:88px;border-radius:50%;margin:0 auto 20px;position:relative;display:flex;align-items:center;justify-content:center;background:#161616;border:2px solid rgba(255,255,255,.34)}
+    .os-ring:before{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid rgba(255,255,255,.16);animation:osRing 1.6s ease-out infinite}
+    .os-ring svg{width:40px;height:40px;stroke:#f5f5f3;stroke-dasharray:50;stroke-dashoffset:50;animation:osCheck .55s ease .12s forwards}
+    .os-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:#161616;border:1px solid rgba(255,255,255,.34);color:#f5f5f3;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+    .os-badge i{width:7px;height:7px;border-radius:50%;background:#3ddc84;display:inline-block}
+    .os-card h1{font-size:1.55rem;line-height:1.2;margin:0 0 8px;color:#f5f5f3;font-weight:800}
+    .os-card p.lead{color:#a9a9a6;font-size:.92rem;line-height:1.65;margin:0 0 6px}
+    .os-card p.note{color:#8f8f8a;font-size:.82rem;margin:0 0 18px}
+    .os-card p.note strong{color:#f5f5f3}
+    .os-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+    .os-pills span{padding:7px 12px;border-radius:999px;background:#161616;border:1px solid rgba(255,255,255,.28);color:#f5f5f3;font-weight:800;font-size:.8rem}
+    .os-meta{text-align:left;background:#161616;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 14px;margin:0 0 16px}
+    .os-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:.82rem}
+    .os-row + .os-row{border-top:1px solid rgba(255,255,255,.08)}
+    .os-k{color:#8f8f8a;font-weight:700}
+    .os-v{color:#f5f5f3;font-weight:800;text-align:right;word-break:break-all}
+    .os-key{text-align:left;background:#111;border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:14px;margin:0 0 16px}
+    .os-key label{display:block;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6f6f6c;margin-bottom:8px}
+    .os-key code{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92rem;color:#f5f5f3;word-break:break-all;line-height:1.6;user-select:all}
+    .os-actions{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+    .os-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border-radius:12px;font-weight:800;font-size:.92rem;font-family:inherit;text-decoration:none;cursor:pointer;box-sizing:border-box}
+    .os-btn-dark{background:#161616;color:#f5f5f3;border:1px solid rgba(255,255,255,.34)}
+    .os-btn-light{background:#fff;color:#111;border:1px solid #111}
+    html[data-theme="light"] .os-ring{background:#fff;border:2px solid #111}
+    html[data-theme="light"] .os-ring:before{border-color:rgba(0,0,0,.12)}
+    html[data-theme="light"] .os-ring svg{stroke:#111}
+    html[data-theme="light"] .os-badge{background:#fff;color:#111;border:1px solid #111}
+    html[data-theme="light"] .os-card h1{color:#111}
+    html[data-theme="light"] .os-card p.lead{color:#4a4a48}
+    html[data-theme="light"] .os-card p.note{color:#6f6f6c}
+    html[data-theme="light"] .os-card p.note strong{color:#111}
+    html[data-theme="light"] .os-pills span{background:#fff;color:#111;border:1px solid #111}
+    html[data-theme="light"] .os-meta{background:#fff;border:1px solid #d4d4d0}
+    html[data-theme="light"] .os-row + .os-row{border-top:1px solid #ecece8}
+    html[data-theme="light"] .os-k{color:#6f6f6c}
+    html[data-theme="light"] .os-v{color:#111}
+    html[data-theme="light"] .os-key{background:#fff;border:1px solid #d4d4d0}
+    html[data-theme="light"] .os-key code{color:#111}
+    html[data-theme="light"] .os-btn-dark{background:#161616;color:#f5f5f3;border:1px solid rgba(255,255,255,.34)}
+    html[data-theme="light"] .os-btn-light{background:#fff;color:#111;border:1px solid #111}
+    @keyframes osRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}
+    @keyframes osCheck{to{stroke-dashoffset:0}}
+  </style>
+  <meta name="theme-color" content="#080808">
+</head>
+<body class="has-bottom-nav">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">RabbiHossainLTD</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="/">Home</a></li>
+        <li><a href="/services/">Services</a></li>
+        <li><a href="/portfolio/">Portfolio</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+      <a href="mailto:info@rabbihossainltd.online" class="nav-cta">Hire Me</a>
+    </div>
+  </nav>
+
+  <main id="main-content" class="os-wrap">
+    <div class="os-card" id="osRoot">
+      <div class="os-ring" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="os-badge"><i></i> Order placed</div>
+      <h1>Your order is placed</h1>
+      <p class="lead">Please wait a few moments. Delivery is usually within 10–15 minutes.</p>
+      <div id="osBody"></div>
+      <div class="os-actions">
+        <a class="os-btn os-btn-light" href="/dashboard/?tab=orders">View My Orders</a>
+        <a class="os-btn os-btn-dark" href="/services/">Continue shopping</a>
+        <button class="os-btn os-btn-dark" type="button" id="osRateBtn">Rate your experience</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/reviews.js" defer></script>
+  <script src="/js/order-success.js" defer></script>
+  <nav id="rabbiBottomNav" class="rabbi-bottom-nav" aria-label="App navigation">
+    <a href="/"><svg viewBox="0 0 24 24" fill="none"><path d="M3.75 11.5 12 4.25l8.25 7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 10.25v9h11.5v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19.25v-5h4v5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a>
+    <a href="/add-credit/"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 7.5h15a1.75 1.75 0 0 1 1.75 1.75v7.5A1.75 1.75 0 0 1 19.5 18.5h-15a1.75 1.75 0 0 1-1.75-1.75v-7.5A1.75 1.75 0 0 1 4.5 7.5Z" stroke="currentColor"/><path d="M2.75 10.25h18.5M6.75 15.5h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>Add Credit</span></a>
+    <a href="/cart/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span>Cart</span></a>
+    <a href="/dashboard/?tab=orders"><svg viewBox="0 0 24 24" fill="none"><path d="M6.25 4.75h11.5v14.5H6.25V4.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8.75 8.25h6.5M8.75 12h6.5M8.75 15.75h3.5" stroke="currentColor" stroke-linecap="round"/></svg><span>My Orders</span></a>
+    <a href="/dashboard/"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.25a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" stroke="currentColor"/><path d="M5 19.25a7 7 0 0 1 14 0" stroke="currentColor" stroke-linecap="round"/></svg><span>Profile</span></a>
+  </nav>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
+</body>
+</html>

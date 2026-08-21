@@ -381,7 +381,17 @@
     else setPayMsg('All orders placed successfully.', 'success');
     if (done.length && window.RhCart) window.RhCart.removeMany(done);
     if (btn) btn.disabled = false;
-    if (!failed.length) setTimeout(function () { window.location.href = '/dashboard/?tab=orders'; }, 1200);
+    if (!failed.length) {
+      try {
+        sessionStorage.setItem('rh_order_success', JSON.stringify({
+          kind: 'cart',
+          serviceName: 'Cart checkout',
+          count: done.length,
+          ts: Date.now()
+        }));
+      } catch (e) {}
+      window.location.href = '/order-success/';
+    }
   }
 
   async function payNow() {

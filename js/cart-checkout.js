@@ -129,7 +129,19 @@
     try { localStorage.removeItem('rh_cart_checkout'); } catch (e) {}
     if (btn) { btn.disabled = false; }
     document.getElementById('ccPayNowLabel').textContent = 'Pay Now';
-    if (!failed.length) setTimeout(function () { window.location.href = '/dashboard/?tab=orders'; }, 1400);
+    if (!failed.length) {
+      try {
+        sessionStorage.setItem('rh_order_success', JSON.stringify({
+          kind: 'cart',
+          serviceName: 'Cart checkout',
+          count: done.length,
+          amountUsd: subtotalUsd,
+          amountBdt: Math.round(Number(subtotalUsd || 0) * 125),
+          ts: Date.now()
+        }));
+      } catch (e) {}
+      window.location.href = '/order-success/';
+    }
   }
 
   async function payNow() {

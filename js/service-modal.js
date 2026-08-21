@@ -367,126 +367,38 @@
     document.head.appendChild(style);
   }
 
+  function rhGoOrderSuccess(payload) {
+    try { sessionStorage.setItem('rh_order_success', JSON.stringify(payload || {})); } catch (e) {}
+    window.location.href = '/order-success/';
+  }
+  window.rhGoOrderSuccess = rhGoOrderSuccess;
+
+  function buildOrderSuccessPayload(result, amountUsd, extra) {
+    const details = (typeof collectFormData === 'function') ? (collectFormData() || {}) : {};
+    const usd = Number((result && result.amountUsd) || amountUsd || 0);
+    const extraSafe = extra || {};
+    return {
+      kind: extraSafe.kind || 'order',
+      serviceName: extraSafe.serviceName || activeServiceName || details.service_type || 'Order',
+      orderId: (result && result.orderId) || extraSafe.orderId || '',
+      amountUsd: usd,
+      amountBdt: Number((result && result.amountBdt) || extraSafe.amountBdt || Math.round(usd * 125)),
+      status: extraSafe.status || (result && result.status) || 'processing',
+      key: extraSafe.key || (result && result.key) || '',
+      packageName: extraSafe.packageName || details.packageName || details.productName || '',
+      uid: extraSafe.uid || details.uid || details.freeFireUid || '',
+      playerName: extraSafe.playerName || details.playerName || window._i4gVerifiedName || '',
+      count: extraSafe.count || 0,
+      ts: Date.now()
+    };
+  }
+
   function showServiceSuccess(result, amountUsd) {
-    // Close modal immediately
     const overlay = document.getElementById('serviceModal');
     if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-
-    // Show full-screen order-placed overlay
-    let ov = document.getElementById('orderPlacedOverlay');
-    if (!ov) {
-      ov = document.createElement('div');
-      ov.id = 'orderPlacedOverlay';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(14px);padding:20px;';
-      document.body.appendChild(ov);
-    }
-
-    const bdtAmt = Math.round((amountUsd || 0) * 125);
-    const usdStr = amountUsd ? `$${Number(amountUsd).toFixed(2)}` : '';
-    const bdtStr = bdtAmt ? `৳${bdtAmt.toLocaleString()}` : '';
-
-    ov.innerHTML = `
-      <div style="width:min(420px,100%);border-radius:28px;padding:36px 28px 28px;text-align:center;
-        background:linear-gradient(180deg,rgba(255, 255, 255,.10) 0%,rgba(255, 255, 255,.06) 100%);
-        border:1px solid rgba(255, 255, 255,.28);
-        box-shadow:0 40px 100px rgba(0,0,0,.5),0 0 60px rgba(255, 255, 255,.08);
-        animation:opIn .5s cubic-bezier(.2,1,.2,1) both;">
-
-        <!-- Animated checkmark ring -->
-        <div style="width:88px;height:88px;border-radius:50%;margin:0 auto 22px;position:relative;
-          background:rgba(255, 255, 255,.12);border:2px solid rgba(255, 255, 255,.35);
-          display:flex;align-items:center;justify-content:center;">
-          <div style="position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255, 255, 255,.18);animation:opRing 1.6s ease-out infinite;"></div>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:opCheck .6s ease .15s both;">
-            <path d="M20 6 9 17l-5-5"/>
-          </svg>
-        </div>
-
-        <!-- Title -->
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;
-          background:rgba(255, 255, 255,.10);border:1px solid rgba(255, 255, 255,.22);
-          color:#dfe9e0;font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">
-          <span style="width:7px;height:7px;border-radius:50%;background:#ffffff;display:inline-block;animation:opDot 1s ease-in-out infinite;"></span>
-          Order Placed
-        </div>
-
-        <h2 style="font-family:var(--font-display,inherit);font-size:1.65rem;color:#f8f8f7;margin:0 0 10px;line-height:1.2;">
-          Your Order is Placed!
-        </h2>
-        <p style="color:#b1b1ae;line-height:1.72;margin:0 0 6px;font-size:.93rem;">
-          Please wait a few moments to complete the order.
-        </p>
-        <p style="color:#8f8f8a;font-size:.83rem;margin:0 0 22px;">
-          It takes maximum <strong style="color:#ffa500;">10–15 minutes</strong> to process.
-        </p>
-
-        ${usdStr ? `
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;">
-          <span style="padding:8px 16px;border-radius:999px;background:rgba(255, 255, 255,.10);border:1px solid rgba(255, 255, 255,.20);color:#dfe9e0;font-weight:900;font-size:.88rem;">${usdStr}</span>
-          ${bdtStr ? `<span style="padding:8px 16px;border-radius:999px;background:rgba(255, 255, 255,.10);border:1px solid rgba(255, 255, 255,.20);color:#e4e4e0;font-weight:900;font-size:.88rem;">${bdtStr}</span>` : ''}
-          <span style="padding:8px 16px;border-radius:999px;background:rgba(255,166,0,.10);border:1px solid rgba(255,166,0,.20);color:#ffd580;font-weight:900;font-size:.88rem;">Processing</span>
-        </div>` : ''}
-
-        <!-- Redirect info -->
-        <div style="padding:14px 16px;border-radius:16px;background:rgba(255, 255, 255,.06);border:1px solid rgba(255, 255, 255,.14);
-          display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:22px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" style="flex-shrink:0;">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-          <div>
-            <div style="color:#e4e4e0;font-weight:900;font-size:.83rem;">Redirecting to My Orders…</div>
-            <div style="color:#7c7c77;font-size:.76rem;margin-top:2px;">Track your order status live from there.</div>
-          </div>
-        </div>
-
-        <button id="opGoNow" type="button" style="width:100%;border:none;border-radius:16px;padding:15px;
-          background:#ffffff;color:#080808;font-weight:950;font-size:.98rem;cursor:pointer;
-          box-shadow:0 16px 40px rgba(255, 255, 255,.2);margin-bottom:10px;">
-          View My Orders Now
-        </button>
-        <button id="opRateBtn" type="button" style="width:100%;border:1px solid rgba(255,165,0,.3);border-radius:16px;padding:12px;
-          background:rgba(255,165,0,.08);color:#ffc14d;font-weight:800;font-size:.88rem;cursor:pointer;
-          display:flex;align-items:center;justify-content:center;gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-          Rate Your Experience
-        </button>
-      </div>
-    `;
-
-    // Inject animation keyframes once
-    if (!document.getElementById('opAnimStyle')) {
-      const s = document.createElement('style');
-      s.id = 'opAnimStyle';
-      s.textContent = `
-        @keyframes opIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}
-        @keyframes opRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.5);opacity:0}}
-        @keyframes opCheck{from{stroke-dasharray:50;stroke-dashoffset:50}to{stroke-dashoffset:0}}
-        @keyframes opDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
-      `;
-      document.head.appendChild(s);
-    }
-
-    // Button click → go to orders
-    document.getElementById('opGoNow')?.addEventListener('click', () => {
-      window.location.href = '/dashboard/?tab=orders';
-    });
-
-    // Rate button → open review modal, cancel auto-redirect
-    const rateBtn = document.getElementById('opRateBtn');
-    let autoRedirect = setTimeout(() => {
-      window.location.href = '/dashboard/?tab=orders';
-    }, 4000);
-
-    rateBtn?.addEventListener('click', () => {
-      clearTimeout(autoRedirect);
-      const ov = document.getElementById('orderPlacedOverlay');
-      if (ov) ov.remove();
-      if (typeof window.openReviewModal === 'function') {
-        window.openReviewModal(typeof activeServiceName !== 'undefined' ? activeServiceName : '');
-      }
-    });
+    const ov = document.getElementById('orderPlacedOverlay');
+    if (ov) ov.remove();
+    rhGoOrderSuccess(buildOrderSuccessPayload(result, amountUsd));
   }
 
 
@@ -1228,6 +1140,18 @@
   }
 
   function showIosKeyModal(key, amountUsd, errorMsg) {
+    if (!errorMsg) {
+      const overlay = document.getElementById('serviceModal');
+      if (overlay) { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+      const ov0 = document.getElementById('orderPlacedOverlay');
+      if (ov0) ov0.remove();
+      rhGoOrderSuccess(buildOrderSuccessPayload(
+        { key: key || '', amountUsd: amountUsd, status: key ? 'delivered' : 'processing' },
+        amountUsd,
+        { kind: 'ios', serviceName: 'Free Fire iPhone Panel (iOS)', key: key || '' }
+      ));
+      return;
+    }
     _injectIosAnimStyles();
 
     let ov = document.getElementById('orderPlacedOverlay');
