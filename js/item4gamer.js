@@ -178,34 +178,44 @@
     };
   }
 
+  let _gkBoot = '';
+  async function gkBoot() {
+    if (_gkBoot) return _gkBoot;
+    const res = await fetch(BACKEND_BASE + '/api/item4gamer/ff-boot', { method: 'GET', headers: { Accept: 'application/json' } });
+    const data = await res.json().catch(() => ({}));
+    _gkBoot = String((data && data.k) || '').trim();
+    return _gkBoot;
+  }
+
   async function checkPlayer(uid) {
     const id = String(uid || '').trim();
     if (!id) return { ok: false, error: 'UID is empty.' };
     const uidEnc = encodeURIComponent(id);
-    const urls = [
-      `${BACKEND_BASE}/api/item4gamer/ff-info?uid=${uidEnc}`,
-      `${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire`,
-      `https://api.gameskinbo.com/ff-info/get?uid=${uidEnc}`
-    ];
-    let lastSoft = null;
-    for (let i = 0; i < urls.length; i++) {
-      try {
-        const res = await fetch(urls[i], { method: 'GET', headers: { Accept: 'application/json' } });
-        const data = await res.json().catch(() => ({}));
-        const parsed = parseFFX(data);
-        if (parsed) return parsed;
-        if (res.status === 402 || data.error === 'PLAYER_NOT_FOUND') {
-          return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
-        }
-        if (res.status === 429 || res.status === 503 || res.status === 401) {
-          lastSoft = { ok: false, error: '', soft: true };
-          continue;
-        }
-      } catch (e) {
-        lastSoft = { ok: false, error: '', soft: true };
+
+    try {
+      const key = await gkBoot();
+      const headers = { Accept: 'application/json' };
+      if (key) headers['x-api-key'] = key;
+      const res = await fetch('https://api.gameskinbo.com/ff-info/get?uid=' + uidEnc, { method: 'GET', headers });
+      const data = await res.json().catch(() => ({}));
+      const parsed = parseFFX(data);
+      if (parsed) return parsed;
+      if (res.status === 402 || /invalid uid/i.test(String(data.error || ''))) {
+        return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
       }
-    }
-    return lastSoft || { ok: false, error: '', soft: true };
+    } catch (e) {}
+
+    try {
+      const res = await fetch(BACKEND_BASE + '/api/item4gamer/ff-info?uid=' + uidEnc, { method: 'GET', headers: { Accept: 'application/json' } });
+      const data = await res.json().catch(() => ({}));
+      const parsed = parseFFX(data);
+      if (parsed) return parsed;
+      if (res.status === 402 || data.error === 'PLAYER_NOT_FOUND') {
+        return { ok: false, error: 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।' };
+      }
+    } catch (e) {}
+
+    return { ok: false, error: '', soft: true };
   }
 
   /* ── SVG icons ──────────────────────────────────────────── */
@@ -544,14 +554,8 @@
       parent.appendChild(card);
     }
 
-    if (!btn.dataset.rhBound) {
-      btn.dataset.rhBound = '1';
-      btn.addEventListener('click', runPlayerCheck);
-    }
-    if (!infoBtn.dataset.rhBound) {
-      infoBtn.dataset.rhBound = '1';
-      infoBtn.addEventListener('click', openPlayerInfo);
-    }
+    btn.dataset.rhBound = '1';
+    infoBtn.dataset.rhBound = '1';
     if (!uidInput.dataset.rhBound) {
       uidInput.dataset.rhBound = '1';
       uidInput.addEventListener('input', function () {
