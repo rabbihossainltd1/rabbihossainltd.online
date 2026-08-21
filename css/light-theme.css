@@ -1098,3 +1098,54 @@ html[data-theme="light"] .i4g-retry-btn {
   color: #111 !important;
 }
 html[data-theme="light"] #i4g-player-status.error { color: #dc2626 !important; }
+
+/* ============================================================
+   WCAG contrast pass — text, controls, selectors and focus rings
+   ============================================================ */
+html[data-theme="light"] .about-portrait-wrap figcaption,
+html[data-theme="light"] .about-portrait-wrap figcaption span,
+html[data-theme="light"] .capability-list article > span,
+html[data-theme="light"] .delivery-timeline .desc,
+html[data-theme="light"] .timeline-item .desc,
+html[data-theme="light"] .delivery-card .desc,
+html[data-theme="light"] .rh-feature-item strong,
+html[data-theme="light"] .rh-feature-item span,
+html[data-theme="light"] .payment-feature strong,
+html[data-theme="light"] .payment-feature span,
+html[data-theme="light"] .payment-auth-notes strong,
+html[data-theme="light"] .payment-auth-notes span {
+  color: #4a4a48 !important;
+}
+
+html[data-theme="light"] .rh-cx-sec {
+  color: #08743d !important;
+  background: #ffffff !important;
+  border-color: #08743d !important;
+}
+
+/* Interactive boundaries remain visible even when their fill matches a card. */
+html[data-theme="light"] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]),
+html[data-theme="light"] textarea,
+html[data-theme="light"] select,
+html[data-theme="light"] .hero-cat-btn,
+html[data-theme="light"] .filter-btn,
+html[data-theme="light"] .btn-outline,
+html[data-theme="light"] .btn-secondary,
+html[data-theme="light"] .settings-lang-btn,
+html[data-theme="light"] .theme-btn,
+html[data-theme="light"] .svc-cart-btn,
+html[data-theme="light"] #authGoogleBtn {
+  border-color: rgba(0,0,0,.46) !important;
+}
+
+html[data-theme="light"] .contact-cta .btn-accent {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+}
+
+html[data-theme="light"] :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #111111 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}

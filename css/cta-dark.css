@@ -237,3 +237,71 @@ html[data-theme="light"] .nav-links.open a.active span {
   background: #f0f0ee !important;
   color: #111111 !important;
 }
+
+/* ============================================================
+   WCAG contrast pass — dark text, boundaries and keyboard focus
+   ============================================================ */
+html[data-theme="dark"] .testimonial-role,
+html[data-theme="dark"] .rh-cx-brandsub,
+html[data-theme="dark"] .auth-divider,
+html[data-theme="dark"] .auth-note,
+html[data-theme="dark"] .float-msg-time {
+  color: #a7a7a2 !important;
+}
+
+html[data-theme="dark"] input:not([type="radio"]):not([type="checkbox"]):not([type="file"]),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .hero-cat-btn,
+html[data-theme="dark"] .filter-btn,
+html[data-theme="dark"] .btn-outline,
+html[data-theme="dark"] .btn-secondary,
+html[data-theme="dark"] .settings-lang-btn,
+html[data-theme="dark"] .theme-btn,
+html[data-theme="dark"] .svc-cart-btn,
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .btn.btn-primary,
+html[data-theme="dark"] .btn-accent,
+html[data-theme="dark"] .submit-btn,
+html[data-theme="dark"] .cart-login-btn,
+html[data-theme="dark"] .tickets-login-btn,
+html[data-theme="dark"] .settings-btn,
+html[data-theme="dark"] #navLoginBtn,
+html[data-theme="dark"] #floatChatToggle,
+html[data-theme="dark"] #addToCartBtn,
+html[data-theme="dark"] #checkoutLoginBtn,
+html[data-theme="dark"] #contactSubmitBtn {
+  border-color: rgba(255,255,255,.48) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #a7a7a2 !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] .contact-cta .btn-accent {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: #ffffff !important;
+}
+
+/* These controls are injected after the main light sheet; IDs keep the final
+   boundary rule deterministic. */
+html[data-theme="light"] .float-msg-time {
+  color: #595957 !important;
+}
+
+html[data-theme="light"] #heroSearchInput,
+html[data-theme="light"] #name,
+html[data-theme="light"] #email,
+html[data-theme="light"] #subject,
+html[data-theme="light"] #message {
+  border-color: rgba(0,0,0,.46) !important;
+}
+
+html[data-theme="dark"] :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #080808 !important;
+}

@@ -180,7 +180,7 @@
         var link = existing || document.createElement('link');
         link.id = 'rh-light-theme-link';
         link.rel = 'stylesheet';
-        link.href = '/css/light-theme.css?v=15';
+        link.href = '/css/light-theme.css?v=16';
         if (link.parentNode !== host) host.appendChild(link);
         var cta = document.getElementById('rh-cta-light-link');
         if (!cta) {
@@ -203,7 +203,7 @@
           cd = document.createElement('link');
           cd.id = 'rh-cta-dark-link';
           cd.rel = 'stylesheet';
-          cd.href = '/css/cta-dark.css?v=5';
+          cd.href = '/css/cta-dark.css?v=6';
         }
         if (cd.parentNode !== host) host.appendChild(cd);
         if (!document.getElementById('rh-cta-inline')) {
