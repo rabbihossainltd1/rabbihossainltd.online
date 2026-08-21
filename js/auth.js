@@ -98,7 +98,7 @@
       .auth-input { width:100%;padding:11px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:#f7f7f4;font-size:0.9rem;outline:none;transition:border-color 0.2s;font-family:inherit; }
       .auth-input:focus { border-color:rgba(255, 255, 255,0.4); }
       .auth-input::placeholder { color:#70706d; }
-      .auth-error { background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:#ff8080;border-radius:8px;padding:10px 14px;font-size:0.82rem;margin-bottom:12px; }
+      .auth-error { background:none;border:none;color:#b5b5b1;border-radius:0;padding:8px 2px;font-size:0.82rem;margin-bottom:12px;text-align:left; }
       .auth-submit-btn { width:100%;padding:12px;background:var(--accent,#ffffff);color:#080808;border:none;border-radius:50px;font-weight:700;font-size:0.9rem;cursor:pointer;font-family:var(--font-display,'DM Sans',sans-serif);transition:all 0.2s;margin-bottom:10px; }
       .auth-submit-btn:hover { opacity:0.88;transform:translateY(-1px); }
       .auth-submit-btn:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
@@ -849,7 +849,7 @@
       dragging = true;
       startX = e.clientX - tx;
       startY = e.clientY - ty;
-      try { box.setPointerCapture(e.pointerId); } catch (err) {}
+      try { box.setPointerCapturCapture(e.pointerId); } catch (err) {}
     }
     function onMove(e) {
       if (!dragging) return;

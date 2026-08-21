@@ -470,14 +470,14 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; line-he
 /* ── Error message ── */
 #formStatus.status-error {
   display: block;
-  padding: 12px 16px;
-  border-radius: var(--radius-xs, 6px);
+  padding: 8px 2px;
+  border-radius: 0;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 650;
   line-height: 1.5;
-  background: rgba(255, 60, 80, 0.10);
-  border: 1px solid rgba(255, 60, 80, 0.35);
-  color: #ff7a8a;
+  background: none;
+  border: none;
+  color: #b5b5b1;
 }
 @keyframes statusFadeIn {
   from { opacity: 0; transform: translateY(8px); }

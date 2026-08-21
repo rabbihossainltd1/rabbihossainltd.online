@@ -644,7 +644,7 @@
       #couponApplyBtn:hover { background:rgba(255, 255, 255,.20); }
       #couponMsg { margin-top:8px; padding:8px 12px; border-radius:10px; font-size:.82rem; font-weight:700; }
       #couponMsg.success { background:rgba(255, 255, 255,.10); border:1px solid rgba(255, 255, 255,.25); color:#dfe9e0; }
-      #couponMsg.error { background:rgba(255,80,80,.10); border:1px solid rgba(255,80,80,.22); color:#ffb0b0; }
+      #couponMsg.error { background:none; border:none; color:#b5b5b1; padding:8px 2px; text-align:left; }
     `;
     document.head.appendChild(style);
 

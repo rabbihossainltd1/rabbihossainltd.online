@@ -1041,3 +1041,28 @@ html[data-theme="light"] .nav-links.open a.active span {
   color: #111111 !important;
   stroke: currentColor !important;
 }
+
+html[data-theme="light"] .service-modal-status.error,
+html[data-theme="light"] #modalStatus.error,
+html[data-theme="light"] #couponMsg.error,
+html[data-theme="light"] .auth-error,
+html[data-theme="light"] .settings-message.error,
+html[data-theme="light"] .wallet-message.error,
+html[data-theme="light"] .spv-auto-msg.error,
+html[data-theme="light"] #formStatus.status-error,
+html[data-theme="light"] .i4g-load-error,
+html[data-theme="light"] #i4g-player-status.error,
+html[data-theme="light"] .cart-msg.error {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #4a4a48 !important;
+  padding: 8px 2px !important;
+  text-align: left !important;
+}
+html[data-theme="light"] .i4g-retry-btn {
+  border: 1px solid #111 !important;
+  background: #fff !important;
+  color: #111 !important;
+}
+html[data-theme="light"] #i4g-player-status.error { color: #4a4a48 !important; }

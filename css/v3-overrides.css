@@ -205,7 +205,7 @@ html body #serviceModal .radio-option:has(input:checked),html body #serviceModal
 #couponApplyBtn{border:1px solid rgba(255,255,255,.22)!important;background:transparent!important;color:#e4e4e0!important;border-radius:999px!important}
 #couponApplyBtn:hover{background:rgba(255,255,255,.09)!important;border-color:rgba(255,255,255,.42)!important}
 #couponMsg.success{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.18)!important;color:#dfe9e0!important}
-#couponMsg.error{background:rgba(255,90,90,.09)!important;border:1px solid rgba(255,90,90,.24)!important;color:#ffbdbd!important}
+#couponMsg.error{background:none!important;border:none!important;color:#b5b5b1!important;padding:8px 2px!important;text-align:left!important}
 .checkout-state-title{font-size:1.55rem;margin:0 0 12px;color:#f7f7f4;letter-spacing:-.02em;font-weight:700}
 
 /* ============================================================
@@ -1070,4 +1070,31 @@ html[data-theme="light"] .support-ticket-item{background:#fff!important;border-c
   .dashboard-wrap{width:100%!important;max-width:none!important;padding:calc(var(--nav-h) + 2px) 8px 96px!important}
   html.orders-only-mode .dashboard-wrap{max-width:none!important}
   .v2-page-intro,.page-hero,.policy-hero{width:100%!important;padding:calc(var(--nav-h) + 4px) 10px 14px!important}
+}
+
+/* Form/validation errors: no red "alert" boxes — plain text only */
+.service-modal-status.error,
+#modalStatus.error,
+#couponMsg.error,
+.auth-error,
+.settings-message.error,
+.wallet-message.error,
+.spv-auto-msg.error,
+#formStatus.status-error,
+.i4g-load-error,
+#i4g-player-status.error,
+.cart-msg.error {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #b5b5b1 !important;
+  padding: 8px 2px !important;
+  text-align: left !important;
+  font-weight: 650 !important;
+  border-radius: 0 !important;
+}
+.i4g-retry-btn {
+  border: 1px solid rgba(255,255,255,.28) !important;
+  background: transparent !important;
+  color: #e8e8e4 !important;
 }
