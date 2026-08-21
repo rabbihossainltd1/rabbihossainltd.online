@@ -313,6 +313,10 @@
   function renderFF() {
     const wrap = document.createElement('div');
     wrap.innerHTML = `
+      <div class="form-group" id="ffServerGroup">
+        <label class="form-label">Server</label>
+        <select class="form-input" id="ffServerSelect"></select>
+      </div>
       <div class="form-group">
         <label class="form-label">Top-up Type</label>
         <div class="tgl" id="ffTypeToggle">
@@ -343,7 +347,6 @@
       tg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.t === t));
       wrap.querySelector('#ffDiamondOptions').style.display = t === 'diamond' ? '' : 'none';
       wrap.querySelector('#ffWeeklyOptions').style.display = t === 'weekly' ? '' : 'none';
-      if (t === 'weekly' && window.Item4Gamer && window.Item4Gamer.loadAndRender) window.Item4Gamer.loadAndRender();
     };
     tg.querySelectorAll('button').forEach(b => b.onclick = () => window.ffSelectType(b.dataset.t));
 

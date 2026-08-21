@@ -61,9 +61,10 @@
     const amountUsd    = extractPrice(p);
     const amountBDT    = p.amountBDT ?? p.amountBdt ??
                          (amountUsd !== null ? Math.round(amountUsd * BDT_FALLBACK_RATE) : null);
-    const isMembership = MEMBERSHIP_IDS.has(productId) ||
-                         String(p.type || '').toLowerCase() === 'membership';
     const name         = String(p.productName ?? p.product_name ?? p.name ?? p.title ?? 'Unknown Package').trim();
+    const isMembership = MEMBERSHIP_IDS.has(productId) ||
+                         String(p.type || '').toLowerCase() === 'membership' ||
+                         /weekly|monthly/i.test(name);
     const hasPrice     = amountUsd !== null && amountUsd > 0;
 
     if (!hasPrice) {
@@ -139,14 +140,37 @@
   }
 
   /* ── Check player via backend ──────────────────────────── */
+  const REGION_ORDER = ['Bangladesh','Indonesia','Singapore','Malaysia','Thailand','Vietnam','India','Pakistan','MENA','Taiwan','Brazil','LATAM','Europe','Global'];
+  const GK_CODE = {
+    Bangladesh: 'BD', Indonesia: 'ID', Singapore: 'SG', India: 'IND',
+    Pakistan: 'PK', Brazil: 'BR', LATAM: 'SAC'
+  };
+  const CODE_TO_REGION = {
+    BD: 'Bangladesh', IND: 'India', IN: 'India', ID: 'Indonesia',
+    SG: 'Singapore', BR: 'Brazil', PK: 'Pakistan', SAC: 'LATAM', MY: 'Malaysia',
+    TH: 'Thailand', VN: 'Vietnam', TW: 'Taiwan'
+  };
+  let selectedRegion = 'Bangladesh';
+
+  function regionOf(p) {
+    return String(p.region || '').trim() || 'Other';
+  }
+
+  function shortPackName(p) {
+    let n = String(p.productName || '');
+    n = n.replace(/^Free Fire Diamonds\s*-\s*[^,]+,\s*/i, '');
+    n = n.replace(/^Free Fire\s+/i, '');
+    return n.trim() || p.productName;
+  }
+
   async function checkPlayer(uid) {
     if (!String(uid).trim()) return { ok: false, error: 'UID is empty.' };
 
-    // Try GET first, fall back to POST on 405
     let res;
     const uidEnc = encodeURIComponent(String(uid).trim());
+    const region = GK_CODE[selectedRegion] || 'BD';
     try {
-      res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire`);
+      res = await fetch(`${BACKEND_BASE}/api/item4gamer/check-player?uid=${uidEnc}&game=freefire&region=${encodeURIComponent(region)}`);
     } catch (e) {
       return { ok: false, error: 'Network error. You can still continue manually.', soft: true };
     }
@@ -170,8 +194,10 @@
 
     if (!res.ok || data.ok === false || data.success === false) {
       let msg = data.message || data.error || data.msg || 'Player not found. Check your UID.';
-      if (/no route was found/i.test(String(msg))) msg = 'এই UID খুঁজে পাওয়া যায়নি। নম্বরটা আবার দেখুন।';
-      const soft = false;
+      if (/no route was found/i.test(String(msg))) {
+        return { ok: false, error: 'UID চেক এখন কাজ করছে না। একটু পরে চেষ্টা করুন।', soft: true };
+      }
+      const soft = res.status === 429 || res.status === 503 || /UNAVAILABLE|BUSY/i.test(String(data.error || ''));
       return { ok: false, error: msg, soft };
     }
 
@@ -296,6 +322,14 @@
       .i4g-info-row span{opacity:.7}
       .i4g-info-row b{text-align:right;word-break:break-word}
       #i4g-ff-info-close{margin-top:14px;width:100%;padding:11px;border-radius:12px;border:1px solid #111;background:#fff;color:#111;font-weight:800;cursor:pointer}
+      .ff-option-list{display:grid!important;gap:4px!important}
+      .ff-option-item{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;padding:7px 10px!important;border-radius:10px!important;min-height:0!important}
+      .ff-pack-icon{display:none!important}
+      .ff-option-label{font-size:.8rem!important;font-weight:700!important;line-height:1.25!important}
+      .ff-option-price{font-size:.78rem!important}
+      .ff-option-price small{font-size:.68rem!important}
+      #ffServerSelect,#ffServerSelect.form-input{min-height:42px;font-weight:800;font-size:.86rem}
+      html[data-theme="light"] #ffServerSelect{background:#fff;color:#111;border:1px solid #111}
     `;
     document.head.appendChild(s);
   }
@@ -465,6 +499,13 @@
         btn.textContent = name;
         btn.title = name;
         if (infoBtn) infoBtn.classList.add('show');
+        const mapped = CODE_TO_REGION[String(result.server || '').toUpperCase()];
+        const sel = document.getElementById('ffServerSelect');
+        if (mapped && sel && [...sel.options].some(o => o.value === mapped)) {
+          selectedRegion = mapped;
+          sel.value = mapped;
+          renderByRegion();
+        }
       } else if (result.soft) {
         window._i4gPlayerVerified = true;
         window._i4gVerifiedUid = uid;
@@ -595,13 +636,70 @@
     window._i4gProducts = products;
     console.log(`[Item4Gamer] Loaded ${products.length} products from cache`);
 
-    const diamonds    = products.filter(p => !p.isMembership);
-    const memberships = products.filter(p => p.isMembership);
-
-    renderList(diamonds,    diamondEl,    'No diamond packages available.');
-    renderList(memberships, membershipEl, 'No membership plans available.');
-
+    ensureServerSelect(products);
+    renderByRegion();
     setTimeout(injectCheckPlayerUI, 80);
+  }
+
+  function uniqueRegions(products) {
+    const set = {};
+    (products || []).forEach(p => {
+      const r = regionOf(p);
+      if (r) set[r] = true;
+    });
+    const extra = Object.keys(set).filter(r => REGION_ORDER.indexOf(r) === -1).sort();
+    return REGION_ORDER.filter(r => set[r]).concat(extra);
+  }
+
+  function ensureServerSelect(products) {
+    const regions = uniqueRegions(products);
+    if (regions.indexOf('Bangladesh') !== -1) selectedRegion = 'Bangladesh';
+    else if (regions.length) selectedRegion = regions[0];
+
+    let host = document.getElementById('ffServerSelect');
+    if (!host) {
+      const diamondEl = document.getElementById('ffDiamondOptionsList');
+      const parent = diamondEl && (diamondEl.closest('.form-group') || diamondEl.parentElement);
+      if (!parent || !parent.parentNode) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'form-group';
+      wrap.id = 'ffServerGroup';
+      wrap.innerHTML = '<label class="form-label">Server</label><select class="form-input" id="ffServerSelect"></select>';
+      parent.parentNode.insertBefore(wrap, parent);
+      host = wrap.querySelector('#ffServerSelect');
+    }
+    if (host.tagName !== 'SELECT') {
+      const sel = document.createElement('select');
+      sel.id = 'ffServerSelect';
+      sel.className = 'form-input';
+      host.replaceWith(sel);
+      host = sel;
+    }
+    host.innerHTML = regions.map(r => {
+      const label = r === 'Bangladesh' ? 'Bangladesh (BD)' : r;
+      return `<option value="${r}"${r === selectedRegion ? ' selected' : ''}>${label}</option>`;
+    }).join('');
+    if (!host.dataset.rhBound) {
+      host.dataset.rhBound = '1';
+      host.addEventListener('change', function () {
+        selectedRegion = this.value || 'Bangladesh';
+        renderByRegion();
+      });
+    } else {
+      host.value = selectedRegion;
+    }
+  }
+
+  function renderByRegion() {
+    const products = window._i4gProducts || [];
+    const diamondEl    = document.getElementById('ffDiamondOptionsList');
+    const membershipEl = document.getElementById('ffMembershipOptionsList');
+    const region = selectedRegion || 'Bangladesh';
+    const filtered = products.filter(p => regionOf(p) === region);
+    const diamonds    = filtered.filter(p => !p.isMembership);
+    const memberships = filtered.filter(p => p.isMembership);
+    renderList(diamonds,    diamondEl,    'এই সার্ভারে ডায়মন্ড প্যাকেজ নেই।');
+    renderList(memberships, membershipEl, 'এই সার্ভারে উইকলি/মান্থলি নেই।');
   }
 
   /* ── Public API ─────────────────────────────────────────── */
