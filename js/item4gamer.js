@@ -357,6 +357,12 @@
       #i4g-ff-info-btn.show{display:flex}
       #i4g-player-status{font-size:.8rem;font-weight:700;display:none;padding:7px 4px 0;border-radius:0}
       #i4g-player-status.error{color:#ff8080;display:block}
+      #i4g-player-status.ok{color:#3ddc84;display:block}
+      #i4g-player-card{display:none;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#161616;color:#f5f5f3}
+      #i4g-player-card.on{display:block}
+      #i4g-player-card b{display:block;font-size:.92rem;margin-bottom:4px}
+      #i4g-player-card small{display:block;font-size:.74rem;opacity:.85;line-height:1.45}
+      html[data-theme="light"] #i4g-player-card{background:#fff;color:#111;border:1px solid #111}
       #i4g-ff-info-sheet{position:fixed;inset:0;z-index:4200;background:rgba(4,6,8,.92);display:none;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}
       #i4g-ff-info-sheet.open{display:flex}
       #i4g-ff-info-box{width:min(520px,100%);margin:auto;background:#111;border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:18px 18px 22px;color:#eee}
@@ -530,6 +536,12 @@
       status = document.createElement('div');
       status.id = 'i4g-player-status';
       parent.appendChild(status);
+    }
+    let card = document.getElementById('i4g-player-card');
+    if (!card && parent) {
+      card = document.createElement('div');
+      card.id = 'i4g-player-card';
+      parent.appendChild(card);
     }
 
     if (!btn.dataset.rhBound) {
@@ -797,6 +809,15 @@
   function init() {
     injectCSS();
     injectCheckPlayerUI();
+    if (!document.documentElement.dataset.rhI4gClick) {
+      document.documentElement.dataset.rhI4gClick = '1';
+      document.addEventListener('click', function (e) {
+        const t = e.target && e.target.closest && e.target.closest('#i4g-check-player-btn');
+        if (t) { e.preventDefault(); runPlayerCheck(); }
+        const info = e.target && e.target.closest && e.target.closest('#i4g-ff-info-btn');
+        if (info) { e.preventDefault(); openPlayerInfo(); }
+      }, true);
+    }
     if (document.body) {
       new MutationObserver(function () { injectCheckPlayerUI(); }).observe(document.body, { childList: true, subtree: true });
     }
