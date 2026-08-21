@@ -356,13 +356,13 @@
       .i4g-retry-btn:hover{background:rgba(255,80,80,.22)}
       .i4g-uid-row{display:flex;gap:8px;align-items:stretch}
       .i4g-uid-row #mo_ff_uid{flex:1;min-width:0;min-height:48px}
-      #i4g-check-player-btn,#i4g-ff-info-btn{min-height:48px}
+      #i4g-check-player-btn{min-height:48px}
       #i4g-check-player-btn{flex:0 0 auto;min-width:78px;max-width:132px;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:12px;padding:0 12px;font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       html[data-theme="light"] #i4g-check-player-btn{background:#fff;color:#111;border:1px solid #111}
       #i4g-check-player-btn:hover{opacity:.9}
       #i4g-check-player-btn:disabled{opacity:.55;cursor:default}
       #i4g-check-player-btn.is-ok{max-width:160px}
-      #i4g-ff-info-btn{display:none;flex:0 0 42px;width:42px;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:12px;font-weight:900;font-size:1.05rem;cursor:pointer;align-items:center;justify-content:center}
+      #i4g-ff-info-btn{display:none;flex:0 0 48px;width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border:1px solid rgba(255,255,255,.34);background:#161616;color:#f5f5f3;border-radius:50%!important;font-weight:900;font-size:1.05rem;cursor:pointer;align-items:center;justify-content:center;line-height:1;overflow:hidden}
       html[data-theme="light"] #i4g-ff-info-btn{background:#fff;color:#111;border:1px solid #111}
       #i4g-ff-info-btn.show{display:flex}
       #i4g-player-status{font-size:.8rem;font-weight:700;display:none;padding:7px 4px 0;border-radius:0}
@@ -426,18 +426,18 @@
       .trim();
   }
 
-  function prettyVal(val) {
+  function looksLikeTimeKey(key) {
+    return /time|login|date|created|updated|expire/i.test(String(key || ''));
+  }
+
+  function prettyVal(val, asTime) {
     if (val === null || val === undefined || val === '') return '—';
     if (typeof val === 'boolean') return val ? 'Yes' : 'No';
-    if (typeof val === 'number' && val > 1000000000 && val < 2000000000000) {
-      const ms = val < 1e12 ? val * 1000 : val;
-      try { return new Date(ms).toLocaleString(); } catch (e) { return String(val); }
-    }
-    if (typeof val === 'string' && /^\d{10,13}$/.test(val)) {
-      const n = Number(val);
-      if (n > 1000000000) {
+    if (asTime) {
+      const n = typeof val === 'number' ? val : (typeof val === 'string' && /^\d{9,13}$/.test(val) ? Number(val) : NaN);
+      if (Number.isFinite(n) && n > 1e8) {
         const ms = n < 1e12 ? n * 1000 : n;
-        try { return new Date(ms).toLocaleString(); } catch (e) {}
+        try { return new Date(ms).toLocaleString(); } catch (e) { return String(val); }
       }
     }
     return String(val);
@@ -450,7 +450,7 @@
       const v = obj[k];
       const label = prefix ? prefix + ' · ' + prettyKey(k) : prettyKey(k);
       if (v && typeof v === 'object' && !Array.isArray(v)) flattenInfo(v, label, out);
-      else if (!Array.isArray(v)) out.push([label, prettyVal(v)]);
+      else if (!Array.isArray(v)) out.push([label, prettyVal(v, looksLikeTimeKey(k) || looksLikeTimeKey(label))]);
     });
     return out;
   }
@@ -475,19 +475,19 @@
     const social = info.SocialInfo || {};
     const pet = info.PetInfo || {};
     const head = [];
-    function add(label, val) {
+    function add(label, val, asTime) {
       if (val === undefined || val === null || val === '') return;
-      head.push([label, prettyVal(val)]);
+      head.push([label, prettyVal(val, asTime)]);
     }
     add('Name', acc.AccountName);
-    add('UID', window._i4gVerifiedUid);
+    add('UID', window._i4gVerifiedUid || acc.AccountID || acc.accountId);
     add('Server', acc.AccountRegion);
     add('Level', acc.AccountLevel);
     add('Likes', acc.AccountLikes);
     add('EXP', acc.AccountEXP);
     add('Season', acc.AccountSeasonId);
-    add('Created', acc.AccountCreateTime);
-    add('Last login', acc.AccountLastLogin);
+    add('Created', acc.AccountCreateTime, true);
+    add('Last login', acc.AccountLastLogin, true);
     add('BR max rank', prof.BrMaxRank);
     add('BR points', prof.BrRankPoint);
     add('CS max rank', prof.CsMaxRank);
