@@ -383,14 +383,18 @@
     if (btn) btn.disabled = false;
     if (!failed.length) {
       try {
-        sessionStorage.setItem('rh_order_success', JSON.stringify({
+        var payload = JSON.stringify({
           kind: 'cart',
           serviceName: 'Cart checkout',
           count: done.length,
           ts: Date.now()
-        }));
+        });
+        localStorage.setItem('rh_order_success', payload);
+        sessionStorage.setItem('rh_order_success', payload);
       } catch (e) {}
-      window.location.href = '/order-success/';
+      var w = null;
+      try { w = window.open('/order-success/', '_blank'); } catch (e2) {}
+      if (!w) window.location.assign('/order-success/');
     }
   }
 

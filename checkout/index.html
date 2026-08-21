@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <script src="/js/boot-auth.js?v=72"></script>
+  <script src="/js/boot-auth.js?v=73"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Checkout | RabbiHossainLTD</title>
@@ -321,15 +321,22 @@ html[data-theme="light"] .cart-pay.sel::after{
   <script src="/js/service-info.js" defer></script>
   <script src="/js/auth.js" defer></script>
   <script type="module" src="/js/wallet.js"></script>
-  <script src="/js/service-modal.js?v=72" defer></script>
+  <script src="/js/service-modal.js?v=73" defer></script>
   <script>
     (function () {
       function hijack(node) {
         if (!node) return;
         var t = node.textContent || '';
         if (t.indexOf('Redirecting to My Orders') === -1 && t.indexOf('Your Order is Placed') === -1 && t.indexOf('View My Orders Now') === -1) return;
-        try { sessionStorage.setItem('rh_order_success', JSON.stringify({ serviceName: 'Order', ts: Date.now() })); } catch (e) {}
-        window.location.replace('/order-success/');
+        try {
+          var payload = JSON.stringify({ serviceName: 'Order', ts: Date.now() });
+          localStorage.setItem('rh_order_success', payload);
+          sessionStorage.setItem('rh_order_success', payload);
+        } catch (e) {}
+        try { if (node && node.remove) node.remove(); } catch (e2) {}
+        var w = null;
+        try { w = window.open('/order-success/', '_blank'); } catch (e3) {}
+        if (!w) window.location.assign('/order-success/');
       }
       var mo = new MutationObserver(function (muts) {
         for (var i = 0; i < muts.length; i++) {

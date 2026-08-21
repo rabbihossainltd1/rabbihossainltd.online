@@ -30,9 +30,14 @@
         t.indexOf('View My Orders Now') === -1
       ) return;
       try {
-        sessionStorage.setItem('rh_order_success', JSON.stringify({ serviceName: 'Order', ts: Date.now() }));
+        var payload = JSON.stringify({ serviceName: 'Order', ts: Date.now() });
+        localStorage.setItem('rh_order_success', payload);
+        sessionStorage.setItem('rh_order_success', payload);
       } catch (e) {}
-      window.location.replace('/order-success/');
+      try { if (node && node.remove) node.remove(); } catch (e2) {}
+      var w = null;
+      try { w = window.open('/order-success/', '_blank'); } catch (e3) {}
+      if (!w) window.location.assign('/order-success/');
     }
     try {
       var mo = new MutationObserver(function (muts) {

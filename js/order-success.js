@@ -1,4 +1,4 @@
-/* Dedicated order-success page — no auto-redirect to My Orders. */
+/* Dedicated order-success page — no chrome, no auto-redirect. */
 (function () {
   'use strict';
 
@@ -23,16 +23,22 @@
   }
 
   function readPayload() {
+    var raw = null;
+    try { raw = localStorage.getItem('rh_order_success'); } catch (e) {}
+    if (!raw) {
+      try { raw = sessionStorage.getItem('rh_order_success'); } catch (e2) {}
+    }
+    if (!raw) return null;
     try {
-      var raw = sessionStorage.getItem('rh_order_success');
-      if (!raw) return null;
       var data = JSON.parse(raw);
-      if (!data || typeof data !== 'object') return null;
-      return data;
+      return data && typeof data === 'object' ? data : null;
     } catch (e) {
       return null;
     }
   }
+
+  var copySvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
   var data = readPayload() || {};
   var body = document.getElementById('osBody');
@@ -49,7 +55,10 @@
   if (data.packageName) rows += '<div class="os-row"><span class="os-k">Package</span><span class="os-v">' + esc(data.packageName) + '</span></div>';
   if (data.playerName) rows += '<div class="os-row"><span class="os-k">Player</span><span class="os-v">' + esc(data.playerName) + '</span></div>';
   if (data.uid) rows += '<div class="os-row"><span class="os-k">UID</span><span class="os-v">' + esc(data.uid) + '</span></div>';
-  if (data.orderId) rows += '<div class="os-row"><span class="os-k">Order ID</span><span class="os-v">' + esc(data.orderId) + '</span></div>';
+  if (data.orderId) {
+    rows += '<div class="os-row"><span class="os-k">Order ID</span><span class="os-id"><span class="os-v" id="osOrderId">' + esc(data.orderId) + '</span>' +
+      '<button type="button" class="os-copy" id="osCopyId" aria-label="Copy order ID" title="Copy">' + copySvg + '</button></span></div>';
+  }
   if (data.count) rows += '<div class="os-row"><span class="os-k">Items</span><span class="os-v">' + esc(data.count) + '</span></div>';
 
   var html = '';
@@ -68,12 +77,31 @@
 
   body.innerHTML = html;
 
-  var copyBtn = document.getElementById('osCopyKey');
-  if (copyBtn && data.key) {
-    copyBtn.addEventListener('click', function () {
+  function copyText(text, btn) {
+    if (!text) return;
+    navigator.clipboard.writeText(String(text)).then(function () {
+      if (!btn) return;
+      btn.classList.add('is-ok');
+      var prev = btn.innerHTML;
+      btn.innerHTML = checkSvg;
+      setTimeout(function () {
+        btn.classList.remove('is-ok');
+        btn.innerHTML = prev;
+      }, 1600);
+    }).catch(function () {});
+  }
+
+  var copyId = document.getElementById('osCopyId');
+  if (copyId && data.orderId) {
+    copyId.addEventListener('click', function () { copyText(data.orderId, copyId); });
+  }
+
+  var copyKey = document.getElementById('osCopyKey');
+  if (copyKey && data.key) {
+    copyKey.addEventListener('click', function () {
       navigator.clipboard.writeText(String(data.key)).then(function () {
-        copyBtn.textContent = 'Copied';
-        setTimeout(function () { copyBtn.textContent = 'Copy key'; }, 1800);
+        copyKey.textContent = 'Copied';
+        setTimeout(function () { copyKey.textContent = 'Copy key'; }, 1600);
       }).catch(function () {});
     });
   }
@@ -81,9 +109,7 @@
   var rateBtn = document.getElementById('osRateBtn');
   if (rateBtn) {
     rateBtn.addEventListener('click', function () {
-      if (typeof window.openReviewModal === 'function') {
-        window.openReviewModal(service || '');
-      }
+      window.location.href = '/dashboard/?tab=orders';
     });
   }
 })();

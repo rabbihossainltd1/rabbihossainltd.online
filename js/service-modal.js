@@ -368,8 +368,11 @@
   }
 
   function rhGoOrderSuccess(payload) {
+    try { localStorage.setItem('rh_order_success', JSON.stringify(payload || {})); } catch (e) {}
     try { sessionStorage.setItem('rh_order_success', JSON.stringify(payload || {})); } catch (e) {}
-    window.location.replace('/order-success/');
+    var w = null;
+    try { w = window.open('/order-success/', '_blank'); } catch (e) {}
+    if (!w) window.location.assign('/order-success/');
   }
   window.rhGoOrderSuccess = rhGoOrderSuccess;
 
