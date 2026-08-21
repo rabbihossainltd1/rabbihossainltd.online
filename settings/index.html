@@ -52,13 +52,31 @@
     html[data-theme="light"] .settings-edit-btn{color:#161616;border-color:rgba(0,0,0,.16)}
     .settings-photo-btn{display:none!important}
     .settings-avatar-preview{cursor:default;pointer-events:none}
-    .settings-avatar-wrap{position:relative;display:inline-block;width:88px;height:88px}
-    .settings-avatar-wrap .settings-avatar-preview{width:88px;height:88px;border-radius:50%}
-    .settings-avatar-pencil{display:none;position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:50%;border:2px solid #111;background:#161616;color:#fff;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2}
-    .settings-avatar-pencil svg{width:16px;height:16px}
+    .settings-avatar-wrap{position:relative;display:inline-block;width:88px;height:88px;overflow:visible}
+    .settings-avatar-wrap .settings-avatar-preview{width:88px;height:88px;border-radius:50%;overflow:hidden}
+    .settings-avatar-pencil{display:none;position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:50%;border:2px solid #111;background:#161616;color:#fff;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:3;margin:0}
+    .settings-avatar-pencil svg{width:16px;height:16px;pointer-events:none}
     .settings-page.is-editing .settings-avatar-pencil{display:flex}
     .settings-page.is-editing .settings-avatar-preview{pointer-events:auto;cursor:pointer}
     html[data-theme="light"] .settings-avatar-pencil{background:#111;color:#fff;border-color:#fff}
+    .settings-page input[type="file"],
+    #settingsPhotoInput,
+    .settings-photo-file{
+      position:absolute!important;
+      left:-9999px!important;
+      top:auto!important;
+      width:0!important;
+      height:0!important;
+      opacity:0!important;
+      overflow:hidden!important;
+      clip:rect(0,0,0,0)!important;
+      border:0!important;
+      padding:0!important;
+      margin:0!important;
+      pointer-events:none!important;
+      appearance:none!important;
+      font-size:0!important;
+    }
     .settings-field input[readonly]{opacity:.78;cursor:default}
     #settingsPwPanel,.settings-pw-panel{display:none!important}
     .settings-page.is-pw-open #settingsPwPanel,
@@ -124,8 +142,8 @@
             <label class="settings-avatar-pencil" id="settingsAvatarPencil" for="settingsPhotoInput" aria-label="Change picture">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </label>
-            <input type="file" id="settingsPhotoInput" class="settings-photo-file" accept="image/*" />
           </div>
+          <input type="file" id="settingsPhotoInput" accept="image/*" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:0;height:0;opacity:0;overflow:hidden;border:0;padding:0;margin:0;" />
         </div>
 
         <div class="settings-grid">
