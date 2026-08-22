@@ -39,12 +39,21 @@ function checkCss(file) {
 }
 
 for (const file of ['css/style.css', 'css/v3-overrides.css', 'css/style.min.css']) checkCss(file);
+for (const file of ['entity.json']) {
+  try { JSON.parse(fs.readFileSync(path.join(root, file), 'utf8')); }
+  catch (error) { errors.push(`${file}: invalid JSON (${error.message})`); }
+}
 
 const attrRegex = /\b(?:href|src)=["']([^"']+)["']/gi;
 for (const htmlFile of htmlFiles) {
   const text = fs.readFileSync(path.join(root, htmlFile), 'utf8');
   if (/no-inspect\.js/i.test(text)) errors.push(`${htmlFile}: no-inspect.js must not be loaded`);
   if (/\bkeys\//i.test(text)) errors.push(`${htmlFile}: public key-file reference found`);
+
+  for (const match of text.matchAll(/<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { JSON.parse(match[1]); }
+    catch (error) { errors.push(`${htmlFile}: invalid JSON-LD (${error.message})`); }
+  }
 
   for (const match of text.matchAll(attrRegex)) {
     const value = match[1].trim();

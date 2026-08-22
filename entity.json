@@ -1,0 +1,89 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": [
+        "Organization",
+        "ProfessionalService"
+      ],
+      "@id": "https://rabbihossainltd.online/#business",
+      "name": "RabbiHossainLTD",
+      "alternateName": [
+        "Rabbi Hossain LTD",
+        "Rabbihossainltd"
+      ],
+      "url": "https://rabbihossainltd.online/",
+      "description": "RabbiHossainLTD is an independent software and digital services brand founded in 2024 and operated by MD Rabbi Hossain in Kaliganj, Jhenaidah, Khulna, Bangladesh. It is a personal brand and online business, not a registered limited company; LTD is part of the brand name.",
+      "foundingDate": "2024",
+      "founder": {
+        "@id": "https://rabbihossainltd.online/#md-rabbi-hossain"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Kaliganj",
+        "addressRegion": "Jhenaidah, Khulna",
+        "addressCountry": "BD"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Bangladesh"
+      },
+      "email": "info@rabbihossainltd.online",
+      "telephone": "+8801731410341",
+      "logo": "https://rabbihossainltd.online/favicon.png",
+      "image": "https://rabbihossainltd.online/images/og/default.png",
+      "sameAs": [
+        "https://rabbihossainltd.info/",
+        "https://facebook.com/rabbihossainltd",
+        "https://instagram.com/rabbihossainltd1",
+        "https://x.com/rabbihossainltd",
+        "https://www.linkedin.com/in/rabbihossainltd1",
+        "https://github.com/build-rabbi",
+        "https://github.com/rabbihossainltd1",
+        "https://rabbihossainltd.wordpress.com/",
+        "https://bsky.app/profile/rabbihossainltd.bsky.social",
+        "https://tiktok.com/@rabbihossainltd",
+        "https://t.me/Rabbihossainltd0"
+      ],
+      "knowsAbout": [
+        "Web Development",
+        "Android App Development",
+        "Custom Software",
+        "API Integration",
+        "Automation",
+        "UI/UX Design",
+        "Digital Branding",
+        "Website Security",
+        "Digital Services"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://rabbihossainltd.online/#md-rabbi-hossain",
+      "name": "MD Rabbi Hossain",
+      "alternateName": "Rabbi Hossain",
+      "url": "https://rabbihossainltd.online/about/",
+      "description": "Founder and owner of RabbiHossainLTD; a Bangladeshi web, software and digital services professional with more than three years of experience.",
+      "image": "https://rabbihossainltd.online/images/rabbihossainltd.png",
+      "jobTitle": "Founder and Owner of RabbiHossainLTD",
+      "worksFor": {
+        "@id": "https://rabbihossainltd.online/#business"
+      },
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Kaliganj, Jhenaidah, Khulna, Bangladesh"
+      },
+      "sameAs": [
+        "https://rabbihossainltd.info/",
+        "https://facebook.com/rabbihossainltd",
+        "https://instagram.com/rabbihossainltd1",
+        "https://x.com/rabbihossainltd",
+        "https://www.linkedin.com/in/rabbihossainltd1",
+        "https://github.com/build-rabbi",
+        "https://github.com/rabbihossainltd1",
+        "https://gitlab.com/build-rabbi",
+        "https://www.reddit.com/user/rabbihossainltd"
+      ]
+    }
+  ]
+}

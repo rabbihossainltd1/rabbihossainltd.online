@@ -717,15 +717,17 @@ html[data-theme="light"] .tools-section {
   border-color: rgba(0,0,0,.10) !important;
 }
 html[data-theme="light"] .about-contact-band {
-  background: #111 !important;
-  color: #fff !important;
+  background: #ffffff !important;
+  color: #161616 !important;
+  border: 1px solid rgba(0,0,0,.18) !important;
+  box-shadow: none !important;
 }
-html[data-theme="light"] .about-contact-band h2,
-html[data-theme="light"] .about-contact-band .eyebrow { color: #fff !important; }
+html[data-theme="light"] .about-contact-band h2 { color: #161616 !important; }
+html[data-theme="light"] .about-contact-band .eyebrow { color: #595957 !important; }
 html[data-theme="light"] .about-contact-band .btn-primary {
-  background: #fff !important;
-  color: #111 !important;
-  border-color: #fff !important;
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
 }
 
 /* ── contact form ── */
